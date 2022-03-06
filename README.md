@@ -2,6 +2,9 @@
 "Learning the language of viral evolution and escape" by Brian Hie, Ellen Zhong, Bonnie Berger, and Bryan Bryson (2020).
 * Author: Andrew Chan
 
+# Prerequisites:
+To run on ARC, you must copy this directory to ~/ on ARC.
+
 
 # Learning the language of viral evolution and escape
 
