@@ -1,3 +1,8 @@
+# Fork of paper 
+"Learning the language of viral evolution and escape" by Brian Hie, Ellen Zhong, Bonnie Berger, and Bryan Bryson (2020).
+* Author: Andrew Chan
+
+
 # Learning the language of viral evolution and escape
 
 This repository contains the analysis code, links to the data, and pretrained models for the paper "Learning the language of viral evolution and escape" by Brian Hie, Ellen Zhong, Bonnie Berger, and Bryan Bryson (2020).
