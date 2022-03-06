@@ -12,4 +12,3 @@ scipy
 scikit-learn
 seaborn
 tensorflow-gpu
-
