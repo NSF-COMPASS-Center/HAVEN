@@ -1,0 +1,15 @@
+biopython
+flair
+hmmlearn
+keras
+matplotlib
+nltk
+numpy
+pandas
+pattern3
+scanpy
+scipy
+scikit-learn
+seaborn
+tensorflow-gpu
+
