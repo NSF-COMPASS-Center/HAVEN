@@ -5,18 +5,28 @@
 #SBATCH -N1 
 #SBATCH --ntasks-per-node=128 # 1 node, use all the power of 128 cores/threads/cpus RYZEN EPYC 7702 on tinkerclifs
 #SBATCH -t 01:30:00 # 1 hour, 30 mins
+
 #SBATCH -p a100_dev_q
 #SBATCH --gres=gpu:1
 
+#SBATCH --export=NONE # Fixes some bugs with pathing
+
 # Relative path vars, since SLURM doesn't seem to preserve original env's env vars
-HOME=/home/andrewclchan211
-PROJECT_DIR=$HOME/BioNLP
-cd $HOME
+USER_HOME=/home/andrewclchan211
+PROJECT_DIR=$USER_HOME/BioNLP
+cd $PROJECT_DIR
 
-module purge
-module load apps site/tinkercliffs-rome/easybuild/setup Anaconda3
+module reset
+module load Anaconda3
+module load cuDNN/8.1.1.33-CUDA-11.2.1
 
-source activate $HOME/.conda/envs/BioNLP
+
+
+
+
+source activate $USER_HOME/.conda/envs/BioNLP
+
+python --version
 
 # Parameters
 SCRIPT_LOCATION=$PROJECT_DIR/bin/flu.py 

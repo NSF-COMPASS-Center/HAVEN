@@ -18,3 +18,4 @@ target*
 temp*
 *__pycache__
 sshUtil.sh
+deployment/slurm*

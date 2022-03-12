@@ -21,16 +21,12 @@ CONDA_ENV_NAME="BioNLP"
 # Go to script dir
 cd "$(dirname "$0")"
 
-echo "Something?"
 module purge
 module load apps site/tinkercliffs-rome/easybuild/setup Anaconda3
-echo "Something 1?"
 
 # Conda environment 3.9
 cd ..
-echo "Something 2?"
 conda create -y -n $CONDA_ENV_NAME python=3.9
-echo "Conda create worked?"
 conda activate $CONDA_ENV_NAME
 echo "Conda activate worked?"
 

@@ -12,3 +12,5 @@ scipy
 scikit-learn
 seaborn
 tensorflow-gpu
+igraph
+louvain 
