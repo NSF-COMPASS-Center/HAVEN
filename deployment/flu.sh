@@ -1,31 +1,38 @@
-#!/bin/bash
+#! /bin/bash
 
-#SBATCH -J hello-world
-
-#SBATCH -N 1 
-#SBATCH --ntasks-per-node=12 # 1 node, 12 threads/cpus
-#SBATCH -t 4:00:00 # 4 hours
-
-#SBATCH -p a100_normal_q
-# #SBATCH -A arcadm
-
+#SBATCH -J BILSTM_FLU_MODEL
+#SBATCH -A seqevol
+#SBATCH -N1 
+#SBATCH --ntasks-per-node=128 # 1 node, use all the power of 128 cores/threads/cpus RYZEN EPYC 7702 on tinkerclifs
+#SBATCH -t 01:30:00 # 1 hour, 30 mins
+#SBATCH -p a100_dev_q
 #SBATCH --gres=gpu:1
 
-# Go to script deployment dir
-cd "$(dirname "$0")"
-cd ..
+# Relative path vars, since SLURM doesn't seem to preserve original env's env vars
+HOME=/home/andrewclchan211
+PROJECT_DIR=$HOME/BioNLP
+cd $HOME
 
 module purge
 module load apps site/tinkercliffs-rome/easybuild/setup Anaconda3
 
-source activate ~/.conda/envs/BioNLP
+source activate $HOME/.conda/envs/BioNLP
 
-# Run python 
-python bin/flu.py bilstm --checkpoint models/flu.hdf5 --embed > flu_embed.log 2>&1
+# Parameters
+SCRIPT_LOCATION=$PROJECT_DIR/bin/flu.py 
+MODEL=bilstm
+SAVED_MODEL=$PROJECT_DIR/models/flu.hdf5 
+RESULTS_DIR=$PROJECT_DIR/results
 
-python bin/flu.py bilstm --checkpoint models/flu.hdf5 --semantics > flu_semantics.log 2>&1
+# Ensure results directory exists
+mkdir -p $RESULTS_DIR
 
-python bin/flu.py bilstm --checkpoint models/flu.hdf5 --combfit > flu_combfit.log 2>&1
+# Run python scripts
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/flu_embed.log 2>&1
+
+#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --semantics > $RESULTS_DIR/flu_semantics.log 2>&1
+
+#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/flu_combfit.log 2>&1
 
 
 # # Training:
