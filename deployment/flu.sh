@@ -38,11 +38,11 @@ RESULTS_DIR=$PROJECT_DIR/results
 mkdir -p $RESULTS_DIR
 
 # Run python scripts
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/flu_embed.log 2>&1
+#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/flu_embed.log 2>&1
 
-#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --semantics > $RESULTS_DIR/flu_semantics.log 2>&1
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --semantics > $RESULTS_DIR/flu_semantics.log 2>&1
 
-#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/flu_combfit.log 2>&1
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/flu_combfit.log 2>&1
 
 
 # # Training:
