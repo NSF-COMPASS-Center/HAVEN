@@ -37,6 +37,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+debug = {}
 def parse_viprbrc(entry):
     fields = entry.split('|')
     if fields[7] == 'NA':
@@ -55,10 +56,20 @@ def parse_viprbrc(entry):
 
     from mammals import species2group
 
+    # might error out
+    if fields[8] in species2group:
+        group = species2group[fields[8]]
+    else:
+        group = "NA"
+        if fields[8] in debug:
+            debug[fields[8]] += 1
+        else:
+            debug[fields[8]] = 1
+
     meta = {
         'strain': fields[5],
         'host': fields[8],
-        'group': species2group[fields[8]],
+        'group': group,
         'country': country,
         'continent': continent,
         'dataset': 'viprbrc',
@@ -132,10 +143,13 @@ def process(fnames):
                 meta = parse_viprbrc(record.description)
             elif fname == 'data/cov/gisaid.fasta':
                 meta = parse_gisaid(record.description)
+                if(meta['group'] == 'NA'):
+                    continue
             else:
                 meta = parse_nih(record.description)
             meta['accession'] = record.description
             seqs[record.seq].append(meta)
+    print(debug)
 
     with open('data/cov/cov_all.fa', 'w') as of:
         for seq in seqs:
@@ -161,9 +175,9 @@ def split_seqs(seqs, split_method='random'):
     return train_seqs, test_seqs
 
 def setup(args):
-    fnames = [ 'data/cov/sars_cov2_seqs.fa',
-               'data/cov/viprbrc_db.fasta',
-               'data/cov/gisaid.fasta' ]
+    fnames = [ 'data/cov/sars_cov2_seqs.fa', # From NCBI
+               'data/cov/viprbrc_db.fasta',  # From VIPBRC
+               'data/cov/gisaid.fasta' ]     # From GISAID
 
     seqs = process(fnames)
 
