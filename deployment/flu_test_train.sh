@@ -1,10 +1,10 @@
 #! /bin/bash
 
-#SBATCH -J BILSTM_FLU_MODEL
+#SBATCH -J FLU_TRAIN_BILSTM
 #SBATCH -A seqevol
 #SBATCH -N1 
 #SBATCH --ntasks-per-node=128 # 1 node, use all the power of 128 cores/threads/cpus RYZEN EPYC 7702 on tinkerclifs
-#SBATCH -t 30:00:00 # 30 hours
+#SBATCH -t 24:00:00 # 1 hour, 30 mins
 
 #SBATCH -p a100_normal_q
 #SBATCH --gres=gpu:1
@@ -20,32 +20,32 @@ module reset
 module load Anaconda3
 module load cuDNN/8.1.1.33-CUDA-11.2.1
 
+
 source activate $USER_HOME/.conda/envs/BioNLP
 
 python --version
 
 # Parameters
-SCRIPT_LOCATION=$PROJECT_DIR/bin/cov.py 
+SCRIPT_LOCATION=$PROJECT_DIR/bin/flu.py 
 MODEL=bilstm
-#SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
-SAVED_MODEL=$PROJECT_DIR/target/cov/checkpoints/bilstm/bilstm_512-01.hdf5
+SAVED_MODEL=$PROJECT_DIR/models/flu.hdf5 
 RESULTS_DIR=$PROJECT_DIR/results
 
 # Ensure results directory exists
 mkdir -p $RESULTS_DIR
 
 # Run python scripts
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/cov_embed.log 2>&1
+#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/flu_embed.log 2>&1
 
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --semantics > $RESULTS_DIR/cov_semantics.log 2>&1
+#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --semantics > $RESULTS_DIR/flu_semantics.log 2>&1
 
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/cov_combfit.log 2>&1
-
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --reinfection > $RESULTS_DIR/cov_reinfection.log 2>&1
+# python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/flu_combfit.log 2>&1
 
 # # Training:
-# # python ~/BioNLP/bin/flu.py bilstm --train --test > flu_train.log 2>&1
 
-
+touch $RESULTS_DIR/flu_train.log
+date >> $RESULTS_DIR/flu_train.log
+echo "------------------------------------------------" >>  $RESULTS_DIR/flu_train.log
+python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/flu_train.log 2>&1
 
 

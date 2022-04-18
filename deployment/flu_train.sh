@@ -1,10 +1,10 @@
 #! /bin/bash
 
-#SBATCH -J BILSTM_FLU_MODEL
+#SBATCH -J FLU_TRAIN_BILSTM
 #SBATCH -A seqevol
 #SBATCH -N1 
 #SBATCH --ntasks-per-node=128 # 1 node, use all the power of 128 cores/threads/cpus RYZEN EPYC 7702 on tinkerclifs
-#SBATCH -t 02:00:00 # 1 hour, 30 mins
+#SBATCH -t 03:00:00 # 1 hour, 30 mins
 
 #SBATCH -p a100_dev_q
 #SBATCH --gres=gpu:1
@@ -28,23 +28,21 @@ python --version
 # Parameters
 SCRIPT_LOCATION=$PROJECT_DIR/bin/flu.py 
 MODEL=bilstm
-#SAVED_MODEL=$PROJECT_DIR/models/flu.hdf5 
-SAVED_MODEL=$PROJECT_DIR/target/flu/checkpoints/bilstm/bilstm_512-11.hdf5
+SAVED_MODEL=$PROJECT_DIR/models/flu.hdf5 
 RESULTS_DIR=$PROJECT_DIR/results
 
 # Ensure results directory exists
 mkdir -p $RESULTS_DIR
 
 # Run python scripts
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/flu_embed.log 2>&1
+#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/flu_embed.log 2>&1
 
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --semantics > $RESULTS_DIR/flu_semantics.log 2>&1
+#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --semantics > $RESULTS_DIR/flu_semantics.log 2>&1
 
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/flu_combfit.log 2>&1
-
+# python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/flu_combfit.log 2>&1
 
 # # Training:
-# # python ~/BioNLP/bin/flu.py bilstm --train --test > flu_train.log 2>&1
+python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/flu_train.log 2>&1
 
 
 
