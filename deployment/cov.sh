@@ -48,4 +48,5 @@ python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --reinfection > $RESULT
 
 
 
+echo "job done"
 
