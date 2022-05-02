@@ -4,9 +4,9 @@
 #SBATCH -A seqevol
 #SBATCH -N1 
 #SBATCH --ntasks-per-node=128 # 1 node, use all the power of 128 cores/threads/cpus RYZEN EPYC 7702 on tinkerclifs
-#SBATCH -t 03:00:00 # 1 hour, 30 mins
+#SBATCH -t 12:00:00 # hours, mins, secs
 
-#SBATCH -p a100_dev_q
+#SBATCH -p a100_normal_q
 #SBATCH --gres=gpu:1
 
 #SBATCH --export=NONE # Fixes some bugs with pathing
@@ -28,7 +28,8 @@ python --version
 # Parameters
 SCRIPT_LOCATION=$PROJECT_DIR/bin/flu.py 
 MODEL=bilstm
-SAVED_MODEL=$PROJECT_DIR/models/flu.hdf5 
+#SAVED_MODEL=$PROJECT_DIR/models/flu.hdf5 
+SAVED_MODEL=$PROJECT_DIR/target/flu/checkpoints/bilstm/r1/bilstm_512-11.hdf5
 RESULTS_DIR=$PROJECT_DIR/results
 
 # Ensure results directory exists
@@ -42,8 +43,5 @@ mkdir -p $RESULTS_DIR
 # python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/flu_combfit.log 2>&1
 
 # # Training:
-python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/flu_train.log 2>&1
-
-
-
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --train > $RESULTS_DIR/flu_train2.log 2>&1
 

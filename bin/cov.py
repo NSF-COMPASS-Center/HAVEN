@@ -129,6 +129,7 @@ def parse_gisaid(entry):
     }
     return meta
 
+# Seqs key:value | string sequence : [metadata1, metadata2, ...]
 def process(fnames):
     seqs = {}
     for fname in fnames:

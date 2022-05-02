@@ -27,6 +27,8 @@ class LanguageModel(object):
         raise NotImplementedError('Use LM instantiation instead '
                                   'of base class.')
 
+    # X_cats comes in the form of 1 large array, but has beginning and ending vocab separators
+    # lengths is length of each sequence
     def fit(self, X_cat, lengths):
         X, y = self.split_and_pad(
             X_cat, lengths, self.seq_len_, self.vocab_size_, self.verbose_
@@ -367,34 +369,50 @@ class BiLSTMLanguageModel(LanguageModel):
 
         if verbose > 1:
             tprint('Splitting {} seqs...'.format(len(lengths)))
+	# Convert concatenated format back to array separated sequences
         X_seqs = [
             X_cat[start:end].flatten()
             for start, end in iterate_lengths(lengths, seq_len)
         ]
+
+	#  Build from left to right [1,2,3] -> [[],[1],[1,2]]
         X_pre = [
             X_seq[:i] for X_seq in X_seqs for i in range(len(X_seq))
         ]
+
+	# Build from right to left? [1,2,3] -> [[2,3],[3],[]]
+	# Makes sense. [] in X_pre where [2,3] in X_post.
+	# Missing 1 element in total, where y has that information
         X_post = [
             X_seq[i + 1:] for X_seq in X_seqs for i in range(len(X_seq))
         ]
+
+	# [1,2,3] ->[[1],[2],[3]]
         y = np.array([
             X_seq[i] for X_seq in X_seqs for i in range(len(X_seq))
         ])
 
         if verbose > 1:
             tprint('Padding {} splitted...'.format(len(X_pre)))
+
+	# tf pad_sequences lib [[1],[1,2],[1,2,3]] -> [[0,0,1],[0,1,2],[1,2,3]]
         X_pre = pad_sequences(
             X_pre, maxlen=seq_len - 1,
             dtype='int32', padding='pre', truncating='pre', value=0
         )
         if verbose > 1:
             tprint('Padding {} splitted again...'.format(len(X_pre)))
+
+	# tf post padding
         X_post = pad_sequences(
             X_post, maxlen=seq_len - 1,
             dtype='int32', padding='post', truncating='post', value=0
         )
+
         if verbose > 1:
             tprint('Flipping...')
+
+	# Reverse order of each post sequence, because you want it to read right to left
         X_post = np.flip(X_post, 1)
         X = [ X_pre, X_post ]
 

@@ -1,11 +1,11 @@
 WARNING:tensorflow:From /home/andrewclchan211/.conda/envs/BioNLP/lib/python3.9/site-packages/keras/mixed_precision/loss_scale.py:52: DynamicLossScale.__init__ (from tensorflow.python.training.experimental.loss_scale) is deprecated and will be removed in a future version.
 Instructions for updating:
 Use tf.keras.mixed_precision.LossScaleOptimizer instead. LossScaleOptimizer now has all the functionality of DynamicLossScale
-2022-04-24 03:41:50.037467: I tensorflow/core/platform/cpu_feature_guard.cc:151] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+2022-05-02 05:33:56.450591: I tensorflow/core/platform/cpu_feature_guard.cc:151] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
 To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2022-04-24 03:41:50.506379: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1525] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 79135 MB memory:  -> device: 0, name: NVIDIA A100-SXM-80GB, pci bus id: 0000:48:00.0, compute capability: 8.0
+2022-05-02 05:33:56.909303: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1525] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 79135 MB memory:  -> device: 0, name: NVIDIA A100-SXM-80GB, pci bus id: 0000:48:00.0, compute capability: 8.0
 {'Tapir': 1, 'Hedgehog': 10, 'Fathead_Minnow': 1, 'Raccoon': 2, 'Donkey': 1, 'Anatidae': 1, 'Jackal': 2, 'Avian': 1, 'Horseshoe_Bat': 1, 'Eel': 1, 'Bream': 1, 'Snake': 1, 'Vesper_Bat': 1}
-2022-04-24 03:41:52.025218 | Model summary:
+2022-05-02 05:33:58.651724 | Model summary:
 Model: "model"
 __________________________________________________________________________________________________
  Layer (type)                   Output Shape         Param #     Connected to                     
@@ -35,43 +35,43 @@ Total params: 3,220,044
 Trainable params: 3,220,044
 Non-trainable params: 0
 __________________________________________________________________________________________________
-2022-04-24 03:41:52.026314 | None
-2022-04-24 03:41:52.041414 | To et al. 2020...
-2022-04-24 03:41:53.732373: I tensorflow/stream_executor/cuda/cuda_dnn.cc:368] Loaded cuDNN version 8101
-2022-04-24 03:41:54.866034 | Embedding...
+2022-05-02 05:33:58.652919 | None
+2022-05-02 05:33:58.676875 | To et al. 2020...
+2022-05-02 05:34:00.444816: I tensorflow/stream_executor/cuda/cuda_dnn.cc:368] Loaded cuDNN version 8101
+2022-05-02 05:34:01.615782 | Embedding...
+1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 112ms/step
+2022-05-02 05:34:02.101678 | Done embedding.
+2022-05-02 05:34:02.147422 | Embedding...
 1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 113ms/step
-2022-04-24 03:41:55.350792 | Done embedding.
-2022-04-24 03:41:55.387669 | Embedding...
-1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 115ms/step
-2022-04-24 03:41:55.843620 | Done embedding.
+2022-05-02 05:34:02.601477 | Done embedding.
 /home/andrewclchan211/.conda/envs/BioNLP/lib/python3.9/site-packages/numpy/core/_methods.py:48: RuntimeWarning: overflow encountered in reduce
   return umr_sum(a, axis, dtype, out, keepdims, initial, where)
-Higher prob, higher change: 59
-Higher prob, lower change: 101
-Lower prob, higher change: 10153
-Lower prob, lower change: 5845
-Fisher's exact P = 1.4556453316774244e-11
-2022-04-24 07:30:41.470911 | Mutant L18F,A222V,D614G,Q780E, P < 1e-08
-2022-04-24 07:30:43.580326 | Positive controls...
-2022-04-24 07:30:44.047977 | Embedding...
-1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 111ms/step
-2022-04-24 07:30:44.502281 | Done embedding.
-2022-04-24 07:30:44.537305 | Embedding...
-1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 113ms/step
-2022-04-24 07:30:44.993376 | Done embedding.
-Higher prob, higher change: 11095
-Higher prob, lower change: 4990
-Lower prob, higher change: 12
-Lower prob, lower change: 62
-Fisher's exact P = 1.061596602141651e-20
-2022-04-24 07:44:05.889645 | Embedding...
-1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 113ms/step
-2022-04-24 07:44:06.343131 | Done embedding.
-2022-04-24 07:44:06.360307 | Embedding...
-1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 113ms/step
-2022-04-24 07:44:06.823491 | Done embedding.
-Higher prob, higher change: 8294
-Higher prob, lower change: 7782
-Lower prob, higher change: 10
-Lower prob, lower change: 73
-Fisher's exact P = 6.752161536396047e-14
+Higher prob, higher change: 0
+Higher prob, lower change: 0
+Lower prob, higher change: 0
+Lower prob, lower change: 0
+Fisher's exact P = 1.0
+2022-05-02 09:19:23.779428 | Mutant L18F,A222V,D614G,Q780E, P < 1e-08
+2022-05-02 09:19:25.704686 | Positive controls...
+2022-05-02 09:19:26.144017 | Embedding...
+1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 114ms/step
+2022-05-02 09:19:26.607592 | Done embedding.
+2022-05-02 09:19:26.640300 | Embedding...
+1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 114ms/step
+2022-05-02 09:19:27.099105 | Done embedding.
+Higher prob, higher change: 0
+Higher prob, lower change: 0
+Lower prob, higher change: 0
+Lower prob, lower change: 0
+Fisher's exact P = 1.0
+2022-05-02 09:37:50.012465 | Embedding...
+1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 117ms/step
+2022-05-02 09:37:50.473631 | Done embedding.
+2022-05-02 09:37:50.500376 | Embedding...
+1/2 [==============>...............] - ETA: 0s2/2 [==============================] - 0s 117ms/step
+2022-05-02 09:37:50.973150 | Done embedding.
+Higher prob, higher change: 0
+Higher prob, lower change: 0
+Lower prob, higher change: 0
+Lower prob, lower change: 0
+Fisher's exact P = 1.0

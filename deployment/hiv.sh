@@ -4,9 +4,9 @@
 #SBATCH -A seqevol
 #SBATCH -N1 
 #SBATCH --ntasks-per-node=128 # 1 node, use all the power of 128 cores/threads/cpus RYZEN EPYC 7702 on tinkerclifs
-#SBATCH -t 03:30:00 # 3 hour, 30 mins
+#SBATCH -t 24:30:00 # 3 hour, 30 mins
 
-#SBATCH -p a100_dev_q
+#SBATCH -p a100_normal_q
 #SBATCH --gres=gpu:1
 
 #SBATCH --export=NONE # Fixes some bugs with pathing
@@ -39,6 +39,8 @@ python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/
 python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --semantics > $RESULTS_DIR/hiv_semantics.log 2>&1
 python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/hiv_combfit.log 2>&1
 
+
+echo "All done"
 
 # # Training:
 # # python ~/BioNLP/bin/flu.py bilstm --train --test > flu_train.log 2>&1

@@ -83,17 +83,25 @@ def get_model(args, seq_len, vocab_size,
 
     return model
 
+# Featurizes sequences?
+
 def featurize_seqs(seqs, vocabulary):
+    # First two in vocabulary are paddings
     start_int = len(vocabulary) + 1
     end_int = len(vocabulary) + 2
+
     sorted_seqs = sorted(seqs.keys())
+
     X = np.concatenate([
         np.array([ start_int ] + [
             vocabulary[word] for word in seq
         ] + [ end_int ]) for seq in sorted_seqs
     ]).reshape(-1, 1)
+
+    # Check that length of each word is valid (all have + 2 padding and same length as original)
     lens = np.array([ len(seq) + 2 for seq in sorted_seqs ])
     assert(sum(lens) == X.shape[0])
+
     return X, lens
 
 def fit_model(name, model, seqs, vocabulary):
@@ -150,6 +158,8 @@ def batch_train(args, model, seqs, vocabulary, batch_size=5000,
     for epoch in range(n_epochs):
         if verbose:
             tprint('True epoch {}/{}'.format(epoch + 1, n_epochs))
+
+	# permuted string sequences
         perm_seqs = [ str(s) for s in seqs.keys() ]
         random.shuffle(perm_seqs)
 

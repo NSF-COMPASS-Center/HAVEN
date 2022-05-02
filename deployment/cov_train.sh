@@ -4,7 +4,7 @@
 #SBATCH -A seqevol
 #SBATCH -N1 
 #SBATCH --ntasks-per-node=128 # 1 node, use all the power of 128 cores/threads/cpus RYZEN EPYC 7702 on tinkerclifs
-#SBATCH -t 48:00:00 # 24 hours
+#SBATCH -t 72:00:00 # 24 hours
 
 #SBATCH -p a100_normal_q
 #SBATCH --gres=gpu:1
@@ -27,7 +27,8 @@ python --version
 # Parameters
 SCRIPT_LOCATION=$PROJECT_DIR/bin/cov.py 
 MODEL=bilstm
-SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
+#SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
+SAVED_MODEL=$PROJECT_DIR/target/cov/checkpoints/bilstm/r2/bilstm_512-02.hdf5 
 RESULTS_DIR=$PROJECT_DIR/results
 
 # Ensure results directory exists
@@ -36,11 +37,12 @@ mkdir -p $RESULTS_DIR
 # Run python scripts
 #python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/cov_embed.log 2>&1
 
-python $SCRIPT_LOCATION $MODEL --train --checkpoint $PROJECT_DIR/target/cov/checkpoints/bilstm/bilstm_512-01.hdf5 > $RESULTS_DIR/cov_train.log 2>&1
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --train  > $RESULTS_DIR/cov_train3.log 2>&1
+
 
 # # Training:
 # # python ~/BioNLP/bin/flu.py bilstm --train --test > flu_train.log 2>&1
 
-
+echo "All done cov_train"
 
 
