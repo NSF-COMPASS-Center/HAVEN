@@ -194,8 +194,10 @@ def split_seqs(seqs, split_method='random'):
     return train_seqs, test_seqs
 
 def setup(args):
-    fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta'] # From VIPBRC
-    #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
+    #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta'] # From VIPBRC
+    #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta', # From VIPRBRC
+	#'data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
+    fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
 
     seqs = process(fnames)
 

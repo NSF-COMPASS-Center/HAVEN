@@ -28,7 +28,7 @@ python --version
 SCRIPT_LOCATION=$PROJECT_DIR/bin/cov.py 
 MODEL=bilstm
 #SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
-SAVED_MODEL=$PROJECT_DIR/target/cov/checkpoints/bilstm/r2/bilstm_512-02.hdf5 
+SAVED_MODEL=$PROJECT_DIR/target/cov/checkpoints/bilstm/r3/bilstm_512-02.hdf5 
 RESULTS_DIR=$PROJECT_DIR/results
 
 # Ensure results directory exists
@@ -37,7 +37,7 @@ mkdir -p $RESULTS_DIR
 # Run python scripts
 #python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/cov_embed.log 2>&1
 
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --train  > $RESULTS_DIR/cov_train3.log 2>&1
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --train > $RESULTS_DIR/cov_train4.log 2>&1
 
 
 # # Training:
