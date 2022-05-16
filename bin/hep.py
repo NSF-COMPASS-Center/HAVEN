@@ -288,7 +288,7 @@ if __name__ == '__main__':
 	# Vis with numpy
         print(speciesCounter)
         import matplotlib.pyplot as plt
-        fig = plt.figure(1, [20, 15])
+        fig = plt.figure(1, [23, 18])
         plt.bar(speciesCounter.keys(), speciesCounter.values())
         plt.xticks(
             rotation=45, 
