@@ -277,11 +277,18 @@ if __name__ == '__main__':
 	# Vis with numpy
         print(speciesCounter)
         import matplotlib.pyplot as plt
+        fig = plt.figure(1, [20, 8])
         plt.bar(speciesCounter.keys(), speciesCounter.values())
+        plt.xticks(
+            rotation=45, 
+            horizontalalignment='right',
+            fontweight='light',
+            fontsize='x-large'  
+	)
         
-        plt.savefig('distribution.png')
 
 	# Print image
+        plt.savefig('distribution.png')
 
     if args.checkpoint is not None:
         model.model_.load_weights(args.checkpoint)
