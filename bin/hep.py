@@ -79,6 +79,7 @@ def parse_viprbrc(entry):
         'country': country,
         'continent': continent,
         'dataset': 'viprbrc',
+	'protein': fields[1],
     }
     return meta
 
@@ -114,6 +115,7 @@ def parse_nih(entry):
         'country': country,
         'continent': continent,
         'dataset': 'nih',
+	'protein': fields[1],
     }
     return meta
 
@@ -154,8 +156,8 @@ def process(fnames):
     seqs = {}
     for fname in fnames:
         for record in SeqIO.parse(fname, 'fasta'):
-            if len(record.seq) < 1000:
-                continue
+            #if len(record.seq) < 1000:
+            #    continue
             if str(record.seq).count('X') > 0:
                 continue
             if record.seq not in seqs:
@@ -192,8 +194,8 @@ def split_seqs(seqs, split_method='random'):
     return train_seqs, test_seqs
 
 def setup(args):
-    #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta'] # From VIPBRC
-    fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-NCBI.fasta'] # From NCBI
+    fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta'] # From VIPBRC
+    #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
 
     seqs = process(fnames)
 
@@ -285,21 +287,34 @@ if __name__ == '__main__':
         for sv in seqs.values():
             speciesCounter[sv[0]['host']]+=1
 
-	# Vis with numpy
-        print(speciesCounter)
-        import matplotlib.pyplot as plt
-        fig = plt.figure(1, [23, 18])
-        plt.bar(speciesCounter.keys(), speciesCounter.values())
-        plt.xticks(
-            rotation=45, 
-            horizontalalignment='right',
-            fontweight='light',
-            fontsize='x-large'  
-	)
-        
+        speciesORF1Counter = Counter()
+        for sv in seqs.values():
+            if "orf1" in sv[0]["protein"].lower():
+            	speciesORF1Counter[sv[0]['host']]+=1
 
-	# Print image
-        plt.savefig('distribution.png')
+        speciesORF2Counter = Counter()
+        for sv in seqs.values():
+            if "orf2" in sv[0]["protein"].lower():
+            	speciesORF2Counter[sv[0]['host']]+=1
+
+        import matplotlib.pyplot as plt
+        def plotCounter(d, name):
+	    # Vis with numpy
+            print(f"{name}: {d}")
+            fig = plt.figure(1, [23, 18])
+            plt.bar(d.keys(), d.values())
+            plt.xticks(
+                rotation=45, 
+                horizontalalignment='right',
+                fontweight='light',
+                fontsize='x-large'  
+	    )
+	    # Print image
+            plt.savefig(name)
+
+        plotCounter(speciesCounter, 'distribution-overall.png')
+        plotCounter(speciesORF1Counter, 'distribution-orf1.png')
+        plotCounter(speciesORF2Counter, 'distribution-orf2.png')
 
     if args.checkpoint is not None:
         model.model_.load_weights(args.checkpoint)
