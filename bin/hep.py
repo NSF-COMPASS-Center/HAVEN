@@ -146,12 +146,12 @@ def process(fnames):
                 continue
             if record.seq not in seqs:
                 seqs[record.seq] = []
-            if fname == 'data/cov/viprbrc_db.fasta':
+            if fname == 'data/hep/hep_seqs.fa':
                 meta = parse_viprbrc(record.description)
-            elif fname == 'data/cov/gisaid.fasta':
-                meta = parse_gisaid(record.description)
-                if(meta['group'] == 'NA'):
-                    continue
+            #elif fname == 'data/hep/gisaid.fasta':
+            #    meta = parse_gisaid(record.description)
+            #    if(meta['group'] == 'NA'):
+            #        continue
             else:
                 meta = parse_nih(record.description)
             meta['accession'] = record.description
@@ -189,10 +189,10 @@ def setup(args):
     seq_len = max([ len(seq) for seq in seqs ]) + 2
     vocab_size = len(AAs) + 2
 
-    model = get_model(args, seq_len, vocab_size,
-                      inference_batch_size=1200)
-
-    return model, seqs
+    return seqs
+    #model = get_model(args, seq_len, vocab_size,
+                      #inference_batch_size=1200)
+    #return model, seqs
 
 def interpret_clusters(adata):
     clusters = sorted(set(adata.obs['louvain']))
@@ -260,10 +260,28 @@ if __name__ == '__main__':
     ]
     vocabulary = { aa: idx + 1 for idx, aa in enumerate(sorted(AAs)) }
 
-    model, seqs = setup(args)
+    #model, seqs = setup(args)
+    seqs = setup(args)
 
     if args.visulise:
         print(f"visulise_dataset: {args.visulise}")
+	# Extract freq map of species wide distribution
+        from collections import Counter
+	# Basically a hashmap obj
+        speciesCounter = Counter()
+
+	# Count the hosts
+        for sv in seqs.values():
+            speciesCounter[sv[0]['host']]+=1
+
+	# Vis with numpy
+        print(speciesCounter)
+        import matplotlib.pyplot as plt
+        plt.bar(speciesCounter.keys(), speciesCounter.values())
+        
+        plt.savefig('distribution.png')
+
+	# Print image
 
     if args.checkpoint is not None:
         model.model_.load_weights(args.checkpoint)
