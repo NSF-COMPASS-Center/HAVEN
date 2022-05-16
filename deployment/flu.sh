@@ -29,7 +29,7 @@ python --version
 SCRIPT_LOCATION=$PROJECT_DIR/bin/flu.py 
 MODEL=bilstm
 #SAVED_MODEL=$PROJECT_DIR/models/flu.hdf5 
-SAVED_MODEL=$PROJECT_DIR/target/flu/checkpoints/bilstm/bilstm_512-11.hdf5
+SAVED_MODEL=$PROJECT_DIR/target/flu/checkpoints/bilstm/r2/bilstm_512-05.hdf5
 RESULTS_DIR=$PROJECT_DIR/results
 
 # Ensure results directory exists

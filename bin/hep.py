@@ -146,13 +146,9 @@ def process(fnames):
                 continue
             if record.seq not in seqs:
                 seqs[record.seq] = []
-            if fname == 'data/hep/hep_seqs.fa':
+            if "viprbrc" in fname.lower():
                 meta = parse_viprbrc(record.description)
-            #elif fname == 'data/hep/gisaid.fasta':
-            #    meta = parse_gisaid(record.description)
-            #    if(meta['group'] == 'NA'):
-            #        continue
-            else:
+            elif "ncbi" in fname.lower():
                 meta = parse_nih(record.description)
             meta['accession'] = record.description
             seqs[record.seq].append(meta)
@@ -182,7 +178,8 @@ def split_seqs(seqs, split_method='random'):
     return train_seqs, test_seqs
 
 def setup(args):
-    fnames = ['data/hep/hep_seqs.fa'] # From VIPBRC
+    #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta'] # From VIPBRC
+    fnames = ['data/hep/2022-05-09-NucComplete-OrthohepevirusA-NCBI.fasta'] # From NCBI
 
     seqs = process(fnames)
 
