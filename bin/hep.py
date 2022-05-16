@@ -304,13 +304,14 @@ if __name__ == '__main__':
             fig = plt.figure(1, [23, 18])
             plt.bar(d.keys(), d.values())
             plt.xticks(
-                rotation=45, 
+                rotation=45,
                 horizontalalignment='right',
                 fontweight='light',
-                fontsize='x-large'  
+                fontsize='x-large'
 	    )
 	    # Print image
             plt.savefig(name)
+            plt.clf()
 
         plotCounter(speciesCounter, 'distribution-overall.png')
         plotCounter(speciesORF1Counter, 'distribution-orf1.png')
