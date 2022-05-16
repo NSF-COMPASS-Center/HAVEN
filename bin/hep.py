@@ -93,10 +93,24 @@ def parse_nih(entry):
         country = 'NA'
         continent = 'NA'
 
+    from mammals import species2group
+    if fields[2] in species2group:
+        group = species2group[fields[2]]
+    else:
+        group = "NA"
+        if fields[2] in debug:
+            debug[fields[2]] += 1
+        else:
+            debug[fields[2]] = 1
+    if fields[2] == "":
+        host = "unknown"
+    else:
+        host = fields[2]
+
     meta = {
         'strain': 'SARS-CoV-2',
-        'host': 'human',
-        'group': 'human',
+        'host': host,
+        'group': group,
         'country': country,
         'continent': continent,
         'dataset': 'nih',
@@ -179,7 +193,7 @@ def split_seqs(seqs, split_method='random'):
 
 def setup(args):
     #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta'] # From VIPBRC
-    fnames = ['data/hep/2022-05-09-NucComplete-OrthohepevirusA-NCBI.fasta'] # From NCBI
+    fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-NCBI.fasta'] # From NCBI
 
     seqs = process(fnames)
 
