@@ -1,0 +1,5 @@
+{'Polecat': 6, 'Fish': 16, 'Hare': 1, 'Rodent': 21, 'Boar': 35, 'Prawn': 3, 'Crayfish': 3, 'Macaque': 6, 'Avian': 3, 'Common_Kestrel': 2, 'Egret': 2, 'Frog': 6, 'Environmental': 1, 'Planthopper': 4, 'Amphibian': 1, 'Wolf': 1, 'Fox': 1, 'Yak': 2}
+visulise_dataset: vis
+overall: Counter({'Human': 711, 'Unknown': 671, 'Swine': 192, 'Rabbit': 73, 'Rat': 56, 'Boar': 31, 'Rodent': 21, 'Chicken': 18, 'Bat': 18, 'NA': 16, 'Vole': 14, 'Ferret': 13, 'Camel': 12, 'Fish': 10, 'Goat': 9, 'Mouse': 7, 'Shrew': 7, 'Polecat': 6, 'Macaque': 5, 'Cattle': 4, 'Prawn': 3, 'Crayfish': 3, 'Avian': 3, 'Frog': 3, 'Monkey': 2, 'Common_Kestrel': 2, 'Egret': 2, 'Planthopper': 2, 'Sparrow': 2, 'Yak': 2, 'Hare': 1, 'Environmental': 1, 'Amphibian': 1, 'Wolf': 1, 'Fox': 1})
+orf1: Counter({'Unknown': 186, 'Human': 64, 'Swine': 12, 'Ferret': 3, 'Boar': 2, 'Prawn': 1, 'Macaque': 1, 'Rabbit': 1, 'Avian': 1, 'Rat': 1})
+orf2: Counter({'Unknown': 156, 'Human': 74, 'Swine': 9, 'Ferret': 4, 'Macaque': 2, 'Mouse': 2, 'Vole': 2, 'Prawn': 1, 'Rabbit': 1, 'Avian': 1, 'Rat': 1, 'Frog': 1, 'Chicken': 1, 'Boar': 1})
