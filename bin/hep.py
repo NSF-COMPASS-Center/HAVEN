@@ -304,13 +304,17 @@ if __name__ == '__main__':
         def plotCounter(d, p_name):
             print(f"{p_name}: {d}")
             with plt.style.context("seaborn"):
-                fig = plt.figure(1, [23, 18])
-                plt.bar(d.keys(), d.values())
+                #fig = plt.figure(1, [5, 4])
+                #plt.rcParams.update({'font.size': 22})
+                tmp = sorted(zip(d.keys(), d.values()), key=lambda x: -x[1])  
+                keys = [x[0] for x in tmp]
+                values = [y[1] for y in tmp]
+                plt.bar(keys, values)
                 plt.xticks(
                     rotation=45,
                     horizontalalignment='right',
-                    fontweight='heavy',
-                    fontsize='x-large'
+                    #fontweight='heavy',
+                    #fontsize='small'
 	            )
             plt.xlabel('Protien category')
             plt.ylabel('Count')
