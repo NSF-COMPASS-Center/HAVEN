@@ -196,7 +196,7 @@ def split_seqs(seqs, split_method='random'):
 def setup(args):
     #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta'] # From VIPBRC
     #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta', # From VIPRBRC
-	#'data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
+	#           'data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
     fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
 
     seqs = process(fnames)
@@ -299,9 +299,9 @@ if __name__ == '__main__':
             if "orf2" in sv[0]["protein"].lower():
             	speciesORF2Counter[sv[0]['host']]+=1
 
-        import matplotlib.pyplot as plt
-        def plotCounter(d, name):
 	    # Vis with numpy
+        import matplotlib.pyplot as plt
+        def plotCounter(d, p_name):
             print(f"{name}: {d}")
             fig = plt.figure(1, [23, 18])
             plt.bar(d.keys(), d.values())
@@ -310,14 +310,20 @@ if __name__ == '__main__':
                 horizontalalignment='right',
                 fontweight='light',
                 fontsize='x-large'
-	    )
-	    # Print image
+	        )
+            plt.xlabel('Protien category')
+            plt.ylabel('Count')
+            plt.title(f'Frequency count of {p_name}')
+
+	        # Print image
+            name = f'distribution-{p_name}.png'
             plt.savefig(name)
             plt.clf()
 
-        plotCounter(speciesCounter, 'distribution-overall.png')
-        plotCounter(speciesORF1Counter, 'distribution-orf1.png')
-        plotCounter(speciesORF2Counter, 'distribution-orf2.png')
+        # With all 3 frequency maps
+        plotCounter(speciesCounter, 'overall')
+        plotCounter(speciesORF1Counter, 'orf1')
+        plotCounter(speciesORF2Counter, 'orf2')
 
     if args.checkpoint is not None:
         model.model_.load_weights(args.checkpoint)
