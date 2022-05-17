@@ -1,0 +1,5 @@
+{'Sus scrofa': 34, '': 355, 'Oryctolagus cuniculus': 2, 'Homo sapiens': 149, 'Camelus bactrianus': 2, 'Macaca fascicularis': 4}
+visulise_dataset: vis
+overall: Counter({'unknown': 336, 'Homo sapiens': 136, 'Sus scrofa': 29, 'Oryctolagus cuniculus': 2, 'Camelus bactrianus': 2, 'Macaca fascicularis': 1})
+orf1: Counter({'unknown': 183, 'Homo sapiens': 62, 'Sus scrofa': 16, 'Oryctolagus cuniculus': 1, 'Camelus bactrianus': 1})
+orf2: Counter({'unknown': 153, 'Homo sapiens': 74, 'Sus scrofa': 13, 'Oryctolagus cuniculus': 1, 'Camelus bactrianus': 1, 'Macaca fascicularis': 1})

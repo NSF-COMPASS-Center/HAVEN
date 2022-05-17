@@ -194,10 +194,10 @@ def split_seqs(seqs, split_method='random'):
     return train_seqs, test_seqs
 
 def setup(args):
-    fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta'] # From VIPBRC
+    #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta'] # From VIPBRC
     #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta', # From VIPRBRC
 	#           'data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
-    #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
+    fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
 
     seqs = process(fnames)
 
@@ -295,9 +295,11 @@ if __name__ == '__main__':
             	speciesORF1Counter[sv[0]['host']]+=1
 
         speciesORF2Counter = Counter()
+        dataset = None
         for sv in seqs.values():
             if "orf2" in sv[0]["protein"].lower():
             	speciesORF2Counter[sv[0]['host']]+=1
+            dataset = sv[0]["dataset"]
 
 	    # Vis with numpy
         import matplotlib.pyplot as plt
@@ -316,9 +318,9 @@ if __name__ == '__main__':
                     #fontweight='heavy',
                     #fontsize='small'
 	            )
-            plt.xlabel('Protien category')
-            plt.ylabel('Count')
-            plt.title(f'Frequency count of {p_name}')
+            plt.xlabel('Host species')
+            plt.ylabel('Sequence count')
+            plt.title(f'Host species vs frequency count: ({dataset}, Orthohepevirus A, {p_name})')
 
 	        # Print image
             name = f'distribution-{p_name}.png'
