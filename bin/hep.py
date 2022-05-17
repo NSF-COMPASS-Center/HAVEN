@@ -302,7 +302,7 @@ if __name__ == '__main__':
 	    # Vis with numpy
         import matplotlib.pyplot as plt
         def plotCounter(d, p_name):
-            print(f"{name}: {d}")
+            print(f"{p_name}: {d}")
             fig = plt.figure(1, [23, 18])
             plt.bar(d.keys(), d.values())
             plt.xticks(
@@ -317,7 +317,7 @@ if __name__ == '__main__':
 
 	        # Print image
             name = f'distribution-{p_name}.png'
-            plt.savefig(name)
+            plt.savefig(name, bbox_inches='tight', dpi=300)
             plt.clf()
 
         # With all 3 frequency maps
