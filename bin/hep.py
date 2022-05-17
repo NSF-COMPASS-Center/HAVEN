@@ -303,14 +303,15 @@ if __name__ == '__main__':
         import matplotlib.pyplot as plt
         def plotCounter(d, p_name):
             print(f"{p_name}: {d}")
-            fig = plt.figure(1, [23, 18])
-            plt.bar(d.keys(), d.values())
-            plt.xticks(
-                rotation=45,
-                horizontalalignment='right',
-                fontweight='light',
-                fontsize='x-large'
-	        )
+            with plt.style.context("seaborn"):
+                fig = plt.figure(1, [23, 18])
+                plt.bar(d.keys(), d.values())
+                plt.xticks(
+                    rotation=45,
+                    horizontalalignment='right',
+                    fontweight='heavy',
+                    fontsize='x-large'
+	            )
             plt.xlabel('Protien category')
             plt.ylabel('Count')
             plt.title(f'Frequency count of {p_name}')
