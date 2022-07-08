@@ -38,7 +38,7 @@ def parse_args():
                         help='Analyze combinatorial fitness')
     parser.add_argument('--reinfection', action='store_true',
                         help='Analyze reinfection cases')
-    parser.add_argument('--visulise', type=str, default="vis",
+    parser.add_argument('--visulise', type=str,
                         help='Analyze dataset distributions')
     args = parser.parse_args()
     return args
@@ -151,6 +151,26 @@ def parse_gisaid(entry):
     }
     return meta
 
+
+def parse_manual(entry):
+    fields = [x.strip() for x in entry.split('|')]
+
+    country = 'NA'
+    continent = 'NA'
+
+
+    meta = {
+        'protein' : fields[1],
+        'host': fields[2],
+        'group': fields[3],
+        'country': country,
+        'continent': continent,
+        'dataset': 'viprbrc-genbank',
+    }
+    return meta
+
+
+
 # Seqs key:value | string sequence : [metadata1, metadata2, ...]
 def process(fnames):
     seqs = {}
@@ -162,7 +182,9 @@ def process(fnames):
                 continue
             if record.seq not in seqs:
                 seqs[record.seq] = []
-            if "viprbrc" in fname.lower():
+            if "manual" in fname.lower():
+                meta = parse_manual(record.description)
+            elif "viprbrc" in fname.lower():
                 meta = parse_viprbrc(record.description)
             elif "ncbi" in fname.lower():
                 meta = parse_nih(record.description)
@@ -197,17 +219,17 @@ def setup(args):
     #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta'] # From VIPBRC
     #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-viprbrc.fasta', # From VIPRBRC
 	#           'data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
-    fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
-
+    #fnames = ['data/hep/2022-05-16-NucComplete-OrthohepevirusA-ORF1-ORF2-NCBI.fasta'] # From NCBI
+    fnames = ['data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta'] # From VIPBRC accessions hand scrapped from genbank
     seqs = process(fnames)
 
     seq_len = max([ len(seq) for seq in seqs ]) + 2
     vocab_size = len(AAs) + 2
 
-    return seqs
-    #model = get_model(args, seq_len, vocab_size,
-                      #inference_batch_size=1200)
-    #return model, seqs
+    #return seqs
+    model = get_model(args, seq_len, vocab_size,
+                      inference_batch_size=1200)
+    return model, seqs
 
 def interpret_clusters(adata):
     clusters = sorted(set(adata.obs['louvain']))
@@ -221,7 +243,7 @@ def interpret_clusters(adata):
                 tprint('\t\t{}: {}'.format(val, count))
         tprint('')
 
-def plot_umap(adata, categories, namespace='cov'):
+def plot_umap(adata, categories, namespace='hep'):
     for category in categories:
         sc.pl.umap(adata, color=category,
                    save='_{}_{}.png'.format(namespace, category))
@@ -275,8 +297,8 @@ if __name__ == '__main__':
     ]
     vocabulary = { aa: idx + 1 for idx, aa in enumerate(sorted(AAs)) }
 
-    #model, seqs = setup(args)
-    seqs = setup(args)
+    model, seqs = setup(args)
+    #seqs = setup(args)
 
     if args.visulise:
         print(f"visulise_dataset: {args.visulise}")
