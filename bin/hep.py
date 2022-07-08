@@ -372,6 +372,7 @@ if __name__ == '__main__':
                           prob_cutoff=0, beta=1., plot_acquisition=True,
                           plot_namespace='cov2rbd')
 
+    # where to get data for this...
     if args.combfit:
         from combinatorial_fitness import load_starr2020
         tprint('Starr et al. 2020...')

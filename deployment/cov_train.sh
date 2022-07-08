@@ -8,6 +8,7 @@
 
 #SBATCH -p a100_normal_q
 #SBATCH --gres=gpu:1
+#SBATCH --mem=192G
 
 #SBATCH --export=NONE # Fixes some bugs with pathing
 
@@ -37,7 +38,8 @@ mkdir -p $RESULTS_DIR
 # Run python scripts
 #python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/cov_embed.log 2>&1
 
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --train > $RESULTS_DIR/cov_train4.log 2>&1
+#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --train > $RESULTS_DIR/cov_train4.log 2>&1
+python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/cov_train1a.log 2>&1
 
 
 # # Training:
