@@ -398,7 +398,7 @@ class BiLSTMLanguageModel(LanguageModel):
 	# tf pad_sequences lib [[1],[1,2],[1,2,3]] -> [[0,0,1],[0,1,2],[1,2,3]]
         X_pre = pad_sequences(
             X_pre, maxlen=seq_len - 1,
-            dtype='int32', padding='pre', truncating='pre', value=0
+            dtype='int8', padding='pre', truncating='pre', value=0
         )
         if verbose > 1:
             tprint('Padding {} splitted again...'.format(len(X_pre)))
@@ -406,7 +406,7 @@ class BiLSTMLanguageModel(LanguageModel):
 	# tf post padding
         X_post = pad_sequences(
             X_post, maxlen=seq_len - 1,
-            dtype='int32', padding='post', truncating='post', value=0
+            dtype='int8', padding='post', truncating='post', value=0
         )
 
         if verbose > 1:

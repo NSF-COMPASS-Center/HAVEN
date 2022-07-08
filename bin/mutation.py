@@ -170,6 +170,7 @@ def batch_train(args, model, seqs, vocabulary, batch_size=5000,
             train_test(args, model, seqs_batch, vocabulary)
             del seqs_batch
 
+        print(f"Namespace: {args.namespace}")
         fname_prefix = ('target/{0}/checkpoints/{1}/{1}_{2}'
                         .format(args.namespace, args.model_name, args.dim))
 
