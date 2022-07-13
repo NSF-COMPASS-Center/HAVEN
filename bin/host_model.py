@@ -150,7 +150,7 @@ class BiLSTMHostModel(HostLanguageModel):
             batch_size=1000,
             inference_batch_size=1500,
             cache_dir='.',
-            model_name='bilstm',
+            model_name='bilstm_host',
             seed=None,
             verbose=False
     ):
