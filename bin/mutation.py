@@ -155,7 +155,6 @@ def featurize_hosts(seqs, vocabulary):
     Y = []
     for key in sorted_seqs:
 	# Check if key is in 
-        print(seqs[key][0]['host'])
         if seqs[key][0]['host'] == "Human": 
             Y.append(1)
         else:
@@ -171,8 +170,6 @@ def fit_model(name, model, seqs, vocabulary):
 def fit_model_host(name, model, seqs, vocabulary):
     X, lengths = featurize_seqs_hosts(seqs, vocabulary)
     y = featurize_hosts(seqs, None)
-    print("X", X)
-    print("y", y)
     model.fit(X, lengths, y)
     return model
 
@@ -272,7 +269,7 @@ def batch_train(args, model, seqs, vocabulary, batch_size=5000,
               '{}-01.hdf5'.format(fname_prefix))
 
 
-def batch_train_host(args, model, seqs, vocabulary, batch_size=5000,
+def batch_train_host(args, model, seqs, vocabulary, batch_size=500,
                 verbose=True):
     assert(args.train_host)
 
@@ -303,7 +300,7 @@ def batch_train_host(args, model, seqs, vocabulary, batch_size=5000,
 
         print(f"Namespace: {args.namespace}")
         fname_prefix = ('target/{0}/checkpoints/{1}/{1}_{2}'
-                        .format(args.namespace, args.model_name, args.dim))
+                        .format(args.namespace, model.model_name_, args.dim))
 
         if epoch == 0:
             os.rename('{}-01.hdf5'.format(fname_prefix),

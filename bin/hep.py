@@ -191,6 +191,8 @@ def process(fnames):
                 seqs[record.seq] = []
             if "manual" in fname.lower():
                 meta = parse_manual(record.description)
+                if meta['host'] == "unknown":
+                    continue
             elif "viprbrc" in fname.lower():
                 meta = parse_viprbrc(record.description)
             elif "ncbi" in fname.lower():
@@ -206,6 +208,7 @@ def process(fnames):
                 of.write('>{}\n'.format(meta['accession']))
                 of.write('{}\n'.format(str(seq)))
 
+    print(f"Dataset size: {len(seqs)}")
     return seqs
 
 def split_seqs(seqs, split_method='random'):
@@ -385,7 +388,7 @@ if __name__ == '__main__':
 
     if args.train_host:
         hostModel.model_.summary()
-        batch_train_host(args, hostModel, seqs, vocabulary, batch_size=1000)
+        batch_train_host(args, hostModel, seqs, vocabulary, batch_size=128)
 
     if args.train:
         batch_train(args, model, seqs, vocabulary, batch_size=1000)

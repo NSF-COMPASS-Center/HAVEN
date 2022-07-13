@@ -247,6 +247,5 @@ class BiLSTMHostModel(HostLanguageModel):
 
         if verbose > 1:
             tprint('Done splitting and padding.')
-        print(X)
         return X
 
