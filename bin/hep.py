@@ -236,7 +236,7 @@ def setup(args):
     #return seqs
     model = get_model(args, seq_len, vocab_size,
                       inference_batch_size=1200)
-    return model, seqs
+    return model, seqs, seq_len, vocab_size
 
 def interpret_clusters(adata):
     clusters = sorted(set(adata.obs['louvain']))
@@ -307,7 +307,7 @@ if __name__ == '__main__':
     hosts = {"Human", "Non-Human"}
     hostVocab = {host : idx for idx, host in enumerate(sorted(hosts), start=1)}
 
-    model, seqs = setup(args)
+    model, seqs, seq_len, vocab_size = setup(args)
     #seqs = setup(args)
 
     if args.visulise:
@@ -371,16 +371,20 @@ if __name__ == '__main__':
     
 
     # Make host model
-    predictions = layers.Dense(4, activation='softmax')(model.model_.layers[-3].output) # remove two layers
-    hostModel = Model(inputs=model.model_.inputs, outputs=predictions)
+    predictions = layers.Dense(2, activation='softmax')(model.model_.layers[-3].output) # remove two layers
+    tmpModel = Model(inputs=model.model_.inputs, outputs=predictions)
+    print(tmpModel)
+    hostModel = get_model_host(args, tmpModel, seq_len-1, vocab_size, inference_batch_size=1200)
+    print(hostModel.model_)
+
     # Transfer learning
 
     if args.checkpoint_host is not None:
-        hostModel.load_weights(args.checkpoint_host)
-        hostModel.summary()
+        hostModel.model_.load_weights(args.checkpoint_host)
+        hostModel.model_.summary()
 
     if args.train_host:
-        hostModel.summary()
+        hostModel.model_.summary()
         batch_train_host(args, hostModel, seqs, vocabulary, batch_size=1000)
 
     if args.train:

@@ -3,6 +3,31 @@ from utils import *
 def err_model(name):
     raise ValueError('Model {} not supported'.format(name))
 
+def get_model_host(args, rawModel, seq_len, vocab_size,
+              inference_batch_size=200):
+    if args.model_name == 'bilstm':
+        from host_model import BiLSTMHostModel
+        model = BiLSTMHostModel(
+            seq_len,
+	    rawModel,
+            vocab_size,
+            embedding_dim=20,
+            hidden_dim=args.dim,
+            n_hidden=2,
+            n_epochs=args.n_epochs,
+            batch_size=args.batch_size,
+            inference_batch_size=inference_batch_size,
+            cache_dir='target/{}'.format(args.namespace),
+            seed=args.seed,
+            verbose=True,
+        )
+    else:
+        err_model(args.model_name)
+
+    return model
+
+
+
 def get_model(args, seq_len, vocab_size,
               inference_batch_size=1500):
     if args.model_name == 'hmm':
@@ -93,9 +118,9 @@ def featurize_seqs(seqs, vocabulary):
     sorted_seqs = sorted(seqs.keys())
 
     X = np.concatenate([
-        np.array([ start_int ] + [
+        np.array([start_int] + [
             vocabulary[word] for word in seq
-        ] + [ end_int ]) for seq in sorted_seqs
+        ] + [end_int] ) for seq in sorted_seqs
     ]).reshape(-1, 1)
 
     # Check that length of each word is valid (all have + 2 padding and same length as original)
@@ -103,6 +128,27 @@ def featurize_seqs(seqs, vocabulary):
     assert(sum(lens) == X.shape[0])
 
     return X, lens
+
+def featurize_seqs_hosts(seqs, vocabulary):
+    # First two in vocabulary are paddings
+    start_int = len(vocabulary) + 1
+    end_int = len(vocabulary) + 2
+
+    sorted_seqs = sorted(seqs.keys())
+
+    X = np.concatenate([
+        np.array([ start_int ] + [
+            vocabulary[word] for word in seq
+        ]) for seq in sorted_seqs
+    ]).reshape(-1, 1)
+
+    # Check that length of each word is valid (all have + 2 padding and same length as original)
+    lens = np.array([ len(seq) + 1 for seq in sorted_seqs ])
+    assert(sum(lens) == X.shape[0])
+
+    return X, lens
+
+
 
 def featurize_hosts(seqs, vocabulary):
     sorted_seqs = sorted(seqs.keys())
@@ -123,9 +169,10 @@ def fit_model(name, model, seqs, vocabulary):
     return model
 
 def fit_model_host(name, model, seqs, vocabulary):
-    X, lengths = featurize_seqs(seqs, vocabulary)
+    X, lengths = featurize_seqs_hosts(seqs, vocabulary)
     y = featurize_hosts(seqs, None)
-    print(y)
+    print("X", X)
+    print("y", y)
     model.fit(X, lengths, y)
     return model
 
