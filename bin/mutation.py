@@ -104,9 +104,29 @@ def featurize_seqs(seqs, vocabulary):
 
     return X, lens
 
+def featurize_hosts(seqs, vocabulary):
+    sorted_seqs = sorted(seqs.keys())
+    Y = []
+    for key in sorted_seqs:
+	# Check if key is in 
+        print(seqs[key][0]['host'])
+        if seqs[key][0]['host'] == "Human": 
+            Y.append(1)
+        else:
+            Y.append(0)
+    Y = np.array(Y, dtype=int)
+    return Y
+
 def fit_model(name, model, seqs, vocabulary):
     X, lengths = featurize_seqs(seqs, vocabulary)
     model.fit(X, lengths)
+    return model
+
+def fit_model_host(name, model, seqs, vocabulary):
+    X, lengths = featurize_seqs(seqs, vocabulary)
+    y = featurize_hosts(seqs, None)
+    print(y)
+    model.fit(X, lengths, y)
     return model
 
 def cross_entropy(logprob, n_samples):
@@ -140,6 +160,27 @@ def train_test(args, model, seqs, vocabulary, split_seqs=None):
     if args.test:
         report_performance(args.model_name, model, vocabulary,
                            train_seqs, val_seqs)
+
+
+def train_test_host(args, model, seqs, vocabulary, split_seqs=None):
+    if args.train_host and args.train_split:
+        raise ValueError('Training on full and split data is invalid.')
+
+    if args.train_host:
+        model = fit_model_host(args.model_name, model, seqs, vocabulary)
+        return
+
+    if split_seqs is None:
+        raise ValueError('Must provide function to split train/test.')
+    train_seqs, val_seqs = split_seqs(seqs)
+
+    if args.train_split:
+        model = fit_model(args.model_name, model, train_seqs, vocabulary)
+    if args.test:
+        report_performance(args.model_name, model, vocabulary,
+                           train_seqs, val_seqs)
+
+
 
 def batch_train(args, model, seqs, vocabulary, batch_size=5000,
                 verbose=True):
@@ -182,6 +223,51 @@ def batch_train(args, model, seqs, vocabulary, batch_size=5000,
                       '{}-{:02d}.hdf5'.format(fname_prefix, epoch + 1))
     os.rename('{}-00.hdf5'.format(fname_prefix),
               '{}-01.hdf5'.format(fname_prefix))
+
+
+def batch_train_host(args, model, seqs, vocabulary, batch_size=5000,
+                verbose=True):
+    assert(args.train_host)
+
+    # Control epochs here.
+    n_epochs = args.n_epochs
+    args.n_epochs = 1
+    model.n_epochs_ = 1
+
+    n_batches = math.ceil(len(seqs) / float(batch_size))
+    if verbose:
+        tprint('Traing seq batch size: {}, N batches: {}'
+               .format(batch_size, n_batches))
+
+    for epoch in range(n_epochs):
+        if verbose:
+            tprint('True epoch {}/{}'.format(epoch + 1, n_epochs))
+
+	# permuted string sequences
+        perm_seqs = [ str(s) for s in seqs.keys() ]
+        random.shuffle(perm_seqs)
+
+        for batchi in range(n_batches):
+            start = batchi * batch_size
+            end = (batchi + 1) * batch_size
+            seqs_batch = { seq: seqs[seq] for seq in perm_seqs[start:end] }
+            train_test_host(args, model, seqs_batch, vocabulary)
+            del seqs_batch
+
+        print(f"Namespace: {args.namespace}")
+        fname_prefix = ('target/{0}/checkpoints/{1}/{1}_{2}'
+                        .format(args.namespace, args.model_name, args.dim))
+
+        if epoch == 0:
+            os.rename('{}-01.hdf5'.format(fname_prefix),
+                      '{}-00.hdf5'.format(fname_prefix))
+        else:
+            os.rename('{}-01.hdf5'.format(fname_prefix),
+                      '{}-{:02d}.hdf5'.format(fname_prefix, epoch + 1))
+    os.rename('{}-00.hdf5'.format(fname_prefix),
+              '{}-01.hdf5'.format(fname_prefix))
+
+
 
 def embed_seqs(args, model, seqs, vocabulary,
                use_cache=False, verbose=True):
