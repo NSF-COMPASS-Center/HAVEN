@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#SBATCH -J BILSTM_COV_MODEL
+#SBATCH -J BILSTM_HOST_HEP
 #SBATCH -A seqevol
 #SBATCH -N1 
-#SBATCH -t 30:00:00 # 30 hours
+#SBATCH -t 15:00:00 # 15 hours
 
 #SBATCH -p a100_normal_q
 #SBATCH --gres=gpu:2
@@ -29,7 +29,7 @@ python --version
 SCRIPT_LOCATION=$PROJECT_DIR/bin/hep.py 
 MODEL=bilstm
 #SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
-SAVED_MODEL=$PROJECT_DIR/target/cov/checkpoints/bilstm/bilstm_512-11.hdf5
+SAVED_MODEL=$PROJECT_DIR/target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5
 RESULTS_DIR=$PROJECT_DIR/results
 
 echo "Job start"
@@ -48,8 +48,9 @@ mkdir -p $RESULTS_DIR
 #python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --reinfection > $RESULTS_DIR/hep_reinfection.log 2>&1
 
 # # Training:
-python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/hep_train.log 2>&1
+# python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/hep_train.log 2>&1
 
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --train_host > $RESULTS_DIR/hep_host_transfer.log 2>&1
 
 echo "Job done"
 date
