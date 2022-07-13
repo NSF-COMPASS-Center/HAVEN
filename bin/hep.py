@@ -3,6 +3,9 @@
 #import random
 #from Bio import Seq, SeqIO
 from mutation import *
+from keras.models import Sequential
+from keras.models import Model
+from tensorflow.keras import layers
 
 np.random.seed(1)
 random.seed(1)
@@ -12,7 +15,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Hep sequence analysis')
     parser.add_argument('model_name', type=str,
                         help='Type of language model (e.g., hmm, lstm)')
-    parser.add_argument('--namespace', type=str, default='bilstm',
+    parser.add_argument('--namespace', type=str, default='hep',
                         help='Model namespace')
     parser.add_argument('--dim', type=int, default=512,
                         help='Embedding dimension')
@@ -26,6 +29,10 @@ def parse_args():
                         help='Model checkpoint')
     parser.add_argument('--train', action='store_true',
                         help='Train model')
+    parser.add_argument('--train_host', action='store_true',
+                        help='Train host model')
+    parser.add_argument('--checkpoint_host', type=str, default=None,
+                        help='Model checkpoint')
     parser.add_argument('--train-split', action='store_true',
                         help='Train model on portion of data')
     parser.add_argument('--test', action='store_true',
@@ -297,6 +304,9 @@ if __name__ == '__main__':
     ]
     vocabulary = { aa: idx + 1 for idx, aa in enumerate(sorted(AAs)) }
 
+    hosts = {"Human", "Non-Human"}
+    hostVocab = {host : idx for idx, host in enumerate(sorted(hosts), start=1)}
+
     model, seqs = setup(args)
     #seqs = setup(args)
 
@@ -323,7 +333,7 @@ if __name__ == '__main__':
             	speciesORF2Counter[sv[0]['host']]+=1
             dataset = sv[0]["dataset"]
 
-	    # Vis with numpy
+	# Vis with numpy
         import matplotlib.pyplot as plt
         def plotCounter(d, p_name):
             print(f"{p_name}: {d}")
@@ -358,6 +368,20 @@ if __name__ == '__main__':
         model.model_.load_weights(args.checkpoint)
         tprint('Model summary:')
         tprint(model.model_.summary())
+    
+
+    # Make host model
+    predictions = layers.Dense(4, activation='softmax')(model.model_.layers[-3].output) # remove two layers
+    hostModel = Model(inputs=model.model_.inputs, outputs=predictions)
+    # Transfer learning
+
+    if args.checkpoint_host is not None:
+        hostModel.load_weights(args.checkpoint_host)
+        hostModel.summary()
+
+    if args.train_host:
+        hostModel.summary()
+        batch_train_host(args, hostModel, seqs, vocabulary, batch_size=1000)
 
     if args.train:
         batch_train(args, model, seqs, vocabulary, batch_size=1000)
