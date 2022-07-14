@@ -207,10 +207,10 @@ def train_test(args, model, seqs, vocabulary, split_seqs=None):
 
 
 def train_test_host(args, model, seqs, vocabulary, split_seqs=None):
-    if args.train_host and args.train_split:
+    if args.train and args.train_split:
         raise ValueError('Training on full and split data is invalid.')
 
-    if args.train_host:
+    if args.train:
         model = fit_model_host(args.model_name, model, seqs, vocabulary)
         return
 
@@ -271,7 +271,7 @@ def batch_train(args, model, seqs, vocabulary, batch_size=5000,
 
 def batch_train_host(args, model, seqs, vocabulary, batch_size=500,
                 verbose=True):
-    assert(args.train_host)
+    assert(args.train)
 
     # Control epochs here.
     n_epochs = args.n_epochs

@@ -1,22 +1,25 @@
 #!/usr/bin/env python
-#import numpy as np
-#import random
+import numpy as np
+import random
 #from Bio import Seq, SeqIO
+import os.path
 from collections import Counter
 from mutation import *
 from keras.models import Sequential
 from keras.models import Model
 from tensorflow.keras import layers
-from typing import List
+from keras.models import load_model
 import tensorflow as tf
+import yaml
 import types
+from typing import List
 from AA import AAs
 
-class Hep():
+class HepHost():
     def __init__(self, model_name:str, checkpoint:str=None, datasets:List[str]=None, transferCheckpoint:str=None,
             namespace:str="hep", seed:int=1, dim:int=512, batch_size:int=500, 
             n_epochs:int=11, train:bool=False, test:bool=False, embed:bool=False, 
-            semantics:bool=False, combfit:bool=False, reinfection:bool=False, train_split:bool=False, visulise:bool=False):
+            semantics:bool=False, combfit:bool=False, reinfection:bool=False, train_split:bool=False):
         self.args = types.SimpleNamespace()
         self.args.model_name = model_name
         self.args.seed = seed
@@ -26,7 +29,6 @@ class Hep():
         self.args.checkpoint = checkpoint
         self.args.n_epochs = n_epochs
         self.args.train = train
-        self.args.train_split=train_split
         self.args.test = test
         self.args.embed = embed
         self.args.semantics = semantics
@@ -34,17 +36,14 @@ class Hep():
         self.args.reinfection = reinfection
         self.args.datasets = datasets
         self.args.transferCheckpoint = transferCheckpoint
-        self.args.visulise=visulise
+        self.args.train_split= train_split
 
         # Set seeds
         np.random.seed(self.args.seed)
         random.seed(self.args.seed)
         tf.random.set_seed(self.args.seed)
 
-        print(self.args)
- 
-
-    def parse_viprbrc(self, entry):
+    def parse_viprbrc(self,entry):
         fields = entry.split('|')
         if fields[7] == 'NA':
             date = None
@@ -144,7 +143,7 @@ class Hep():
         return meta
 
 
-    def parse_manual(self,entry):
+    def parse_manual(self, entry):
         fields = [x.strip() for x in entry.split('|')]
 
         country = 'NA'
@@ -164,6 +163,7 @@ class Hep():
 
 
     # Seqs key:value | string sequence : [metadata1, metadata2, ...]
+    # Processes list of fasta files to records
     def process(self, fnames):
         seqs = {}
         for fname in fnames:
@@ -209,17 +209,15 @@ class Hep():
 
         return train_seqs, test_seqs
 
-    def setup(self, args):
-        fnames = self.args.datasets
+    def setup(self):
+        fnames = self.args.datasets 
         seqs = self.process(fnames)
 
         seq_len = max([ len(seq) for seq in seqs ]) + 2 # For padding
         vocab_size = len(AAs) + 2 # For padding characters
 
         #return seqs
-        model = get_model(self.args, seq_len, vocab_size,
-                          inference_batch_size=1200)
-        return model, seqs, seq_len, vocab_size
+        return seqs, seq_len, vocab_size
 
     def interpret_clusters(self, adata):
         clusters = sorted(set(adata.obs['louvain']))
@@ -282,74 +280,29 @@ class Hep():
 
         hosts = {"Human", "Non-Human"}
         hostVocab = {host : idx for idx, host in enumerate(sorted(hosts), start=1)}
-        model, seqs, seq_len, vocab_size = self.setup(self.args)
+        seqs, seq_len, vocab_size = self.setup()
 
-        if self.args.visulise:
-            print(f"visulise_dataset: {self.args.visulise}")
-            # Extract freq map of species wide distribution
-            # Basically a hashmap obj
-            speciesCounter = Counter()
+        # Load in for transfer learning
+        if self.args.transferCheckpoint:
+            model = load_model(self.args.transferCheckpoint)
+            print("getting transfercp")
+        else:
+            model = get_model(self.args, seq_len, vocab_size, inference_batch_size=1200).model_
 
-            # Count the hosts
-            for sv in seqs.values():
-                speciesCounter[sv[0]['host']]+=1
+        # Make host model
+        predictions = layers.Dense(2, activation='softmax')(model.layers[-3].output) # Replace classifier with ours
+        tmpModel = Model(inputs=model.inputs, outputs=predictions)
+        hostModel = get_model_host(self.args, tmpModel, seq_len-1, vocab_size, inference_batch_size=1200)
 
-            speciesORF1Counter = Counter()
-            for sv in seqs.values():
-                if "orf1" in sv[0]["protein"].lower():
-                    speciesORF1Counter[sv[0]['host']]+=1
-
-            speciesORF2Counter = Counter()
-            dataset = None
-            for sv in seqs.values():
-                if "orf2" in sv[0]["protein"].lower():
-                    speciesORF2Counter[sv[0]['host']]+=1
-                dataset = sv[0]["dataset"]
-
-            # Vis with numpy
-            import matplotlib.pyplot as plt
-            def plotCounter(d, p_name):
-                print(f"{p_name}: {d}")
-                with plt.style.context("seaborn"):
-                    #fig = plt.figure(1, [5, 4])
-                    #plt.rcParams.update({'font.size': 22})
-                    tmp = sorted(zip(d.keys(), d.values()), key=lambda x: -x[1])  
-                    keys = [x[0] for x in tmp]
-                    values = [y[1] for y in tmp]
-                    plt.bar(keys, values)
-                    plt.xticks(
-                        rotation=45,
-                        horizontalalignment='right',
-                        #fontweight='heavy',
-                        #fontsize='small'
-                    )
-                plt.xlabel('Host species')
-                plt.ylabel('Sequence count')
-                plt.title(f'Host species vs frequency count: ({dataset}, Orthohepevirus A, {p_name})')
-
-                # Print image
-                name = f'distribution-{p_name}.png'
-                plt.savefig(name, bbox_inches='tight', dpi=300)
-                plt.clf()
-
-            # With all 3 frequency maps
-            plotCounter(speciesCounter, 'overall')
-            plotCounter(speciesORF1Counter, 'orf1')
-            plotCounter(speciesORF2Counter, 'orf2')
-
-        # If bilstm model has a checkpoint, load it in
+        # Transfer learning
         if self.args.checkpoint:
-            model.model_.load_weights(self.args.checkpoint)
-            tprint('Model summary:')
-            tprint(model.model_.summary())
-     
-        # If bilstm model should train
-        if self.args.train:
-            batch_train(self.args, model, seqs, vocabulary, batch_size=1000)
+            hostModel.model_.load_weights(self.args.checkpoint)
+            hostModel.model_.summary()
 
-        # If bilstm should train with splits or test
-        if self.args.train_split or self.args.test:
-            train_test(self.args, model, seqs, vocabulary, split_seqs)
+        if self.args.train:
+            hostModel.model_.summary()
+            batch_train_host(self.args, hostModel, seqs, vocabulary, batch_size=128)
+
 
         if self.args.embed:
             if self.args.checkpoint is None and not self.args.train:
