@@ -31,6 +31,7 @@ MODEL=bilstm
 #SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
 SAVED_MODEL=$PROJECT_DIR/target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5
 RESULTS_DIR=$PROJECT_DIR/results
+CONFIG_DIR=$PROJECT_DIR/config-files
 
 echo "Job start"
 date
@@ -50,7 +51,7 @@ mkdir -p $RESULTS_DIR
 # # Training:
 # python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/hep_train.log 2>&1
 
-python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --train_host > $RESULTS_DIR/hep_host_transfer.log 2>&1
+python $SCRIPT_LOCATION -c $CONFIG_DIR/hepConfig.yaml > $RESULTS_DIR/hep_host_transfer.r4.log 2>&1
 
 echo "Job done"
 date
