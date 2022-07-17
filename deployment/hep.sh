@@ -3,12 +3,12 @@
 #SBATCH -J BILSTM_HOST_HEP
 #SBATCH -A seqevol
 #SBATCH -N1 
-#SBATCH -t 15:00:00 # 15 hours
+#SBATCH -t 5:00:00 # 5 hours
 
 #SBATCH -p a100_normal_q
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=4
-#SBATCH --mem-per-cpu=128G # Yeah, ik making all those permutations costs a lot of memory, which is the required format for TF, unless I want to alter the TF libs, this is fine
+#SBATCH --mem-per-cpu=32G # Yeah, ik making all those permutations costs a lot of memory, which is the required format for TF, unless I want to alter the TF libs, this is fine
 
 #SBATCH --export=NONE # Fixes some bugs with pathing
 
@@ -26,7 +26,7 @@ source activate $USER_HOME/.conda/envs/BioNLP
 python --version
 
 # Parameters
-SCRIPT_LOCATION=$PROJECT_DIR/bin/hep.py 
+SCRIPT_LOCATION=$PROJECT_DIR/bin/hep_pipeline.py 
 MODEL=bilstm
 #SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
 SAVED_MODEL=$PROJECT_DIR/target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5
@@ -51,7 +51,7 @@ mkdir -p $RESULTS_DIR
 # # Training:
 # python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/hep_train.log 2>&1
 
-python $SCRIPT_LOCATION -c $CONFIG_DIR/hepConfig.yaml > $RESULTS_DIR/hep_host_transfer.r4.log 2>&1
+python $SCRIPT_LOCATION -c $CONFIG_DIR/hepConfig.yaml > $RESULTS_DIR/hep_host_transfer.r5.log 2>&1
 
 echo "Job done"
 date
