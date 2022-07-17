@@ -29,9 +29,10 @@ class DataUtils:
         plt.xlabel(f"{metricName}", fontsize=20)
         plt.ylabel('Epoch', fontsize=20)
         plt.title('Training history',fontsize=20)
+        plt.legend()
 
         # Print image
-        name = f'results/{filename}.png'
+        name = f'figures/{filename}.png'
         plt.savefig(name, bbox_inches='tight', dpi=300)
         plt.clf()
 
