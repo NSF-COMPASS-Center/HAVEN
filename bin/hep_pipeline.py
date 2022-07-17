@@ -5,7 +5,7 @@ from hep_host import HepHost
 from hep import Hep
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Hep sequence analysis')
+    parser = argparse.ArgumentParser(description='Hep sequence analysis pipeline')
     parser.add_argument('-c','--config', required=True,
                         help="Configuration file containing list of datasets "
                         "algorithms and output specifications.\n")
@@ -21,32 +21,38 @@ def yaml_parse(path):
         print(f"Error parsing config file: {exc}")
         return None
 
+
 def main():
     args = parse_args()
     args.config = yaml_parse(args.config)
 
-
-    print(args.config)
-    '''
-    def __init__(self, checkpoint:str=None, datasets:List[str]=None, transferCheckpoint:str=None,
-            namespace:str="hep", model_name:str="bilstm",  seed:int=1, dim:int=512, batch_size:int=500, 
-            n_epochs:int=11, train:bool=False, test:bool=False, embed:bool=False, 
-            semantics:bool=False, combfit:bool=False, reinfection:bool=False):
-    '''
- 
     # extract respectively
     datasets = [v for d in args.config['input_settings']['datasets'] for k,v in d.items() if k == "path"]
-    print(datasets)
 
-    hh = HepHost(model_name="bilstm", datasets=datasets, 
-            train=args.config['input_settings']['models']['bilstm_host']['should_train'],  
-            transferCheckpoint=args.config['input_settings']['models']['bilstm']['checkpoint'], 
-            seed=args.config['input_settings']['models']['bilstm_host']['seed'])
-    hh.start()
-    #h = Hep(model_name="bilstm", datasets=datasets, train=, 
-    #        checkpoint=args.config['input_settings']['models']['bilstm']['checkpoint'],
-    #        seed=args.config['input_settings']['models']['bilstm_host']['seed'])
-    #h.start()
+    # Language model
+    modelName = 'bilstm'
+    bilstmSettings = args.config['input_settings']['models'][modelName]
+    if bilstmSettings['active']:
+        print("Initalizing Bilstm Language Model----------------------------")
+        h = Hep(model_name=modelName, datasets=datasets, 
+                train=bilstmSettings['should_train'], 
+                checkpoint=bilstmSettings['checkpoint'],
+               seed=bilstmSettings['seed'])
+        h.start()
+
+    # Host model
+    bilstmHostSettings = bilstmSettings[f'{modelName}_host']
+    if bilstmHostSettings['active']:
+        print("Initalizing Bilstm Host Model--------------------------------")
+        hh = HepHost(model_name=modelName, datasets=datasets, 
+                train=bilstmHostSettings['should_train'],  
+                train_split=bilstmHostSettings['train_split'],
+                batch_size = bilstmHostSettings['batch_size'],
+                test=bilstmHostSettings['should_test'],
+                transferCheckpoint=bilstmSettings['checkpoint'], 
+                seed=bilstmSettings['seed'])
+        hh.start()
+
 
 if __name__ == '__main__':
     main()

@@ -216,9 +216,8 @@ class Hep():
         seq_len = max([ len(seq) for seq in seqs ]) + 2 # For padding
         vocab_size = len(AAs) + 2 # For padding characters
 
-        #return seqs
         model = get_model(self.args, seq_len, vocab_size,
-                          inference_batch_size=1200)
+                          inference_batch_size=self.args.batch_size)
         return model, seqs, seq_len, vocab_size
 
     def interpret_clusters(self, adata):
@@ -345,7 +344,7 @@ class Hep():
      
         # If bilstm model should train
         if self.args.train:
-            batch_train(self.args, model, seqs, vocabulary, batch_size=1000)
+            batch_train(self.args, model, seqs, vocabulary, batch_size=self.args.batch_size)
 
         # If bilstm should train with splits or test
         if self.args.train_split or self.args.test:

@@ -33,8 +33,10 @@ class HostLanguageModel(object):
         X = self.split_and_pad(
             X_cat, lengths, self.seq_len_, self.vocab_size_, self.verbose_
         )
+        import sys
+        import numpy
+        numpy.set_printoptions(threshold=sys.maxsize)
 
-        print("data before training: ", X_cat, y)
         opt = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999,
                    amsgrad=False)
         self.model_.compile(
@@ -44,6 +46,7 @@ class HostLanguageModel(object):
 
         dirname = '{}/checkpoints/{}'.format(self.cache_dir_,
                                                         self.model_name_)
+        print(f"Saving model stats to {dirname}")
         mkdir_p(dirname)
         checkpoint = ModelCheckpoint(
             '{}/{}_{}'
@@ -115,7 +118,7 @@ class HostLanguageModel(object):
 
         return X_embed
 
-    #y_true in the form of numpy array [1,2,3,4,1,2,3, ...]
+    # Returns the total cross entropy
     def score(self, X_cat, lengths, y_true):
         X = self.split_and_pad(
             X_cat, lengths, self.seq_len_, self.vocab_size_, self.verbose_
@@ -134,6 +137,7 @@ class HostLanguageModel(object):
         for val, metric in zip(metrics, self.model_.metrics_names):
             if self.verbose_:
                 tprint('Metric {}: {}'.format(metric, val))
+
 
         return metrics[self.model_.metrics_names.index('loss')] * -len(lengths)
 

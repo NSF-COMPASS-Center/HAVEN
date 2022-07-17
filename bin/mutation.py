@@ -179,13 +179,20 @@ def cross_entropy(logprob, n_samples):
 def report_performance(model_name, model, vocabulary,
                        train_seqs, test_seqs):
     X_train, lengths_train = featurize_seqs(train_seqs, vocabulary)
-    logprob = model.score(X_train, lengths_train)
+    y_train = featurize_hosts(train_seqs, None)
+    logprob = model.score(X_train, lengths_train, y_train)
+
+    trainCE = cross_entropy(logprob, len(lengths_train))
     tprint('Model {}, train cross entropy: {}'
-           .format(model_name, cross_entropy(logprob, len(lengths_train))))
+           .format(model_name, trainCE))
+
     X_test, lengths_test = featurize_seqs(test_seqs, vocabulary)
-    logprob = model.score(X_test, lengths_test)
+    y_test = featurize_hosts(test_seqs, None)
+    logprob = model.score(X_test, lengths_test, y_test)
+    testCE = cross_entropy(logprob, len(lengths_test))
     tprint('Model {}, test cross entropy: {}'
-           .format(model_name, cross_entropy(logprob, len(lengths_test))))
+           .format(model_name, testCE))
+    return (trainCE, testCE)
 
 def train_test(args, model, seqs, vocabulary, split_seqs=None):
     if args.train and args.train_split:
@@ -193,25 +200,6 @@ def train_test(args, model, seqs, vocabulary, split_seqs=None):
 
     if args.train:
         model = fit_model(args.model_name, model, seqs, vocabulary)
-        return
-
-    if split_seqs is None:
-        raise ValueError('Must provide function to split train/test.')
-    train_seqs, val_seqs = split_seqs(seqs)
-
-    if args.train_split:
-        model = fit_model(args.model_name, model, train_seqs, vocabulary)
-    if args.test:
-        report_performance(args.model_name, model, vocabulary,
-                           train_seqs, val_seqs)
-
-
-def train_test_host(args, model, seqs, vocabulary, split_seqs=None):
-    if args.train and args.train_split:
-        raise ValueError('Training on full and split data is invalid.')
-
-    if args.train:
-        model = fit_model_host(args.model_name, model, seqs, vocabulary)
         return
 
     if split_seqs is None:
@@ -269,7 +257,12 @@ def batch_train(args, model, seqs, vocabulary, batch_size=5000,
               '{}-01.hdf5'.format(fname_prefix))
 
 
-def batch_train_host(args, model, seqs, vocabulary, batch_size=500,
+def train_host(args, model, train_seqs, vocabulary):
+    if args.train:
+        model = fit_model_host(args.model_name, model, train_seqs, vocabulary)
+
+
+def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, batch_size=500,
                 verbose=True):
     assert(args.train)
 
@@ -278,27 +271,36 @@ def batch_train_host(args, model, seqs, vocabulary, batch_size=500,
     args.n_epochs = 1
     model.n_epochs_ = 1
 
-    n_batches = math.ceil(len(seqs) / float(batch_size))
+    train_loss = []
+    test_loss = []
+
+    n_batches = math.ceil(len(train_seqs) / float(batch_size))
     if verbose:
         tprint('Traing seq batch size: {}, N batches: {}'
                .format(batch_size, n_batches))
 
+    
     for epoch in range(n_epochs):
         if verbose:
             tprint('True epoch {}/{}'.format(epoch + 1, n_epochs))
 
-	# permuted string sequences
-        perm_seqs = [ str(s) for s in seqs.keys() ]
+	    # permuted string sequences
+        perm_seqs = [ str(s) for s in train_seqs.keys()]
         random.shuffle(perm_seqs)
 
         for batchi in range(n_batches):
             start = batchi * batch_size
             end = (batchi + 1) * batch_size
-            seqs_batch = { seq: seqs[seq] for seq in perm_seqs[start:end] }
-            train_test_host(args, model, seqs_batch, vocabulary)
+            seqs_batch = { seq: train_seqs[seq] for seq in perm_seqs[start:end] }
+            train_host(args, model, seqs_batch, vocabulary)
             del seqs_batch
 
-        print(f"Namespace: {args.namespace}")
+        if args.test and val_seqs:
+            trainCE, testCE = report_performance(args.model_name, model, vocabulary,
+                               train_seqs, val_seqs)
+            train_loss.append(trainCE)
+            test_loss.append(testCE)
+
         fname_prefix = ('target/{0}/checkpoints/{1}/{1}_{2}'
                         .format(args.namespace, model.model_name_, args.dim))
 
@@ -308,8 +310,11 @@ def batch_train_host(args, model, seqs, vocabulary, batch_size=500,
         else:
             os.rename('{}-01.hdf5'.format(fname_prefix),
                       '{}-{:02d}.hdf5'.format(fname_prefix, epoch + 1))
+
     os.rename('{}-00.hdf5'.format(fname_prefix),
               '{}-01.hdf5'.format(fname_prefix))
+
+    return train_loss, test_loss
 
 
 

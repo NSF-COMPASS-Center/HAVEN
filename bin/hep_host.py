@@ -2,24 +2,29 @@
 import numpy as np
 import random
 #from Bio import Seq, SeqIO
-import os.path
-from collections import Counter
-from mutation import *
 from keras.models import Sequential
 from keras.models import Model
 from tensorflow.keras import layers
 from keras.models import load_model
 import tensorflow as tf
-import yaml
-import types
+
+import os.path
+from collections import Counter
 from typing import List
+import types
+import yaml
+
+from DataUtils import DataUtils
+
+from mutation import *
 from AA import AAs
+
 
 class HepHost():
     def __init__(self, model_name:str, checkpoint:str=None, datasets:List[str]=None, transferCheckpoint:str=None,
             namespace:str="hep", seed:int=1, dim:int=512, batch_size:int=500, 
             n_epochs:int=11, train:bool=False, test:bool=False, embed:bool=False, 
-            semantics:bool=False, combfit:bool=False, reinfection:bool=False, train_split:bool=False):
+            semantics:bool=False, combfit:bool=False, reinfection:bool=False, train_split:float=0.8):
         self.args = types.SimpleNamespace()
         self.args.model_name = model_name
         self.args.seed = seed
@@ -29,6 +34,7 @@ class HepHost():
         self.args.checkpoint = checkpoint
         self.args.n_epochs = n_epochs
         self.args.train = train
+        self.args.train_split= train_split
         self.args.test = test
         self.args.embed = embed
         self.args.semantics = semantics
@@ -36,7 +42,6 @@ class HepHost():
         self.args.reinfection = reinfection
         self.args.datasets = datasets
         self.args.transferCheckpoint = transferCheckpoint
-        self.args.train_split= train_split
 
         # Set seeds
         np.random.seed(self.args.seed)
@@ -195,20 +200,6 @@ class HepHost():
         print(f"Dataset size: {len(seqs)}")
         return seqs
 
-    def split_seqs(self, seqs, split_method='random'):
-        train_seqs, test_seqs = {}, {}
-
-        tprint('Splitting seqs...')
-        for idx, seq in enumerate(seqs):
-            if idx % 10 < 2:
-                test_seqs[seq] = seqs[seq]
-            else:
-                train_seqs[seq] = seqs[seq]
-        tprint('{} train seqs, {} test seqs.'
-               .format(len(train_seqs), len(test_seqs)))
-
-        return train_seqs, test_seqs
-
     def setup(self):
         fnames = self.args.datasets 
         seqs = self.process(fnames)
@@ -287,22 +278,26 @@ class HepHost():
             model = load_model(self.args.transferCheckpoint)
             print("getting transfercp")
         else:
-            model = get_model(self.args, seq_len, vocab_size, inference_batch_size=1200).model_
+            model = get_model(self.args, seq_len, vocab_size, inference_batch_size=self.args.batch_size).model_
 
         # Make host model
         predictions = layers.Dense(2, activation='softmax')(model.layers[-3].output) # Replace classifier with ours
         tmpModel = Model(inputs=model.inputs, outputs=predictions)
-        hostModel = get_model_host(self.args, tmpModel, seq_len-1, vocab_size, inference_batch_size=1200)
+        hostModel = get_model_host(self.args, tmpModel, seq_len-1, vocab_size, inference_batch_size=self.args.batch_size)
 
-        # Transfer learning
+        # Regular checkpoint of weights
         if self.args.checkpoint:
             hostModel.model_.load_weights(self.args.checkpoint)
             hostModel.model_.summary()
 
         if self.args.train:
             hostModel.model_.summary()
-            batch_train_host(self.args, hostModel, seqs, vocabulary, batch_size=128)
+            train_seqs, test_seqs = DataUtils.split_seqs(seqs, self.args.train_split, self.args.seed)
+            print("Batch sz:", self.args.batch_size)
 
+            trainCE, testCE = batch_train_host(self.args, hostModel, train_seqs, test_seqs, vocabulary,
+                    batch_size=self.args.batch_size)
+            DataUtils.plot_metric(trainCE, testCE, f"CE-bilstm-host")
 
         if self.args.embed:
             if self.args.checkpoint is None and not self.args.train:

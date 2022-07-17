@@ -15,20 +15,21 @@ input_settings:
     models:
         # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
         bilstm:
+            active: false
             should_train: false
             seed: 1
             checkpoint: "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
 
-        # Same model as above, but different last layer classifier
-        # Classifies 1/0 human/non-human
-        bilstm_host:
-            should_train: True
-            seed: 1
-            # If true, will use the weights from models.bilstm.checkpoint
-            transfer_learning: True 
-            # If undefined, will not transfer weights
-            checkpoint: "" # "target/hep/checkpoints/bilstm_host/r1/bilstm_512-11.hdf5"
-            split: .75 # Will do k-fold validation with skl
+            # Same model as above, but different last layer classifier
+            # Classifies 1/0 human/non-human
+            bilstm_host:
+                active: True
+                should_train: True
+                train_split: 0.8
+                batch_size: 16
+                should_test: True
+                transfer_learning: True 
+                checkpoint: "" # "target/hep/checkpoints/bilstm_host/r1/bilstm_512-11.hdf5"
 
 # Output Settings: initialize base output folder names
 output_settings:
