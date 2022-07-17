@@ -8,6 +8,7 @@ from tensorflow.keras import layers
 from keras.models import load_model
 import tensorflow as tf
 
+from datetime import datetime
 import os.path
 from collections import Counter
 from typing import List
@@ -297,7 +298,8 @@ class HepHost():
 
             trainCE, testCE = batch_train_host(self.args, hostModel, train_seqs, test_seqs, vocabulary,
                     batch_size=self.args.batch_size)
-            DataUtils.plot_metric(trainCE, testCE, f"CE-bilstm-host")
+            date = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
+            DataUtils.plot_metric(trainCE, testCE, f"hep_bilstm_host_{date}")
 
         if self.args.embed:
             if self.args.checkpoint is None and not self.args.train:
