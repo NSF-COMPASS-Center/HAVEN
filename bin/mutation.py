@@ -3,13 +3,13 @@ from utils import *
 def err_model(name):
     raise ValueError('Model {} not supported'.format(name))
 
-def get_model_host(args, rawModel, seq_len, vocab_size,
+def get_model_host(args, parentModel, seq_len, vocab_size,
               inference_batch_size=200):
     if args.model_name == 'bilstm':
         from host_model import BiLSTMHostModel
         model = BiLSTMHostModel(
             seq_len,
-	    rawModel,
+	    parentModel,
             vocab_size,
             embedding_dim=20,
             hidden_dim=args.dim,
@@ -301,6 +301,7 @@ def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, batch_size=5
             train_loss.append(trainCE)
             test_loss.append(testCE)
 
+
         fname_prefix = ('target/{0}/checkpoints/{1}/{1}_{2}'
                         .format(args.namespace, model.model_name_, args.dim))
 
@@ -310,6 +311,7 @@ def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, batch_size=5
         else:
             os.rename('{}-01.hdf5'.format(fname_prefix),
                       '{}-{:02d}.hdf5'.format(fname_prefix, epoch + 1))
+        model.gpu_gc()
 
     os.rename('{}-00.hdf5'.format(fname_prefix),
               '{}-01.hdf5'.format(fname_prefix))

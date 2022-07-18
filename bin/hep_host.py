@@ -3,12 +3,10 @@ import numpy as np
 import random
 #from Bio import Seq, SeqIO
 from keras.models import Sequential
-from keras.models import Model
-from tensorflow.keras import layers
 from keras.models import load_model
 import tensorflow as tf
 
-from datetime import datetime
+import datetime
 import os.path
 from collections import Counter
 from typing import List
@@ -282,9 +280,7 @@ class HepHost():
             model = get_model(self.args, seq_len, vocab_size, inference_batch_size=self.args.batch_size).model_
 
         # Make host model
-        predictions = layers.Dense(2, activation='softmax')(model.layers[-3].output) # Replace classifier with ours
-        tmpModel = Model(inputs=model.inputs, outputs=predictions)
-        hostModel = get_model_host(self.args, tmpModel, seq_len-1, vocab_size, inference_batch_size=self.args.batch_size)
+        hostModel = get_model_host(self.args, model, seq_len-1, vocab_size, inference_batch_size=self.args.batch_size)
 
         # Regular checkpoint of weights
         if self.args.checkpoint:
@@ -298,7 +294,7 @@ class HepHost():
 
             trainCE, testCE = batch_train_host(self.args, hostModel, train_seqs, test_seqs, vocabulary,
                     batch_size=self.args.batch_size)
-            date = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
+            date = datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
             DataUtils.plot_metric(trainCE, testCE, f"hep_bilstm_host_{date}")
 
         if self.args.embed:

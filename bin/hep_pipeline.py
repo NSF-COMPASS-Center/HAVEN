@@ -35,7 +35,7 @@ def main():
     if bilstmSettings['active']:
         print("Initalizing Bilstm Language Model----------------------------")
         h = Hep(model_name=modelName, datasets=datasets, 
-                n_epochs=bilstmSettings['epochs']
+                n_epochs=bilstmSettings['epochs'],
                 train=bilstmSettings['should_train'], 
                 checkpoint=bilstmSettings['checkpoint'],
                 seed=bilstmSettings['seed'])
@@ -47,7 +47,7 @@ def main():
         print("Initalizing Bilstm Host Model--------------------------------")
         hh = HepHost(model_name=modelName, datasets=datasets, 
                 train=bilstmHostSettings['should_train'],  
-                n_epochs=bilstmHostSettings['epochs']
+                n_epochs=bilstmHostSettings['epochs'],
                 train_split=bilstmHostSettings['train_split'],
                 batch_size = bilstmHostSettings['batch_size'],
                 test=bilstmHostSettings['should_test'],

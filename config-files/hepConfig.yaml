@@ -19,7 +19,7 @@ input_settings:
             should_train: false
             seed: 1
             checkpoint: "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
-            epochs: 32
+            epochs: 12
 
             # Same model as above, but different last layer classifier for transfer learning
             # Classifies 1/0 human/non-human
@@ -28,7 +28,7 @@ input_settings:
                 epochs: 32
                 should_train: True
                 train_split: 0.8
-                batch_size: 128
+                batch_size: 64
                 should_test: True
                 transfer_learning: True 
                 checkpoint: "" # "target/hep/checkpoints/bilstm_host/r1/bilstm_512-11.hdf5"
