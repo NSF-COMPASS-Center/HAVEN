@@ -1,7 +1,9 @@
 from utils import *
+import gc
 
 import tensorflow as tf
 from tensorflow.keras import Input
+from tensorflow.keras.backend import clear_session
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.layers import (
     concatenate, Activation, Dense, Embedding, LSTM, Reshape)
@@ -9,6 +11,8 @@ from tensorflow.keras.mixed_precision import experimental as mixed_precision
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+from tensorflow.keras import layers
 
 class HostLanguageModel(object):
     def __init__(self, seed=None):
@@ -26,6 +30,10 @@ class HostLanguageModel(object):
     def split_and_pad(self, *args, **kwargs):
         raise NotImplementedError('Use LM instantiation instead '
                                   'of base class.')
+
+    def gpu_gc(self):
+        gc.collect()
+        clear_session()
 
     # X_cats comes in the form of 1 large array, but has beginning and ending vocab separators
     # lengths is length of each sequence
@@ -145,7 +153,7 @@ class BiLSTMHostModel(HostLanguageModel):
     def __init__(
             self,
             seq_len,
-            model,
+            parentModel,
             vocab_size,
             embedding_dim=20,
             hidden_dim=256,
@@ -164,7 +172,7 @@ class BiLSTMHostModel(HostLanguageModel):
         policy = mixed_precision.Policy('mixed_float16')
         mixed_precision.set_policy(policy)
 
-        if not model:
+        if not parentModel:
             input_pre = Input(shape=(seq_len - 1,))
             input_post = Input(shape=(seq_len - 1,))
 
@@ -192,7 +200,16 @@ class BiLSTMHostModel(HostLanguageModel):
             self.model_ = Model(inputs=[ input_pre, input_post ],
                                 outputs=output)
         else:
-            self.model_ = model
+            # Replace classifier
+            x = parentModel.layers[-3].output
+            parentModel.trainable = False
+
+            for sz in (512, 256, 128, 64):
+                x = layers.Dense(sz, activation='swish')(x)
+                
+            predictions = layers.Dense(2, activation='softmax', dtype='float32')(x) 
+            self.model_ = Model(inputs=parentModel.inputs, outputs=predictions)
+            assert self.model_.layers[0].trainable == False
 
         self.seq_len_ = seq_len
         self.vocab_size_ = vocab_size
