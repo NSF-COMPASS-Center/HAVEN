@@ -26,8 +26,8 @@ class DataUtils:
                 plt.plot(epochs, testCE, label=f"Testing {metricName}")
             
 
-        plt.xlabel(f"{metricName}", fontsize=20)
-        plt.ylabel('Epoch', fontsize=20)
+        plt.xlabel('Epoch', fontsize=20)
+        plt.ylabel(f"{metricName}", fontsize=20)
         plt.title('Training history',fontsize=20)
         plt.legend()
 
