@@ -45,7 +45,7 @@ class HostLanguageModel(object):
         import numpy
         numpy.set_printoptions(threshold=sys.maxsize)
 
-        opt = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999,
+        opt = Adam(learning_rate=0.0005, beta_1=0.9, beta_2=0.999,
                    amsgrad=False)
         self.model_.compile(
             loss='sparse_categorical_crossentropy', optimizer=opt,
