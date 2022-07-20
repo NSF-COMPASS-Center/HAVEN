@@ -177,9 +177,8 @@ def fit_model_host(name, model, seqs, vocabulary, labelVocab):
 
 def cross_entropy(logprob, n_samples):
     return -logprob / n_samples
-, labelVocab, filename, average)
 
-def report_auroc_host_internal(X_test, lengths_test, labelVocab, filename=None, average="macro")
+def report_auroc_host_internal(model, X_test, y_test, lengths_test, labelVocab, filename=None, average="macro"):
     y_pred = model.predict(X_test, lengths_test)
     print(f"ypred: {y_pred}")
     y_pred = y_pred.argmax(axis=-1)
@@ -190,7 +189,7 @@ def report_auroc_host_internal(X_test, lengths_test, labelVocab, filename=None, 
 def report_auroc_host(model, vocab, labelVocab, test_seqs, filename=None, average="macro"):
     X_test, lengths_test = featurize_seqs_host(test_seqs, vocab)
     y_test = featurize_hosts(test_seqs, labelVocab)
-    return report_auroc_host_internal(X_test, lengths_test, labelVocab, filename, average)
+    return report_auroc_host_internal(model, X_test, y_test, lengths_test, labelVocab, filename, average)
 
 
 def report_performance_host(model_name, model, vocabulary, labelVocab, train_seqs, test_seqs):
@@ -202,7 +201,11 @@ def report_performance_host(model_name, model, vocabulary, labelVocab, train_seq
     tprint('Model {}, train cross entropy: {}'
            .format(model_name, trainCE))
 
-    trainAUROC = report_auroc_host_internal(model, vocabulary, labelVocab, train_seqs)
+    trainAUROC = report_auroc_host_internal(model, X_train, y_train, lengths_train, labelVocab)
+
+    tprint('Model {}, train AUROC: {}'
+           .format(model_name, trainAUROC))
+
 
     X_test, lengths_test = featurize_seqs_host(test_seqs, vocabulary)
     y_test = featurize_hosts(test_seqs, labelVocab)
@@ -211,7 +214,10 @@ def report_performance_host(model_name, model, vocabulary, labelVocab, train_seq
     tprint('Model {}, test cross entropy: {}'
            .format(model_name, testCE))
 
-    testAUROC = report_auroc_host_internal(model, vocabulary, labelVocab, test_seqs)
+    testAUROC = report_auroc_host_internal(model, X_test, y_test, lengths_test, labelVocab)
+
+    tprint('Model {}, test AUROC: {}'
+           .format(model_name, testAUROC))
 
     return (trainCE, testCE, trainAcc, testAcc, trainAUROC, testAUROC)
 
