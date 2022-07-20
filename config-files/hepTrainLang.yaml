@@ -1,0 +1,42 @@
+# Input Settings: initialize base input folder names,
+# dataset collections, and algorithms to run over
+input_settings:
+
+    # Denotes a list of datasets, each with the following parameters:
+    #   name: Name of the dataset. May be used in logging or other
+    #       messages written during execution
+    #
+    #   path: Relative path to the protein file
+    datasets:
+        - name: "viprbrc_protein"
+          path: "data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta"
+
+    # Denotes a list of models to train/run
+    models:
+        # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
+        bilstm:
+            active: true
+            should_train: true
+            seed: 1
+            checkpoint: "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
+            epochs: 24
+
+            # Same model as above, but different last layer classifier for transfer learning
+            # Classifies 1/0 human/non-human
+            bilstm_host:
+                active: false
+                epochs: 128
+                should_train: false
+                train_split: 0.8
+                batch_size: 64
+                should_test: True
+                transfer_learning: True 
+                checkpoint: "" # "target/hep/checkpoints/bilstm_host/r1/bilstm_512-11.hdf5"
+                test: false
+
+# Output Settings: initialize base output folder names
+output_settings:
+    # Base output directory
+    output_dir: "outputs"
+    output_prefix: "GSD"
+
