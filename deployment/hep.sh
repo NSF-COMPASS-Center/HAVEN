@@ -3,12 +3,12 @@
 #SBATCH -J BILSTM_HOST_HEP
 #SBATCH -A seqevol
 #SBATCH -N1 
-#SBATCH -t 8:00:00 # n hours
+#SBATCH -t 12:00:00 # n hours
 
 #SBATCH -p a100_normal_q
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=4
-#SBATCH --mem-per-cpu=64G # Yeah, ik making all those permutations costs a lot of memory, which is the required format for TF, unless I want to alter the TF libs, this is fine
+#SBATCH --mem-per-cpu=128G # Yeah, ik making all those permutations costs a lot of memory, which is the required format for TF, unless I want to alter the TF libs, this is fine
 
 #SBATCH --export=NONE # Fixes some bugs with pathing
 
@@ -36,11 +36,6 @@ CONFIG_DIR=$PROJECT_DIR/config-files
 echo "Job start"
 date
 
-# Logic to get run count
-runN = $(ls $RESULTS_DIR/hep_host_transfer.r* | wc -l)
-runN = $((runN + 1))
-echo $runN
-
 # Ensure results directory exists
 mkdir -p $RESULTS_DIR
 
@@ -56,7 +51,7 @@ mkdir -p $RESULTS_DIR
 # # Training:
 # python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/hep_train.log 2>&1
 
-python $SCRIPT_LOCATION -c $CONFIG_DIR/hepConfig.yaml > $RESULTS_DIR/hep_host_transfer.r${runN}.log 2>&1
+python $SCRIPT_LOCATION -c $CONFIG_DIR/hepConfig.yaml > $RESULTS_DIR/hep_host_transfer.$(date +%Y_%b_%d_%H_%M).log 2>&1
 
 echo "Job done"
 date

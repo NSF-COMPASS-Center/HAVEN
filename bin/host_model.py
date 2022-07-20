@@ -41,12 +41,8 @@ class HostLanguageModel(object):
         X = self.split_and_pad(
             X_cat, lengths, self.seq_len_, self.vocab_size_, self.verbose_
         )
-        import sys
-        import numpy
-        numpy.set_printoptions(threshold=sys.maxsize)
-
-        opt = Adam(learning_rate=0.0005, beta_1=0.9, beta_2=0.999,
-                   amsgrad=False)
+        opt = Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999,
+                   amsgrad=True)
         self.model_.compile(
             loss='sparse_categorical_crossentropy', optimizer=opt,
             metrics=[ 'accuracy' ]
@@ -75,7 +71,7 @@ class HostLanguageModel(object):
     def predict(self, X_cat, lengths):
         X = self.split_and_pad(X_cat, lengths, self.seq_len_,
                                self.vocab_size_, self.verbose_)
-        y_pred = self.model_.predict(X, batch_size=2500)
+        y_pred = self.model_.predict(X, batch_size=self.inference_batch_size_)
         return y_pred
 
     def transform(self, X_cat, lengths, embed_fname=None):
@@ -133,7 +129,7 @@ class HostLanguageModel(object):
         )
 
         opt = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999,
-                   amsgrad=False)
+                   amsgrad=True)
         self.model_.compile(
             loss='sparse_categorical_crossentropy', optimizer=opt,
             metrics=[ 'accuracy' ]
@@ -147,7 +143,7 @@ class HostLanguageModel(object):
                 tprint('Metric {}: {}'.format(metric, val))
 
 
-        return metrics[self.model_.metrics_names.index('loss')] * -len(lengths)
+        return metrics[self.model_.metrics_names.index('loss')] * -len(lengths), metrics[self.model_.metrics_names.index('accuracy')] 
 
 class BiLSTMHostModel(HostLanguageModel):
     def __init__(
@@ -210,6 +206,8 @@ class BiLSTMHostModel(HostLanguageModel):
             predictions = layers.Dense(2, activation='softmax', dtype='float32')(x) 
             self.model_ = Model(inputs=parentModel.inputs, outputs=predictions)
             assert self.model_.layers[0].trainable == False
+            assert self.model_.layers[1].trainable == False
+            assert self.model_.layers[2].trainable == False
 
         self.seq_len_ = seq_len
         self.vocab_size_ = vocab_size
@@ -238,15 +236,12 @@ class BiLSTMHostModel(HostLanguageModel):
             for start, end in iterate_lengths(lengths, seq_len)
         ]
 
-	#  Build from left to right [1,2,3] -> [[],[1],[1,2]]
         X_pre = X_seqs.copy()
         X_post = X_seqs.copy()
-
 
         if verbose > 1:
             tprint('Padding {} splitted...'.format(len(X_pre)))
 
-	# tf pad_sequences lib [[1],[1,2],[1,2,3]] -> [[0,0,1],[0,1,2],[1,2,3]]
         X_pre = pad_sequences(
             X_pre, maxlen=seq_len,
             dtype='int8', padding='pre', truncating='pre', value=0

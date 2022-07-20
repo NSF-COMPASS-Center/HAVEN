@@ -4,3 +4,4 @@ AAs = [
     'Y', 'V', 'X', 'Z', 'J', 'U', 'B',
 ]
 
+hostVocab = ["Human"]

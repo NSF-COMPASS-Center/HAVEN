@@ -1,4 +1,5 @@
 from utils import *
+from DataUtils import DataUtils
 
 def err_model(name):
     raise ValueError('Model {} not supported'.format(name))
@@ -151,12 +152,13 @@ def featurize_seqs_hosts(seqs, vocabulary):
 
 
 def featurize_hosts(seqs, vocabulary):
+    assert(vocabulary)
     sorted_seqs = sorted(seqs.keys())
     Y = []
     for key in sorted_seqs:
 	# Check if key is in 
-        if seqs[key][0]['host'] == "Human": 
-            Y.append(1)
+        if seqs[key][0]['host'] in vocabulary: 
+            Y.append(seqs[key][0]['host'])
         else:
             Y.append(0)
     Y = np.array(Y, dtype=int)
@@ -167,32 +169,58 @@ def fit_model(name, model, seqs, vocabulary):
     model.fit(X, lengths)
     return model
 
-def fit_model_host(name, model, seqs, vocabulary):
+def fit_model_host(name, model, seqs, vocabulary, labelVocab):
     X, lengths = featurize_seqs_hosts(seqs, vocabulary)
-    y = featurize_hosts(seqs, None)
+    y = featurize_hosts(seqs, labelVocab)
     model.fit(X, lengths, y)
     return model
 
 def cross_entropy(logprob, n_samples):
     return -logprob / n_samples
 
+def report_auroc_host(model, vocab, labelVocab, test_seqs, filename=None, average="macro"):
+    X_test, lengths_test = featurize_seqs_host(test_seqs, vocab)
+    y_test = featurize_hosts(test_seqs, labelVocab)
+    y_pred = model.predict(X_test, lengths_test).argmax(axis=-1)
+    print(f"ypred: {y_pred}")
+    print(f"ytest: {y_test}")
+    return DataUtils.plot_auroc(y_test, y_pred, labelVocab, filename, average)
+
+def report_performance_host(model_name, model, vocabulary, labelVocab, train_seqs, test_seqs):
+    # Expects featurized X, y and lengths, returns 
+        X_train, lengths_train = featurize_seqs_host(train_seqs, vocabulary)
+    y_train = featurize_hosts(train_seqs, labelVocab)
+    logprob, trainAcc = model.score(X_train, lengths_train, y_train)
+    trainCE = cross_entropy(logprob, len(lengths_train))
+    tprint('Model {}, train cross entropy: {}'
+           .format(model_name, trainCE))
+
+
+    X_test, lengths_test = featurize_seqs_host(test_seqs, vocabulary)
+    y_test = featurize_hosts(test_seqs, labelVocab)
+    logprob, testAcc = model.score(X_test, lengths_test, y_test)
+    testCE = cross_entropy(logprob, len(lengths_test))
+    tprint('Model {}, test cross entropy: {}'
+           .format(model_name, testCE))
+
+
+    return (trainCE, testCE, trainAcc, testAcc)
+
+
+
 def report_performance(model_name, model, vocabulary,
                        train_seqs, test_seqs):
     X_train, lengths_train = featurize_seqs(train_seqs, vocabulary)
-    y_train = featurize_hosts(train_seqs, None)
-    logprob = model.score(X_train, lengths_train, y_train)
-
+    logprob, trainAcc = model.score(X_train, lengths_train)
     trainCE = cross_entropy(logprob, len(lengths_train))
     tprint('Model {}, train cross entropy: {}'
            .format(model_name, trainCE))
 
     X_test, lengths_test = featurize_seqs(test_seqs, vocabulary)
-    y_test = featurize_hosts(test_seqs, None)
-    logprob = model.score(X_test, lengths_test, y_test)
+    logprob, testAcc = model.score(X_test, lengths_test)
     testCE = cross_entropy(logprob, len(lengths_test))
     tprint('Model {}, test cross entropy: {}'
            .format(model_name, testCE))
-    return (trainCE, testCE)
 
 def train_test(args, model, seqs, vocabulary, split_seqs=None):
     if args.train and args.train_split:
@@ -257,12 +285,12 @@ def batch_train(args, model, seqs, vocabulary, batch_size=5000,
               '{}-01.hdf5'.format(fname_prefix))
 
 
-def train_host(args, model, train_seqs, vocabulary):
+def train_host(args, model, train_seqs, vocabulary, labelVocab):
     if args.train:
-        model = fit_model_host(args.model_name, model, train_seqs, vocabulary)
+        model = fit_model_host(args.model_name, model, train_seqs, vocabulary, labelVocab)
 
 
-def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, batch_size=500,
+def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, labelVocab, batch_size=500,
                 verbose=True):
     assert(args.train)
 
@@ -273,6 +301,8 @@ def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, batch_size=5
 
     train_loss = []
     test_loss = []
+    train_acc = []
+    test_acc = []
 
     n_batches = math.ceil(len(train_seqs) / float(batch_size))
     if verbose:
@@ -292,14 +322,16 @@ def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, batch_size=5
             start = batchi * batch_size
             end = (batchi + 1) * batch_size
             seqs_batch = { seq: train_seqs[seq] for seq in perm_seqs[start:end] }
-            train_host(args, model, seqs_batch, vocabulary)
+            train_host(args, model, seqs_batch, vocabulary, labelVocab)
             del seqs_batch
 
         if args.test and val_seqs:
-            trainCE, testCE = report_performance(args.model_name, model, vocabulary,
+            trainCE, testCE, trainAcc, testAcc = report_performance(args.model_name, model, vocabulary,
                                train_seqs, val_seqs)
             train_loss.append(trainCE)
             test_loss.append(testCE)
+            train_acc.append(trainAcc)
+            test_acc.append(testAcc)
 
 
         fname_prefix = ('target/{0}/checkpoints/{1}/{1}_{2}'
@@ -316,7 +348,7 @@ def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, batch_size=5
     os.rename('{}-00.hdf5'.format(fname_prefix),
               '{}-01.hdf5'.format(fname_prefix))
 
-    return train_loss, test_loss
+    return train_loss, test_loss, train_acc, test_acc
 
 
 

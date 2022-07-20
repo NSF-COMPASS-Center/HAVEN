@@ -11,6 +11,7 @@ from typing import List
 import tensorflow as tf
 import types
 from AA import AAs
+from AA import hostVocab
 
 class Hep():
     def __init__(self, model_name:str, checkpoint:str=None, datasets:List[str]=None, transferCheckpoint:str=None,
