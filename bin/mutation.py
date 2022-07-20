@@ -130,7 +130,7 @@ def featurize_seqs(seqs, vocabulary):
 
     return X, lens
 
-def featurize_seqs_hosts(seqs, vocabulary):
+def featurize_seqs_host(seqs, vocabulary):
     # First two in vocabulary are paddings
     start_int = len(vocabulary) + 1
     end_int = len(vocabulary) + 2
@@ -158,7 +158,7 @@ def featurize_hosts(seqs, vocabulary):
     for key in sorted_seqs:
 	# Check if key is in 
         if seqs[key][0]['host'] in vocabulary: 
-            Y.append(seqs[key][0]['host'])
+            Y.append(vocabulary[seqs[key][0]['host']])
         else:
             Y.append(0)
     Y = np.array(Y, dtype=int)
@@ -170,7 +170,7 @@ def fit_model(name, model, seqs, vocabulary):
     return model
 
 def fit_model_host(name, model, seqs, vocabulary, labelVocab):
-    X, lengths = featurize_seqs_hosts(seqs, vocabulary)
+    X, lengths = featurize_seqs_host(seqs, vocabulary)
     y = featurize_hosts(seqs, labelVocab)
     model.fit(X, lengths, y)
     return model
@@ -181,14 +181,17 @@ def cross_entropy(logprob, n_samples):
 def report_auroc_host(model, vocab, labelVocab, test_seqs, filename=None, average="macro"):
     X_test, lengths_test = featurize_seqs_host(test_seqs, vocab)
     y_test = featurize_hosts(test_seqs, labelVocab)
-    y_pred = model.predict(X_test, lengths_test).argmax(axis=-1)
+
+    y_pred = model.predict(X_test, lengths_test)
+    print(f"ypred: {y_pred}")
+    y_pred = y_pred.argmax(axis=-1)
     print(f"ypred: {y_pred}")
     print(f"ytest: {y_test}")
     return DataUtils.plot_auroc(y_test, y_pred, labelVocab, filename, average)
 
 def report_performance_host(model_name, model, vocabulary, labelVocab, train_seqs, test_seqs):
     # Expects featurized X, y and lengths, returns 
-        X_train, lengths_train = featurize_seqs_host(train_seqs, vocabulary)
+    X_train, lengths_train = featurize_seqs_host(train_seqs, vocabulary)
     y_train = featurize_hosts(train_seqs, labelVocab)
     logprob, trainAcc = model.score(X_train, lengths_train, y_train)
     trainCE = cross_entropy(logprob, len(lengths_train))

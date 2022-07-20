@@ -50,11 +50,15 @@ class DataUtils:
         y_test = lb.transform(y_test)
         y_pred = lb.transform(y_pred)
 
+        print(y_test)
+        print(y_pred)
+        print(labelDict)
+
         if filename:
             with plt.style.context("seaborn"):
                 fig = plt.figure(1, [16, 9])
                 for label, i in labelDict.items():
-                    fpr, tpr, thresholds = roc_curve(y_test[:,i].astype(int), y_pred[:,i])
+                    fpr, tpr, thresholds = roc_curve(y_test[:,i-1].astype(int), y_pred[:,i-1])
                     plt.plot(fpr, tpr, label = '%s (AUC:%0.2f)'  % (label, auc(fpr, tpr)))
                 plt.plot(fpr, fpr, 'b-', label = 'Random Guessing')
 

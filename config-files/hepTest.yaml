@@ -31,7 +31,7 @@ input_settings:
                 batch_size: 64
                 should_test: True
                 transfer_learning: false
-                checkpoint: "target/hep/checkpoints/bilstm_host/r1/bilstm_512-128.hdf5"
+                checkpoint: "target/hep/checkpoints/bilstm_host/r4/bilstm_512-128.hdf5"
 
 # Output Settings: initialize base output folder names
 output_settings:
