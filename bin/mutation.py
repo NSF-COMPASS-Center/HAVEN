@@ -177,17 +177,21 @@ def fit_model_host(name, model, seqs, vocabulary, labelVocab):
 
 def cross_entropy(logprob, n_samples):
     return -logprob / n_samples
+, labelVocab, filename, average)
 
-def report_auroc_host(model, vocab, labelVocab, test_seqs, filename=None, average="macro"):
-    X_test, lengths_test = featurize_seqs_host(test_seqs, vocab)
-    y_test = featurize_hosts(test_seqs, labelVocab)
-
+def report_auroc_host_internal(X_test, lengths_test, labelVocab, filename=None, average="macro")
     y_pred = model.predict(X_test, lengths_test)
     print(f"ypred: {y_pred}")
     y_pred = y_pred.argmax(axis=-1)
     print(f"ypred: {y_pred}")
     print(f"ytest: {y_test}")
     return DataUtils.plot_auroc(y_test, y_pred, labelVocab, filename, average)
+
+def report_auroc_host(model, vocab, labelVocab, test_seqs, filename=None, average="macro"):
+    X_test, lengths_test = featurize_seqs_host(test_seqs, vocab)
+    y_test = featurize_hosts(test_seqs, labelVocab)
+    return report_auroc_host_internal(X_test, lengths_test, labelVocab, filename, average)
+
 
 def report_performance_host(model_name, model, vocabulary, labelVocab, train_seqs, test_seqs):
     # Expects featurized X, y and lengths, returns 
@@ -198,6 +202,7 @@ def report_performance_host(model_name, model, vocabulary, labelVocab, train_seq
     tprint('Model {}, train cross entropy: {}'
            .format(model_name, trainCE))
 
+    trainAUROC = report_auroc_host_internal(model, vocabulary, labelVocab, train_seqs)
 
     X_test, lengths_test = featurize_seqs_host(test_seqs, vocabulary)
     y_test = featurize_hosts(test_seqs, labelVocab)
@@ -206,8 +211,9 @@ def report_performance_host(model_name, model, vocabulary, labelVocab, train_seq
     tprint('Model {}, test cross entropy: {}'
            .format(model_name, testCE))
 
+    testAUROC = report_auroc_host_internal(model, vocabulary, labelVocab, test_seqs)
 
-    return (trainCE, testCE, trainAcc, testAcc)
+    return (trainCE, testCE, trainAcc, testAcc, trainAUROC, testAUROC)
 
 
 
@@ -306,6 +312,8 @@ def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, labelVocab, 
     test_loss = []
     train_acc = []
     test_acc = []
+    train_auc = []
+    test_auc = []
 
     n_batches = math.ceil(len(train_seqs) / float(batch_size))
     if verbose:
@@ -329,12 +337,14 @@ def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, labelVocab, 
             del seqs_batch
 
         if args.test and val_seqs:
-            trainCE, testCE, trainAcc, testAcc = report_performance(args.model_name, model, vocabulary,
+            trainCE, testCE, trainAcc, testAcc, trainAUROC, testAUROC = report_performance_host(args.model_name, model, vocabulary, labelVocab,
                                train_seqs, val_seqs)
             train_loss.append(trainCE)
             test_loss.append(testCE)
             train_acc.append(trainAcc)
             test_acc.append(testAcc)
+            train_auc.append(trainAUROC)
+            test_auc.append(testAUROC)
 
 
         fname_prefix = ('target/{0}/checkpoints/{1}/{1}_{2}'
@@ -351,7 +361,7 @@ def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, labelVocab, 
     os.rename('{}-00.hdf5'.format(fname_prefix),
               '{}-01.hdf5'.format(fname_prefix))
 
-    return train_loss, test_loss, train_acc, test_acc
+    return train_loss, test_loss, train_acc, test_acc, train_auc, test_auc
 
 
 
