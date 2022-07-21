@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 #SBATCH -J TRAIN_COV_BILSTM
 #SBATCH -A seqevol
@@ -43,7 +43,7 @@ python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/cov_train1a.log 2>&
 
 
 # # Training:
-# # python ~/BioNLP/bin/flu.py bilstm --train --test > flu_train.log 2>&1
+# # python ~/BioNLP/src/flu.py bilstm --train --test > flu_train.log 2>&1
 
 echo "All done cov_train"
 

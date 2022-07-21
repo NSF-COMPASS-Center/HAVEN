@@ -12,5 +12,5 @@ cd $HOME
 pwd
 
 # # Training:
-# # python ~/BioNLP/bin/flu.py bilstm --train --test > flu_train.log 2>&1
+# # python ~/BioNLP/src/flu.py bilstm --train --test > flu_train.log 2>&1
 

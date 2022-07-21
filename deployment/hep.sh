@@ -26,7 +26,7 @@ source activate $USER_HOME/.conda/envs/BioNLP
 python --version
 
 # Parameters
-SCRIPT_LOCATION=$PROJECT_DIR/bin/hep_pipeline.py 
+SCRIPT_LOCATION=$PROJECT_DIR/bin/pipeline.py
 MODEL=bilstm
 #SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
 SAVED_MODEL=$PROJECT_DIR/target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5
@@ -38,18 +38,6 @@ date
 
 # Ensure results directory exists
 mkdir -p $RESULTS_DIR
-
-# Run python scripts
-#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/hep_embed.log 2>&1
-
-#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --semantics > $RESULTS_DIR/hep_semantics.log 2>&1
-
-#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/hep_combfit.log 2>&1
-
-#python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --reinfection > $RESULTS_DIR/hep_reinfection.log 2>&1
-
-# # Training:
-# python $SCRIPT_LOCATION $MODEL --train --test > $RESULTS_DIR/hep_train.log 2>&1
 
 python $SCRIPT_LOCATION -c $CONFIG_DIR/hepConfig.yaml > $RESULTS_DIR/hep_host_transfer.$(date +%Y_%b_%d_%H_%M).log 2>&1
 

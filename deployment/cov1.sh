@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 #SBATCH -J BILSTM_FLU_MODEL
 #SBATCH -A seqevol
@@ -43,7 +43,7 @@ python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/
 #python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --reinfection > $RESULTS_DIR/cov_reinfection.log 2>&1
 
 # # Training:
-# # python ~/BioNLP/bin/flu.py bilstm --train --test > flu_train.log 2>&1
+# # python ~/BioNLP/src/flu.py bilstm --train --test > flu_train.log 2>&1
 
 
 

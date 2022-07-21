@@ -45,7 +45,7 @@ python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DI
 python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --reinfection > $RESULTS_DIR/cov_reinfection_final.log 2>&1
 
 # # Training:
-# # python ~/BioNLP/bin/flu.py bilstm --train --test > flu_train.log 2>&1
+# # python ~/BioNLP/src/flu.py bilstm --train --test > flu_train.log 2>&1
 
 
 

@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 #SBATCH -J FLU_TRAIN_BILSTM
 #SBATCH -A seqevol
