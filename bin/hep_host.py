@@ -295,9 +295,9 @@ class HepHost():
             trainCE, testCE, trainAcc, testAcc, trainAUROC, testAUROC = batch_train_host(self.args, hostModel, train_seqs, test_seqs, vocabulary, yVocab,
                     batch_size=self.args.batch_size)
             
-            DataUtils.plot_metric(trainCE, testCE, f"hep_bilstm_host_CE_{date}", metricName="Categorical Cross Entropy", optimal="min")
-            DataUtils.plot_metric(trainAcc, testAcc, f"hep_bilstm_host_ACC_{date}", metricName="Accuracy", optimal="max")
-            DataUtils.plot_metric(trainAUROC, testAUROC, f"hep_bilstm_host_AUROC_MACRO_{date}", metricName="Auroc (macro)", optimal="max")
+            DataUtils.plot_metric(trainCE, testCE, f"hep_bilstm_host_CE_{date}", metricName="Categorical Cross Entropy", optimalFlag="min")
+            DataUtils.plot_metric(trainAcc, testAcc, f"hep_bilstm_host_ACC_{date}", metricName="Accuracy", optimalFlag="max")
+            DataUtils.plot_metric(trainAUROC, testAUROC, f"hep_bilstm_host_AUROC_MACRO_{date}", metricName="Auroc (macro)", optimalFlag="max")
 
         if self.args.test:
             report_auroc_host(hostModel, vocabulary, yVocab, seqs, filename="hep_bilstm_host_AUROC_{date}")

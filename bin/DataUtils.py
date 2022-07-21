@@ -26,7 +26,7 @@ class DataUtils:
                 plt.hlines(y=optimal ,xmin=0,xmax=len(trainCE)+1, label=f"Training set optimum {metricName}: {optimal}",  linestyles='-.', lw=1)
             if testCE:
                 plt.plot(epochs, testCE, label=f"Testing {metricName}")
-                optimal = min(testCE) if optimalFLag == "min" else max(testCE)
+                optimal = min(testCE) if optimalFlag == "min" else max(testCE)
                 plt.hlines(y=optimal ,xmin=0,xmax=len(testCE)+1, label=f"Testing set optimum {metricName}: {optimal}", linestyles='--', lw=1)
             
         plt.xlabel('Epoch', fontsize=20)

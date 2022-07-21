@@ -41,8 +41,8 @@ class HostLanguageModel(object):
         X = self.split_and_pad(
             X_cat, lengths, self.seq_len_, self.vocab_size_, self.verbose_
         )
-        opt = Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999,
-                   amsgrad=True)
+        opt = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999,
+                   amsgrad=False)
         self.model_.compile(
             loss='sparse_categorical_crossentropy', optimizer=opt,
             metrics=[ 'accuracy' ]
@@ -50,7 +50,6 @@ class HostLanguageModel(object):
 
         dirname = '{}/checkpoints/{}'.format(self.cache_dir_,
                                                         self.model_name_)
-        print(f"Saving model stats to {dirname}")
         mkdir_p(dirname)
 
         # hdf5 file needs to be renamed per epoch by caller of function
