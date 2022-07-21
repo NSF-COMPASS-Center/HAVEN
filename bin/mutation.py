@@ -180,10 +180,7 @@ def cross_entropy(logprob, n_samples):
 
 def report_auroc_host_internal(model, X_test, y_test, lengths_test, labelVocab, filename=None, average="macro"):
     y_pred = model.predict(X_test, lengths_test)
-    print(f"ypred: {y_pred}")
     y_pred = y_pred.argmax(axis=-1)
-    print(f"ypred: {y_pred}")
-    print(f"ytest: {y_test}")
     return DataUtils.plot_auroc(y_test, y_pred, labelVocab, filename, average)
 
 def report_auroc_host(model, vocab, labelVocab, test_seqs, filename=None, average="macro"):
