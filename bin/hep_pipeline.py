@@ -31,6 +31,8 @@ def main():
 
     # Language model
     modelName = 'bilstm'
+    #args.config['input_settings']['models'].keys()
+
     bilstmSettings = args.config['input_settings']['models'][modelName]
     if bilstmSettings['active']:
         print("Initalizing Bilstm Language Model----------------------------")

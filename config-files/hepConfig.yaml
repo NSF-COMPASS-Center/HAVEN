@@ -13,7 +13,7 @@ input_settings:
 
     # Denotes a list of models to train/run
     models:
-        # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
+        # Parameters for Bilstm language model from https://doi.org/10.1126/science.abd7331
         bilstm:
             active: false
             should_train: false
@@ -22,7 +22,7 @@ input_settings:
             epochs: 12
 
             # Same model as above, but different last layer classifier for transfer learning
-            # Classifies 1/0 human/non-human
+            # Model predicts host (non-human=0, human=1) for a viral sequence 
             bilstm_host:
                 active: True
                 epochs: 5

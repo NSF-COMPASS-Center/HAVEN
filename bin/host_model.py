@@ -52,6 +52,8 @@ class HostLanguageModel(object):
                                                         self.model_name_)
         print(f"Saving model stats to {dirname}")
         mkdir_p(dirname)
+
+        # hdf5 file needs to be renamed per epoch by caller of function
         checkpoint = ModelCheckpoint(
             '{}/{}_{}'
             .format(dirname, self.model_name_, self.hidden_dim_) +

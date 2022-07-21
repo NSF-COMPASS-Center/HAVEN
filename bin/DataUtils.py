@@ -14,8 +14,6 @@ class DataUtils:
 
         return train_seqs, test_seqs
 
-
-
     @staticmethod
     def plot_metric(trainCE, testCE, filename, metricName="Cross Entropy", optimalFlag="min"):
         assert filename

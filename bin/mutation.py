@@ -133,6 +133,9 @@ def featurize_seqs(seqs, vocabulary):
 def featurize_seqs_host(seqs, vocabulary):
     # First two in vocabulary are paddings
     start_int = len(vocabulary) + 1
+
+    # TODO: extensive comment
+    # tldr since their model is 1 less, we chop off end_int.
     end_int = len(vocabulary) + 2
 
     sorted_seqs = sorted(seqs.keys())
@@ -331,7 +334,7 @@ def batch_train_host(args, model, train_seqs, val_seqs, vocabulary, labelVocab, 
         if verbose:
             tprint('True epoch {}/{}'.format(epoch + 1, n_epochs))
 
-	    # permuted string sequences
+	    # Shuffle training sequences in each epoch
         perm_seqs = [ str(s) for s in train_seqs.keys()]
         random.shuffle(perm_seqs)
 
