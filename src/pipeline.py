@@ -31,7 +31,7 @@ def main():
     args.config = yaml_parse(args.config)
 
     # extract respectively
-    datasets = [v for d in args.config['input_settings']['datasets'] for k, v in d.items() if k == "path"]
+    datasets = [v for d in args.config['input_settings']['datasets'].values() for k, v in d.items() if k == "path"]
 
     # Language model
     modelName = 'bilstm'
@@ -47,11 +47,15 @@ def main():
                 seed=bilstmSettings['seed'])
         h.start()
 
+    datasets = [d for d in args.config['input_settings']['datasets'].values()]
     # Host model
     bilstmHostSettings = bilstmSettings[f'{modelName}_host']
     if bilstmHostSettings['active']:
         print("Initalizing Bilstm Host Model--------------------------------")
-        hh = HepHost(model_name=modelName, datasets=datasets,
+        hh = HepHost(model_name=modelName,
+                     datasets=datasets,
+                     targetNames=bilstmHostSettings['targetNames'],
+                     targetKey=bilstmHostSettings['targetKey'],
                      train=bilstmHostSettings['should_train'],
                      n_epochs=bilstmHostSettings['epochs'],
                      train_split=bilstmHostSettings['train_split'],
@@ -59,6 +63,7 @@ def main():
                      test=bilstmHostSettings['should_test'],
                      transferCheckpoint=bilstmSettings['checkpoint'],
                      seed=bilstmSettings['seed'])
+
         hh.start()
 
 

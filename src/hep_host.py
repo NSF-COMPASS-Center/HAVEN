@@ -10,19 +10,18 @@ from keras.models import load_model
 
 import TransferModel.Analysis.Visualization as Visualization
 import TransferModel.DataUtils.Preprocessor as Preprocessor
-from LanguageModel.AA import AAs
 # Imports from language model
-from LanguageModel.locations import country2continent
-from LanguageModel.mammals import species2group
 from LanguageModel.mutation import *
 # Our modules
 from TransferModel.Analysis.Evaluation import report_auroc_host
-from TransferModel.DataUtils.Vocabularies import hostVocab
-from mutation_host import *
+from TransferModel.DataUtils import Ingestion
+from TransferModel.DataUtils.Vocabularies import AAs
+from TransferModel.Models.Utils import batch_train_host, get_model_host
 
 
 class HepHost():
-    def __init__(self, model_name: str, checkpoint: str = None, datasets: List[str] = None,
+    def __init__(self, model_name: str, checkpoint: str = None, datasets=None,
+                 targetNames: List[str] = ["Human"], targetKey: str = "Host",
                  transferCheckpoint: str = None,
                  namespace: str = "hep", seed: int = 1, dim: int = 512, batch_size: int = 500,
                  n_epochs: int = 11, train: bool = False, test: bool = False, embed: bool = False,
@@ -43,162 +42,16 @@ class HepHost():
         self.args.combfit = combfit
         self.args.reinfection = reinfection
         self.args.datasets = datasets
+        self.args.targetNames = targetNames
+        self.args.targetKey = targetKey
         self.args.transferCheckpoint = transferCheckpoint
+
+        assert datasets
 
         # Set seeds
         np.random.seed(self.args.seed)
         random.seed(self.args.seed)
         tf.random.set_seed(self.args.seed)
-
-    def parse_viprbrc(self, entry):
-        fields = entry.split('|')
-        if fields[7] == 'NA':
-            date = None
-        else:
-            date = fields[7].split('/')[0]
-            date = dparse(date.replace('_', '-'))
-
-        country = fields[9]
-        if country in country2continent:
-            continent = country2continent[country]
-        else:
-            country = 'NA'
-            continent = 'NA'
-
-        # might error out
-        if fields[8] in species2group:
-            group = species2group[fields[8]]
-        else:
-            group = "NA"
-
-        meta = {
-            'strain': fields[5],
-            'host': fields[8],
-            'group': group,
-            'country': country,
-            'continent': continent,
-            'dataset': 'viprbrc',
-            'protein': fields[1],
-        }
-        return meta
-
-    def parse_nih(self, entry):
-        fields = entry.split('|')
-
-        country = fields[3]
-        if country in country2continent:
-            continent = country2continent[country]
-        else:
-            country = 'NA'
-            continent = 'NA'
-
-        if fields[2] in species2group:
-            group = species2group[fields[2]]
-        else:
-            group = "NA"
-        if fields[2] == "":
-            host = "unknown"
-        else:
-            host = fields[2]
-
-        meta = {
-            'strain': 'SARS-CoV-2',
-            'host': host,
-            'group': group,
-            'country': country,
-            'continent': continent,
-            'dataset': 'nih',
-            'protein': fields[1],
-        }
-        return meta
-
-    def parse_gisaid(self, entry):
-        fields = entry.split('|')
-
-        type_id = fields[1].split('/')[1]
-
-        if type_id in {'bat', 'canine', 'cat', 'env', 'mink',
-                       'pangolin', 'tiger'}:
-            host = type_id
-            country = 'NA'
-            continent = 'NA'
-        else:
-            host = 'human'
-            if type_id in country2continent:
-                country = type_id
-                continent = country2continent[country]
-            else:
-                country = 'NA'
-                continent = 'NA'
-
-        meta = {
-            'strain': fields[1],
-            'host': host,
-            'group': species2group[host].lower(),
-            'country': country,
-            'continent': continent,
-            'dataset': 'gisaid',
-        }
-        return meta
-
-    def parse_manual(self, entry):
-        fields = [x.strip() for x in entry.split('|')]
-
-        country = 'NA'
-        continent = 'NA'
-
-        meta = {
-            'protein': fields[1],
-            'host': fields[2],
-            'group': fields[3],
-            'country': country,
-            'continent': continent,
-            'dataset': 'viprbrc-genbank',
-        }
-        return meta
-
-    # Seqs key:value | string sequence : [metadata1, metadata2, ...]
-    # Processes list of fasta files to records
-    def process(self, fnames):
-        seqs = {}
-        for fname in fnames:
-            for record in SeqIO.parse(fname, 'fasta'):
-                # if len(record.seq) < 1000:
-                #    continue
-                if str(record.seq).count('X') > 0:
-                    continue
-                if record.seq not in seqs:
-                    seqs[record.seq] = []
-                if "manual" in fname.lower():
-                    meta = self.parse_manual(record.description)
-                    if meta['host'] == "unknown":
-                        continue
-                elif "viprbrc" in fname.lower():
-                    meta = self.parse_viprbrc(record.description)
-                elif "ncbi" in fname.lower():
-                    meta = self.parse_nih(record.description)
-                meta['accession'] = record.description
-                seqs[record.seq].append(meta)
-
-        with open('data/hep/hep_all.fa', 'w') as of:
-            for seq in seqs:
-                metas = seqs[seq]
-                for meta in metas:
-                    of.write('>{}\n'.format(meta['accession']))
-                    of.write('{}\n'.format(str(seq)))
-
-        print(f"Dataset size: {len(seqs)}")
-        return seqs
-
-    def setup(self):
-        fnames = self.args.datasets
-        seqs = self.process(fnames)
-
-        seq_len = max([len(seq) for seq in seqs]) + 2  # For padding
-        vocab_size = len(AAs) + 2  # For padding characters
-
-        # return seqs
-        return seqs, seq_len, vocab_size
 
     def interpret_clusters(self, adata):
         clusters = sorted(set(adata.obs['louvain']))
@@ -257,9 +110,16 @@ class HepHost():
                        namespace='cov7')
 
     def start(self):
+        # Initialization
         vocabulary = {aa: idx + 1 for idx, aa in enumerate(sorted(AAs))}
-        yVocab = {host: idx for idx, host in enumerate(sorted(hostVocab), start=1)}
-        seqs, seq_len, vocab_size = self.setup()
+        vocab_size = len(vocabulary) + 2  # For padding characters
+        yVocab = {host: idx for idx, host in enumerate(sorted(self.args.targetNames), start=1)}
+        yVocab['not-in-dictionary'] = 0
+
+        # Load dataframe
+        df = Ingestion.loadFastaFiles(self.args.datasets)
+        seq_len = int(df.seq.map(len).max()) + 2
+        df = Preprocessor.featurize_df(df, seq_len, vocabulary, yVocab, self.args.targetKey)
 
         # Load in for transfer learning
         if self.args.transferCheckpoint:
@@ -278,25 +138,14 @@ class HepHost():
         date = datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
         if self.args.train:
             hostModel.model_.summary()
-            train_seqs, test_seqs = Preprocessor.split_seqs(seqs, self.args.train_split, self.args.seed)
-            print("Batch sz:", self.args.batch_size)
+            train_df, test_df = Preprocessor.split_df(df, self.args.train_split)
 
-            trainCE, testCE, trainAcc, testAcc, trainAUROC, testAUROC = batch_train_host(self.args, hostModel,
-                                                                                         train_seqs, test_seqs,
-                                                                                         vocabulary, yVocab,
-                                                                                         batch_size=self.args.batch_size)
-
-            Visualization.plot_metric(trainCE, testCE, f"hep_bilstm_host_CE_{date}",
-                                      metricName="Categorical Cross Entropy",
-                                      optimalFlag="min")
-            Visualization.plot_metric(trainAcc, testAcc, f"hep_bilstm_host_ACC_{date}", metricName="Accuracy",
-                                      optimalFlag="max")
-            Visualization.plot_metric(trainAUROC, testAUROC, f"hep_bilstm_host_AUROC_MACRO_{date}",
-                                      metricName="Auroc (macro)", optimalFlag="max")
+            h = hostModel.fit(train_df['seq_processed'], train_df['target'], test_df['seq_processed'], test_df['target'], date, yVocab)
 
         if self.args.test:
-            report_auroc_host(hostModel, vocabulary, yVocab, seqs, filename="hep_bilstm_host_AUROC_{date}")
+            pass
 
+'''
         if self.args.embed:
             if self.args.checkpoint is None and not self.args.train:
                 raise ValueError('Model must be trained or loaded '
@@ -306,3 +155,4 @@ class HepHost():
                 raise ValueError('Embeddings not available for models: {}'
                                  .format(', '.join(no_embed)))
             self.analyze_embedding(self.args, model, seqs, vocabulary)
+'''

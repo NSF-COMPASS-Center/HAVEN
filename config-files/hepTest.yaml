@@ -8,8 +8,9 @@ input_settings:
     #
     #   path: Relative path to the protein file
     datasets:
-        - name: "viprbrc_protein"
-          path: "data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta"
+        "viprbrc_protein":
+            path: "data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta"
+            rowNames: ["Accession", "Protein", "Host", "Genotype"]
 
     # Denotes a list of models to train/run
     models:
@@ -25,13 +26,15 @@ input_settings:
             # Classifies 1/0 human/non-human
             bilstm_host:
                 active: True
-                epochs: 5
-                should_train: False
+                epochs: 2
+                should_train: True
                 train_split: 0.8
                 batch_size: 64
                 should_test: True
                 transfer_learning: false
                 checkpoint: "target/hep/checkpoints/bilstm_host/r4/bilstm_512-128.hdf5"
+                targetKey: "Host"
+                targetNames: ["Human"]
 
 # Output Settings: initialize base output folder names
 output_settings:

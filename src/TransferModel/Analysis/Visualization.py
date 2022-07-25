@@ -29,6 +29,26 @@ def plot_metric(trainCE, testCE, filename, metricName="Cross Entropy", optimalFl
     plt.savefig(name, bbox_inches='tight', dpi=300)
     plt.clf()
 
+# dic : dictioanry of name:[data] pairs
+def plot_metrics(dic, filename, metricName="AUROC"):
+
+    with plt.style.context("seaborn"):
+        fig = plt.figure(1, [16, 9])
+
+        for k, v in dic.items():
+            epochs = range(1, len(v) + 1)
+            plt.plot(epochs, v, label=k)
+
+    plt.xlabel('Epoch', fontsize=20)
+    plt.ylabel(f"{metricName}", fontsize=20)
+    plt.title('Training history', fontsize=20)
+    plt.legend()
+
+    # Print image
+    name = f'figures/{filename}.png'
+    plt.savefig(name, bbox_inches='tight', dpi=300)
+    plt.clf()
+
 
 # Expects y_test, y_pred in softmax format (numerical, not sparse encoding)
 # If filename not provided, will not write to file
@@ -46,7 +66,7 @@ def plot_auroc(y_test, y_pred, labelDict, filename, average="macro"):
         with plt.style.context("seaborn"):
             fig = plt.figure(1, [16, 9])
             for label, i in labelDict.items():
-                fpr, tpr, thresholds = roc_curve(y_test[:, i - 1].astype(int), y_pred[:, i - 1])
+                fpr, tpr, thresholds = roc_curve(y_test[:, i].astype(int), y_pred[:, i])
                 plt.plot(fpr, tpr, label='%s (AUC:%0.2f)' % (label, auc(fpr, tpr)))
             plt.plot(fpr, fpr, 'b-', label='Random Guessing')
 

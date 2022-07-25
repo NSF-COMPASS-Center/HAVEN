@@ -6,7 +6,6 @@ from LanguageModel.language_model import DNNLanguageModel
 from LanguageModel.language_model import LSTMLanguageModel
 from LanguageModel.utils import *
 
-
 def err_model(name):
     raise ValueError('Model {} not supported'.format(name))
 
@@ -85,7 +84,6 @@ def get_model(args, seq_len, vocab_size,
         err_model(args.model_name)
 
     return model
-
 
 # Featurizes sequences?
 
