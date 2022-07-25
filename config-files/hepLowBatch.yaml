@@ -8,33 +8,33 @@ input_settings:
     #
     #   path: Relative path to the protein file
     datasets:
-        "viprbrc_protein":
-            path: "data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta"
-            rowNames: ["Accession", "Protein", "Host", "Genotype"]
+        - name: "viprbrc_protein"
+          path: "data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta"
 
     # Denotes a list of models to train/run
+    # TODO: If active == True, (not yet implemented), bilstm_host will use the generated model
+    # If active == false, then checkpoint will be used on host model
+    # If neither are defined, bilstm_host will train from scratch
     models:
-        # Parameters for Bilstm language model from https://doi.org/10.1126/science.abd7331
+        # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
         bilstm:
-            active: false
+            active: True
             should_train: false
             seed: 1
             checkpoint: "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
-            epochs: 12
+            epochs: 1
 
             # Same model as above, but different last layer classifier for transfer learning
-            # Model predicts host (non-human=0, human=1) for a viral sequence 
+            # Classifies 1/0 human/non-human
             bilstm_host:
                 active: True
-                epochs: 64
+                epochs: 1
                 should_train: True
                 train_split: 0.8
                 batch_size: 64
                 should_test: True
                 transfer_learning: True 
                 checkpoint: "" # "target/hep/checkpoints/bilstm_host/r1/bilstm_512-11.hdf5"
-                targetKey: "Host"
-                targetNames: ["Human"]
 
 # Output Settings: initialize base output folder names
 output_settings:
