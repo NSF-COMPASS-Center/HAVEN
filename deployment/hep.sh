@@ -26,7 +26,7 @@ source activate $USER_HOME/.conda/envs/BioNLP
 python --version
 
 # Parameters
-SCRIPT_LOCATION=$PROJECT_DIR/bin/pipeline.py
+SCRIPT_LOCATION=$PROJECT_DIR/src/pipeline.py
 MODEL=bilstm
 #SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
 SAVED_MODEL=$PROJECT_DIR/target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5
