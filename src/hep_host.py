@@ -9,31 +9,33 @@ import tensorflow as tf
 from keras.models import load_model
 
 import TransferModel.Analysis.Visualization as Visualization
-import TransferModel.DataUtils.Preprocessor as Preprocessor
+import TransferModel.DataUtils.DataProcessor as DataProcessor
 # Imports from language model
 from LanguageModel.mutation import *
 # Our modules
-from TransferModel.Analysis.Evaluation import report_auroc_host
+from TransferModel.Analysis import Evaluation
 from TransferModel.DataUtils import Ingestion
 from TransferModel.DataUtils.Vocabularies import AAs
-from TransferModel.Models.Utils import batch_train_host, get_model_host
+from TransferModel.Models.Utils import get_target_model
 
 
 class HepHost():
-    def __init__(self, model_name: str, checkpoint: str = None, datasets=None,
-                 targetNames: List[str] = ["Human"], targetKey: str = "Host",
-                 transferCheckpoint: str = None,
-                 namespace: str = "hep", seed: int = 1, dim: int = 512, batch_size: int = 500,
-                 n_epochs: int = 11, train: bool = False, test: bool = False, embed: bool = False,
-                 semantics: bool = False, combfit: bool = False, reinfection: bool = False, train_split: float = 0.8):
+    def __init__(self, model_name: str, checkpoint: str = None, datasets=None, targetNames: List[str] = ["Human"],
+                 targetKey: str = "Host", transferCheckpoint: str = None, namespace: str = "hep", seed: int = 1,
+                 dim: int = 512, batch_size: int = 64, inf_batch_size: int = 128, n_epochs: int = 11, n_hidden: int = 2,
+                 embedding_dim=20, train: bool = False, embed: bool = False, semantics: bool = False,
+                 combfit: bool = False, reinfection: bool = False, train_split: float = 0.8, test: bool = False):
         self.args = types.SimpleNamespace()
         self.args.model_name = model_name
         self.args.seed = seed
         self.args.namespace = namespace
+        self.args.embedding_dim = embedding_dim
         self.args.dim = dim
         self.args.batch_size = batch_size
+        self.args.inf_batch_size = inf_batch_size
         self.args.checkpoint = checkpoint
         self.args.n_epochs = n_epochs
+        self.args.n_hidden = n_hidden
         self.args.train = train
         self.args.train_split = train_split
         self.args.test = test
@@ -53,97 +55,54 @@ class HepHost():
         random.seed(self.args.seed)
         tf.random.set_seed(self.args.seed)
 
-    def interpret_clusters(self, adata):
-        clusters = sorted(set(adata.obs['louvain']))
-        for cluster in clusters:
-            tprint('Cluster {}'.format(cluster))
-            adata_cluster = adata[adata.obs['louvain'] == cluster]
-            for var in ['host', 'country', 'strain']:
-                tprint('\t{}:'.format(var))
-                counts = Counter(adata_cluster.obs[var])
-                for val, count in counts.most_common():
-                    tprint('\t\t{}: {}'.format(val, count))
-            tprint('')
-
-    def plot_umap(self, adata, categories, namespace='hep'):
-        for category in categories:
-            sc.pl.umap(adata, color=category,
-                       save='_{}_{}.png'.format(namespace, category))
-
-    def analyze_embedding(self, model, seqs, vocabulary):
-        seqs = embed_seqs(self.args, model, seqs, vocabulary, use_cache=True)
-
-        X, obs = [], {}
-        obs['n_seq'] = []
-        obs['seq'] = []
-        for seq in seqs:
-            meta = seqs[seq][0]
-            X.append(meta['embedding'].mean(0))
-            for key in meta:
-                if key == 'embedding':
-                    continue
-                if key not in obs:
-                    obs[key] = []
-                obs[key].append(Counter([
-                    meta[key] for meta in seqs[seq]
-                ]).most_common(1)[0][0])
-            obs['n_seq'].append(len(seqs[seq]))
-            obs['seq'].append(str(seq))
-        X = np.array(X)
-
-        adata = AnnData(X)
-        for key in obs:
-            adata.obs[key] = obs[key]
-
-        sc.pp.neighbors(adata, n_neighbors=20, use_rep='X')
-        sc.tl.louvain(adata, resolution=1.)
-        sc.tl.umap(adata, min_dist=1.)
-
-        sc.set_figure_params(dpi_save=500)
-        self.plot_umap(adata, ['host', 'group', 'continent', 'louvain'])
-
-        self.interpret_clusters(adata)
-
-        adata_cov2 = adata[(adata.obs['louvain'] == '0') |
-                           (adata.obs['louvain'] == '2')]
-        self.plot_umap(adata_cov2, ['host', 'group', 'country'],
-                       namespace='cov7')
-
     def start(self):
         # Initialization
-        vocabulary = {aa: idx + 1 for idx, aa in enumerate(sorted(AAs))}
+        vocabulary = DataProcessor.initilizeVocab(AAs)
         vocab_size = len(vocabulary) + 2  # For padding characters
-        yVocab = {host: idx for idx, host in enumerate(sorted(self.args.targetNames), start=1)}
+        yVocab = DataProcessor.initilizeVocab(self.args.targetNames)
         yVocab['not-in-dictionary'] = 0
 
         # Load dataframe
         df = Ingestion.loadFastaFiles(self.args.datasets)
         seq_len = int(df.seq.map(len).max()) + 2
-        df = Preprocessor.featurize_df(df, seq_len, vocabulary, yVocab, self.args.targetKey)
+        df = DataProcessor.featurize_df(df, vocabulary, yVocab, self.args.targetKey)
 
-        # Load in for transfer learning
-        if self.args.transferCheckpoint:
+        model = None
+        # Load in for transfer learning and if we won't overwrite it later
+        if self.args.transferCheckpoint and not self.args.checkpoint:
+            print("DEBUG: Loaded transfer checkpoint!")
             model = load_model(self.args.transferCheckpoint)
-        else:
-            model = get_model(self.args, seq_len, vocab_size, inference_batch_size=self.args.batch_size).model_
 
         # Make host model
-        hostModel = get_model_host(self.args, model, seq_len - 1, vocab_size, inference_batch_size=self.args.batch_size)
+        hostModel = get_target_model(self.args, model, seq_len,  vocab_size)
 
         # Regular checkpoint of weights
         if self.args.checkpoint:
-            hostModel.model_.load_weights(self.args.checkpoint)
+            print("DEBUG: Loading checkpoint model!")
+            hostModel.model_ = load_model(self.args.checkpoint)
             hostModel.model_.summary()
 
         date = datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
         if self.args.train:
+            print("DEBUG: Training start")
             hostModel.model_.summary()
-            train_df, test_df = Preprocessor.split_df(df, self.args.train_split)
+            train_df, test_df = DataProcessor.split_df(df, self.args.train_split)
 
-            h = hostModel.fit(train_df['seq_processed'], train_df['target'], test_df['seq_processed'], test_df['target'], date, yVocab)
+            h = hostModel.fit(train_df['X'], train_df['y'], test_df['X'],
+                              test_df['y'], date, yVocab)
 
         if self.args.test:
-            pass
+            print("DEBUG: Testing start")
+            train_df, test_df = DataProcessor.split_df(df, self.args.train_split)
+            print(train_df, test_df)
+            y_pred = hostModel.predict(test_df['X'], sparse=True)
+            testAurocs = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab,
+                                                 filename=f"hep_bilstm_host_AUROC_{date}")
+            yVocabInverse = {y:x for x, y in yVocab.items()}
+            print({yVocabInverse[i]: auroc for i, auroc in enumerate(testAurocs)})
+            print(Evaluation.report_accuracy_per_class(test_df['y'], y_pred, yDict=yVocab))
+            print(Evaluation.report_accuracy(test_df['y'], y_pred))
+
 
 '''
         if self.args.embed:

@@ -8,33 +8,36 @@ input_settings:
     #
     #   path: Relative path to the protein file
     datasets:
-        - name: "viprbrc_protein"
-          path: "data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta"
+        "viprbrc_protein":
+            path: "data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta"
+            rowNames: ["Accession", "Protein", "Host", "Genotype"]
 
     # Denotes a list of models to train/run
-    # TODO: If active == True, (not yet implemented), bilstm_host will use the generated model
-    # If active == false, then checkpoint will be used on host model
-    # If neither are defined, bilstm_host will train from scratch
     models:
         # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
         bilstm:
-            active: True
+            active: false
             should_train: false
             seed: 1
-            checkpoint: "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
-            epochs: 1
+            checkpoint: # "target/hep/checkpoints/bilstm/r1/bilstm_host_512-11.hdf5"
+            epochs: 12
 
             # Same model as above, but different last layer classifier for transfer learning
             # Classifies 1/0 human/non-human
             bilstm_host:
                 active: True
-                epochs: 1
+                epochs: 2
+                n_hidden: 2
+                embedding_dim: 20
                 should_train: True
                 train_split: 0.8
                 batch_size: 64
-                should_test: True
-                transfer_learning: True 
-                checkpoint: "" # "target/hep/checkpoints/bilstm_host/r1/bilstm_512-11.hdf5"
+                inf_batch_size: 128
+                should_test: False
+                transfer_learning: false
+                checkpoint: "" #"target/hep/checkpoints/bilstm_host/r4/bilstm_host_512-128.hdf5"
+                targetKey: "Host"
+                targetNames: ["Human"]
 
 # Output Settings: initialize base output folder names
 output_settings:

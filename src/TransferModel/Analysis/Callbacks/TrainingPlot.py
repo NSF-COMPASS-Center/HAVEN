@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from keras.callbacks import Callback
 
 from TransferModel.Analysis import Visualization
@@ -7,25 +9,20 @@ from TransferModel.Analysis import Visualization
 class TrainingPlot(Callback):
 
     def __init__(self, date):
+        super().__init__()
         self.date = date
-        self.losses = []
-        self.acc = []
-        self.val_losses = []
-        self.val_acc = []
-        self.logs = []
+        self.logs = defaultdict(list)
 
     # This function is called at the end of each epoch
     def on_epoch_end(self, epoch, logs={}):
         # Append the logs, losses and accuracies to the lists
-        self.logs.append(logs)
-        self.losses.append(logs.get('loss'))
-        self.acc.append(logs.get('accuracy'))
-        self.val_losses.append(logs.get('val_loss'))
-        self.val_acc.append(logs.get('val_accuracy'))
+        self.logs["Training Loss"].append(logs.get('loss'))
+        self.logs["Training Accuracy"].append(logs.get('accuracy'))
+        self.logs["Validation Loss"].append(logs.get('val_loss'))
+        self.logs["Validation Accuracy"].append(logs.get('val_accuracy'))
 
         # Before plotting ensure at least 2 epochs have passed
         if len(self.losses) > 1:
-            Visualization.plot_metric(self.losses, self.val_losses, f"hep_bilstm_host_CE_{self.date}",
-                                      metricName="Cross entropy", optimalFlag="min")
-            Visualization.plot_metric(self.acc, self.val_acc, f"hep_bilstm_host_ACC_{self.date}",
-                                      metricName="Accuracy", optimalFlag="max")
+            Visualization.plot_metrics(self.log, f"hep_bilstm_host_training_{self.date}", metricName="Accuracy and "
+                                                                                                     "Cross Entropy "
+                                                                                                     "Loss")

@@ -19,7 +19,7 @@ input_settings:
             active: false
             should_train: false
             seed: 1
-            checkpoint: "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
+            checkpoint: "target/hep/checkpoints/bilstm/r1/bilstm_host_512-11.hdf5"
             epochs: 12
 
             # Same model as above, but different last layer classifier for transfer learning
@@ -27,12 +27,15 @@ input_settings:
             bilstm_host:
                 active: True
                 epochs: 2
-                should_train: True
+                n_hidden: 2
+                embedding_dim: 20
+                should_train: False
                 train_split: 0.8
                 batch_size: 64
+                inf_batch_size: 128
                 should_test: True
                 transfer_learning: false
-                checkpoint: "target/hep/checkpoints/bilstm_host/r4/bilstm_512-128.hdf5"
+                checkpoint: "target/hep/checkpoints/bilstm_host/r4/bilstm_host_512-128.hdf5"
                 targetKey: "Host"
                 targetNames: ["Human"]
 

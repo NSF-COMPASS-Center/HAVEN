@@ -15,7 +15,8 @@ from TransferModel.Analysis import Evaluation
 from TransferModel.Analysis.Callbacks import TrainingPlot
 from TransferModel.Analysis.Callbacks.AUROC import AUROCCallback
 
-class HostLanguageModel(object):
+
+class TargetModel(object):
     def __init__(self, seed=None):
         self.seq_len = None
         if seed is not None:
@@ -59,7 +60,7 @@ class HostLanguageModel(object):
                                              self.model_name_)
         mkdir_p(dirname)
 
-        # hdf5 file needs to be renamed per epoch by caller of function
+        # Callbacks:
         checkpoint = ModelCheckpoint(
             '{}/{}_{}'
             .format(dirname, self.model_name_, self.hidden_dim_) +
@@ -67,10 +68,10 @@ class HostLanguageModel(object):
             save_best_only=False, save_weights_only=False,
             mode='auto', save_freq='epoch',
         )
-
         roc = AUROCCallback(X, y, valX, valY, self.batch_size_, date, yVocab)
         plotter = TrainingPlot.TrainingPlot(date)
 
+        # tf fit
         history = self.model_.fit(
             X, y, epochs=self.n_epochs_, batch_size=self.batch_size_,
             validation_data=(valX, valY),
@@ -80,12 +81,17 @@ class HostLanguageModel(object):
 
         return history
 
-    def predict(self, X_cat, lengths):
-        X = self.split_and_pad(X_cat, lengths, self.seq_len_,
-                               self.vocab_size_, self.verbose_)
+    def predict(self, X, sparse=False):
+        X = self.split_and_pad(X)
         y_pred = self.model_.predict(X, batch_size=self.inference_batch_size_)
+        if not sparse:
+            y_pred = y_pred.argmax(y_pred, axis=1)
         return y_pred
 
+
+
+
+    # Not too sure what this does atm
     def transform(self, X_cat, lengths, embed_fname=None):
         X = self.split_and_pad(
             X_cat, lengths,
@@ -133,28 +139,3 @@ class HostLanguageModel(object):
         ])
 
         return X_embed
-
-    # Returns the total cross entropy
-    def score(self, X_cat, lengths, y_true):
-        X = self.split_and_pad(
-            X_cat, lengths, self.seq_len_, self.vocab_size_, self.verbose_
-        )
-
-        opt = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999,
-                   amsgrad=True)
-        self.model_.compile(
-            loss='sparse_categorical_crossentropy', optimizer=opt,
-            metrics=['accuracy']
-        )
-
-        metrics = self.model_.evaluate(X, y_true, verbose=self.verbose_ > 0,
-                                       batch_size=self.inference_batch_size_)
-
-        for val, metric in zip(metrics, self.model_.metrics_names):
-            if self.verbose_:
-                tprint('Metric {}: {}'.format(metric, val))
-
-        return metrics[self.model_.metrics_names.index('loss')] * -len(lengths), metrics[
-            self.model_.metrics_names.index('accuracy')]
-
-

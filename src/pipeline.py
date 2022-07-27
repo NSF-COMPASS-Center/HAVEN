@@ -58,10 +58,14 @@ def main():
                      targetKey=bilstmHostSettings['targetKey'],
                      train=bilstmHostSettings['should_train'],
                      n_epochs=bilstmHostSettings['epochs'],
+                     n_hidden=bilstmHostSettings['n_hidden'],
+                     embedding_dim=bilstmHostSettings['embedding_dim'],
                      train_split=bilstmHostSettings['train_split'],
                      batch_size=bilstmHostSettings['batch_size'],
+                     inf_batch_size=bilstmHostSettings['inf_batch_size'],
                      test=bilstmHostSettings['should_test'],
                      transferCheckpoint=bilstmSettings['checkpoint'],
+                     checkpoint=bilstmHostSettings['checkpoint'],
                      seed=bilstmSettings['seed'])
 
         hh.start()

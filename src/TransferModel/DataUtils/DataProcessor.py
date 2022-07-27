@@ -1,8 +1,7 @@
 import numpy as np
-from sklearn.model_selection import train_test_split
 import tensorflow as tf
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import label_binarize
-from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 
 def split_seqs_dict(seqs, percentTrain=.8, seed=1):
@@ -46,10 +45,19 @@ def featurize_seqs_host(seq, vocabulary):
     ], dtype=np.int8)
 
 
+def featurize_df(df, inputVocab, targetVocab, targetKey):
+    """
+    Args:
+        df: Pandas df, with seq and targetVocab as a column
+        inputVocab: Vocab for model inputs
+        targetVocab: Target vocab for model outputs
+        targetKey: Key for the column we're targeting
 
-def featurize_df(df, seqLen, vocab, targetVocab, targetKey):
-    df['seq_processed'] = df['seq'].apply(lambda x: featurize_seqs_host(x, vocab))
-    df['target'] = df[targetKey].apply(lambda x: featurize_host(x, targetVocab))
+    Returns: The dataframe, but with two new columns, X, y with featurized results
+
+    """
+    df['X'] = df['seq'].apply(lambda x: featurize_seqs_host(x, inputVocab))
+    df['y'] = df[targetKey].apply(lambda x: featurize_host(x, targetVocab))
     return df
 
 
@@ -63,8 +71,38 @@ def get_tokenizer(vocabulary, maxLen):
     )
     return vectorize_layer
 
+
 def toOneHot(vector, yVocab):
     vector = label_binarize(vector, classes=[x for x in yVocab.values()])
     if len(yVocab) == 2:
         return np.array([[item[0], 0 if item[0] else 1] for item in vector])
     return vector
+
+
+def initilizeVocab(words):
+    """
+    Initializes a vocabulary mapping, starting from 1.
+    Depending on your needs, you can use the zero index for anything,
+    For example, for amino acid words, you can use the 0 index to represent padding
+    For target prediction vocabulary, you can use the 0 index to represent unknown entity
+    Args:
+        words:
+
+    Returns:
+
+    """
+    return {word: i for i, word in enumerate(sorted(words), start=1)}
+
+
+def sparseToDense(y_pred):
+    """
+    Converts sparse to dense format.
+    If y_pred is a one-hot-encoding, no information is lost when converting to dense
+    If y_pred is a model prediction (e.g., softmax values), a prediction is made on the max's column index for dense representation
+    Args:
+        y_pred: Sparse numpy array, e.g [[.8, .2], [.1, .4], ...]
+
+    Returns: Dense representation of data
+
+    """
+    return np.argmax(y_pred, axis=1)
