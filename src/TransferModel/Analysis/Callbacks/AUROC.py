@@ -8,7 +8,7 @@ from TransferModel.DataUtils import DataProcessor
 
 
 class AUROCCallback(Callback):
-    def __init__(self, x, y, valX, valY, batch_size, date, yVocab, average=None, multi_class="ovo"):
+    def __init__(self, x, y, valX, valY, batch_size, date, yVocab, average="macro", multi_class="ovo"):
         super().__init__()
         self.x = x
         self.x_val = valX
@@ -25,6 +25,8 @@ class AUROCCallback(Callback):
         y_pred_train = self.model.predict(self.x, batch_size=self.batch_size)
         y_pred_val = self.model.predict(self.x_val, batch_size=self.batch_size)
 
+        print(self.y.shape)
+        print(y_pred_train.shape)
         roc_train = roc_auc_score(self.y, y_pred_train, multi_class=self.multi_class, average=self.average)
         roc_val = roc_auc_score(self.y_val, y_pred_val, multi_class=self.multi_class, average=self.average)
 

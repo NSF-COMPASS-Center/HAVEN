@@ -92,50 +92,16 @@ class TargetModel(object):
 
 
     # Not too sure what this does atm
-    def transform(self, X_cat, lengths, embed_fname=None):
-        X = self.split_and_pad(
-            X_cat, lengths,
-            self.seq_len_, self.vocab_size_, self.verbose_,
-        )
+    def transform(self, X):
+        X = self.split_and_pad(X)
 
-        # For now, each character in each sequence becomes a sample.
-        n_samples = sum(lengths)
-        if type(X) == list:
-            for X_i in X:
-                assert (X_i.shape[0] == n_samples)
-        else:
-            assert (X.shape[0] == n_samples)
 
-        # Embed using the output of a hidden layer.
-        hidden = tf.keras.backend.function(
-            inputs=self.model_.input,
-            outputs=self.model_.get_layer('embed_layer').output,
-        )
+        tmpModel = Model(inputs=self.model_.input, outputs=self.model_.get_layer('embed_layer').output)
 
-        # Manage batching to avoid overwhelming GPU memory.
-        X_embed_cat = []
-        n_batches = math.ceil(n_samples / self.inference_batch_size_)
-        if self.verbose_:
-            tprint('Embedding...')
-            prog_bar = tf.keras.utils.Progbar(n_batches)
-        for batchi in range(n_batches):
-            start = batchi * self.inference_batch_size_
-            end = min((batchi + 1) * self.inference_batch_size_, n_samples)
-            if type(X) == list:
-                X_batch = [X_i[start:end] for X_i in X]
-            else:
-                X_batch = X[start:end]
-            X_embed_cat.append(hidden(X_batch))
-            if self.verbose_:
-                prog_bar.add(1)
-        X_embed_cat = np.concatenate(X_embed_cat)
-        if self.verbose_:
-            tprint('Done embedding.')
+        X_embeddings = tmpModel.predict(X, batch_size=self.inference_batch_size_)
 
-        X_embed = np.array([
-            X_embed_cat[start:end]
-            for start, end in
-            iterate_lengths(lengths, self.seq_len_)
-        ])
+        self.gpu_gc()
 
-        return X_embed
+        return X_embeddings
+
+
