@@ -90,7 +90,8 @@ class BiLSTMTargetModel(TargetModel):
     def attachTransferHead(self, x):
         for sz in (512, 256, 128, 64):
             x = layers.Dense(sz, activation='swish')(x)
-        return layers.Dense(self.vocab_size_, activation='softmax', dtype='float32')(x)
+        print(self.target_size_)
+        return layers.Dense(self.target_size_, activation='softmax', dtype='float32')(x)
 
     def split_and_pad(self, X):
         # Convert concatenated format back to array separated sequences

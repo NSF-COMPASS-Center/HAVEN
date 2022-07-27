@@ -74,7 +74,7 @@ class HepHost():
             model = load_model(self.args.transferCheckpoint)
 
         # Make host model
-        hostModel = get_target_model(self.args, model, seq_len,  vocab_size)
+        hostModel = get_target_model(self.args, model, seq_len,  vocab_size, len(yVocab))
 
         # Regular checkpoint of weights
         if self.args.checkpoint:

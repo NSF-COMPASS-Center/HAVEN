@@ -12,17 +12,18 @@ class TrainingPlot(Callback):
         super().__init__()
         self.date = date
         self.logs = defaultdict(list)
+        self.accLogs = defaultdict(list)
+        self.lossLogs = defaultdict(list)
 
     # This function is called at the end of each epoch
     def on_epoch_end(self, epoch, logs={}):
         # Append the logs, losses and accuracies to the lists
-        self.logs["Training Loss"].append(logs.get('loss'))
-        self.logs["Training Accuracy"].append(logs.get('accuracy'))
-        self.logs["Validation Loss"].append(logs.get('val_loss'))
-        self.logs["Validation Accuracy"].append(logs.get('val_accuracy'))
+        self.accLogs["Training Accuracy"].append(logs.get('accuracy'))
+        self.accLogs["Validation Accuracy"].append(logs.get('val_accuracy'))
+        self.lossLogs["Training Loss"].append(logs.get('loss'))
+        self.lossLogs["Validation Loss"].append(logs.get('val_loss'))
 
         # Before plotting ensure at least 2 epochs have passed
-        if len(self.losses) > 1:
-            Visualization.plot_metrics(self.log, f"hep_bilstm_host_training_{self.date}", metricName="Accuracy and "
-                                                                                                     "Cross Entropy "
-                                                                                                     "Loss")
+        if len(self.lossLogs['Training Loss']) > 1:
+            Visualization.plot_metrics(self.accLogs, f"hep_bilstm_host_ACC_{self.date}", metricName="Accuracy")
+            Visualization.plot_metrics(self.lossLogs, f"hep_bilstm_host_CE_{self.date}", metricName="Cross entropy")

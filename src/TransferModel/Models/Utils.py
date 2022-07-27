@@ -6,14 +6,14 @@ def err_model(name):
     raise ValueError('Model {} not supported'.format(name))
 
 
-def get_target_model(args, parentModel, seq_len, vocab_size,
+def get_target_model(args, parentModel, seq_len, vocab_size, target_size,
                      inference_batch_size=200):
     if args.model_name == 'bilstm':
         model = BiLSTMTargetModel(
             seq_len,
             parentModel,
             vocab_size,
-            target_size=len(args.targetNames),
+            target_size=target_size,
             embedding_dim=args.embedding_dim,
             hidden_dim=args.dim,
             n_hidden=args.n_hidden,
@@ -35,3 +35,10 @@ def fit_model_host(model, seqs, vocabulary, labelVocab):
     y = seqs['target']
     model.fit(X, lengths, y)
     return model
+
+
+
+#TODO:...
+def embed_sequences(X , model, useCache):
+    embeddings = model.transform(X)
+
