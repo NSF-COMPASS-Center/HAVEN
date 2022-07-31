@@ -134,7 +134,7 @@ def setup(args):
     vocab_size = len(AAs) + 2
 
     model = get_model(args, seq_len, vocab_size,
-                      inference_batch_size=1000)
+                      inference_batch_size=50)
 
     return model, seqs
 
@@ -176,7 +176,7 @@ def plot_umap(adata):
 
 def analyze_embedding(args, model, seqs, vocabulary):
     sorted_seqs = np.array([str(s) for s in sorted(seqs.keys())])
-    batch_size = 3000
+    batch_size = 5
     n_batches = math.ceil(len(sorted_seqs) / float(batch_size))
     for batchi in range(n_batches):
         start = batchi * batch_size
@@ -186,8 +186,11 @@ def analyze_embedding(args, model, seqs, vocabulary):
                                 use_cache=False)
         for seq in seqs_batch:
             for meta in seqs[seq]:
+                # Why is this averaged to squash the sequence length dim, isn't this losing a lot of data?
+                # Actually, I think it's quashing from all the fill-in-the-blank predictions
                 meta['embedding'] = seqs_batch[seq][0]['embedding'].mean(0)
         del seqs_batch
+        break
 
     X, obs = [], {}
     obs['n_seq'] = []
@@ -200,14 +203,21 @@ def analyze_embedding(args, model, seqs, vocabulary):
                 continue
             if key not in obs:
                 obs[key] = []
+            # Sometimes a sequence will have multiple data sources -- Let the one with the most consensus be correct.
             obs[key].append(Counter([
                 meta[key] for meta in seqs[seq]
             ]).most_common(1)[0][0])
+
+        # n number of sources
         obs['n_seq'].append(len(seqs[seq]))
+        # attach the sequence
         obs['seq'].append(str(seq))
     X = np.array(X)
 
+    # AnnData frame for all the quashed embedding data
     adata = AnnData(X)
+
+    # Transfer all the data over to obs namespace
     for key in obs:
         adata.obs[key] = obs[key]
 

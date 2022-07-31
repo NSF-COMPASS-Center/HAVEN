@@ -1,5 +1,14 @@
-from TransferModel.DataUtils.DataProcessor import featurize_seqs_host
+import os
+
+import numpy as np
+from anndata import AnnData
+
+from TransferModel.Analysis import Evaluation
+from TransferModel.Analysis import Visualization
 from TransferModel.Models.BilstmTargetModel import BiLSTMTargetModel
+
+import scanpy as sc
+import pathlib
 
 
 def err_model(name):
@@ -30,15 +39,57 @@ def get_target_model(args, parentModel, seq_len, vocab_size, target_size,
     return model
 
 
-def fit_model_host(model, seqs, vocabulary, labelVocab):
-    X, lengths = featurize_seqs_host(seqs, vocabulary)
-    y = seqs['target']
-    model.fit(X, lengths, y)
-    return model
+def fit_model(model, train_df, test_df, yVocab, date):
+    model.model_.summary()
+
+    h = model.fit(train_df['X'], train_df['y'], test_df['X'],
+                  test_df['y'], date, yVocab)
+
+    return h
 
 
+def print_per_class(metrics, yVocabInverse, metricName):
+    print(f"{metricName} per class: ", {yVocabInverse[i]: m for i, m in enumerate(metrics)})
 
-#TODO:...
-def embed_sequences(X , model, useCache):
-    embeddings = model.transform(X)
 
+def test_model(model, test_df, yVocab, date):
+    y_pred = model.predict(test_df['X'], sparse=True)
+    testAurocs = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab,
+                                         filename=f"hep_bilstm_host_AUROC_{date}")
+    yVocabInverse = {y: x for x, y in yVocab.items()}
+    print_per_class(testAurocs, yVocabInverse, "AUROC")
+    res, matrix = Evaluation.report_accuracy_per_class(test_df['y'], y_pred, yDict=yVocab)
+    print_per_class(res, yVocabInverse, "Accuracy")
+    modelFreq, _ = Evaluation.report_class_distribution(None, None, None, 0, matrix)
+    print_per_class(modelFreq, yVocabInverse, "Frequency of prediction by model")
+    dfFreq, _ = Evaluation.report_class_distribution(None, None, None, 1, matrix)
+    print_per_class(dfFreq, yVocabInverse, "Frequency by dataset")
+    print("Overall accuracy: ", Evaluation.report_accuracy(test_df['y'], y_pred))
+
+
+def analyze_embedding(args, model, test_df, vocabulary):
+    embeddings = embed_sequences(args, test_df["X"], model, args.embedding_cache)
+    adata = AnnData(embeddings, dtype=np.float16)
+    # Probably needs tweaks here... Can't be this simple assigning the properties, right?
+
+    for c in args.embedTargets:
+        adata.obs[c] = test_df[c].to_numpy()
+
+    sc.pp.neighbors(adata, n_neighbors=200, use_rep='X')
+    sc.tl.louvain(adata, resolution=1.)
+    Visualization.plot_umap(args, adata)
+
+
+def embed_sequences(args, X, model, useCache=False):
+    embed_fname = ('target/{}/embedding/{}_{}.npy'
+                   .format(args.namespace, args.model_name, args.dim))
+    if useCache:
+        pathlib.Path('target/{}/embedding'.format(args.namespace)).mkdir(parents=True, exist_ok=True)
+        if os.path.exists(embed_fname):
+            return np.load(embed_fname, allow_pickle=True)
+
+    if not (useCache and os.path.exists(embed_fname)):
+        embeddings = model.transform(X)
+        if useCache:
+            np.save(embed_fname, embeddings)
+        return embeddings

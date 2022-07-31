@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 
+import scanpy as sc
 
 def plot_train_test_metric(trainMetric, testMetric, filename, metricName="Cross Entropy", optimalFlag="min"):
     """
@@ -93,3 +94,11 @@ def plot_auroc(y_test, y_pred, labelDict, filename):
         name = f'figures/{filename}.png'
         plt.savefig(name, bbox_inches='tight', dpi=300)
         plt.clf()
+
+
+def plot_umap(args, adata):
+    sc.set_figure_params(dpi_save=500)
+    sc.tl.umap(adata, min_dist=1.)
+    plt.rcParams['figure.figsize'] = (9, 9)
+    for key in adata.obs.columns:
+        sc.pl.umap(adata, color=key, save=f'_{args.namespace}_{key}.png')

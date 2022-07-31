@@ -88,13 +88,8 @@ class TargetModel(object):
             y_pred = y_pred.argmax(y_pred, axis=1)
         return y_pred
 
-
-
-
-    # Not too sure what this does atm
     def transform(self, X):
         X = self.split_and_pad(X)
-
 
         tmpModel = Model(inputs=self.model_.input, outputs=self.model_.get_layer('embed_layer').output)
 
@@ -103,5 +98,3 @@ class TargetModel(object):
         self.gpu_gc()
 
         return X_embeddings
-
-

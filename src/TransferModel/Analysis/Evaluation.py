@@ -28,22 +28,58 @@ def report_auroc(y_test, y_pred, labelVocab=None, filename=None, average=None, m
     return roc_auc_score(y_test, y_pred, average=average, multi_class=multi_class)
 
 
-def report_accuracy_per_class(y_test, y_pred, yDict):
+def report_confusion_matrix(y_test, y_pred, yDict):
     """
-    Returns accuracies
-    We define accuracy for a class as (TP+TN)/(TP+TN+FP+FN) over every time the model predicted the class.
-    i.e Everytime the model predicts class "a," how often is this prediction correct (tp or tn)?
+    Args:
+        y_test: reference y values in dense format
+        y_pred: Outputs of model in sparse format
+        yDict: Dictionary mapping string label to integer classes (to ensure correct ordering of matrix)
+    Returns:
+        SKL confusion matrix with rows being true label and cols being predicted labels
+    """
+    y_pred = DataProcessor.sparseToDense(y_pred)
+    matrix = confusion_matrix(y_test, y_pred, labels=sorted(list(yDict.values())))
+    return matrix
+
+
+def report_class_distribution(y_test, y_pred, yDict, norm=0, matrix=None):
+    """
+       Returns how frequently the model returns each class
+
+       Args:
+           y_test: r
+           y_pred: Outputs of model in sparse format
+           yDict: Dictionary mapping string label to integer classes (to ensure correct ordering of matrix)
+           norm: 0 == Frequency of model; 1 ==  Frequency of dataset
+           matrix: Confusion matrix given by user. Will generate from y_test, y_pred, yVocab if not given.
+
+       Returns: Numpy array of predicted distribution
+    """
+
+    if matrix is None:
+        matrix = report_confusion_matrix(y_test, y_pred, yDict)
+
+    tmp = matrix.sum(axis=((1+norm) % 2))
+    tmp = tmp / tmp.sum(axis=0)
+    return tmp, matrix
+
+
+def report_accuracy_per_class(y_test, y_pred, yDict, matrix=None):
+    """
+    Returns accuracies normalized over the test set
+    Accuracy of class 'a' is (Tp_a + Tn_a) / (TP_a + TN_a + FP_a + FN_a)
 
     Args:
         y_test: reference y values in dense format
         y_pred: Outputs of model in sparse format
         yDict: Dictionary mapping string label to integer classes (to ensure correct ordering of matrix)
+        matrix: Confusion matrix given by user. Will generate from y_test, y_pred, yVocab if not given.
 
-    Returns: Numpy array of accuracy per class in sorted order class 0, ... n
+    Returns: Numpy array of accuracy per class in sorted order class 0, ... n, generated confusion matrix
     """
-    y_pred = DataProcessor.sparseToDense(y_pred)
-    matrix = confusion_matrix(y_test, y_pred, labels=sorted(list(yDict.values())))
-    return matrix.diagonal() / matrix.sum(axis=1)
+    if matrix is None:
+        matrix = report_confusion_matrix(y_test, y_pred, yDict)
+    return matrix.diagonal() / (matrix.sum(axis=0) + matrix.sum(axis=1) - matrix.diagonal()), matrix
 
 
 def report_accuracy(y_test, y_pred):

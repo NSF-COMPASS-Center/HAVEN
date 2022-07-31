@@ -42,6 +42,7 @@ def main():
         print("Initalizing Bilstm Language Model----------------------------")
         h = Hep(model_name=modelName, datasets=datasets,
                 n_epochs=bilstmSettings['epochs'],
+                n_hidden=bilstmSettings['n_hidden'],
                 train=bilstmSettings['should_train'],
                 checkpoint=bilstmSettings['checkpoint'],
                 seed=bilstmSettings['seed'])
@@ -57,6 +58,9 @@ def main():
                      targetNames=bilstmHostSettings['targetNames'],
                      targetKey=bilstmHostSettings['targetKey'],
                      train=bilstmHostSettings['should_train'],
+                     embed=bilstmHostSettings['should_embed'],
+                     embedTargets=bilstmHostSettings["embed_targets"],
+                     embedding_cache=bilstmHostSettings["embedding_cache"],
                      n_epochs=bilstmHostSettings['epochs'],
                      n_hidden=bilstmHostSettings['n_hidden'],
                      embedding_dim=bilstmHostSettings['embedding_dim'],
@@ -66,7 +70,7 @@ def main():
                      test=bilstmHostSettings['should_test'],
                      transferCheckpoint=bilstmSettings['checkpoint'],
                      checkpoint=bilstmHostSettings['checkpoint'],
-                     seed=bilstmSettings['seed'])
+                     seed=bilstmSettings['seed'], visualize_dataset=bilstmHostSettings['should_visualize_data'])
 
         hh.start()
 

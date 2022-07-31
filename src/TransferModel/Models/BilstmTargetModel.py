@@ -82,8 +82,6 @@ class BiLSTMTargetModel(TargetModel):
             assert self.model_.layers[1].trainable == False
             assert self.model_.layers[2].trainable == False
 
-        print(f"seq_len: {self.seq_len_}")
-
     # May want to
     # Change this to however you want, it'll be saved in the hdf5 file
     # Maybe resnet is good?

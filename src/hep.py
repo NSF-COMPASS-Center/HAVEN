@@ -13,7 +13,7 @@ from LanguageModel.mutation import *
 class Hep():
     def __init__(self, model_name: str, checkpoint: str = None, datasets: List[str] = None,
                  transferCheckpoint: str = None,
-                 namespace: str = "hep", seed: int = 1, dim: int = 512, batch_size: int = 500,
+                 namespace: str = "hep", seed: int = 1, dim: int = 512, batch_size: int = 500, n_hidden:int = 3,
                  n_epochs: int = 11, train: bool = False, test: bool = False, embed: bool = False,
                  semantics: bool = False, combfit: bool = False, reinfection: bool = False, train_split: bool = False,
                  visualise: bool = False):
@@ -25,6 +25,7 @@ class Hep():
         self.args.batch_size = batch_size
         self.args.checkpoint = checkpoint
         self.args.n_epochs = n_epochs
+        self.args.n_hidden = n_hidden
         self.args.train = train
         self.args.train_split = train_split
         self.args.test = test
