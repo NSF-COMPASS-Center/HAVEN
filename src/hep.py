@@ -268,8 +268,8 @@ class Hep():
         vocabulary = {aa: idx + 1 for idx, aa in enumerate(sorted(AAs))}
         model, seqs, seq_len, vocab_size = self.setup(self.args)
 
-        if self.args.visulise:
-            print(f"visulise_dataset: {self.args.visulise}")
+        if self.args.visualise:
+            print(f"visualise_dataset: {self.args.visualise}")
             # Extract freq map of species wide distribution
             # Basically a hashmap obj
             speciesCounter = Counter()
