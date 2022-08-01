@@ -24,11 +24,13 @@ class HepHost():
                  dim: int = 512, batch_size: int = 64, inf_batch_size: int = 128, n_epochs: int = 11, n_hidden: int = 2,
                  embedding_dim=20, embedTargets: List[str] = None, embedding_cache: bool = False, train: bool = False,
                  embed: bool = False, semantics: bool = False,
-                 combfit: bool = False, reinfection: bool = False, train_split: float = 0.8, test: bool = False, visualize_dataset: bool = True):
+                 combfit: bool = False, reinfection: bool = False, train_split: float = 0.8, test: bool = False, visualize_dataset: bool = True, outputDir: str="output"):
         self.args = types.SimpleNamespace()
         self.args.model_name = model_name
         self.args.seed = seed
         self.args.namespace = namespace
+        self.args.outputDir = outputDir
+        self.args.figDir = f"{outputDir}/figures/{model_name}_{dim}"
         self.args.dim = dim
         self.args.batch_size = batch_size
         self.args.inf_batch_size = inf_batch_size
@@ -94,7 +96,7 @@ class HepHost():
             hostModel.model_.summary()
 
         if self.args.train or self.args.test or self.args.embed:
-            train_df, test_df = DataProcessor.split_df(df, self.args.train_split)
+            train_df, test_df = DataProcessor.split_df(df, self.args.train_split, self.args.seed)
 
 
         date = datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
@@ -104,6 +106,12 @@ class HepHost():
 
         if self.args.test:
             print("DEBUG: Testing start")
+            '''
+            pd.set_option('display.max_rows', None)
+            pd.set_option('display.max_columns', None)
+            print(train_df)
+            print(test_df)
+            '''
             TransferModel.Models.Utils.test_model(hostModel, test_df, yVocab, date)
 
         if self.args.embed:
