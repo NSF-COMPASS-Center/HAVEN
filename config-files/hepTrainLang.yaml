@@ -17,7 +17,7 @@ input_settings:
         # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
         bilstm:
             active: true
-            should_train: false
+            should_train: true
             seed: 1
             n_hidden: 3
             checkpoint: # "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
