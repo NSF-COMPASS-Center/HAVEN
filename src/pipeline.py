@@ -37,6 +37,8 @@ def main():
     modelName = 'bilstm'
     # args.config['input_settings']['models'].keys()
 
+    output_settings = args.config['output_settings']
+
     bilstmSettings = args.config['input_settings']['models'][modelName]
     if bilstmSettings['active']:
         print("Initalizing Bilstm Language Model----------------------------")
@@ -45,12 +47,14 @@ def main():
                 n_hidden=bilstmSettings['n_hidden'],
                 train=bilstmSettings['should_train'],
                 checkpoint=bilstmSettings['checkpoint'],
-                seed=bilstmSettings['seed'])
+                seed=bilstmSettings['seed'],
+                namespace=output_settings['namespace'])
         h.start()
 
     datasets = [d for d in args.config['input_settings']['datasets'].values()]
     # Host model
-    bilstmHostSettings = bilstmSettings[f'{modelName}_host']
+    modelName = "bilstm_host"
+    bilstmHostSettings = bilstmSettings[modelName]
     if bilstmHostSettings['active']:
         print("Initalizing Bilstm Host Model--------------------------------")
         hh = HepHost(model_name=modelName,
@@ -70,7 +74,10 @@ def main():
                      test=bilstmHostSettings['should_test'],
                      transferCheckpoint=bilstmSettings['checkpoint'],
                      checkpoint=bilstmHostSettings['checkpoint'],
-                     seed=bilstmSettings['seed'], visualize_dataset=bilstmHostSettings['should_visualize_data'])
+                     seed=bilstmSettings['seed'],
+                     visualize_dataset=bilstmHostSettings['should_visualize_data'],
+                     namespace=output_settings['namespace']
+                     )
 
         hh.start()
 

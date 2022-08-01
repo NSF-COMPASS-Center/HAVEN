@@ -1,4 +1,5 @@
 import gc
+import pathlib
 
 import tensorflow as tf
 from tensorflow.keras import Input
@@ -59,6 +60,8 @@ class TargetModel(object):
         dirname = '{}/checkpoints/{}'.format(self.cache_dir_,
                                              self.model_name_)
         mkdir_p(dirname)
+        pathlib.Path(dirname).mkdir(parents=True, exist_ok=True)
+        pathlib.Path(self.figDir).mkdir(parents=True, exist_ok=True)
 
         # Callbacks:
         checkpoint = ModelCheckpoint(
@@ -68,8 +71,8 @@ class TargetModel(object):
             save_best_only=False, save_weights_only=False,
             mode='auto', save_freq='epoch',
         )
-        roc = AUROCCallback(X, y, valX, valY, self.batch_size_, date, yVocab)
-        plotter = TrainingPlot.TrainingPlot(date)
+        roc = AUROCCallback(X, y, valX, valY, self.inference_batch_size_, date, yVocab, figDir=self.figDir)
+        plotter = TrainingPlot.TrainingPlot(date, figDir=self.figDir)
 
         # tf fit
         history = self.model_.fit(

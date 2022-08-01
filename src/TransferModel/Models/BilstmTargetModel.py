@@ -23,7 +23,8 @@ class BiLSTMTargetModel(TargetModel):
             batch_size=1000,
             inference_batch_size=1500,
             cache_dir='.',
-            model_name='bilstm_host',
+            figDir='.',
+            model_name='bilstm_transfer',
             seed=None,
             verbose=False
     ):
@@ -43,6 +44,7 @@ class BiLSTMTargetModel(TargetModel):
         self.cache_dir_ = cache_dir
         self.model_name_ = model_name
         self.verbose_ = verbose
+        self.figDir = figDir
 
 
         # Generate model

@@ -3,7 +3,9 @@ from sklearn.metrics import roc_curve, auc
 
 import scanpy as sc
 
-def plot_train_test_metric(trainMetric, testMetric, filename, metricName="Cross Entropy", optimalFlag="min"):
+
+def plot_train_test_metric(trainMetric, testMetric, filename, metricName="Cross Entropy", optimalFlag="min",
+                           ylim=[0, 1]):
     """
     Used for plotting train and test metrics indexed by epochs to files
     Args:
@@ -12,6 +14,7 @@ def plot_train_test_metric(trainMetric, testMetric, filename, metricName="Cross 
         filename: filename to write to
         metricName: y-axis name
         optimalFlag: plots a horizontal line depending on the optimal epoch choices are: ["min", "max", None]
+        ylim: plot [ymin, yMax] limits
     """
     assert filename
     with plt.style.context("seaborn"):
@@ -34,6 +37,8 @@ def plot_train_test_metric(trainMetric, testMetric, filename, metricName="Cross 
     plt.ylabel(f"{metricName}", fontsize=20)
     plt.title('Training history', fontsize=20)
     plt.legend()
+    ax = plt.gca()
+    ax.set_ylim(ylim)
 
     # Print image
     name = f'figures/{filename}.png'
@@ -41,13 +46,14 @@ def plot_train_test_metric(trainMetric, testMetric, filename, metricName="Cross 
     plt.clf()
 
 
-def plot_metrics(dic, filename, metricName="AUROC"):
+def plot_metrics(dic, filename, metricName="AUROC", ylim=[0, 1]):
     """
     Plots metrics in figures/filename.png
     Args:
         dic: Dictionary of label:[data1, data2, ...] pairs
         filename: filename to write to
         metricName: y axis label
+        ylim: plot [ymin, yMax] limits
     """
     with plt.style.context("seaborn"):
         fig = plt.figure(1, [16, 9])
@@ -60,14 +66,16 @@ def plot_metrics(dic, filename, metricName="AUROC"):
     plt.ylabel(f"{metricName}", fontsize=20)
     plt.title('Training history', fontsize=20)
     plt.legend()
+    ax = plt.gca()
+    ax.set_ylim(ylim)
 
     # Print image
-    name = f'figures/{filename}.png'
+    name = f'{filename}.png'
     plt.savefig(name, bbox_inches='tight', dpi=300)
     plt.clf()
 
 
-def plot_auroc(y_test, y_pred, labelDict, filename):
+def plot_auroc(y_test, y_pred, labelDict, filename, ylim=[0, 1]):
     """
     Generates an auroc plot
     Assumes that y_test and y_pred are in sparse format e.g [.8, .2, .1] or [1, 0, 0]
@@ -76,6 +84,7 @@ def plot_auroc(y_test, y_pred, labelDict, filename):
         y_pred: model predicted y values
         labelDict: dictionary of labels, e.g {"Human": 1, "Unknown": 0}
         filename: filename to write to
+        ylim: plot [ymin, yMax] limits
     """
     if filename:
         with plt.style.context("seaborn"):
@@ -89,15 +98,17 @@ def plot_auroc(y_test, y_pred, labelDict, filename):
         plt.ylabel("True positive rate", fontsize=20)
         plt.title('ROC', fontsize=20)
         plt.legend()
+        ax = plt.gca()
+        ax.set_ylim(ylim)
 
         # Print image
-        name = f'figures/{filename}.png'
+        name = f'{filename}.png'
         plt.savefig(name, bbox_inches='tight', dpi=300)
         plt.clf()
 
 
-def plot_umap(args, adata):
-    sc.set_figure_params(dpi_save=500)
+def plot_umap(args, adata, figdir):
+    sc.set_figure_params(dpi_save=500, figdir=figdir)
     sc.tl.umap(adata, min_dist=1.)
     plt.rcParams['figure.figsize'] = (9, 9)
     for key in adata.obs.columns:
