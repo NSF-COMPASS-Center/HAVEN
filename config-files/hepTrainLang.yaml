@@ -45,5 +45,5 @@ input_settings:
 output_settings:
     # Base output directory
     namespace: "hep"
-    output_dir: "outputs"
+    output_dir: "Output"
 
