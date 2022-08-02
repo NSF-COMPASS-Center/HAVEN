@@ -108,8 +108,9 @@ def plot_auroc(y_test, y_pred, labelDict, filename, ylim=[0, 1]):
 
 
 def plot_umap(args, adata, figdir):
-    sc.set_figure_params(dpi_save=500, figdir=figdir)
+    sc.settings.figdir = figdir
     sc.tl.umap(adata, min_dist=1.)
+    sc.set_figure_params(dpi_save=500)
     plt.rcParams['figure.figsize'] = (9, 9)
     for key in adata.obs.columns:
         sc.pl.umap(adata, color=key, save=f'_{args.namespace}_{key}.png')

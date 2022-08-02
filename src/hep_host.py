@@ -85,6 +85,7 @@ class HepHost():
         if self.args.transferCheckpoint and not self.args.checkpoint:
             print("DEBUG: Loaded transfer checkpoint!")
             model = load_model(self.args.transferCheckpoint)
+            model.summary()
 
         # Make host model
         hostModel = get_target_model(self.args, model, seq_len, vocab_size, len(yVocab))
@@ -116,4 +117,5 @@ class HepHost():
 
         if self.args.embed:
             print("DEBUG: Testing embedding")
-            TransferModel.Models.Utils.analyze_embedding(self.args, hostModel, test_df, vocabulary)
+            print(test_df)
+            TransferModel.Models.Utils.analyze_embedding(self.args, hostModel, test_df)

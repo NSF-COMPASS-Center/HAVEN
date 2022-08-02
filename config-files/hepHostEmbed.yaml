@@ -20,7 +20,7 @@ input_settings:
             n_hidden: 3
             should_train: false
             seed: 1
-            checkpoint: "models/hep-l3-512-24.hdf5"
+            checkpoint: "models/hep-l2-512-12.hdf5"
             epochs: 12
 
             # Same model as above, but different last layer classifier for transfer learning
@@ -37,7 +37,7 @@ input_settings:
                 should_visualize_data: False
                 train_split: 0
                 batch_size: 64
-                inf_batch_size: 144
+                inf_batch_size: 128
                 should_test: False
                 transfer_learning: True
                 checkpoint: "" #"target/hep/checkpoints/bilstm_host/r4/bilstm_host_512-128.hdf5"

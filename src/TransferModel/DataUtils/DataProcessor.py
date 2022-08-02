@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import label_binarize
@@ -16,7 +17,11 @@ def split_seqs_dict(seqs, percentTrain=.8, seed=1):
 
 # Returns train and test dataframes respectively
 def split_df(df, percentTrain=.8, seed=1):
-    #return np.split(df.sample(frac=1), [int(percentTrain * len(df))])
+    if percentTrain == 0:
+        return pd.DataFrame(columns=df.columns), df
+    elif percentTrain == 1:
+        return df, pd.DataFrame(columns=df.columns)
+
     df_train, df_test = train_test_split(df, train_size=percentTrain, stratify=df['y'], random_state=seed)
     return df_train, df_test
 

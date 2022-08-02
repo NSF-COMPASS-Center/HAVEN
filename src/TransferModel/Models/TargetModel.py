@@ -93,6 +93,7 @@ class TargetModel(object):
 
     def transform(self, X):
         X = self.split_and_pad(X)
+        print(X)
 
         tmpModel = Model(inputs=self.model_.input, outputs=self.model_.get_layer('embed_layer').output)
 

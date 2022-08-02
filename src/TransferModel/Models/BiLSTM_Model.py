@@ -1,14 +1,14 @@
 import numpy as np
 
 from LanguageModel.utils import tprint, iterate_lengths
-from TransferModel.Models.host_model import HostLanguageModel
+from TransferModel.Models.TargetModel import TargetModel
 
 from tensorflow.keras import Input
 from tensorflow.keras import layers
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-class BiLSTMHostModel(HostLanguageModel):
+class BiLSTMTargetModel(TargetModel):
     def __init__(
             self,
             seq_len,
@@ -23,52 +23,14 @@ class BiLSTMHostModel(HostLanguageModel):
             batch_size=1000,
             inference_batch_size=1500,
             cache_dir='.',
-            model_name='bilstm_host',
+            figDir='.',
+            model_name='bilstm_transfer',
             seed=None,
             verbose=False
     ):
         super().__init__(seed=seed, )
 
-        if not parentModel:
-            input_pre = Input(shape=(seq_len - 1,))
-            input_post = Input(shape=(seq_len - 1,))
-
-            embed = Embedding(vocab_size + 1, embedding_dim,
-                              input_length=seq_len - 1)
-            x_pre = embed(input_pre)
-            x_post = embed(input_post)
-
-            for _ in range(n_hidden - 1):
-                lstm = LSTM(hidden_dim, return_sequences=True)
-                x_pre = lstm(x_pre)
-                x_post = lstm(x_post)
-            lstm = LSTM(hidden_dim)
-            x_pre = lstm(x_pre)
-            x_post = lstm(x_post)
-
-            x = concatenate([x_pre, x_post],
-                            name='embed_layer')
-
-            # x = Dense(dff, activation='relu')(x)
-            x = Dense(vocab_size + 1)(x)
-            output = Activation('softmax', dtype='float32')(x)
-
-            self.model_ = Model(inputs=[input_pre, input_post],
-                                outputs=output)
-        else:
-            # Replace classifier
-            x = parentModel.layers[-3].output
-            parentModel.trainable = False
-
-            for sz in (512, 256, 128, 64):
-                x = layers.Dense(sz, activation='swish')(x)
-
-            predictions = layers.Dense(2, activation='softmax', dtype='float32')(x)
-            self.model_ = Model(inputs=parentModel.inputs, outputs=predictions)
-            assert self.model_.layers[0].trainable == False
-            assert self.model_.layers[1].trainable == False
-            assert self.model_.layers[2].trainable == False
-
+        # Init stuff
         self.seq_len_ = seq_len
         self.vocab_size_ = vocab_size
         self.target_size_ = target_size
@@ -82,7 +44,54 @@ class BiLSTMHostModel(HostLanguageModel):
         self.cache_dir_ = cache_dir
         self.model_name_ = model_name
         self.verbose_ = verbose
-        print(f"seq_len: {self.seq_len_}")
+        self.figDir = figDir
+
+
+        # Generate model
+        if not parentModel:
+            input_pre = Input(shape=(seq_len - 1,))
+            input_post = Input(shape=(seq_len - 1,))
+
+            embed = layers.Embedding(vocab_size + 1, embedding_dim,
+                              input_length=seq_len - 1)
+            x_pre = embed(input_pre)
+            x_post = embed(input_post)
+
+            for _ in range(n_hidden - 1):
+                lstm = layers.LSTM(hidden_dim, return_sequences=True)
+                x_pre = lstm(x_pre)
+                x_post = lstm(x_post)
+            lstm = layers.LSTM(hidden_dim)
+            x_pre = lstm(x_pre)
+            x_post = lstm(x_post)
+
+            x = layers.concatenate([x_pre, x_post],
+                            name='embed_layer')
+
+            output = self.attachTransferHead(x)
+
+            self.model_ = Model(inputs=[input_pre, input_post],
+                                outputs=output)
+        else:
+            # Replace classifier
+            x = parentModel.layers[-3].output
+            parentModel.trainable = False
+
+            predictions = self.attachTransferHead(x)
+
+            self.model_ = Model(inputs=parentModel.inputs, outputs=predictions)
+            assert self.model_.layers[0].trainable == False
+            assert self.model_.layers[1].trainable == False
+            assert self.model_.layers[2].trainable == False
+
+    # May want to
+    # Change this to however you want, it'll be saved in the hdf5 file
+    # Maybe resnet is good?
+    def attachTransferHead(self, x):
+        for sz in (512, 256, 128, 64):
+            x = layers.Dense(sz, activation='swish')(x)
+        print(self.target_size_)
+        return layers.Dense(self.target_size_, activation='softmax', dtype='float32')(x)
 
     def split_and_pad(self, X):
         # Convert concatenated format back to array separated sequences
@@ -93,7 +102,7 @@ class BiLSTMHostModel(HostLanguageModel):
             tprint('Padding {} splitted...'.format(len(X_pre)))
 
         X_pre = pad_sequences(
-            X_pre, maxlen=self.seq_len_,
+            X_pre, maxlen=self.seq_len_-1,
             dtype='int8', padding='pre', truncating='pre', value=0
         )
         if self.verbose_ > 1:
@@ -101,17 +110,15 @@ class BiLSTMHostModel(HostLanguageModel):
 
         # tf post padding
         X_post = pad_sequences(
-            X_post, maxlen=self.seq_len_,
+            X_post, maxlen=self.seq_len_-1,
             dtype='int8', padding='post', truncating='post', value=0
         )
 
         if self.verbose_ > 1:
             tprint('Flipping...')
 
-        # Reverse order of each post sequence, because you want it to read right to left
+        # Reverse order of each
         X_post = np.flip(X_post, 1)
         X = [X_pre, X_post]
 
-        if self.verbose_ > 1:
-            tprint('Done splitting and padding.')
         return X

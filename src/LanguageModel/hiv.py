@@ -156,8 +156,10 @@ def interpret_clusters(adata):
         cluster = adata.obs['louvain'][i]
         if cluster not in cluster2subtype:
             cluster2subtype[cluster] = []
+        # Dict that maps cluster key to subtypes contained
         cluster2subtype[cluster].append(adata.obs['subtype'][i])
     largest_pct_subtype = []
+
     for cluster in cluster2subtype:
         count = Counter(cluster2subtype[cluster]).most_common(1)[0][1]
         pct_subtype = float(count) / len(cluster2subtype[cluster])

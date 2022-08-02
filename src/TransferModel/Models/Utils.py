@@ -5,7 +5,7 @@ from anndata import AnnData
 
 from TransferModel.Analysis import Evaluation
 from TransferModel.Analysis import Visualization
-from TransferModel.Models.BilstmTargetModel import BiLSTMTargetModel
+from TransferModel.Models.BiLSTM_Model import BiLSTMTargetModel
 
 import scanpy as sc
 import pathlib
@@ -69,10 +69,10 @@ def test_model(model, test_df, yVocab, date):
     print("Overall accuracy: ", Evaluation.report_accuracy(test_df['y'], y_pred))
 
 
-def analyze_embedding(args, model, test_df, vocabulary):
+def analyze_embedding(args, model, test_df):
     embeddings = embed_sequences(args, test_df["X"], model, args.embedding_cache)
+
     adata = AnnData(embeddings, dtype=np.float16)
-    # Probably needs tweaks here... Can't be this simple assigning the properties, right?
 
     for c in args.embedTargets:
         adata.obs[c] = test_df[c].to_numpy()
@@ -80,13 +80,16 @@ def analyze_embedding(args, model, test_df, vocabulary):
     sc.pp.neighbors(adata, n_neighbors=200, use_rep='X')
     sc.tl.louvain(adata, resolution=1.)
     Visualization.plot_umap(args, adata, args.figDir)
+    Evaluation.report_cluster_purity(adata)
 
 
 def embed_sequences(args, X, model, useCache=False):
-    embed_fname = ('target/{}/embedding/{}_{}.npy'
-                   .format(args.namespace, args.model_name, args.dim))
+    embed_fname = ('{}/target/{}/embedding/{}_{}.npy'
+                   .format(args.outputDir, args.namespace, args.model_name, args.dim))
     if useCache:
-        pathlib.Path('target/{}/embedding'.format(args.namespace)).mkdir(parents=True, exist_ok=True)
+        embed_dir = ('{}/target/{}/embedding'
+                     .format(args.outputDir, args.namespace))
+        pathlib.Path(embed_dir).mkdir(parents=True, exist_ok=True)
         if os.path.exists(embed_fname):
             return np.load(embed_fname, allow_pickle=True)
 

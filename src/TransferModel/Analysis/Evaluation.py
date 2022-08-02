@@ -1,3 +1,7 @@
+from collections import defaultdict, Counter
+
+import pandas as pd
+
 from TransferModel.Analysis import Visualization as Visualization
 import TransferModel.DataUtils.DataProcessor as DataProcessor
 from sklearn.metrics import roc_auc_score, confusion_matrix, accuracy_score
@@ -59,7 +63,7 @@ def report_class_distribution(y_test, y_pred, yDict, norm=0, matrix=None):
     if matrix is None:
         matrix = report_confusion_matrix(y_test, y_pred, yDict)
 
-    tmp = matrix.sum(axis=((1+norm) % 2))
+    tmp = matrix.sum(axis=((1 + norm) % 2))
     tmp = tmp / tmp.sum(axis=0)
     return tmp, matrix
 
@@ -93,3 +97,36 @@ def report_accuracy(y_test, y_pred):
     """
     y_pred = DataProcessor.sparseToDense(y_pred)
     return accuracy_score(y_test, y_pred)
+
+
+def report_cluster_purity(adata):
+    """
+
+    Args:
+        adata: AnnData frame for scanpy. Must have already called sc.tl.louvian
+
+    Returns:
+    """
+    # Report purity for each embed target using louvian method
+    groupedEntries = adata.obs.groupby("louvain")
+
+    for category in adata.obs.columns:
+        if category is not "louvain":
+            print(f"------------------- Category: {category} ---------------------")
+            # Calculate purity by category within this cluster
+            categoryMaps = groupedEntries[category].agg(Counter)
+            for louGroup in groupedEntries.groups:
+                # louGroup, category
+                freqMap = categoryMaps[louGroup]
+                mostCommon = freqMap.most_common(1)[0]
+                purity = mostCommon[1] / sum(freqMap.values())
+                print(f"Purity of louvain cluster {louGroup} in category {category} with majority element {mostCommon[0]}: {purity}")
+
+
+
+
+
+
+
+
+
