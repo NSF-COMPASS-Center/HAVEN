@@ -9,7 +9,7 @@ input_settings:
     #   path: Relative path to the protein file
     datasets:
         "viprbrc_protein":
-            path: "data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta"
+            path: "data/hep/2022-07-08-VipBRC-ORF-1-manual.fasta"
             rowNames: ["Accession", "Protein", "Host", "Genotype"]
 
     # Denotes a list of models to train/run
@@ -20,7 +20,7 @@ input_settings:
             should_train: true
             seed: 1
             n_hidden: 3
-            checkpoint: # "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
+            checkpoint: "target/hep/checkpoints/bilstm/l3-orf1/bilstm_512-24.hdf5"
             epochs: 24
 
             # Same model as above, but different last layer classifier for transfer learning
@@ -45,5 +45,5 @@ input_settings:
 output_settings:
     # Base output directory
     namespace: "hep"
-    output_dir: "Output"
+    output_dir: "outputs"
 
