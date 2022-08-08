@@ -1,0 +1,114 @@
+Initalizing Bilstm Host Model--------------------------------
+DEBUG: Loaded transfer checkpoint!
+Model: "model"
+__________________________________________________________________________________________________
+ Layer (type)                   Output Shape         Param #     Connected to                     
+==================================================================================================
+ input_1 (InputLayer)           [(None, 1784)]       0           []                               
+                                                                                                  
+ input_2 (InputLayer)           [(None, 1784)]       0           []                               
+                                                                                                  
+ embedding (Embedding)          (None, 1784, 20)     560         ['input_1[0][0]',                
+                                                                  'input_2[0][0]']                
+                                                                                                  
+ lstm (LSTM)                    (None, 1784, 512)    1091584     ['embedding[0][0]',              
+                                                                  'embedding[1][0]']              
+                                                                                                  
+ lstm_1 (LSTM)                  (None, 1784, 512)    2099200     ['lstm[0][0]',                   
+                                                                  'lstm[1][0]']                   
+                                                                                                  
+ lstm_2 (LSTM)                  (None, 512)          2099200     ['lstm_1[0][0]',                 
+                                                                  'lstm_1[1][0]']                 
+                                                                                                  
+ embed_layer (Concatenate)      (None, 1024)         0           ['lstm_2[0][0]',                 
+                                                                  'lstm_2[1][0]']                 
+                                                                                                  
+ dense (Dense)                  (None, 28)           28700       ['embed_layer[0][0]']            
+                                                                                                  
+ activation (Activation)        (None, 28)           0           ['dense[0][0]']                  
+                                                                                                  
+==================================================================================================
+Total params: 5,319,244
+Trainable params: 5,319,244
+Non-trainable params: 0
+__________________________________________________________________________________________________
+9
+DEBUG: Testing embedding
+       Accession Protein  ...                                                  X  y
+1813  QAB14111.1    ORF2  ...  [26, 13, 3, 1, 17, 1, 21, 12, 12, 12, 6, 12, 1...  8
+1132  QAB44030.1    ORF2  ...  [26, 13, 17, 15, 17, 15, 9, 12, 12, 12, 6, 12,...  1
+2322  ART85722.1    ORF3  ...  [26, 13, 7, 18, 15, 3, 1, 12, 7, 12, 6, 3, 3, ...  3
+605   QCF29662.1    ORF1  ...  [26, 13, 5, 1, 8, 16, 6, 9, 11, 1, 15, 7, 21, ...  5
+1073  QSD99359.1    ORF2  ...  [26, 13, 17, 15, 17, 1, 21, 12, 12, 12, 6, 6, ...  3
+...          ...     ...  ...                                                ... ..
+2763  QSD99091.1    ORF3  ...  [26, 13, 7, 18, 15, 3, 1, 12, 7, 12, 6, 3, 3, ...  3
+905   AXF47830.1    ORF1  ...  [26, 13, 5, 1, 8, 16, 6, 9, 11, 1, 15, 7, 9, 1...  3
+1096  UBR08179.1    ORF2  ...  [26, 13, 3, 15, 17, 1, 21, 12, 12, 12, 6, 6, 2...  3
+235   QSD99363.1    ORF1  ...  [26, 13, 5, 1, 8, 16, 6, 9, 11, 1, 15, 7, 9, 1...  3
+1061  QBF12160.1    ORF2  ...  [26, 13, 17, 15, 17, 1, 21, 12, 12, 12, 6, 12,...  3
+
+[2848 rows x 7 columns]
+[array([[ 0,  0,  0, ..., 17,  5, 18],
+       [ 0,  0,  0, ..., 17,  5, 12],
+       [ 0,  0,  0, ..., 12, 17, 17],
+       ...,
+       [ 0,  0,  0, ..., 17,  5,  6],
+       [ 0,  0,  0, ..., 17, 21,  5],
+       [ 0,  0,  0, ..., 17,  5, 18]], dtype=int8), array([[ 0,  0,  0, ...,  3, 13, 26],
+       [ 0,  0,  0, ..., 17, 13, 26],
+       [ 0,  0,  0, ...,  7, 13, 26],
+       ...,
+       [ 0,  0,  0, ...,  3, 13, 26],
+       [ 0,  0,  0, ...,  5, 13, 26],
+       [ 0,  0,  0, ..., 17, 13, 26]], dtype=int8)]
+
+ 1/22 [>.............................] - ETA: 4:41
+ 2/22 [=>............................] - ETA: 4:29
+ 3/22 [===>..........................] - ETA: 4:15
+ 4/22 [====>.........................] - ETA: 4:02
+ 5/22 [=====>........................] - ETA: 3:49
+ 6/22 [=======>......................] - ETA: 3:35
+ 7/22 [========>.....................] - ETA: 3:21
+ 8/22 [=========>....................] - ETA: 3:08
+ 9/22 [===========>..................] - ETA: 2:56
+10/22 [============>.................] - ETA: 2:44
+11/22 [==============>...............] - ETA: 2:31
+12/22 [===============>..............] - ETA: 2:18
+13/22 [================>.............] - ETA: 2:05
+14/22 [==================>...........] - ETA: 1:50
+15/22 [===================>..........] - ETA: 1:36
+16/22 [====================>.........] - ETA: 1:22
+17/22 [======================>.......] - ETA: 1:09
+18/22 [=======================>......] - ETA: 55s 
+19/22 [========================>.....] - ETA: 41s
+20/22 [==========================>...] - ETA: 27s
+21/22 [===========================>..] - ETA: 13s
+22/22 [==============================] - ETA: 0s 
+22/22 [==============================] - 299s 14s/step
+------------------- Category: Protein ---------------------
+Purity of louvain cluster 0 in category Protein with majority element ORF1: 0.9981481481481481
+Purity of louvain cluster 1 in category Protein with majority element ORF1: 0.8831168831168831
+Purity of louvain cluster 2 in category Protein with majority element ORF2: 0.9796839729119639
+Purity of louvain cluster 3 in category Protein with majority element ORF3: 0.9848866498740554
+Purity of louvain cluster 4 in category Protein with majority element ORF3: 0.9865229110512129
+Purity of louvain cluster 5 in category Protein with majority element ORF2: 0.9555555555555556
+Purity of louvain cluster 6 in category Protein with majority element ORF2: 0.9842931937172775
+Purity of louvain cluster 7 in category Protein with majority element ORF3: 0.9827586206896551
+------------------- Category: Host ---------------------
+Purity of louvain cluster 0 in category Host with majority element Human: 0.8203703703703704
+Purity of louvain cluster 1 in category Host with majority element Human: 0.5606060606060606
+Purity of louvain cluster 2 in category Host with majority element Human: 0.7178329571106095
+Purity of louvain cluster 3 in category Host with majority element Human: 0.8589420654911839
+Purity of louvain cluster 4 in category Host with majority element Human: 0.5768194070080862
+Purity of louvain cluster 5 in category Host with majority element Human: 0.8185185185185185
+Purity of louvain cluster 6 in category Host with majority element Human: 0.7853403141361257
+Purity of louvain cluster 7 in category Host with majority element Human: 0.8218390804597702
+------------------- Category: Genotype ---------------------
+Purity of louvain cluster 0 in category Genotype with majority element HEV3: 0.5537037037037037
+Purity of louvain cluster 1 in category Genotype with majority element HEV3: 0.6125541125541125
+Purity of louvain cluster 2 in category Genotype with majority element HEV3: 0.8419864559819413
+Purity of louvain cluster 3 in category Genotype with majority element HEV3: 0.8639798488664987
+Purity of louvain cluster 4 in category Genotype with majority element HEV3: 0.6307277628032345
+Purity of louvain cluster 5 in category Genotype with majority element HEV3: 0.7407407407407407
+Purity of louvain cluster 6 in category Genotype with majority element HEV4: 0.9581151832460733
+Purity of louvain cluster 7 in category Genotype with majority element HEV4: 0.9540229885057471

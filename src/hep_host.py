@@ -28,9 +28,12 @@ class HepHost():
         self.args = types.SimpleNamespace()
         self.args.model_name = model_name
         self.args.seed = seed
-        self.args.namespace = namespace
         self.args.outputDir = outputDir
-        self.args.figDir = f"{outputDir}/figures/{model_name}_{dim}"
+        self.args.namespace = namespace
+        self.args.targetDir = f"{outputDir}/target/{namespace}_{model_name}_{dim}"
+        mkdir_p(self.args.targetDir)
+        self.args.figDir = f"{outputDir}/figures/{namespace}_{model_name}_{dim}"
+        mkdir_p(self.args.figDir)
         self.args.dim = dim
         self.args.batch_size = batch_size
         self.args.inf_batch_size = inf_batch_size
@@ -113,7 +116,7 @@ class HepHost():
             print(train_df)
             print(test_df)
             '''
-            TransferModel.Models.Utils.test_model(hostModel, test_df, yVocab, date)
+            TransferModel.Models.Utils.test_model(self.args, hostModel, test_df, yVocab, date)
 
         if self.args.embed:
             print("DEBUG: Testing embedding")

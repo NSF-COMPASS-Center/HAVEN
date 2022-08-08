@@ -199,9 +199,9 @@ def embed_seqs(args, model, seqs, vocabulary,
     X_cat, lengths = featurize_seqs(seqs, vocabulary)
 
     if use_cache:
-        mkdir_p('target/{}/embedding'.format(args.namespace))
-        embed_fname = ('target/{}/embedding/{}_{}.npy'
-                       .format(args.namespace, args.model_name, args.dim))
+        mkdir_p('{}/embedding'.format(args.targetDir))
+        embed_fname = ('{}/embedding/{}_{}.npy'
+                       .format(args.targetDir, args.model_name, args.dim))
     else:
         embed_fname = None
 

@@ -20,13 +20,6 @@ class AUROCCallback(Callback):
         self.yVocab = yVocab
         self.y = DataProcessor.toOneHot(y, yVocab)
         self.y_val = DataProcessor.toOneHot(y_val, yVocab)
-        import sys
-        import numpy
-        numpy.set_printoptions(threshold=sys.maxsize)
-        print(self.y)
-        print(self.y_val)
-        #self.y = y
-        #self.y_val = y_val
         self.average = average
         self.multi_class = multi_class
         self.figDir = figDir

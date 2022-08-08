@@ -12,6 +12,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 from LanguageModel.utils import *
+from TransferModel.DataUtils.DataProcessor import mkdir_p
 from TransferModel.Analysis import Evaluation
 from TransferModel.Analysis.Callbacks import TrainingPlot
 from TransferModel.Analysis.Callbacks.AUROC import AUROCCallback
@@ -57,11 +58,8 @@ class TargetModel(object):
             metrics=['accuracy']
         )
 
-        dirname = '{}/checkpoints/{}'.format(self.cache_dir_,
-                                             self.model_name_)
+        dirname = '{}/checkpoints'.format(self.cache_dir_)
         mkdir_p(dirname)
-        pathlib.Path(dirname).mkdir(parents=True, exist_ok=True)
-        pathlib.Path(self.figDir).mkdir(parents=True, exist_ok=True)
 
         # Callbacks:
         checkpoint = ModelCheckpoint(

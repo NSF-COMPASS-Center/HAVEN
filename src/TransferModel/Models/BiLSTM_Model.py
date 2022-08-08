@@ -8,6 +8,7 @@ from tensorflow.keras import layers
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
+
 class BiLSTMTargetModel(TargetModel):
     def __init__(
             self,
@@ -46,14 +47,13 @@ class BiLSTMTargetModel(TargetModel):
         self.verbose_ = verbose
         self.figDir = figDir
 
-
         # Generate model
         if not parentModel:
             input_pre = Input(shape=(seq_len - 1,))
             input_post = Input(shape=(seq_len - 1,))
 
             embed = layers.Embedding(vocab_size + 1, embedding_dim,
-                              input_length=seq_len - 1)
+                                     input_length=seq_len - 1)
             x_pre = embed(input_pre)
             x_post = embed(input_post)
 
@@ -66,7 +66,7 @@ class BiLSTMTargetModel(TargetModel):
             x_post = lstm(x_post)
 
             x = layers.concatenate([x_pre, x_post],
-                            name='embed_layer')
+                                   name='embed_layer')
 
             output = self.attachTransferHead(x)
 
@@ -74,7 +74,7 @@ class BiLSTMTargetModel(TargetModel):
                                 outputs=output)
         else:
             # Replace classifier
-            x = parentModel.layers[-3].output
+            x = parentModel.get_layer('embed_layer').output
             parentModel.trainable = False
 
             predictions = self.attachTransferHead(x)
@@ -102,7 +102,7 @@ class BiLSTMTargetModel(TargetModel):
             tprint('Padding {} splitted...'.format(len(X_pre)))
 
         X_pre = pad_sequences(
-            X_pre, maxlen=self.seq_len_-1,
+            X_pre, maxlen=self.seq_len_ - 1,
             dtype='int8', padding='pre', truncating='pre', value=0
         )
         if self.verbose_ > 1:
@@ -110,7 +110,7 @@ class BiLSTMTargetModel(TargetModel):
 
         # tf post padding
         X_post = pad_sequences(
-            X_post, maxlen=self.seq_len_-1,
+            X_post, maxlen=self.seq_len_ - 1,
             dtype='int8', padding='post', truncating='post', value=0
         )
 

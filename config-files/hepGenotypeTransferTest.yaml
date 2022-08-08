@@ -20,7 +20,7 @@ input_settings:
             n_hidden: 3
             should_train: false
             seed: 1
-            checkpoint: "" #"target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
+            checkpoint: "models/hep-l2-512-12.hdf5"
             epochs: 12
 
             # Same model as above, but different last layer classifier for transfer learning
@@ -28,19 +28,19 @@ input_settings:
             bilstm_host:
                 active: True
                 epochs: 32
-                n_hidden: 2
+                n_hidden: 3
                 embedding_dim: 20
                 embed_targets: ["Protein", "Host", "Genotype"]
                 embedding_cache: False
                 should_train: False
-                should_embed: True
+                should_embed: False
                 should_visualize_data: False
                 train_split: 0.5
                 batch_size: 64
                 inf_batch_size: 144
-                should_test: False
+                should_test: True
                 transfer_learning: False
-                checkpoint: "models/hep_genotype_nontransfer_l3_512-80.hdf5"
+                checkpoint: "models/hep_genotype_transfer_l2_512-08.hdf5"
                 targetKey: "Genotype"
                 # e.g, the output heads would be ["Unknown", "HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]
                 targetNames: ["HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]

@@ -1,3 +1,5 @@
+import pathlib
+
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -15,14 +17,15 @@ def split_seqs_dict(seqs, percentTrain=.8, seed=1):
     return train_seqs, test_seqs
 
 
-# Returns train and test dataframes respectively
+# Returns random train and test dataframes respectively
 def split_df(df, percentTrain=.8, seed=1):
     if percentTrain == 0:
-        return pd.DataFrame(columns=df.columns), df
+        df_train, df_test = pd.DataFrame(columns=df.columns), df.sample(frac=1, random_state=seed)
     elif percentTrain == 1:
-        return df, pd.DataFrame(columns=df.columns)
+        df_train, df_test = df.sample(frac=1, random_state=seed), pd.DataFrame(columns=df.columns)
+    else:
+        df_train, df_test = train_test_split(df, train_size=percentTrain, stratify=df['y'], random_state=seed)
 
-    df_train, df_test = train_test_split(df, train_size=percentTrain, stratify=df['y'], random_state=seed)
     return df_train, df_test
 
 
@@ -114,3 +117,6 @@ def sparseToDense(y_pred):
 
     """
     return np.argmax(y_pred, axis=1)
+
+def mkdir_p(dir):
+    pathlib.Path(dir).mkdir(parents=True, exist_ok=True)

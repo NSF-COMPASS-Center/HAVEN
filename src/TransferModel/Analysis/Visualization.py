@@ -11,7 +11,7 @@ def plot_train_test_metric(trainMetric, testMetric, filename, metricName="Cross 
     Args:
         trainMetric: Array of test metric values indexed by epoch
         testMetric: Array of train metric values indexed by epoch
-        filename: filename to write to
+        filename: path and filename to write to
         metricName: y-axis name
         optimalFlag: plots a horizontal line depending on the optimal epoch choices are: ["min", "max", None]
         ylim: plot [ymin, yMax] limits
@@ -41,7 +41,7 @@ def plot_train_test_metric(trainMetric, testMetric, filename, metricName="Cross 
     ax.set_ylim(ylim)
 
     # Print image
-    name = f'figures/{filename}.png'
+    name = f'{filename}.png'
     plt.savefig(name, bbox_inches='tight', dpi=300)
     plt.clf()
 
@@ -51,7 +51,7 @@ def plot_metrics(dic, filename, metricName="AUROC", ylim=[0, 1]):
     Plots metrics in figures/filename.png
     Args:
         dic: Dictionary of label:[data1, data2, ...] pairs
-        filename: filename to write to
+        filename: path and filename to write to
         metricName: y axis label
         ylim: plot [ymin, yMax] limits
     """
@@ -83,7 +83,7 @@ def plot_auroc(y_test, y_pred, labelDict, filename, ylim=[0, 1]):
         y_test: reference y values
         y_pred: model predicted y values
         labelDict: dictionary of labels, e.g {"Human": 1, "Unknown": 0}
-        filename: filename to write to
+        filename: path and filename to write to
         ylim: plot [ymin, yMax] limits
     """
     if filename:

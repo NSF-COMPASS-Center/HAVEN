@@ -15,8 +15,7 @@ def err_model(name):
     raise ValueError('Model {} not supported'.format(name))
 
 
-def get_target_model(args, parentModel, seq_len, vocab_size, target_size,
-                     inference_batch_size=200):
+def get_target_model(args, parentModel, seq_len, vocab_size, target_size):
     if 'bilstm' in args.model_name:
         model = BiLSTMTargetModel(
             seq_len,
@@ -31,7 +30,7 @@ def get_target_model(args, parentModel, seq_len, vocab_size, target_size,
             batch_size=args.batch_size,
             inference_batch_size=args.inf_batch_size,
             figDir=args.figDir,
-            cache_dir='{}/target/{}'.format(args.outputDir, args.namespace),
+            cache_dir=args.targetDir,
             seed=args.seed,
             verbose=True,
         )
@@ -54,10 +53,10 @@ def print_per_class(metrics, yVocabInverse, metricName):
     print(f"{metricName} per class: ", {yVocabInverse[i]: m for i, m in enumerate(metrics)})
 
 
-def test_model(model, test_df, yVocab, date):
+def test_model(args, model, test_df, yVocab, date):
     y_pred = model.predict(test_df['X'], sparse=True)
     testAurocs = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab,
-                                         filename=f"hep_bilstm_host_AUROC_{date}")
+                                         filename=f"{args.figDir}/{args.model_name}_AUROC_{date}")
     yVocabInverse = {y: x for x, y in yVocab.items()}
     print_per_class(testAurocs, yVocabInverse, "AUROC")
     res, matrix = Evaluation.report_accuracy_per_class(test_df['y'], y_pred, yDict=yVocab)
@@ -84,11 +83,10 @@ def analyze_embedding(args, model, test_df):
 
 
 def embed_sequences(args, X, model, useCache=False):
-    embed_fname = ('{}/target/{}/embedding/{}_{}.npy'
-                   .format(args.outputDir, args.namespace, args.model_name, args.dim))
+    embed_fname = ('{}/embedding/{}_{}.npy'
+                   .format(args.targetDir, args.model_name, args.dim))
     if useCache:
-        embed_dir = ('{}/target/{}/embedding'
-                     .format(args.outputDir, args.namespace))
+        embed_dir = ('{}/embedding'.format(args.targetDir))
         pathlib.Path(embed_dir).mkdir(parents=True, exist_ok=True)
         if os.path.exists(embed_fname):
             return np.load(embed_fname, allow_pickle=True)
