@@ -48,6 +48,6 @@ input_settings:
 # Output Settings: initialize base output folder names
 output_settings:
     # Base output directory
-    namespace: "hep"
-    output_dir: "Output"
+    namespace: "hepGenotypeTransfer"
+    output_dir: "output"
 

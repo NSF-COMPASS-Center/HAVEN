@@ -17,10 +17,10 @@ input_settings:
         # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
         bilstm:
             active: false
-            n_hidden: 3
             should_train: false
+            n_hidden: 3
             seed: 1
-            checkpoint: # "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
+            checkpoint: "models/hep-l2-512-12.hdf5"
             epochs: 12
 
             # Same model as above, but different last layer classifier for transfer learning
@@ -35,19 +35,19 @@ input_settings:
                 should_train: True
                 should_embed: False
                 should_visualize_data: False
-                train_split: 0.5
+                train_split: .8
                 batch_size: 64
                 inf_batch_size: 144
                 should_test: False
-                transfer_learning: False
-                checkpoint: #"Output/target/hep/checkpoints/hep_bilstm_genotype_512_50_64.hdf5"
-                targetKey: "Genotype"
-                # e.g, the output heads would be ["Unknown", "HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]
-                targetNames: ["HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]
+                transfer_learning: True
+                checkpoint: # "target/hep/checkpoints/bilstm_host/bilstm_host_512-195.hdf5"
+                targetKey: "Host"
+                # e.g, the output heads would be ["Human", "Non-Human"]
+                targetNames: ["Human"]
 
 # Output Settings: initialize base output folder names
 output_settings:
     # Base output directory
-    namespace: "hepGenotypeNoTransfer"
+    namespace: "hepHostTransfer"
     output_dir: "output"
 
