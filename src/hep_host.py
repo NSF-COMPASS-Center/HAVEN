@@ -99,8 +99,9 @@ class HepHost():
             hostModel.model_ = load_model(self.args.checkpoint)
             hostModel.model_.summary()
 
-        if self.args.train or self.args.test or self.args.embed:
-            train_df, test_df = DataProcessor.split_df(df, self.args.train_split, self.args.seed)
+        #if self.args.train or self.args.test or self.args.embed:
+        train_df, test_df = DataProcessor.split_df(df, self.args.train_split, self.args.seed)
+        Ingestion.pandasToFastaFile(train_df, f'hep-manual-{self.args.seed}-{self.args.train_split}.fasta')
 
 
         date = datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")

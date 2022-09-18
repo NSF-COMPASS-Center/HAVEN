@@ -79,6 +79,7 @@ def analyze_embedding(args, model, test_df):
     sc.pp.neighbors(adata, n_neighbors=200, use_rep='X')
     sc.tl.louvain(adata, resolution=1.)
     Visualization.plot_umap(args, adata, args.figDir)
+    Visualization.plot_umap3d(args, adata, args.figDir)
     Evaluation.report_cluster_purity(adata)
 
 
@@ -96,3 +97,6 @@ def embed_sequences(args, X, model, useCache=False):
         if useCache:
             np.save(embed_fname, embeddings)
         return embeddings
+
+
+

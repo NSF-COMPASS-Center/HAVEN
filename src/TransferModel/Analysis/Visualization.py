@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib import animation
 from sklearn.metrics import roc_curve, auc
 
 import scanpy as sc
@@ -114,3 +116,17 @@ def plot_umap(args, adata, figdir):
     plt.rcParams['figure.figsize'] = (9, 9)
     for key in adata.obs.columns:
         sc.pl.umap(adata, color=key, save=f'_{args.namespace}_{key}.png')
+
+def plot_umap3d(args, adata, figdir):
+    sc.settings.figdir = figdir
+    sc.tl.umap(adata, min_dist=1., n_components=3)
+    sc.set_figure_params(dpi_save=150)
+    plt.rcParams['figure.figsize'] = (9, 9)
+    fps = 30
+    interval = 50 #ms inbetween frames in realtime, essentially speed of the animation
+    for key in adata.obs.columns:
+        fig = sc.pl.umap(adata, color=key, return_fig=True, projection="3d")
+        fig, ax = plt.gcf(), plt.gca()
+        plt.tight_layout()
+        rot_animation = animation.FuncAnimation(fig, lambda angle: ax.view_init(azim=angle), frames=np.arange(0, 361, .5), interval=interval)
+        rot_animation.save(f'{figdir}/umap_{args.namespace}_{key}_3d.gif', fps=fps, writer='pillow', dpi=150)

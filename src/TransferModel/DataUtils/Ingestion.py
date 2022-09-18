@@ -5,6 +5,8 @@ from typing import List
 
 import pandas as pd
 from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
 
 
 # Returns dataframe
@@ -28,6 +30,16 @@ def fastaFileToPandas(path: str = None, rowNames: List[str] = None, types: List[
         data['seq'].append(str(seq_record.seq))
 
     return pd.DataFrame.from_dict(data, dtype=types) if types else pd.DataFrame.from_dict(data)
+
+def pandasToFastaFile(df, path: str = None):
+    outFile = open(path, "w")
+
+    for i, row in df.iterrows():
+        feature_sequence = SeqRecord(Seq(row['seq']), id=row['Accession'],
+            description="|{}|{}|{}".format(row['Protein'], row['Host'], row['Genotype']))
+        SeqIO.write(feature_sequence, outFile, 'fasta')
+
+    outFile.close()
 
 
 def loadFastaFiles(fastaMetaData):
