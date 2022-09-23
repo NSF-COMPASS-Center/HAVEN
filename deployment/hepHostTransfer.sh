@@ -33,7 +33,7 @@ CONFIG_DIR=$PROJECT_DIR/config-files
 
 echo "Job start"
 date
-
+echo "Log File: $RESULTS_DIR/hep_host_transfer.$(date +%Y_%b_%d_%H_%M).log"
 # Ensure results directory exists
 mkdir -p $RESULTS_DIR
 
