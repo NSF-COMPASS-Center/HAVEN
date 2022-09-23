@@ -20,7 +20,7 @@ input_settings:
             should_train: True
             n_hidden: 3
             seed: 1
-            checkpoint: "models/hep-host-l3-512-12.hdf5"
+            checkpoint: # "models/hep-host-l3-512-12.hdf5"
             epochs: 12
 
             # Same model as above, but different last layer classifier for transfer learning
