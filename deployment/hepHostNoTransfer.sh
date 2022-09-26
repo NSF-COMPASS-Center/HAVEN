@@ -13,28 +13,27 @@
 #SBATCH --export=NONE # Fixes some bugs with pathing
 
 # Relative path vars, since SLURM doesn't seem to preserve original env's env vars
-USER_HOME=/home/andrewclchan211
-PROJECT_DIR=$USER_HOME/BioNLP
-cd $PROJECT_DIR
+USER_HOME=$HOME
+PROJECT_DIR=$PWD
+echo "Current working directory: $PROJECT_DIR"
 
-module reset
-module load Anaconda3
-module load cuDNN/8.1.1.33-CUDA-11.2.1
+# module reset
+# module load Anaconda3
+# module load cuDNN/8.1.1.33-CUDA-11.2.1
 
-source activate $USER_HOME/.conda/envs/BioNLP
+# source activate $USER_HOME/.conda/envs/BioNLP
 
 python --version
 
 # Parameters
 SCRIPT_LOCATION=$PROJECT_DIR/src/pipeline.py
 MODEL=bilstm
-#SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
-SAVED_MODEL=$PROJECT_DIR/target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5
 RESULTS_DIR=$PROJECT_DIR/results
 CONFIG_DIR=$PROJECT_DIR/config-files
 
 echo "Job start"
 date
+echo "Log File: $RESULTS_DIR/hep_host_notransfer.$(date +%Y_%b_%d_%H_%M).log"
 
 # Ensure results directory exists
 mkdir -p $RESULTS_DIR
