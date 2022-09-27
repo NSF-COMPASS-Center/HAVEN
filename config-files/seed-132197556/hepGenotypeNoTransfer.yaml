@@ -19,7 +19,7 @@ input_settings:
             active: false
             n_hidden: 3
             should_train: false
-            seed: 1
+            seed: 132197556
             checkpoint: # "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
             epochs: 12
 
@@ -34,11 +34,11 @@ input_settings:
                 embedding_cache: False
                 should_train: True
                 should_embed: False
+                should_test: False
                 should_visualize_data: False
                 train_split: 0.5
                 batch_size: 64
                 inf_batch_size: 144
-                should_test: False
                 transfer_learning: False
                 checkpoint: #"Output/target/hep/checkpoints/hep_bilstm_genotype_512_50_64.hdf5"
                 targetKey: "Genotype"
