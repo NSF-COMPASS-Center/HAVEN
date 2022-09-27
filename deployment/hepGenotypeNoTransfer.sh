@@ -29,7 +29,7 @@ python --version
 SCRIPT_LOCATION=$PROJECT_DIR/src/pipeline.py
 MODEL=bilstm
 RESULTS_DIR=$PROJECT_DIR/results
-CONFIG_DIR=$PROJECT_DIR/config-files
+CONFIG_DIR=$PROJECT_DIR/config-files/seed-132197556
 
 echo "Job start"
 date
