@@ -29,8 +29,9 @@ python --version
 SCRIPT_LOCATION=$PROJECT_DIR/src/pipeline.py
 MODEL=bilstm
 RESULTS_DIR=$PROJECT_DIR/results
-CONFIG_DIR=$PROJECT_DIR/config-files/seed-132197556
-
+# CONFIG_DIR=$PROJECT_DIR/config-files/seed-132197556
+CONFIG_FILE=$1
+echo "Config File: $CONFIG_FILE"
 echo "Job start"
 date
 echo "Log File: $RESULTS_DIR/hep_host_notransfer.$(date +%Y_%b_%d_%H_%M).log"
@@ -38,7 +39,7 @@ echo "Log File: $RESULTS_DIR/hep_host_notransfer.$(date +%Y_%b_%d_%H_%M).log"
 # Ensure results directory exists
 mkdir -p $RESULTS_DIR
 
-python $SCRIPT_LOCATION -c $CONFIG_DIR/hepHostNoTransfer.yaml > $RESULTS_DIR/hep_host_notransfer.$(date +%Y_%b_%d_%H_%M).log 2>&1
+python $SCRIPT_LOCATION -c $CONFIG_FILE > $RESULTS_DIR/hep_host_notransfer.$(date +%Y_%b_%d_%H_%M).log 2>&1
 
 echo "Job done"
 date
