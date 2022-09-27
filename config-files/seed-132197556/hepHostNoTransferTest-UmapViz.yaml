@@ -35,7 +35,7 @@ input_settings:
                 should_train: False
                 should_embed: False
                 should_visualize_data: True
-                train_split: .8
+                train_split: 0
                 batch_size: 64
                 inf_batch_size: 144
                 should_test: True
