@@ -25,9 +25,10 @@ input_settings:
 
             # Same model as above, but different last layer classifier for transfer learning
             # Classifies 1/0 human/non-human
+            # seed = 132197556 inherited from  bilstm.seed (above)
             bilstm_host:
                 active: True
-                epochs: 512
+                epochs: 32
                 n_hidden: 2
                 embedding_dim: 20
                 embed_targets: ["Protein", "Host", "Genotype"]
@@ -48,6 +49,6 @@ input_settings:
 # Output Settings: initialize base output folder names
 output_settings:
     # Base output directory
-    namespace: "hepHostNoTransfer-"
+    namespace: "hepHostNoTransfer-s132197556-e32-l2-tr80te20"
     output_dir: "output"
 
