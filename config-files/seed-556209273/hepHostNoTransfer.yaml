@@ -28,7 +28,7 @@ input_settings:
             # seed = 556209273 inherited from  bilstm.seed (above)
             bilstm_host:
                 active: True
-                epochs: 32
+                epochs: 512
                 n_hidden: 2
                 embedding_dim: 20
                 embed_targets: ["Protein", "Host", "Genotype"]
