@@ -118,5 +118,10 @@ def sparseToDense(y_pred):
     """
     return np.argmax(y_pred, axis=1)
 
+def shortenSeqs(df, size):
+    if df.shape[0] > 0 and "X" in df:
+        return df["X"].apply(lambda x: x[0:size])
+    return df
+
 def mkdir_p(dir):
     pathlib.Path(dir).mkdir(parents=True, exist_ok=True)
