@@ -14,7 +14,7 @@
 module reset
 module load
 module load Anaconda3
-module load cuda11.2/toolkit
+module load cuDNN/8.1.1.33-CUDA-11.2.1
 module load TensorFlow
 
 
