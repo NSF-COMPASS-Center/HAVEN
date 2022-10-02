@@ -6,7 +6,8 @@
 
 #SBATCH --gres gpu:1
 #SBATCH -N1 --ntasks-per-node=4 # number of nodes
-#SBATCH -t 00:24:00 # time required
+#SBATCH -t 24:00:00 # time required
+#SBATCH --mem-per-cpu=128G
 
 
 # Load modules
@@ -37,7 +38,7 @@ echo "Log File: $LOG_FILE"
 
 echo "Zoonosis bilstm model START"
 date
-echo python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
+python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
 echo "Zoonosis bilstm model END"
 date
 
