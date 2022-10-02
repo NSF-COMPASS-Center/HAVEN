@@ -5,16 +5,17 @@
 #SBATCH --partition=a100_normal_q
 
 #SBATCH --gres gpu:1
-#SBATCH -N1 --ntasks-per-node=4 # number of nodes
+#SBATCH -N1 --ntasks-per-node=4 # number of nodes and number of tasks per node
 #SBATCH -t 24:00:00 # time required
-#SBATCH --mem-per-gpu=128G
+#SBATCH --mem-per-cpu=128G
 
 
 # Load modules
 module reset
 module load
 module load Anaconda3
-module load cuDNN/8.1.1.33-CUDA-11.2.1
+module load cuda11.2/toolkit
+module load TensorFlow
 
 
 # Load conda environment
