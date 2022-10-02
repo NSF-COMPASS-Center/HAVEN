@@ -5,7 +5,7 @@
 #SBATCH --partition=a100_normal_q
 
 #SBATCH --gres gpu:1
-#SBATCH -N1 -- ntasks-per-node=1 # number of nodes
+#SBATCH -N1 --ntasks-per-node=1 # number of nodes
 #SBATCH -t 00:02:00 # time required
 
 
@@ -14,6 +14,9 @@ module reset
 module load
 module load Anaconda3
 module load cuDNN/8.1.1.33-CUDA-11.2.1
+echo "Listing all available conda envrionments"
+conda info --envs
+
 source activate zoonosis-bilstm
 
 
