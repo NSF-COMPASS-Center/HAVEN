@@ -8,7 +8,6 @@
 #SBATCH -N1 --ntasks-per-node=4 # number of nodes
 #SBATCH -t 24:00:00 # time required
 #SBATCH --mem-per-gpu=128G
-#SBATCH --mem-per-cpu=128G
 
 
 # Load modules
