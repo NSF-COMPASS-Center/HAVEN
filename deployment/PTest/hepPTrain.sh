@@ -3,7 +3,7 @@
 #SBATCH -J BILSTM_HOST_HEP
 #SBATCH -A seqevol
 #SBATCH -N1 
-#SBATCH -t 12:00:00 # n hours
+#SBATCH -t 24:00:00 # n hours
 
 #SBATCH -p a100_normal_q
 #SBATCH --gres=gpu:1
@@ -40,13 +40,14 @@ date
 mkdir -p $RESULTS_DIR
 
 
-declare -a arr=("132197556" "187253406" "556209273" "692853522" "766510479")
+#declare -a arr=("132197556" "187253406" "556209273" "692853522" "766510479")
+declare -a arr=("132197556")
 
 ## now loop through the above array
 for i in "${arr[@]}"; do
-    for j in $CONFIG_DIR/PAUROC/$i/*.yaml; do
+    for j in $CONFIG_DIR/PTest/$i/*.yaml; do
     echo "start $j $(date)"
-    python $SCRIPT_LOCATION -c $j > $RESULTS_DIR/RES-$(basename $j)-$(date +%Y_%b_%d_%H_%M).log 2>&1
+    python $SCRIPT_LOCATION -c $j > $RESULTS_DIR/$(basename $j)-$(date +%Y_%b_%d_%H_%M).log 2>&1
     echo "Location: $RESULTS_DIR/$(basename $j)-$(date +%Y_%b_%d_%H_%M).log" 
     echo "finish $(date)"
     done
