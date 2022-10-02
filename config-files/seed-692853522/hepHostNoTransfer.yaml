@@ -41,7 +41,7 @@ input_settings:
                 inf_batch_size: 144
                 should_test: False
                 transfer_learning: False
-                checkpoint: # "target/hep/checkpoints/bilstm_host/bilstm_host_512-195.hdf5"
+                checkpoint: #
                 targetKey: "Host"
                 # e.g, the output heads would be ["Human", "Non-Human"]
                 targetNames: ["Human"]

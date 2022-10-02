@@ -5,8 +5,8 @@
 #SBATCH --partition=a100_normal_q
 
 #SBATCH --gres gpu:1
-#SBATCH -N1 --ntasks-per-node=1 # number of nodes
-#SBATCH -t 00:02:00 # time required
+#SBATCH -N1 --ntasks-per-node=4 # number of nodes
+#SBATCH -t 00:24:00 # time required
 
 
 # Load modules
@@ -14,32 +14,31 @@ module reset
 module load
 module load Anaconda3
 module load cuDNN/8.1.1.33-CUDA-11.2.1
-echo "Listing all available conda envrionments"
-conda info --envs
-
-source activate zoonosis-bilstm
 
 
+# Load conda envrionment
+source activate ~/anaconda3/envs/zoonosis-bilstm
+echo "Conda information:"
+conda info
+
+# Setup project and result directories
 PROJECT_DIR=$1
-echo "Current working directory: $PROJECT_DIR"
-
-python --version
-
-# Results directory
 RESULTS_DIR=$PROJECT_DIR/results
 mkdir -p $RESULTS_DIR #ensure that the results directory exists
+echo "Project directory: $PROJECT_DIR"
+echo "Results directory: $RESULTS_DIR"
 
-# Parameters
+# Execute python script
 SCRIPT_LOCATION=$PROJECT_DIR/src/pipeline.py
 CONFIG_FILE=$2
+LOG_FILE=$RESULTS_DIR/hep_host_notransfer.$(date +%Y_%b_%d_%H_%M).log
 echo "Config File: $CONFIG_FILE"
-echo "Job start"
+echo "Log File: $LOG_FILE"
+
+echo "Zoonosis bilstm model START"
 date
-echo "Log File: $RESULTS_DIR/hep_host_notransfer.$(date +%Y_%b_%d_%H_%M).log"
-
-echo "python $SCRIPT_LOCATION -c $CONFIG_FILE > $RESULTS_DIR/hep_host_notransfer.$(date +%Y_%b_%d_%H_%M).log 2>&1"
-
-echo "Job done"
+python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
+echo "Zoonosis bilstm model END"
 date
 
 
