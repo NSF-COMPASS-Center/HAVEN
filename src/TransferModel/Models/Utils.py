@@ -57,8 +57,17 @@ def test_model(args, model, test_df, yVocab, date):
     y_pred = model.predict(test_df['X'], sparse=True)
     testAurocs = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab,
                                          filename=f"{args.figDir}/{args.model_name}_AUROC_{date}")
+
+
     yVocabInverse = {y: x for x, y in yVocab.items()}
     print_per_class(testAurocs, yVocabInverse, "AUROC")
+
+    testAuroc = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab, average='macro')
+    print(f"Macro auroc: {testAuroc}")
+    testAuroc = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab, average='micro')
+    print(f"Micro auroc: {testAuroc}")
+
+
     res, matrix = Evaluation.report_accuracy_per_class(test_df['y'], y_pred, yDict=yVocab)
     print_per_class(res, yVocabInverse, "Accuracy")
     modelFreq, _ = Evaluation.report_class_distribution(None, None, None, 0, matrix)

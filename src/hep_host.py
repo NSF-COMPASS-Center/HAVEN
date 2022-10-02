@@ -97,6 +97,7 @@ class HepHost():
         if self.args.checkpoint:
             print("DEBUG: Loading checkpoint model!")
             hostModel.model_ = load_model(self.args.checkpoint)
+            hostModel.seq_len_ = hostModel.model_.layers[0].input_shape[0][1] + 1
             hostModel.model_.summary()
 
         #if self.args.train or self.args.test or self.args.embed:
