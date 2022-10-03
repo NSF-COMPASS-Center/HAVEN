@@ -40,7 +40,7 @@ input_settings:
                 batch_size: 64
                 inf_batch_size: 144
                 transfer_learning: False
-                checkpoint: #"Output/target/hep/checkpoints/hep_bilstm_genotype_512_50_64.hdf5"
+                checkpoint:
                 targetKey: "Genotype"
                 # e.g, the output heads would be ["Unknown", "HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]
                 targetNames: ["HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]
