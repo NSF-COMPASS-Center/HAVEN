@@ -14,6 +14,9 @@ temp*
 sshUtil.sh
 deployment/slurm*
 
+#input files
+*.fasta
+
 #output and log files
 *.out
 *.swp
