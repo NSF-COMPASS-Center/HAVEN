@@ -55,6 +55,11 @@ def print_per_class(metrics, yVocabInverse, metricName):
 
 def test_model(args, model, test_df, yVocab, date):
     y_pred = model.predict(test_df['X'], sparse=True)
+    print("test_df = ", test_df.shape)
+    print(test_df)
+
+    print("y_pred = ", y_pred.shape)
+    print(y_pred)
     testAurocs = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab,
                                          filename=f"{args.figDir}/{args.model_name}_AUROC_{date}")
     yVocabInverse = {y: x for x, y in yVocab.items()}
