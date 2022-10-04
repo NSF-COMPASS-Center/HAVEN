@@ -19,5 +19,9 @@ deployment/slurm*
 *.swp
 *.log
 
+
+# input files
+*.fasta
+
 #IDE files (PyCharm/ IntelliJ)
 .idea/
