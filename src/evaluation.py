@@ -1,7 +1,7 @@
 import argparse
 import pandas as pd
 
-from src.TransferModel.Analysis import metrics_computation
+from TransferModel.Analysis import metrics_computation
 import TransferModel.DataUtils.DataProcessor as DataProcessor
 
 

@@ -5,7 +5,7 @@ import os
 import pandas as pd
 import numpy as np
 
-import metrics_visualization
+from TransferModel.Analysis import metrics_visualization
 
 
 def compute_metrics_binary(metrics, combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir):
@@ -126,7 +126,7 @@ def compute_accuracy_binary(combined_output_df, target_mapping_idx_name, model_v
                 accuracy["metric_val"] = target_accuracy
             accuracy_summary.append(accuracy)
     df = pd.DataFrame(accuracy_summary)
-    metrics_visualization.box_plot(df, os.path.join(output_dir, "accuracy_box_plot.png"), "model", "metric_val", "accuracy", 0.5)
+    metrics_visualization.box_plot(df, os.path.join(output_dir, "accuracy_box_plot.png"), "model", "metric_val", "accuracy", 0.73)
 
 
 def compute_auprc_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values):
@@ -142,7 +142,7 @@ def compute_auprc_binary(combined_output_df, target_mapping_idx_name, model_valu
                 auprc["metric_val"] = target_auprc
             auprc_summary.append(auprc)
     df = pd.DataFrame(auprc_summary)
-    metrics_visualization.box_plot(df, os.path.join(output_dir, "auprc_box_plot.png"), "model", "metric_val", "auprc", 0.5)
+    metrics_visualization.box_plot(df, os.path.join(output_dir, "auprc_box_plot.png"), "model", "metric_val", "auprc", 0.73)
 
 
 def compute_auroc_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values):
