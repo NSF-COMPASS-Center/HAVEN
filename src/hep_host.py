@@ -24,7 +24,7 @@ class HepHost():
                  dim: int = 512, batch_size: int = 64, inf_batch_size: int = 128, n_epochs: int = 11, n_hidden: int = 2,
                  embedding_dim=20, embedTargets: List[str] = None, embedding_cache: bool = False, train: bool = False,
                  embed: bool = False, semantics: bool = False,
-                 combfit: bool = False, reinfection: bool = False, train_split: float = 0.8, test: bool = False, visualize_dataset: bool = True, outputDir: str="output"):
+                 combfit: bool = False, reinfection: bool = False, train_split: float = 0.8, test: bool = False, visualize_dataset: bool = True, outputDir: str="output", output_model_name: str="bilstmHost"):
         self.args = types.SimpleNamespace()
         self.args.model_name = model_name
         self.args.seed = seed

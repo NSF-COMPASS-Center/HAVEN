@@ -16,7 +16,7 @@ class Hep():
                  namespace: str = "hep", seed: int = 1, dim: int = 512, batch_size: int = 500, n_hidden:int = 3,
                  n_epochs: int = 11, train: bool = False, test: bool = False, embed: bool = False,
                  semantics: bool = False, combfit: bool = False, reinfection: bool = False, train_split: bool = False,
-                 visualise: bool = False):
+                 visualise: bool = False, output_model_name: str="bilstm"):
         self.args = types.SimpleNamespace()
         self.args.model_name = model_name
         self.args.seed = seed
@@ -36,6 +36,7 @@ class Hep():
         self.args.datasets = datasets
         self.args.transferCheckpoint = transferCheckpoint
         self.args.visualise = visualise
+        self.args.output_model_name = output_model_name
 
         # Set seeds
         np.random.seed(self.args.seed)

@@ -17,10 +17,10 @@ input_settings:
         # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
         bilstm:
             active: false
-            should_train: false
             n_hidden: 3
-            seed: 556209273
-            checkpoint: "" # "target/hep/checkpoints/bilstm/r1/bilstm_host_512-11.hdf5"
+            should_train: false
+            seed: 766510479
+            checkpoint: # "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
             epochs: 12
 
             # Same model as above, but different last layer classifier for transfer learning
@@ -31,23 +31,24 @@ input_settings:
                 n_hidden: 2
                 embedding_dim: 20
                 embed_targets: ["Protein", "Host", "Genotype"]
-                embedding_cache: True
+                embedding_cache: False
                 should_train: False
                 should_embed: False
+                should_test: True
                 should_visualize_data: False
-                train_split: .8
+                train_split: 0.5
                 batch_size: 64
                 inf_batch_size: 144
-                should_test: True
                 transfer_learning: False
-                checkpoint: "arc_models/hepHostNoTransfer/s556209273.hdf5"
-                targetKey: "Host"
-                # e.g, the output heads would be ["Human", "Non-Human"]
-                targetNames: ["Human"]
+                checkpoint: "arc_models/hepGenotypeNoTransfer/s766510479.hdf5"
+                targetKey: "Genotype"
+                # e.g, the output heads would be ["Unknown", "HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]
+                targetNames: ["HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]
 
 # Output Settings: initialize base output folder names
 output_settings:
     # Base output directory
-    namespace: "hepHostNoTransfer-s556209273-e32-l2-tr80te20"
+    namespace: "hepGenotypeNoTransfer-s766510479-e256-l2-tr50te50"
     output_dir: "Output"
-    model_name: "no-transfer-80:20"
+    model_name: "no-transfer-50:50"
+

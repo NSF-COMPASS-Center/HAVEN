@@ -50,4 +50,5 @@ output_settings:
     # Base output directory
     namespace: "hepHostNoTransfer-s132197556-e256-l2-tr80te20"
     output_dir: "Output"
+    model_name: "no-transfer-80:20"
 
