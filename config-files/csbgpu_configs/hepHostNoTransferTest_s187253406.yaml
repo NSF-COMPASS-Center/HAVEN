@@ -19,7 +19,7 @@ input_settings:
             active: false
             should_train: false
             n_hidden: 3
-            seed: 692853522
+            seed: 187253406
             checkpoint: "" # "target/hep/checkpoints/bilstm/r1/bilstm_host_512-11.hdf5"
             epochs: 12
 
@@ -34,13 +34,13 @@ input_settings:
                 embedding_cache: True
                 should_train: False
                 should_embed: False
-                should_visualize_data: True
-                train_split: 0
+                should_visualize_data: False
+                train_split: .8
                 batch_size: 64
                 inf_batch_size: 144
                 should_test: True
                 transfer_learning: False
-                checkpoint: "target/hep/bilstm_host/hephost_notransfer_s692853522_e256_l2_tr80te20.hdf5"
+                checkpoint: "arc_models/hepHostNoTransfer/s187253406.hdf5"
                 targetKey: "Host"
                 # e.g, the output heads would be ["Human", "Non-Human"]
                 targetNames: ["Human"]
@@ -48,6 +48,6 @@ input_settings:
 # Output Settings: initialize base output folder names
 output_settings:
     # Base output directory
-    namespace: "hepHostNoTransfer-s692853522-e256-l2-tr80te20"
+    namespace: "hepHostNoTransfer-s187253406-e256-l2-tr80te20"
     output_dir: "Output"
 

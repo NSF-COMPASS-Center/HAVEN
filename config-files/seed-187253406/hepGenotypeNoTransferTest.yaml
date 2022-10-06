@@ -35,12 +35,12 @@ input_settings:
                 should_train: False
                 should_embed: False
                 should_test: True
-                should_visualize_data: True
+                should_visualize_data: False
                 train_split: 0.5
                 batch_size: 64
                 inf_batch_size: 144
                 transfer_learning: False
-                checkpoint: "target/hep/bilstm_host/hepgenotype_notransfer_s187253406_e256_l2_tr80te20.hdf5"
+                checkpoint: "/home/blessyantony/dev/git/zoonosis/output/target/hepGenotypeNoTransfer-s187253406-e256-l2-tr80te20_bilstm_host_512/checkpoints/bilstm_host_512-256.hdf5"
                 targetKey: "Genotype"
                 # e.g, the output heads would be ["Unknown", "HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]
                 targetNames: ["HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]

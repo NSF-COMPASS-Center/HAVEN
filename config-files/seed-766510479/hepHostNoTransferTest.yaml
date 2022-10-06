@@ -34,13 +34,13 @@ input_settings:
                 embedding_cache: True
                 should_train: False
                 should_embed: False
-                should_visualize_data: True
+                should_visualize_data: False
                 train_split: .8
                 batch_size: 64
                 inf_batch_size: 144
                 should_test: True
                 transfer_learning: False
-                checkpoint: "target/hep/bilstm_host/hephost_notransfer_s766510479_e256_l2_tr80te20.hdf5"
+                checkpoint: "/home/blessyantony/dev/git/zoonosis/output/target/hepHostNoTransfer-s766510479-e256-l2-tr80te20_bilstm_host_512/checkpoints/bilstm_host_512-256.hdf5"
                 targetKey: "Host"
                 # e.g, the output heads would be ["Human", "Non-Human"]
                 targetNames: ["Human"]
