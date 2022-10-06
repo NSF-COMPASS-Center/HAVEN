@@ -55,6 +55,7 @@ class HepHost():
         self.args.transferCheckpoint = transferCheckpoint
         self.args.embedTargets = embedTargets
         self.args.visualize_dataset = visualize_dataset
+        self.args.ooutput_model_name = output_model_name
 
         assert datasets
 
