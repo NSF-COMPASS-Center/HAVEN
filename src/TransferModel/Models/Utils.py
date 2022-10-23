@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import pandas as pd
 from anndata import AnnData
 
 from TransferModel.Analysis import Evaluation
@@ -54,27 +55,46 @@ def print_per_class(metrics, yVocabInverse, metricName):
 
 
 def test_model(args, model, test_df, yVocab, date):
-    y_pred = model.predict(test_df['X'], sparse=True)
-    testAurocs = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab,
+    y_pred_probab = model.predict(test_df['X'], sparse=True)
+    print("test_df = ", test_df.shape)
+    print(test_df)
+    print("y_pred = ", y_pred_probab.shape)
+    print(y_pred_probab)
+    testAurocs = Evaluation.report_auroc(test_df['y'], y_pred_probab, labelVocab=yVocab,
                                          filename=f"{args.figDir}/{args.model_name}_AUROC_{date}")
-
 
     yVocabInverse = {y: x for x, y in yVocab.items()}
     print_per_class(testAurocs, yVocabInverse, "AUROC")
 
-    testAuroc = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab, average='macro')
+    testAuroc = Evaluation.report_auroc(test_df['y'], y_pred_probab, labelVocab=yVocab, average='macro')
     print(f"Macro auroc: {testAuroc}")
-    testAuroc = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab, average='micro')
+    testAuroc = Evaluation.report_auroc(test_df['y'], y_pred_probab, labelVocab=yVocab, average='micro')
     print(f"Micro auroc: {testAuroc}")
 
-
-    res, matrix = Evaluation.report_accuracy_per_class(test_df['y'], y_pred, yDict=yVocab)
+    res, matrix = Evaluation.report_accuracy_per_class(test_df['y'], y_pred_probab, yDict=yVocab)
     print_per_class(res, yVocabInverse, "Accuracy")
     modelFreq, _ = Evaluation.report_class_distribution(None, None, None, 0, matrix)
     print_per_class(modelFreq, yVocabInverse, "Frequency of prediction by model")
     dfFreq, _ = Evaluation.report_class_distribution(None, None, None, 1, matrix)
     print_per_class(dfFreq, yVocabInverse, "Frequency by dataset")
-    print("Overall accuracy: ", Evaluation.report_accuracy(test_df['y'], y_pred))
+    print("Overall accuracy: ", Evaluation.report_accuracy(test_df['y'], y_pred_probab))
+
+    y_test = test_df["y"]
+    output = np.c_[y_pred_probab, y_test]
+    column_names = np.arange(len(yVocab)).tolist()
+    column_names = [str(c) for c in column_names]
+    column_names.append("test_label")
+    print(column_names)
+    output_pd_df = pd.DataFrame(output, columns=column_names)
+    output_pd_df["seed"] = args.seed
+    output_pd_df["model"] = args.output_model_name
+    output_pd_df.astype({"test_label": "int32"}, copy=False)
+    print("output_pd_df shape = ", output_pd_df.shape)
+    print(output_pd_df)
+    output_file_name = args.namespace + "_" + date + "_output.csv"
+    output_file_path = os.path.join(args.figDir, output_file_name)
+    output_pd_df.to_csv(output_file_path, index=False)
+
 
 
 def analyze_embedding(args, model, test_df):

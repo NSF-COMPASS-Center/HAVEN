@@ -19,7 +19,7 @@ input_settings:
             active: false
             should_train: false
             n_hidden: 3
-            seed: 1
+            seed: 132197556
             checkpoint: #"models/hep-l2-512-12.hdf5"
             epochs: 12
 
@@ -48,6 +48,6 @@ input_settings:
 # Output Settings: initialize base output folder names
 output_settings:
     # Base output directory
-    namespace: "hepHostNoTransfrer"
+    namespace: "hepHostNoTransfer-"
     output_dir: "output"
 

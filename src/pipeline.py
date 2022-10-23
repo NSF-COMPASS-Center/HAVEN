@@ -48,7 +48,9 @@ def main():
                 train=bilstmSettings['should_train'],
                 checkpoint=bilstmSettings['checkpoint'],
                 seed=bilstmSettings['seed'],
-                namespace=output_settings['namespace'])
+                namespace=output_settings['namespace'],
+                output_model_name=output_settings["model_name"])
+
         h.start()
 
     datasets = [d for d in args.config['input_settings']['datasets'].values()]
@@ -76,7 +78,8 @@ def main():
                      checkpoint=bilstmHostSettings['checkpoint'],
                      seed=bilstmSettings['seed'],
                      visualize_dataset=bilstmHostSettings['should_visualize_data'],
-                     namespace=output_settings['namespace']
+                     namespace=output_settings['namespace'],
+                     output_model_name=output_settings["model_name"]
                      )
 
         hh.start()

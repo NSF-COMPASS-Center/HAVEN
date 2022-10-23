@@ -80,6 +80,7 @@ class BiLSTMTargetModel(TargetModel):
             predictions = self.attachTransferHead(x)
             self.model_ = Model(inputs=parentModel.inputs, outputs=predictions)
             self.seq_len_ = self.model_.layers[0].input_shape[0][1] + 1
+            print("____________ ------------ Agh", self.seq_len)
 
             assert self.model_.layers[0].trainable == False
             assert self.model_.layers[1].trainable == False

@@ -13,3 +13,18 @@ temp*
 *__pycache__
 sshUtil.sh
 deployment/slurm*
+
+#input files
+*.fasta
+
+#output and log files
+*.out
+*.swp
+*.log
+
+
+# input files
+*.fasta
+
+#IDE files (PyCharm/ IntelliJ)
+.idea/

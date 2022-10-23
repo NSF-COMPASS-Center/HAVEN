@@ -1,0 +1,54 @@
+# Input Settings: initialize base input folder names,
+# dataset collections, and algorithms to run over
+input_settings:
+
+    # Denotes a list of datasets, each with the following parameters:
+    #   name: Name of the dataset. May be used in logging or other
+    #       messages written during execution
+    #
+    #   path: Relative path to the protein file
+    datasets:
+        "viprbrc_protein":
+            path: "data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta"
+            rowNames: ["Accession", "Protein", "Host", "Genotype"]
+
+    # Denotes a list of models to train/run
+    models:
+        # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
+        bilstm:
+            active: false
+            should_train: false
+            n_hidden: 3
+            seed: 132197556
+            checkpoint: "" # "target/hep/checkpoints/bilstm/r1/bilstm_host_512-11.hdf5"
+            epochs: 12
+
+            # Same model as above, but different last layer classifier for transfer learning
+            # Classifies 1/0 human/non-human
+            bilstm_host:
+                active: True
+                epochs: 256
+                n_hidden: 2
+                embedding_dim: 20
+                embed_targets: ["Protein", "Host", "Genotype"]
+                embedding_cache: True
+                should_train: False
+                should_embed: False
+                should_visualize_data: False
+                train_split: .8
+                batch_size: 64
+                inf_batch_size: 144
+                should_test: True
+                transfer_learning: False
+                checkpoint: "arc_models/hepHostNoTransfer/s132197556.hdf5"
+                targetKey: "Host"
+                # e.g, the output heads would be ["Human", "Non-Human"]
+                targetNames: ["Human"]
+
+# Output Settings: initialize base output folder names
+output_settings:
+    # Base output directory
+    namespace: "hepHostNoTransfer-s132197556-e256-l2-tr80te20"
+    output_dir: "Output"
+    model_name: "no-transfer-80:20"
+
