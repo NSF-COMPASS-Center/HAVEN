@@ -15,14 +15,20 @@ input_settings:
     # Denotes a list of models to train/run
     models:
         # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
+        # Phase 1--
         bilstm:
-            active: false
+            active: False
             n_hidden: 3
-            should_train: false
+            should_train: True
             seed: 1
             checkpoint: # "target/hep/checkpoints/bilstm/r1/bilstm_512-11.hdf5"
             epochs: 12
 
+        # Probably want to move this to some other directory --
+        # Trained model output from phase 1:
+        # "target/hep/checkpoints/bilstm/bilstm_512-11.hdf5"
+
+        # Phase 2 --
             # Same model as above, but different last layer classifier for transfer learning
             # Classifies 1/0 human/non-human
             bilstm_host:
@@ -33,7 +39,7 @@ input_settings:
                 embed_targets: ["Protein", "Host", "Genotype"]
                 embedding_cache: False
                 should_train: True
-                should_embed: False
+                should_embed: True # --> x -> f(x) also caches
                 should_visualize_data: False
                 train_split: 0.8
                 batch_size: 64
@@ -41,6 +47,7 @@ input_settings:
                 should_test: False
                 transfer_learning: False
                 checkpoint: # "target/hep/checkpoints/bilstm_host/r4/bilstm_host_512-128.hdf5"
+        # "target/hep/checkpoints/bilstm/bilstm_512-11.hdf5"
                 targetKey: "Host"
                 # e.g, the output heads would be ["Human", "Non-Human"]
                 targetNames: ["Human"]
