@@ -36,7 +36,7 @@ input_settings:
                 should_train: True
                 should_embed: False
                 should_visualize_data: False
-                train_split: .8
+                train_split: .5
                 batch_size: 64
                 inf_batch_size: 144
                 should_test: False
@@ -49,6 +49,6 @@ input_settings:
 # Output Settings: initialize base output folder names
 output_settings:
     # Base output directory
-    namespace: "hepHostNoTransfer-s556209273-e256-l2-tr80te20"
+    namespace: "hepHostNoTransfer-s556209273-e256-l2-tr50te50"
     output_dir: "output"
 

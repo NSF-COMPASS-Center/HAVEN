@@ -3,10 +3,13 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import PrecisionRecallDisplay, RocCurveDisplay
 
 
-def box_plot(df, output_file_path, x_col, y_col, y_label):
+def box_plot(df, output_file_path, x_col, y_col, y_label, random_predictor_val=None):
     plt.clf()
-    ax = sns.boxplot(df, x=x_col, y=y_col, orient="v")
+    ax = sns.boxplot(x=df[x_col], y=df[y_col], orient="v")
     ax.set_ylabel(y_label)
+    if random_predictor_val is not None:
+        ax.axhline(random_predictor_val, color="gray", linestyle="--")
+    ax.set_ylim(0, 1)
     plt.savefig(output_file_path)
 
 

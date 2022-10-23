@@ -70,6 +70,7 @@ def test_model(args, model, test_df, yVocab, date):
     print(column_names)
     output_pd_df = pd.DataFrame(output, columns=column_names)
     output_pd_df["seed"] = args.seed
+    output_pd_df["model"] = args.output_model_name
     output_pd_df.astype({"test_label": "int32"}, copy=False)
     print("output_pd_df shape = ", output_pd_df.shape)
     print(output_pd_df)
