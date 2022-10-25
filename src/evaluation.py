@@ -13,6 +13,7 @@ def parse_args():
     parser.add_argument("-t", "--targets", required=True, help="Comma separated list of prediction targets/labels.\n")
     parser.add_argument("-dir", "--output_dir", required=True, help="Absolute path to the output directory to store visualizations.\n")
     parser.add_argument("-ct", "--classification_type", required=True, help="Type of classification. Accepted values = binary, multi.\n")
+    parser.add_argument("-op", "--output_prefix", required=True, help="Prefix of the generate output files\n")
     args = parser.parse_args()
     return args
 
@@ -48,10 +49,10 @@ def main():
     seed_values = combined_output_df["seed"].unique()
 
     if classification_type == "binary":
-        metrics_computation.compute_metrics_binary(metrics, combined_output_df, target_mapping_idx_name, model_values, seed_values, args.output_dir)
+        metrics_computation.compute_metrics_binary(metrics, combined_output_df, target_mapping_idx_name, model_values, seed_values, args.output_dir, args.output_prefix)
     elif classification_type == "multi":
         metrics_computation.compute_metrics_multi(metrics, combined_output_df, target_mapping_idx_name, model_values,
-                                                  seed_values, args.output_dir)
+                                                  seed_values, args.output_dir, args.output_prefix)
     else:
         print(f"ERROR: unsupported classification type: {classification_type}")
 
