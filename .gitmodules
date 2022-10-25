@@ -1,0 +1,3 @@
+[submodule "GenbankData"]
+	path = GenbankData
+	url = https://github.com/Matsumotorise/GenbankParser.git

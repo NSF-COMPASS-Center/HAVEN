@@ -1,0 +1,53 @@
+# Input Settings: initialize base input folder names,
+# dataset collections, and algorithms to run over
+input_settings:
+
+    # Denotes a list of datasets, each with the following parameters:
+    #   name: Name of the dataset. May be used in logging or other
+    #       messages written during execution
+    #
+    #   path: Relative path to the protein file
+    datasets:
+        "viprbrc_protein":
+            path: "data/hep/2022-07-08-VipBRC-ORF-1-2-3-4-manual.fasta"
+            rowNames: ["Accession", "Protein", "Host", "Genotype"]
+
+    # Denotes a list of models to train/run
+    models:
+        # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
+        bilstm:
+            active: false
+            n_hidden: 2
+            should_train: false
+            seed: 1
+            checkpoint: "models/hep-l2-512-12.hdf5"
+            epochs: 12
+
+            # Same model as above, but different last layer classifier for transfer learning
+            # Classifies 1/0 human/non-human
+            bilstm_host:
+                active: True
+                epochs: 80
+                n_hidden: 3
+                embedding_dim: 20
+                embed_targets: ["Protein", "Host", "Genotype"]
+                embedding_cache: False
+                should_train: False
+                should_embed: True
+                should_test: False
+                should_visualize_data: False
+                train_split: 0
+                batch_size: 64
+                inf_batch_size: 132
+                transfer_learning: False
+                checkpoint: #"models/hep_genotype_nontransfer_l3_512-80.hdf5"
+                targetKey: "Genotype"
+                # e.g, the output heads would be ["Unknown", "HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]
+                targetNames: ["HEV1", "HEV2", "HEV3", "HEV3ra", "HEV4", "HEV5", "HEV6", "HEV7"]
+
+# Output Settings: initialize base output folder names
+output_settings:
+    # Base output directory
+    namespace: "hep"
+    output_dir: "Output"
+

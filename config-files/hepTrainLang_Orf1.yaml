@@ -1,0 +1,49 @@
+# Input Settings: initialize base input folder names,
+# dataset collections, and algorithms to run over
+input_settings:
+
+    # Denotes a list of datasets, each with the following parameters:
+    #   name: Name of the dataset. May be used in logging or other
+    #       messages written during execution
+    #
+    #   path: Relative path to the protein file
+    datasets:
+        "viprbrc_protein":
+            path: "data/hep/2022-07-08-VipBRC-ORF-1-manual.fasta"
+            rowNames: ["Accession", "Protein", "Host", "Genotype"]
+
+    # Denotes a list of models to train/run
+    models:
+        # Classical bilstm language model from https://doi.org/10.1126/science.abd7331
+        bilstm:
+            active: true
+            should_train: true
+            seed: 1
+            n_hidden: 3
+            checkpoint: "target/hep/checkpoints/bilstm/l3-orf1/bilstm_512-24.hdf5"
+            epochs: 24
+
+            # Same model as above, but different last layer classifier for transfer learning
+            # Classifies 1/0 human/non-human
+            bilstm_host:
+                active: false
+                epochs: 128
+                n_hidden: 2
+                embedding_dim: 20
+                should_train: false
+                should_visualize_data: True
+                train_split: 0.8
+                batch_size: 64
+                inf_batch_size: 128
+                should_test: false
+                transfer_learning: false
+                checkpoint: "" #"target/hep/checkpoints/bilstm_host/r4/bilstm_host_512-128.hdf5"
+                targetKey: "Host"
+                targetNames: ["Human"]
+
+# Output Settings: initialize base output folder names
+output_settings:
+    # Base output directory
+    namespace: "hep"
+    output_dir: "outputs"
+

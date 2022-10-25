@@ -1,0 +1,53 @@
+#!/bin/bash
+
+#SBATCH -J BILSTM_COV_MODEL
+#SBATCH -A seqevol
+#SBATCH -N1 
+#SBATCH -t 30:00:00 # 30 hours
+
+#SBATCH -p a100_normal_q
+#SBATCH --gres=gpu:2
+#SBATCH --ntasks-per-node=16
+#SBATCH --mem-per-cpu=32G # Yeah... making all those permutations costs a lot of memory, which is the required format for TF, unless I want to alter the TF libs, this is fine
+
+#SBATCH --export=NONE # Fixes some bugs with pathing
+
+# Relative path vars, since SLURM doesn't seem to preserve original env's env vars
+USER_HOME=/home/andrewclchan211
+PROJECT_DIR=$USER_HOME/BioNLP
+cd $PROJECT_DIR
+
+module reset
+module load Anaconda3
+module load cuDNN/8.1.1.33-CUDA-11.2.1
+
+source activate $USER_HOME/.conda/envs/BioNLP
+
+python --version
+
+# Parameters
+SCRIPT_LOCATION=$PROJECT_DIR/bin/cov.py 
+MODEL=bilstm
+#SAVED_MODEL=$PROJECT_DIR/models/cov.hdf5 
+SAVED_MODEL=$PROJECT_DIR/target/cov/checkpoints/bilstm/bilstm_512-11.hdf5
+RESULTS_DIR=$PROJECT_DIR/results
+
+# Ensure results directory exists
+mkdir -p $RESULTS_DIR
+
+# Run python scripts
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --embed > $RESULTS_DIR/cov_embed_final.log 2>&1
+
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --semantics > $RESULTS_DIR/cov_semantics_final.log 2>&1
+
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --combfit > $RESULTS_DIR/cov_combfit_final.log 2>&1
+
+python $SCRIPT_LOCATION $MODEL --checkpoint $SAVED_MODEL --reinfection > $RESULTS_DIR/cov_reinfection_final.log 2>&1
+
+# # Training:
+# # python ~/BioNLP/src/flu.py bilstm --train --test > flu_train.log 2>&1
+
+
+
+echo "job done"
+
