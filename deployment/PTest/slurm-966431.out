@@ -1,0 +1,66 @@
+Resetting modules to system default. Reseting $MODULEPATH back to system default. All extra directories will be removed from $MODULEPATH.
+Python 3.9.7
+Job start
+Sun Oct  2 16:10:08 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/132197556/hepGenotypeTransferTrain-132197556-0.5.yaml Sun Oct  2 16:10:08 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepGenotypeTransferTrain-132197556-0.5.yaml-2022_Oct_02_16_10.log
+finish Sun Oct  2 16:10:26 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/132197556/hepGenotypeTransferTrain-132197556-0.8.yaml Sun Oct  2 16:10:26 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepGenotypeTransferTrain-132197556-0.8.yaml-2022_Oct_02_16_11.log
+finish Sun Oct  2 16:11:34 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/132197556/hepHostTransferTrain-132197556-0.5.yaml Sun Oct  2 16:11:34 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepHostTransferTrain-132197556-0.5.yaml-2022_Oct_02_16_11.log
+finish Sun Oct  2 16:11:44 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/132197556/hepHostTransferTrain-132197556-0.8.yaml Sun Oct  2 16:11:44 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepHostTransferTrain-132197556-0.8.yaml-2022_Oct_02_16_11.log
+finish Sun Oct  2 16:11:54 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/187253406/hepGenotypeTransferTrain-187253406-0.5.yaml Sun Oct  2 16:11:54 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepGenotypeTransferTrain-187253406-0.5.yaml-2022_Oct_02_16_12.log
+finish Sun Oct  2 16:12:09 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/187253406/hepGenotypeTransferTrain-187253406-0.8.yaml Sun Oct  2 16:12:09 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepGenotypeTransferTrain-187253406-0.8.yaml-2022_Oct_02_16_12.log
+finish Sun Oct  2 16:12:23 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/187253406/hepHostTransferTrain-187253406-0.5.yaml Sun Oct  2 16:12:23 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepHostTransferTrain-187253406-0.5.yaml-2022_Oct_02_16_12.log
+finish Sun Oct  2 16:12:40 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/187253406/hepHostTransferTrain-187253406-0.8.yaml Sun Oct  2 16:12:40 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepHostTransferTrain-187253406-0.8.yaml-2022_Oct_02_16_12.log
+finish Sun Oct  2 16:12:50 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/556209273/hepGenotypeTransferTrain-556209273-0.5.yaml Sun Oct  2 16:12:50 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepGenotypeTransferTrain-556209273-0.5.yaml-2022_Oct_02_16_13.log
+finish Sun Oct  2 16:13:05 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/556209273/hepGenotypeTransferTrain-556209273-0.8.yaml Sun Oct  2 16:13:05 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepGenotypeTransferTrain-556209273-0.8.yaml-2022_Oct_02_16_13.log
+finish Sun Oct  2 16:13:20 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/556209273/hepHostTransferTrain-556209273-0.5.yaml Sun Oct  2 16:13:20 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepHostTransferTrain-556209273-0.5.yaml-2022_Oct_02_16_13.log
+finish Sun Oct  2 16:13:35 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/556209273/hepHostTransferTrain-556209273-0.8.yaml Sun Oct  2 16:13:35 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepHostTransferTrain-556209273-0.8.yaml-2022_Oct_02_16_13.log
+finish Sun Oct  2 16:13:52 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/692853522/hepGenotypeTransferTrain-692853522-0.5.yaml Sun Oct  2 16:13:52 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepGenotypeTransferTrain-692853522-0.5.yaml-2022_Oct_02_16_14.log
+finish Sun Oct  2 16:14:02 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/692853522/hepGenotypeTransferTrain-692853522-0.8.yaml Sun Oct  2 16:14:02 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepGenotypeTransferTrain-692853522-0.8.yaml-2022_Oct_02_16_14.log
+finish Sun Oct  2 16:14:14 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/692853522/hepHostTransferTrain-692853522-0.5.yaml Sun Oct  2 16:14:14 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepHostTransferTrain-692853522-0.5.yaml-2022_Oct_02_16_14.log
+finish Sun Oct  2 16:14:23 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/692853522/hepHostTransferTrain-692853522-0.8.yaml Sun Oct  2 16:14:23 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepHostTransferTrain-692853522-0.8.yaml-2022_Oct_02_16_14.log
+finish Sun Oct  2 16:14:33 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/766510479/hepGenotypeTransferTrain-766510479-0.5.yaml Sun Oct  2 16:14:33 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepGenotypeTransferTrain-766510479-0.5.yaml-2022_Oct_02_16_14.log
+finish Sun Oct  2 16:14:43 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/766510479/hepGenotypeTransferTrain-766510479-0.8.yaml Sun Oct  2 16:14:43 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepGenotypeTransferTrain-766510479-0.8.yaml-2022_Oct_02_16_15.log
+finish Sun Oct  2 16:15:00 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/766510479/hepHostTransferTrain-766510479-0.5.yaml Sun Oct  2 16:15:00 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepHostTransferTrain-766510479-0.5.yaml-2022_Oct_02_16_15.log
+finish Sun Oct  2 16:15:10 EDT 2022
+start /home/andrewclchan211/BioNLP/config-files/PAUROC/766510479/hepHostTransferTrain-766510479-0.8.yaml Sun Oct  2 16:15:10 EDT 2022
+Location: /home/andrewclchan211/BioNLP/results/hepHostTransferTrain-766510479-0.8.yaml-2022_Oct_02_16_15.log
+finish Sun Oct  2 16:15:23 EDT 2022
+Job done
+Sun Oct  2 16:15:23 EDT 2022

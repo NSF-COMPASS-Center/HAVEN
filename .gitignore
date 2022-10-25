@@ -18,6 +18,7 @@ deployment/slurm*
 *.fasta
 
 #output and log files
+output/
 *.out
 *.swp
 *.log

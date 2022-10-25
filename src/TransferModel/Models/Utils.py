@@ -58,9 +58,26 @@ def test_model(args, model, test_df, yVocab, date):
     y_pred_probab = model.predict(test_df['X'], sparse=True)
     print("test_df = ", test_df.shape)
     print(test_df)
-
     print("y_pred = ", y_pred_probab.shape)
     print(y_pred_probab)
+    testAurocs = Evaluation.report_auroc(test_df['y'], y_pred_probab, labelVocab=yVocab,
+                                         filename=f"{args.figDir}/{args.model_name}_AUROC_{date}")
+
+    yVocabInverse = {y: x for x, y in yVocab.items()}
+    print_per_class(testAurocs, yVocabInverse, "AUROC")
+
+    testAuroc = Evaluation.report_auroc(test_df['y'], y_pred_probab, labelVocab=yVocab, average='macro')
+    print(f"Macro auroc: {testAuroc}")
+    testAuroc = Evaluation.report_auroc(test_df['y'], y_pred_probab, labelVocab=yVocab, average='micro')
+    print(f"Micro auroc: {testAuroc}")
+
+    res, matrix = Evaluation.report_accuracy_per_class(test_df['y'], y_pred_probab, yDict=yVocab)
+    print_per_class(res, yVocabInverse, "Accuracy")
+    modelFreq, _ = Evaluation.report_class_distribution(None, None, None, 0, matrix)
+    print_per_class(modelFreq, yVocabInverse, "Frequency of prediction by model")
+    dfFreq, _ = Evaluation.report_class_distribution(None, None, None, 1, matrix)
+    print_per_class(dfFreq, yVocabInverse, "Frequency by dataset")
+    print("Overall accuracy: ", Evaluation.report_accuracy(test_df['y'], y_pred_probab))
 
     y_test = test_df["y"]
     output = np.c_[y_pred_probab, y_test]
@@ -78,17 +95,6 @@ def test_model(args, model, test_df, yVocab, date):
     output_file_path = os.path.join(args.figDir, output_file_name)
     output_pd_df.to_csv(output_file_path, index=False)
 
-    # testAurocs = Evaluation.report_auroc(test_df['y'], y_pred, labelVocab=yVocab,
-    #                                      filename=f"{args.figDir}/{args.model_name}_AUROC_{date}")
-    # yVocabInverse = {y: x for x, y in yVocab.items()}
-    # print_per_class(testAurocs, yVocabInverse, "AUROC")
-    # res, matrix = Evaluation.report_accuracy_per_class(test_df['y'], y_pred, yDict=yVocab)
-    # print_per_class(res, yVocabInverse, "Accuracy")
-    # modelFreq, _ = Evaluation.report_class_distribution(None, None, None, 0, matrix)
-    # print_per_class(modelFreq, yVocabInverse, "Frequency of prediction by model")
-    # dfFreq, _ = Evaluation.report_class_distribution(None, None, None, 1, matrix)
-    # print_per_class(dfFreq, yVocabInverse, "Frequency by dataset")
-    # print("Overall accuracy: ", Evaluation.report_accuracy(test_df['y'], y_pred))
 
 
 def analyze_embedding(args, model, test_df):
