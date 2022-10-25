@@ -5,11 +5,19 @@ from sklearn.metrics import PrecisionRecallDisplay, RocCurveDisplay
 
 def box_plot(df, output_file_path, x_col, y_col, y_label, random_predictor_val=None):
     plt.clf()
-    ax = sns.boxplot(x=df[x_col], y=df[y_col], orient="v")
+    sns.set_theme()
+    sns.set(font_scale=1.2)
+    ax = plt.subplot(1, 1, 1)
+    sns.boxplot(x=df[x_col], y=df[y_col], orient="v", ax=ax)
     ax.set_ylabel(y_label)
+    xtick_labels = ax.get_xticklabels()
+    xtick_labels = [x.get_text().replace(" \\n", "\n") for x in xtick_labels]
+    ax.set_xticklabels(xtick_labels)
     if random_predictor_val is not None:
         ax.axhline(random_predictor_val, color="gray", linestyle="--")
     ax.set_ylim(0, 1)
+    plt.tight_layout()
+    # plt.show()
     plt.savefig(output_file_path)
 
 

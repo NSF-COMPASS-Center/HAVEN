@@ -8,13 +8,13 @@ import numpy as np
 from TransferModel.Analysis import metrics_visualization
 
 
-def compute_metrics_binary(metrics, combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir):
+def compute_metrics_binary(metrics, combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, output_prefix):
     target_values = list(target_mapping_idx_name.keys())
     target_values.remove(0)
     target_values = [str(v) for v in target_values]
     for metric in metrics:
         if metric == "acc":
-            compute_accuracy_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values)
+            compute_accuracy_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix)
         # elif metric == "pr":
         #     compute_precision(combined_output_df, target_mapping_idx_name, seed_values)
         # elif metric == "rec":
@@ -24,20 +24,20 @@ def compute_metrics_binary(metrics, combined_output_df, target_mapping_idx_name,
         elif metric == "roc":
             metrics_visualization.binary_roc_curves(combined_output_df, y_test_col="test_label", y_pred_col="1", itr_col="seed", output_file_path=os.path.join(output_dir, "roc_curves.png"))
         elif metric == "auprc":
-            compute_auprc_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values)
+            compute_auprc_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix)
         elif metric == "auroc":
-            compute_auroc_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values)
+            compute_auroc_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix)
         else:
             print(f"ERROR: Unsupported metric {metric}")
     return
 
 
-def compute_metrics_multi(metrics, combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir):
+def compute_metrics_multi(metrics, combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, output_prefix):
     target_values = list(target_mapping_idx_name.keys())
     target_values = [str(v) for v in target_values]
     for metric in metrics:
         if metric == "acc":
-            compute_accuracy_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values)
+            compute_accuracy_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix)
         # elif metric == "pr":
         #     compute_precision(combined_output_df, target_mapping_idx_name, seed_values)
         # elif metric == "rec":
@@ -47,16 +47,15 @@ def compute_metrics_multi(metrics, combined_output_df, target_mapping_idx_name, 
         elif metric == "roc":
             metrics_visualization.binary_roc_curves(combined_output_df, y_test_col="test_label", y_pred_col="1", itr_col="seed", output_file_path=os.path.join(output_dir, "roc_curves.png"))
         elif metric == "auprc":
-            compute_auprc_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values)
+            compute_auprc_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix)
         elif metric == "auroc":
-            compute_auroc_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values)
+            compute_auroc_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix)
         else:
             print(f"ERROR: Unsupported metric {metric}")
     return
 
 
-
-def compute_accuracy_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values):
+def compute_accuracy_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix):
     accuracy_summary = []
     # combined_output_df = combined_output_df.astype({"test_label": "int32"})
     for model_value in model_values:
@@ -71,10 +70,10 @@ def compute_accuracy_multi(combined_output_df, target_mapping_idx_name, model_va
             accuracy["metric_val"] = accuracy_val
             accuracy_summary.append(accuracy)
     df = pd.DataFrame(accuracy_summary)
-    metrics_visualization.box_plot(df, os.path.join(output_dir, "accuracy_box_plot.png"), "model", "metric_val", "accuracy")
+    metrics_visualization.box_plot(df, os.path.join(output_dir, output_prefix + "_accuracy_box_plot.png"), "model", "metric_val", "accuracy", 0.60)
 
 
-def compute_auprc_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values):
+def compute_auprc_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix):
     auprc_summary = []
     for model_value in model_values:
         model_df = combined_output_df[combined_output_df.model == model_value]
@@ -86,10 +85,10 @@ def compute_auprc_multi(combined_output_df, target_mapping_idx_name, model_value
             auprc["metric_val"] = auprc_val
             auprc_summary.append(auprc)
     df = pd.DataFrame(auprc_summary)
-    metrics_visualization.box_plot(df, os.path.join(output_dir, "auprc_box_plot.png"), "model", "metric_val", "macro-auprc")
+    metrics_visualization.box_plot(df, os.path.join(output_dir, output_prefix + "_auprc_box_plot.png"), "model", "metric_val", "macro-auprc")
 
 
-def compute_auroc_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values):
+def compute_auroc_multi(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix):
     auroc_summary = []
     for model_value in model_values:
         model_df = combined_output_df[combined_output_df.model == model_value]
@@ -101,7 +100,7 @@ def compute_auroc_multi(combined_output_df, target_mapping_idx_name, model_value
             auroc["metric_val"] = auroc_val
             auroc_summary.append(auroc)
     df = pd.DataFrame(auroc_summary)
-    metrics_visualization.box_plot(df, os.path.join(output_dir, "auroc_box_plot.png"), "model", "metric_val", "macro-auroc")
+    metrics_visualization.box_plot(df, os.path.join(output_dir, output_prefix + "_auroc_box_plot.png"), "model", "metric_val", "macro-auroc", 0.11)
 
 
 def convert_multiclass_label_to_binary(y, labels):
@@ -112,7 +111,7 @@ def convert_multiclass_label_to_binary(y, labels):
     return pd.DataFrame(y_bin, columns=labels)
 
 
-def compute_accuracy_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values):
+def compute_accuracy_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix):
     accuracy_summary = []
     for model_value in model_values:
         model_df = combined_output_df[combined_output_df.model == model_value]
@@ -126,10 +125,10 @@ def compute_accuracy_binary(combined_output_df, target_mapping_idx_name, model_v
                 accuracy["metric_val"] = target_accuracy
             accuracy_summary.append(accuracy)
     df = pd.DataFrame(accuracy_summary)
-    metrics_visualization.box_plot(df, os.path.join(output_dir, "accuracy_box_plot.png"), "model", "metric_val", "accuracy", 0.73)
+    metrics_visualization.box_plot(df, os.path.join(output_dir, output_prefix + "_accuracy_box_plot.png"), "model", "metric_val", "accuracy", 0.73)
 
 
-def compute_auprc_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values):
+def compute_auprc_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix):
     auprc_summary = []
     for model_value in model_values:
         model_df = combined_output_df[combined_output_df.model == model_value]
@@ -142,10 +141,10 @@ def compute_auprc_binary(combined_output_df, target_mapping_idx_name, model_valu
                 auprc["metric_val"] = target_auprc
             auprc_summary.append(auprc)
     df = pd.DataFrame(auprc_summary)
-    metrics_visualization.box_plot(df, os.path.join(output_dir, "auprc_box_plot.png"), "model", "metric_val", "auprc", 0.73)
+    metrics_visualization.box_plot(df, os.path.join(output_dir, output_prefix + "_auprc_box_plot.png"), "model", "metric_val", "auprc", 0.73)
 
 
-def compute_auroc_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values):
+def compute_auroc_binary(combined_output_df, target_mapping_idx_name, model_values, seed_values, output_dir, target_values, output_prefix):
     auroc_summary = []
     for model_value in model_values:
         model_df = combined_output_df[combined_output_df.model == model_value]
@@ -158,5 +157,5 @@ def compute_auroc_binary(combined_output_df, target_mapping_idx_name, model_valu
                 auroc["metric_val"] = target_auroc
             auroc_summary.append(auroc)
     df = pd.DataFrame(auroc_summary)
-    metrics_visualization.box_plot(df, os.path.join(output_dir, "auroc_box_plot.png"), "model", "metric_val", "auroc", 0.5)
+    metrics_visualization.box_plot(df, os.path.join(output_dir, output_prefix + "_auroc_box_plot.png"), "model", "metric_val", "auroc", 0.5)
 
