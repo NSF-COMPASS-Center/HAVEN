@@ -1,0 +1,30 @@
+config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw"
+
+  # Subdirectory of inputs that datasets are placed in
+  dataset_dir: "hev"
+
+  # Name of file(s) in subdirectory to be read and processed.
+  file_names: ["kmer_k3_lr_host_tr0.8_n2_orf2_orf3_orf4_output.csv"]
+
+
+evaluation_settings:
+  auroc: True
+  auprc: True
+  f1: False
+  accuracy: False
+
+
+
+output_settings:
+  output_dir: "output"
+  evaluation_dir: "evaluation"
+  visualization_dir: "visualization"
+  dataset_dir: "hev"
+  prefix: # default: none; default file name = <input_file_name>_<output_prefix>_output.csv

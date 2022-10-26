@@ -1,0 +1,29 @@
+config_type: "data_preprocessor" # options: data_preprocessor, classification, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "data"
+
+  # Subdirectory of inputs that datasets are placed in
+  dataset_dir: "hev"
+
+  # Name of file(s) in subdirectory to be read and processed.
+  file_names: ["ORF2.fa", "ORF3.fa", "ORF4.fa"]
+
+
+processor_settings:
+  label_names: ["host", "genotype"]
+
+
+output_settings:
+  output_dir: "input/data"
+  dataset_dir: "hev"
+  prefix: # default: none; default file name = <file_name>_processed.csv
+
+
+
+
+
