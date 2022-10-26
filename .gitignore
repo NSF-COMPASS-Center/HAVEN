@@ -13,5 +13,7 @@ output/
 
 #IDE files (PyCharm/ IntelliJ)
 .idea/
+
+#pycache
 */__pycache__/*
 *.pyc
