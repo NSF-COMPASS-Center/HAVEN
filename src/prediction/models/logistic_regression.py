@@ -2,16 +2,23 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
 import random
+import pandas as pd
 
 
 def run(X_train, X_test, y_train, lr_settings):
     print(y_train)
-    lr_model = LogisticRegression(solver="saga", max_iter=1000, penalty="l1")
+    # lr_model = LogisticRegression(solver="saga", max_iter=1000, penalty="l1")
+    if lr_settings["classification_type"] == "binary":
+        print("Binary Logistic Regression Model")
+        lr_model = LogisticRegression(solver="saga", max_iter=500)
+    else:
+        print("Multiclass Logistic Regression Model")
+        lr_model = LogisticRegression(solver="lbfgs", max_iter=500, multi_class="multinomial")
 
     ## K-Fold Cross Validation: START ##
     # hyper-parameter tuning using K-Fold Cross Validation with K = 5; shuffle the data with given random seed before splitting into batches
     tuning_parameters = {"C": lr_settings['c']}
-    evaluation_params = ["average_precision"]
+    evaluation_params = ["accuracy"]
     kfold_cv_model = KFold(n_splits=5, shuffle=True, random_state=random.randint(0, 10000))
 
     for evaluation_param in evaluation_params:
@@ -30,6 +37,5 @@ def run(X_train, X_test, y_train, lr_settings):
     print("Training best model from k-fold cross validation over full training set")
     classifier.fit(X_train, y_train)
     y_pred = classifier.predict_proba(X_test)
-    y_pred = [y[1] for y in y_pred]
     return y_pred
     ## TRAINING: END ##
