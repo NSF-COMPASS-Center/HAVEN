@@ -1,31 +1,15 @@
-*.egg-info
-*.pyc
-*~
-.#*
-R/*
-ZIFA*
-build/
-data*
-dist/
-plots*
-target*
-temp*
-*__pycache__
-sshUtil.sh
-deployment/slurm*
-
 #input files
 *.fasta
+*.fa
 
-#output and log files
+#output files
 output/
 *.out
 *.swp
+*.csv
+
+# log files
 *.log
-
-
-# input files
-*.fasta
 
 #IDE files (PyCharm/ IntelliJ)
 .idea/
