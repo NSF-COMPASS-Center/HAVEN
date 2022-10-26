@@ -1,6 +1,6 @@
 #input files
 *.fasta
-*.fa
+# *.fa
 
 #output files
 output/
@@ -13,3 +13,5 @@ output/
 
 #IDE files (PyCharm/ IntelliJ)
 .idea/
+*/__pycache__/*
+*.pyc

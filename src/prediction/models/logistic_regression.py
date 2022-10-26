@@ -30,5 +30,6 @@ def run(X_train, X_test, y_train, lr_settings):
     print("Training best model from k-fold cross validation over full training set")
     classifier.fit(X_train, y_train)
     y_pred = classifier.predict_proba(X_test)
+    y_pred = [y[1] for y in y_pred]
     return y_pred
     ## TRAINING: END ##
