@@ -112,7 +112,7 @@ def execute_lr_classification(df, model):
 
         print(f"result size = {result_df.shape}")
         results.append(result_df)
-    return pd.concat(results, axis=1)
+    return pd.concat(results)
 
 
 def create_splits(df, train_proportion, label_col):
