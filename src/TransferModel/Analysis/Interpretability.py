@@ -46,7 +46,8 @@ def visualizeExplanation(model, predClasses, preds, explanation, test_df, inputV
     backwardsSeq = DataProcessor.unfeaturize_seqs_input(X[1], inputVocab)
 
     print(explanation.attributions[0])
-    attrs = np.nansum(explanation.attributions[0], axis=2)
+    attrs = np.nan_to_num(explanation.attributions[0])
+    attrs = attrs.sum(axis=2)
 
     htmlData = ["<table width: 100%>"]
     rows = [
