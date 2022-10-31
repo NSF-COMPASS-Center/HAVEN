@@ -65,7 +65,7 @@ def visualizeExplanation(model, predClasses, preds, explanation, test_df, inputV
         trueClass = test_df._get_value(rowIdx, 'y')
         genbankID = test_df._get_value(rowIdx, 'Accession')
 
-        print("Row:", rowIdx, "Prediction:", predClass)
+        print("Row:", rowIdx, "Prediction:", predClass, "attribution:", attribution)
         curColors = colorize(attribution)
 
         rows.append(

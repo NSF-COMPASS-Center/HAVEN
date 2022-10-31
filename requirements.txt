@@ -22,3 +22,5 @@ pyyaml>=6.0
 
 alibi[ray]
 alibi[tensorflow]
+
+IPython
