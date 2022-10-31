@@ -1,6 +1,6 @@
 import matplotlib as mpl
 import numpy as np
-from IPython.display import HTML, display
+from IPython.display import HTML
 from alibi.explainers import IntegratedGradients
 
 from TransferModel.DataUtils import DataProcessor
@@ -46,7 +46,7 @@ def visualizeExplanation(model, predClasses, preds, explanation, test_df, inputV
     backwardsSeq = DataProcessor.unfeaturize_seqs_input(X[1], inputVocab)
 
     print(explanation.attributions[0])
-    attrs = explanation.attributions[0].nansum(axis=2)
+    attrs = np.nansum(explanation.attributions[0], axis=2)
 
     htmlData = ["<table width: 100%>"]
     rows = [
