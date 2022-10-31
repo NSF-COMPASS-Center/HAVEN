@@ -50,4 +50,4 @@ output_settings:
     # Base output directory
     namespace: "hepHostTransfer"
     output_dir: "output"
-
+    model_name: "hep_host_transfer_l2_512-6_80.hdf5"

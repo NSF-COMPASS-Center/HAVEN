@@ -50,4 +50,4 @@ output_settings:
     # Base output directory
     namespace: "hepGenotypeTransfer"
     output_dir: "output"
-
+    model_name: "bilstm_host_512-128.hdf5"

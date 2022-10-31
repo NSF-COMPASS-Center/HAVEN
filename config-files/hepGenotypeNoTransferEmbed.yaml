@@ -50,4 +50,6 @@ output_settings:
     # Base output directory
     namespace: "hepGenotypeNoTransfer"
     output_dir: "output"
+    model_name: "hep_genotype_notransfer_84-50.hdf5"
+
 

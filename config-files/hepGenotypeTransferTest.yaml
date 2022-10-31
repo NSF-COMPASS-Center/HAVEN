@@ -50,4 +50,4 @@ output_settings:
     # Base output directory
     namespace: "hep"
     output_dir: "Output"
-
+    model_name: "hep_genotype_transfer_l2_512-08.hdf5"
