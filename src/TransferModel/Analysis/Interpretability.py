@@ -44,6 +44,7 @@ def visualizeExplanation(model, predClasses, preds, explanation, test_df, inputV
     forwardsSeq = DataProcessor.unfeaturize_seqs_input(X[0], inputVocab)
     backwardsSeq = DataProcessor.unfeaturize_seqs_input(X[1], inputVocab)
 
+    print(explanation.attributions[0])
     attrs = explanation.attributions[0].sum(axis=2)
 
     htmlData = ["<table width: 100%>"]
