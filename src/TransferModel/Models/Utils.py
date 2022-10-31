@@ -57,6 +57,8 @@ def print_per_class(metrics, yVocabInverse, metricName):
 def test_model(args, model, test_df, inputVocab, targetVocab, date):
     explanation, predClasses, preds = Interpretability.getIntegratedGradients(model, test_df)
     Interpretability.visualizeExplanation(model, predClasses, preds, explanation, test_df, inputVocab, targetVocab, filename = f"{args.figDir}/{args.model_name}_IG_Table_{date}.html")
+
+    '''
     y_pred_probab = model.predict(test_df['X'], sparse=True)
     print("test_df = ", test_df.shape)
     print(test_df)
@@ -97,6 +99,7 @@ def test_model(args, model, test_df, inputVocab, targetVocab, date):
     output_file_path = os.path.join(args.figDir, output_file_name)
     output_pd_df.to_csv(output_file_path, index=False)
 
+    '''
 
 
 def analyze_embedding(args, model, test_df):

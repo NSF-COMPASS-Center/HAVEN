@@ -10,6 +10,7 @@ from TransferModel.Models.TargetModel import TargetModel
 def getIntegratedGradients(model: TargetModel, test_df, method="gausslegendre", n_steps=50, internal_batch_size=32):
     X = model.split_and_pad(test_df["X"])
 
+    print(X)
     preds = model.model_.predict(X, batch_size=model.inference_batch_size_)
     predClasses = np.argmax(preds, axis=1)
 
@@ -45,7 +46,7 @@ def visualizeExplanation(model, predClasses, preds, explanation, test_df, inputV
     backwardsSeq = DataProcessor.unfeaturize_seqs_input(X[1], inputVocab)
 
     print(explanation.attributions[0])
-    attrs = explanation.attributions[0].sum(axis=2)
+    attrs = explanation.attributions[0].nansum(axis=2)
 
     htmlData = ["<table width: 100%>"]
     rows = [
