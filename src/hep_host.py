@@ -63,6 +63,7 @@ class HepHost():
         np.random.seed(self.args.seed)
         random.seed(self.args.seed)
         tf.random.set_seed(self.args.seed)
+        tf.config.experimental.enable_tensor_float_32_execution(False)
 
     def start(self):
         # Initialization
