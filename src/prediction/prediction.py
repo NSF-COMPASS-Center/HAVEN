@@ -119,7 +119,8 @@ def create_splits(df, train_proportion, label_col):
     seed = random.randint(0, 10000)
     print(f"seed={seed}")
     X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=[label_col]).values, df[label_col].values,
-                                                        train_size=train_proportion, random_state=seed, stratify=df[label_col].unique())
+                                                        train_size=train_proportion, random_state=seed, stratify=df[label_col].values)
+
     min_max_scaler = MinMaxScaler()
     X_train = min_max_scaler.fit_transform(X_train)
     X_test = min_max_scaler.fit_transform(X_test)

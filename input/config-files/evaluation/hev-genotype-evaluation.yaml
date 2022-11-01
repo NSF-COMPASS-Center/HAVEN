@@ -10,11 +10,14 @@ input_settings:
   # Subdirectory of inputs that datasets are placed in
   dataset_dir: "hev"
 
+  # TODO: support for multiple files
   # Name of file(s) in subdirectory to be read and processed.
-  file_names: ["kmer_k3_lr_host_tr0.8_n2_orf2_orf3_orf4_output.csv"]
+  # file_names: ["kmer_k3_lr_host_tr0.8_n2_orf2_orf3_orf4_output.csv"]
+  file_name: "kmer_k3_lr_genotype_multi_tr0.8_n10_orf2_orf3_orf4_output.csv"
 
 
 evaluation_settings:
+  type: "multi"
   auroc: True
   auprc: True
   f1: False
