@@ -36,11 +36,16 @@ def execute(config):
     label_settings = classification_settings["label_settings"]
     label_col = label_settings["label_col"]
 
+    # 1. Read the data files
     df = read_dataset(input_files, label_col)
-    kmer_df = kmer_utils.compute_kmer_based_dataset(df, k, label_col)
-    transformed_df_with_label = transform_labels(kmer_df, classification_type, label_settings)
 
-    # perform classification
+    # 2. Compute kmer features
+    kmer_df = kmer_utils.compute_kmer_features(df, k, label_col)
+
+    # 3. Group the labels (if applicable) and convert the string labels to mapped integer indices
+    kmer_df_with_transformed_label = transform_labels(kmer_df, classification_type, label_settings)
+
+    # 4. Perform classification
     for model in models:
         if model["active"] is False:
             print(f"Skipping {model['name']} ...")
@@ -49,7 +54,7 @@ def execute(config):
         output_file_name = f"kmer_k{k}_{model_name}_{label_col}_{classification_type}_tr{train_proportion}_n{n}" + output_prefix + "_output.csv"
         output_file_path = os.path.join(output_dir, output_dataset_dir, output_file_name)
 
-        # Setting needed values within model object for cleaner code and avoid passing multiple arguments.
+        # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
         model["n"] = n
         model["train_proportion"] = train_proportion
         model["label_col"] = label_col
@@ -57,26 +62,25 @@ def execute(config):
 
         if model["name"] == "lr":
             print("Executing Logistic Regression")
-            output_df = execute_lr_classification(transformed_df_with_label, model)
+            results_df = execute_lr_classification(kmer_df_with_transformed_label, model)
         elif model["name"] == "svm":
             print("Executing SVM")
             return
+        # 5. Write the classification output
+        print(f"Writing results of {model_name} to {output_file_path}")
+        results_df.to_csv(output_file_path, index=False)
 
-        print(f"Writing output of {model_name} to {output_file_path}")
-        write_output(output_df, output_file_path)
 
-
-def read_dataset(input_files, label):
+def read_dataset(input_files, label_col):
     datasets = []
     for input_file in input_files:
-        df = pd.read_csv(input_file, usecols=["id", "sequence", label])
+        df = pd.read_csv(input_file, usecols=["id", "sequence", label_col])
         print(f"input file: {input_file}, size = {df.shape}")
         datasets.append(df)
 
     dataset = pd.concat(datasets)
     dataset.set_index("id", inplace=True)
     print(f"Size of input dataset = {dataset.shape}")
-    # print(dataset)
     return dataset
 
 
@@ -121,6 +125,7 @@ def create_splits(df, train_proportion, label_col):
     X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=[label_col]).values, df[label_col].values,
                                                         train_size=train_proportion, random_state=seed, stratify=df[label_col].values)
 
+    # Standardize dataset
     min_max_scaler = MinMaxScaler()
     X_train = min_max_scaler.fit_transform(X_train)
     X_test = min_max_scaler.fit_transform(X_test)
@@ -129,7 +134,3 @@ def create_splits(df, train_proportion, label_col):
     print(f"y_train size = {y_train.shape}")
     print(f"y_test size = {y_test.shape}")
     return X_train, X_test, y_train, y_test
-
-
-def write_output(df, output_file_path):
-    df.to_csv(output_file_path, index=False)

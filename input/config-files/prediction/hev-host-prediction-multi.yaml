@@ -26,7 +26,8 @@ classification_settings:
   models:
     - name: "lr"
       active: True
-      c: [0.01, 0.03, 0.1, 0.3, 1, 3]
+      # parameters as per scikit implementation
+      C: [0.01, 0.03, 0.1, 0.3, 1, 3]
 
     - name: "svm"
       active: True
