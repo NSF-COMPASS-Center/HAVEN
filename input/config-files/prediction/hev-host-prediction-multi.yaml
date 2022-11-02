@@ -23,6 +23,7 @@ classification_settings:
   label_settings:
     label_col: "host"
     exclude_labels: [ "culture supernatant (Unknown map)", "Unknown" ]
+
   models:
     - name: "lr"
       active: True

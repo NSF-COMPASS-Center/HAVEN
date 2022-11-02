@@ -23,6 +23,10 @@ classification_settings:
   label_settings:
     label_col: "genotype"
     exclude_labels: ["unknown", "Could not assign"]
+    label_groupings:
+      "HEV_1_2" : ["HEV1", "HEV2"]
+      "HEV_3_4": ["HEV3", "HEV3ra", "HEV4"]
+      "HEV_others": ["HEV5", "HEV6", "HEV7"]
   models:
     - name: "lr"
       active: True

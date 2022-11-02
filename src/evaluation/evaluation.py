@@ -23,7 +23,6 @@ def execute(config):
     print(f"input file = {input_file_path}")
     df = pd.read_csv(input_file_path)
     print(f"input results size = {df.shape}")
-    print(df)
 
     output_file_name = Path(input_file_path).stem + "_" + output_prefix
     evaluation_output_file_base_path = os.path.join(output_dir, output_evaluation_dir, output_dataset_dir)
