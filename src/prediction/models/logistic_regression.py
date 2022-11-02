@@ -1,41 +1,38 @@
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import GridSearchCV
 import random
-import pandas as pd
 
 
 def run(X_train, X_test, y_train, lr_settings):
-    print(y_train)
-    # lr_model = LogisticRegression(solver="saga", max_iter=1000, penalty="l1")
-    if lr_settings["classification_type"] == "binary":
-        print("Binary Logistic Regression Model")
-        lr_model = LogisticRegression(solver="saga", max_iter=500)
-    else:
+    lr_model = LogisticRegression(solver="saga", penalty="l1", class_weight="balanced", max_iter=1000)
+
+    if lr_settings["classification_type"] == "multi":
         print("Multiclass Logistic Regression Model")
-        lr_model = LogisticRegression(solver="lbfgs", max_iter=500, multi_class="multinomial")
+        # multinomial: multi-class cross-entropy loss
+        lr_model.multi_class = "multinomial"
 
-    ## K-Fold Cross Validation: START ##
-    # hyper-parameter tuning using K-Fold Cross Validation with K = 5; shuffle the data with given random seed before splitting into batches
-    tuning_parameters = {"C": lr_settings['c']}
-    evaluation_params = ["accuracy"]
-    kfold_cv_model = KFold(n_splits=5, shuffle=True, random_state=random.randint(0, 10000))
+    # K-Fold Cross Validation: START #
+    # hyper-parameter tuning using K-Fold Cross Validation with K = 5;
+    # shuffle the data with given random seed before splitting into batches
+    tuning_parameters = {"C": lr_settings["C"]}
+    scoring_param = "accuracy"
+    print(f"Tuning hyper-parameters {tuning_parameters} based on {scoring_param}")
 
-    for evaluation_param in evaluation_params:
-        print("\nTuning hyper-parameters based on %s" % evaluation_param)
-        cv_model = GridSearchCV(estimator=lr_model, param_grid=tuning_parameters, scoring=evaluation_param,
-                                cv=kfold_cv_model, verbose=2, return_train_score=True)
-        cv_model.fit(X_train, y_train)
+    # use stratified k-fold to ensure each set contains approximately the same percentage of samples of each target class as the complete set.
+    # TODO: should we use StratifiedShuffleSplit instead? What is the difference?
+    kfold_cv_model = StratifiedKFold(n_splits=5, shuffle=True, random_state=random.randint(0, 10000))
 
-        # The best values chosen by KFold-cross-validation
-        print("Best parameters in trained model = ", cv_model.best_params_)
-        print("Best score in trained model = ", cv_model.best_score_)
+    # refit=True : retrain the best model on the full training dataset
+    cv_model = GridSearchCV(estimator=lr_model, param_grid=tuning_parameters, scoring=scoring_param,
+                            cv=kfold_cv_model, verbose=2, return_train_score=True, refit=True)
+    cv_model.fit(X_train, y_train)
+
+    # The best values chosen by KFold-cross-validation
+    print("Best parameters in trained model = ", cv_model.best_params_)
+    print("Best score in trained model = ", cv_model.best_score_)
     classifier = cv_model.best_estimator_
-    ## K-Fold Cross Validation: END ##
+    # K-Fold Cross Validation: END #
 
-    ## TRAINING: START ##
-    print("Training best model from k-fold cross validation over full training set")
-    classifier.fit(X_train, y_train)
     y_pred = classifier.predict_proba(X_test)
     return y_pred
-    ## TRAINING: END ##
