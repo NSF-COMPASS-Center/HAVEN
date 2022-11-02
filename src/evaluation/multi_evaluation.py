@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from sklearn.metrics import roc_auc_score, average_precision_score
+from sklearn.metrics import roc_auc_score, accuracy_score, f1_score
 from utils import visualization_utils
 import numpy as np
 
@@ -11,14 +11,77 @@ def execute(evaluation_settings, df, evaluation_output_file_base_path, visualiza
     itr_col = "itr"
     y_true_col = "y_true"
     y_pred_columns = list(df.columns.values)
-    print(y_pred_columns)
     y_pred_columns.remove(itr_col)
     y_pred_columns.remove(y_true_col)
-    print(f"y_pred_columns = {y_pred_columns}")
     if evaluation_settings["auroc"]:
         auroc(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path)
     if evaluation_settings["auprc"]:
-        auprc(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path)
+        print("ERROR:  AUPRC for multiclass format is not supported.")
+        # auprc(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path)
+    if evaluation_settings["accuracy"]:
+        accuracy(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path)
+    if evaluation_settings["f1"]:
+        f1(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path)
+    plot_prediction_distribution(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path)
+    return
+
+
+def plot_prediction_distribution(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path):
+    itr_col = "itr"
+    y_true_col = "y_true"
+    itrs = df["itr"].unique()
+    result = []
+
+    for itr in itrs:
+        df_itr = df[df[itr_col] == itr]
+        y_pred = convert_probability_to_prediction(df_itr[y_pred_columns])
+        labels, counts = np.unique(y_pred, return_counts=True)
+        result_itr_pred = pd.DataFrame({"label": labels, "label_count": counts, "itr": itr, "group": "y_pred"})
+
+        y_true = df_itr[y_true_col].values
+        labels, counts = np.unique(y_true, return_counts=True)
+        result_itr_true = pd.DataFrame({"label": labels, "label_count": counts, "itr": itr, "group": "y_true"})
+
+        result.append(result_itr_pred)
+        result.append(result_itr_true)
+    result_df = pd.concat(result)
+    result_df.to_csv(evaluation_output_file_path + "class_distribution.csv")
+    visualization_utils.class_distribution_plot(result_df, visualization_output_file_path + "class_distribution.png")
+
+
+def accuracy(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path):
+    # TODO: Move hard-coded values across src to common location (properties file?)
+    itr_col = "itr"
+    y_true_col = "y_true"
+    itrs = df["itr"].unique()
+    result = []
+
+    for itr in itrs:
+        df_itr = df[df[itr_col] == itr]
+        y_pred = convert_probability_to_prediction(df_itr[y_pred_columns])
+        acc_itr = accuracy_score(y_true=df_itr[y_true_col].values, y_pred=y_pred)
+        result.append({itr_col: itr, "accuracy": acc_itr})
+    result_df = pd.DataFrame(result)
+    result_df.to_csv(evaluation_output_file_path + "accuracy.csv")
+    visualization_utils.box_plot(result_df, "accuracy", visualization_output_file_path + "accuracy_boxplot.png")
+    return
+
+
+def f1(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path):
+    # TODO: Move hard-coded values across src to common location (properties file?)
+    itr_col = "itr"
+    y_true_col = "y_true"
+    itrs = df["itr"].unique()
+    result = []
+
+    for itr in itrs:
+        df_itr = df[df[itr_col] == itr]
+        y_pred = convert_probability_to_prediction(df_itr[y_pred_columns])
+        f1_itr = f1_score(y_true=df_itr[y_true_col].values, y_pred=y_pred, average="macro")
+        result.append({itr_col: itr, "f1": f1_itr})
+    result_df = pd.DataFrame(result)
+    result_df.to_csv(evaluation_output_file_path + "f1.csv")
+    visualization_utils.box_plot(result_df, "f1", visualization_output_file_path + "f1_boxplot.png")
     return
 
 
@@ -30,45 +93,28 @@ def auroc(df, y_pred_columns, evaluation_output_file_path, visualization_output_
     result = []
     for itr in itrs:
         df_itr = df[df[itr_col] == itr]
-        print(f"y_true={df_itr[y_true_col]}")
-        print(f"y_score={df_itr[y_pred_columns]}")
-
-        y_true_df = convert_multiclass_label_to_binary(df_itr[y_true_col], y_pred_columns)
-        print(f"y_true_df = {y_true_df}")
-        print("sum")
-        print(y_true_df.sum(axis=0))
-        auroc_itr = roc_auc_score(y_true=y_true_df, y_score=df_itr[y_pred_columns], multi_class="ovr")
+        auroc_itr = roc_auc_score(y_true=df_itr[y_true_col], y_score=df_itr[y_pred_columns], multi_class="ovr")
         result.append({itr_col: itr, "auroc": auroc_itr})
     result_df = pd.DataFrame(result)
-    result_df.to_csv(evaluation_output_file_path + "_auroc.csv")
-    visualization_utils.box_plot(result_df, "auroc", visualization_output_file_path + "_auroc_boxplot.png")
+    result_df.to_csv(evaluation_output_file_path + "auroc.csv")
+    visualization_utils.box_plot(result_df, "auroc", visualization_output_file_path + "auroc_boxplot.png")
     return
 
 
-def auprc(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path):
-    # TODO: Move hard-coded values across src to common location (properties file?)
-    itr_col = "itr"
-    y_true_col = "y_true"
-    itrs = df["itr"].unique()
-    result = []
-    for itr in itrs:
-        df_itr = df[df[itr_col] == itr]
-        print(f"Number of unique classes = {df_itr[y_true_col].unique()}")
-        y_true_df = convert_multiclass_label_to_binary(df_itr[y_true_col], y_pred_columns)
-        print(f"y_true_df = {y_true_df}")
-        auprc_itr = average_precision_score(y_true=y_true_df, y_score=df_itr[y_pred_columns].values)
-        result.append({itr_col: itr, "auprc": auprc_itr})
-    result_df = pd.DataFrame(result)
-    result_df.to_csv(evaluation_output_file_path + "_auprc.csv")
-    visualization_utils.box_plot(result_df, "auprc", visualization_output_file_path + "_auprc_boxplot.png")
-    return
+# def auprc(df, y_pred_columns, evaluation_output_file_path, visualization_output_file_path):
+#     # TODO: Move hard-coded values across src to common location (properties file?)
+#     itr_col = "itr"
+#     y_true_col = "y_true"
+#     itrs = df["itr"].unique()
+#     result = []
+#     for itr in itrs:
+#         df_itr = df[df[itr_col] == itr]
+#         auprc_itr = average_precision_score(y_true=df_itr[y_true_col], y_score=df_itr[y_pred_columns].values, average="micro")
+#         result.append({itr_col: itr, "auprc": auprc_itr})
+#     result_df = pd.DataFrame(result)
+#     result_df.to_csv(evaluation_output_file_path + "_auprc.csv")
+#     visualization_utils.box_plot(result_df, "auprc", visualization_output_file_path + "_auprc_boxplot.png")
+#     return
 
-
-def convert_multiclass_label_to_binary(y, labels):
-    print(f"Number of unique classes = {y.unique()}")
-    n = len(y)
-    y_bin = np.zeros((n, len(labels)))
-    for idx, val in enumerate(y):
-        print(val)
-        y_bin[idx][int(val)] = 1
-    return pd.DataFrame(y_bin, columns=labels)
+def convert_probability_to_prediction(y_pred_prob):
+    return [int(y) for y in y_pred_prob.idxmax(axis="columns")]

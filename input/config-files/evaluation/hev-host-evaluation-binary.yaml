@@ -20,8 +20,8 @@ evaluation_settings:
   type: "binary"
   auroc: True
   auprc: True
-  f1: False
-  accuracy: False
+  f1: True
+  accuracy: True
 
 
 
