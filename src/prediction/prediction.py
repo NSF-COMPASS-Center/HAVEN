@@ -1,8 +1,8 @@
 import os
 import pandas as pd
 import random
-import numpy as np
 
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
@@ -39,13 +39,16 @@ def execute(config):
     # 1. Read the data files
     df = read_dataset(input_files, label_col)
 
-    # 2. Compute kmer features
+    # 2. filter out noise: labels configured to be excluded, NaN labels
+    df = utils.filter_noise(df, label_settings)
+
+    # 3. Compute kmer features
     kmer_df = kmer_utils.compute_kmer_features(df, k, label_col)
 
-    # 3. Group the labels (if applicable) and convert the string labels to mapped integer indices
-    kmer_df_with_transformed_label = transform_labels(kmer_df, classification_type, label_settings)
+    # 4. Group the labels (if applicable) and convert the string labels to mapped integer indices
+    kmer_df_with_transformed_label, idx_label_map = utils.transform_labels(kmer_df, classification_type, label_settings)
 
-    # 4. Perform classification
+    # 5. Perform classification
     for model in models:
         if model["active"] is False:
             print(f"Skipping {model['name']} ...")
@@ -53,6 +56,8 @@ def execute(config):
         model_name = model["name"]
         output_file_name = f"kmer_k{k}_{model_name}_{label_col}_{classification_type}_tr{train_proportion}_n{n}" + output_prefix + "_output.csv"
         output_file_path = os.path.join(output_dir, output_dataset_dir, output_file_name)
+        # create any missing parent directories
+        Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
 
         # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
         model["n"] = n
@@ -66,6 +71,10 @@ def execute(config):
         elif model["name"] == "svm":
             print("Executing SVM")
             return
+        # Remap the class indices to original input labels
+        results_df.rename(columns=idx_label_map, inplace=True)
+        results_df["y_true"] = results_df["y_true"].map(idx_label_map)
+
         # 5. Write the classification output
         print(f"Writing results of {model_name} to {output_file_path}")
         results_df.to_csv(output_file_path, index=False)
@@ -82,26 +91,6 @@ def read_dataset(input_files, label_col):
     dataset.set_index("id", inplace=True)
     print(f"Size of input dataset = {dataset.shape}")
     return dataset
-
-
-def transform_labels(df, classification_type, label_settings):
-    label_col = label_settings["label_col"]
-
-    # remove rows with labels to be excluded
-    df = df[~df[label_col].isin(label_settings["exclude_labels"])]
-    labels = df[label_col].unique()
-    if classification_type == "binary":
-        positive_label = label_settings["positive_label"]
-        negative_label = "Not " + positive_label
-        df[label_col] = np.where(df[label_col] == positive_label, positive_label, negative_label)
-        labels = [negative_label, positive_label]
-
-    label_idx_map, idx_label_map = utils.get_label_vocabulary(labels)
-    print(f"label_idx_map={label_idx_map}\nidx_label_map={idx_label_map}")
-
-    df[label_col] = df[label_col].transform(lambda x: label_idx_map[x])
-    print(df[label_col].unique())
-    return df
 
 
 def execute_lr_classification(df, model):

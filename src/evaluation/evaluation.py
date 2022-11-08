@@ -1,8 +1,8 @@
 import pandas as pd
 import os
 from pathlib import Path
-from evaluation import binary_evaluation
-from evaluation import multi_evaluation
+from evaluation.BinaryClassEvaluation import BinaryClassEvaluation
+from evaluation.MultiClassEvaluation import MultiClassEvaluation
 
 
 def execute(config):
@@ -29,9 +29,13 @@ def execute(config):
     visualization_output_file_base_path = os.path.join(output_dir, output_visualization_dir, output_dataset_dir)
 
     evaluation_settings = config["evaluation_settings"]
-    if evaluation_settings["type"] == "binary":
-        binary_evaluation.execute(evaluation_settings, df, evaluation_output_file_base_path, visualization_output_file_base_path, output_file_name)
+    evaluation_type = evaluation_settings["type"]
+    if evaluation_type == "binary":
+        evaluation_executor = BinaryClassEvaluation(df, evaluation_settings, evaluation_output_file_base_path, visualization_output_file_base_path, output_file_name)
+    elif evaluation_type == "multi":
+        evaluation_executor = MultiClassEvaluation(df, evaluation_settings, evaluation_output_file_base_path, visualization_output_file_base_path, output_file_name)
     else:
-        multi_evaluation.execute(evaluation_settings, df, evaluation_output_file_base_path, visualization_output_file_base_path, output_file_name)
+        print(f"ERROR: Unsupported type of evaluation: evaluation_settings.type = {evaluation_type}")
 
+    evaluation_executor.execute()
     return
