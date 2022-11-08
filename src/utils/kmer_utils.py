@@ -8,6 +8,9 @@ def compute_kmer_features(df, k, label_col):
     df["features"] = df.apply(lambda row: get_kmer_vector(row["sequence"], k, kmer_keys), axis=1)
     df.drop(columns=["sequence"], inplace=True)
     kmer_df = pd.DataFrame.from_records(df["features"].values, index=df.index)
+
+    # drop all columns (kmers) that do not occure in the dataset i.e. sum across all rows = 0
+    kmer_df = kmer_df[kmer_df.columns[kmer_df.sum() > 0]]
     kmer_df_with_label = kmer_df.join(df[label_col], on="id", how="left")
     print(f"Size of kmer dataset with label = {kmer_df_with_label.shape}")
     print(f"Validation: First row in kmer dataset with label = \n{kmer_df_with_label.head(1)}")

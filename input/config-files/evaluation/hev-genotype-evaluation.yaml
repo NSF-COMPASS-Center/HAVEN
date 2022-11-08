@@ -5,15 +5,15 @@ config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "output/raw"
+  input_dir: "output/raw/hev"
 
   # Subdirectory of inputs that datasets are placed in
-  dataset_dir: "hev"
+  dataset_dir: "orf2_orf3_orf4"
 
   # TODO: support for multiple files
   # Name of file(s) in subdirectory to be read and processed.
   # file_names: ["kmer_k3_lr_host_tr0.8_n2_orf2_orf3_orf4_output.csv"]
-  file_name: "kmer_k3_lr_genotype_multi_tr0.8_n10_orf2_orf3_orf4_output.csv"
+  file_name: "kmer_k3_lr_genotype_multi_tr0.8_n2_orf2_orf3_orf4_output.csv"
 
 
 evaluation_settings:
@@ -22,12 +22,12 @@ evaluation_settings:
   auprc: True
   f1: True
   accuracy: True
-
+  prediction_distribution: True
 
 
 output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "hev"
+  dataset_dir: "hev/orf2_orf3_orf4"
   prefix: # default: none; default file name = <input_file_name>_<output_prefix>_output.csv
