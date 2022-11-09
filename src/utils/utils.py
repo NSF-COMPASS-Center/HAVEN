@@ -12,7 +12,7 @@ def filter_noise(df, label_settings):
 
 def transform_labels(df, classification_type, label_settings):
     label_col = label_settings["label_col"]
-    if label_settings["label_groupings"] is not None:
+    if "label_groupings" in label_settings.keys():
         label_grouping_config = label_settings["label_groupings"]
         print(f"Grouping labels using config : {label_grouping_config}")
         df = group_labels(df, label_col, label_grouping_config)

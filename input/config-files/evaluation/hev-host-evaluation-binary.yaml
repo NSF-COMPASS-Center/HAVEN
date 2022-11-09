@@ -13,8 +13,7 @@ input_settings:
   # TODO: support for multiple files
   # Name of file(s) in subdirectory to be read and processed.
   # file_names: ["kmer_k3_lr_host_tr0.8_n2_orf2_orf3_orf4_output.csv"]
-  file_name: "kmer_k3_lr_host_binary_tr0.8_n10_orf2_orf3_orf4_output.csv"
-
+  file_name: "kmer_k3_lr_host_binary_tr0.5_n10_output.csv"
 
 evaluation_settings:
   type: "binary"
