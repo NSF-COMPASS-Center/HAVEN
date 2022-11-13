@@ -1,6 +1,6 @@
 import os
 import re
-
+from pathlib import Path
 
 def execute(config):
     input_settings = config["input_settings"]
@@ -21,6 +21,8 @@ def execute(config):
 
         output_file_name = input_file + output_prefix + "_processed.csv"
         output_file_path = os.path.join(output_dir, output_dataset_dir, output_file_name)
+        # create any missing parent directories
+        Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
         process_file(input_file_path, output_file_path, label_names)
 
 

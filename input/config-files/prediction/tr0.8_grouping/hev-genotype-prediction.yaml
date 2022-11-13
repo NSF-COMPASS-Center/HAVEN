@@ -11,7 +11,7 @@ input_settings:
   dataset_dir: "data/hev"
 
   # Name of file(s) in subdirectory to be read and processed.
-  file_names: ["ORF2.fa_processed.csv", "ORF3.fa_processed.csv", "ORF4.fa_processed.csv"]
+  file_names: ["ORF1.fa_processed.csv", "ORF2.fa_processed.csv", "ORF3.fa_processed.csv", "ORF4.fa_processed.csv"]
 
 
 classification_settings:
