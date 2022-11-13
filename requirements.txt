@@ -1,4 +1,4 @@
-Bottleneck
+Bottleneck>=1.3.5
 certifi==2022.9.24
 cycler==0.11.0
 fonttools==4.25.0
