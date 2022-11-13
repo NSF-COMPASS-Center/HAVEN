@@ -8,11 +8,9 @@
 #SBATCH -N1 --ntasks-per-node=4 # number of nodes and number of tasks per node
 #SBATCH -t 08:00:00 # wall-time required (
 # 8hrs)
-#SBATCH --mem-per-cpu=32G
 
 
-# Load modules
-module reset
+# Load m
 module load
 module load Anaconda3
 
