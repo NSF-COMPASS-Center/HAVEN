@@ -2,7 +2,7 @@
 
 #SBATCH -J zoonosis-hev-baseline
 #SBATCH --account=seqevol
-#SBATCH --partition=a100_normal_q
+#SBATCH --partition=normal_q
 
 #SBATCH --mem=32G
 #SBATCH -N1 --ntasks-per-node=4 # number of nodes and number of tasks per node
@@ -32,7 +32,7 @@ echo "Project directory: $PROJECT_DIR"
 SCRIPT_LOCATION=$PROJECT_DIR/src/protein_structure_analysis.py
 CONFIG_FILE=$2
 LOG_FILE=$LOGS_DIR/$3.$(date +%Y_%b_%d_%H_%M).log
-echo "Config File: $CONFIG_FILE"
+echo "Config File: $CONFIG_FILE"osi
 echo "Log File: $LOG_FILE"
 
 echo "Zoonosis baseline model START"
