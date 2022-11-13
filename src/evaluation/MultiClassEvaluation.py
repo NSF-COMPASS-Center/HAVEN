@@ -13,6 +13,7 @@ class MultiClassEvaluation(EvaluationBase):
         y_pred_columns = list(self.df.columns.values)
         y_pred_columns.remove(self.itr_col)
         y_pred_columns.remove(self.y_true_col)
+        y_pred_columns.remove(self.experiment_col)
         return y_pred_columns
 
     def compute_accuracy(self, df_itr):
@@ -27,8 +28,7 @@ class MultiClassEvaluation(EvaluationBase):
         return roc_auc_score(y_true=df_itr[self.y_true_col], y_score=df_itr[self.y_pred_columns], multi_class="ovr")
 
     def compute_auprc(self, df_itr):
-        # NOT used
-        # case handled in parent class method: EvaluationBase.auprc()
+        # print("ERROR: AUPRC not supported for multiclass classification.")
         pass
 
     def convert_probability_to_prediction(self, df_itr):

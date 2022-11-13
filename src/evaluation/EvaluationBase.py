@@ -19,68 +19,53 @@ class EvaluationBase:
         self.visualization_output_file_path = os.path.join(visualization_output_file_base_path, output_file_name)
         Path(os.path.dirname(self.visualization_output_file_path)).mkdir(parents=True, exist_ok=True)
 
+        self.evaluation_metrics_df = None
         self.itr_col = "itr"
+        self.experiment_col = "experiment"
         self.y_true_col = "y_true"
         self.itrs = df["itr"].unique()
 
     def execute(self):
+        experiments = self.df[self.experiment_col].unique()
+        result = []
+        for experiment in experiments:
+            experiment_df = self.df[self.df[self.experiment_col] == experiment]
+            for itr in self.itrs:
+                result_itr = {self.itr_col: itr, self.experiment_col: experiment}
+                df_itr = experiment_df[experiment_df[self.itr_col] == itr]
+                if self.evaluation_settings["auroc"]:
+                    auroc_itr = self.compute_auroc(df_itr)
+                    result_itr["auroc"] = auroc_itr
+                if self.evaluation_settings["auprc"]:
+                    auprc_itr = self.compute_auprc(df_itr)
+                    result_itr["auprc"] = auprc_itr
+                if self.evaluation_settings["accuracy"]:
+                    acc_itr = self.compute_accuracy(df_itr)
+                    result_itr["accuracy"] = acc_itr
+                if self.evaluation_settings["f1"]:
+                    f1_itr = self.compute_f1(df_itr)
+                    result_itr["f1"] = f1_itr
+                if self.evaluation_settings["prediction_distribution"]:
+                    self.prediction_distribution()
+                result.append(result_itr)
+        self.evaluation_metrics_df = pd.DataFrame(result)
+        self.evaluation_metrics_df.to_csv(self.evaluation_output_file_path + "_evaluation_metrics.csv")
+
+        self.plot_visualizations()
+        return
+
+
+    def plot_visualizations(self):
         if self.evaluation_settings["auroc"]:
-            self.auroc()
+            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auroc", self.visualization_output_file_path + "_auroc_boxplot.png")
         if self.evaluation_settings["auprc"]:
-            self.auprc()
+            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auprc", self.visualization_output_file_path + "_auprc_boxplot.png")
         if self.evaluation_settings["accuracy"]:
-            self.accuracy()
+            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "accuracy", self.visualization_output_file_path + "_accuracy_boxplot.png")
         if self.evaluation_settings["f1"]:
-            self.f1()
+            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "f1", self.visualization_output_file_path + "_f1_boxplot.png")
         if self.evaluation_settings["prediction_distribution"]:
             self.prediction_distribution()
-        return
-
-    def accuracy(self):
-        result = []
-        for itr in self.itrs:
-            df_itr = self.df[self.df[self.itr_col] == itr]
-            acc_itr = self.compute_accuracy(df_itr)
-            result.append({self.itr_col: itr, "accuracy": acc_itr})
-        result_df = pd.DataFrame(result)
-        result_df.to_csv(self.evaluation_output_file_path + "accuracy.csv")
-        visualization_utils.box_plot(result_df, "accuracy", self.visualization_output_file_path + "accuracy_boxplot.png")
-        return
-
-    def f1(self):
-        result = []
-        for itr in self.itrs:
-            df_itr = self.df[self.df[self.itr_col] == itr]
-            f1_itr = self.compute_f1(df_itr)
-            result.append({self.itr_col: itr, "f1": f1_itr})
-        result_df = pd.DataFrame(result)
-        result_df.to_csv(self.evaluation_output_file_path + "f1.csv")
-        visualization_utils.box_plot(result_df, "f1", self.visualization_output_file_path + "f1_boxplot.png")
-        return
-
-    def auroc(self):
-        result = []
-        for itr in self.itrs:
-            df_itr = self.df[self.df[self.itr_col] == itr]
-            auroc_itr = self.compute_auroc(df_itr)
-            result.append({self.itr_col: itr, "auroc": auroc_itr})
-        result_df = pd.DataFrame(result)
-        result_df.to_csv(self.evaluation_output_file_path + "auroc.csv")
-        visualization_utils.box_plot(result_df, "auroc", self.visualization_output_file_path + "auroc_boxplot.png")
-        return
-
-    def auprc(self):
-        if self.evaluation_settings["type"] == "multi":
-            print("ERROR: AUPRC not supported for multiclass classification.")
-            return
-        result = []
-        for itr in self.itrs:
-            df_itr = self.df[self.df[self.itr_col] == itr]
-            auprc_itr = self.compute_auprc(df_itr)
-            result.append({self.itr_col: itr, "auprc": auprc_itr})
-        result_df = pd.DataFrame(result)
-        result_df.to_csv(self.evaluation_output_file_path + "auprc.csv")
-        visualization_utils.box_plot(result_df, "auprc", self.visualization_output_file_path + "auprc_boxplot.png")
         return
 
     def prediction_distribution(self):
