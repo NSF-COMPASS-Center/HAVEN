@@ -5,7 +5,7 @@
 #SBATCH --partition=normal_q
 
 #SBATCH --mem=32G
-#SBATCH -N1 --ntasks-per-node=4 # number of nodes and number of tasks per node
+#SBATCH --nodes=1
 #SBATCH -t 08:00:00 # wall-time required (
 # 8hrs)
 
