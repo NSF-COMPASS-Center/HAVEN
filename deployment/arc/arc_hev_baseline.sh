@@ -1,45 +1,44 @@
 #!/bin/bash
 
-#SBATCH -J zoonosis-hep-bilstm-nolstm-host
+#SBATCH -J zoonosis-hev-baseline
 #SBATCH --account=seqevol
 #SBATCH --partition=a100_normal_q
 
-#SBATCH --gres gpu:1
+#SBATCH --mem=32G
 #SBATCH -N1 --ntasks-per-node=4 # number of nodes and number of tasks per node
-#SBATCH -t 01:00:00 # time required
-#SBATCH --mem-per-cpu=16G
+#SBATCH -t 08:00:00 # wall-time required (
+# 8hrs)
+#SBATCH --mem-per-cpu=32G
 
 
 # Load modules
 module reset
 module load
 module load Anaconda3
-module load cuDNN/8.1.1.33-CUDA-11.2.1
 
 
 # Load conda environment
-source activate ~/anaconda3/envs/zoonosis-bilstm_3.9.7
+source activate ~/anaconda3/envs/zoonosis-baseline
 echo "Conda information:"
 conda info
 
 # Setup project and result directories
 PROJECT_DIR=$1
-RESULTS_DIR=$PROJECT_DIR/results
+LOGS_DIR=$PROJECT_DIR/output/logs
 mkdir -p $RESULTS_DIR #ensure that the results directory exists
 echo "Project directory: $PROJECT_DIR"
-echo "Results directory: $RESULTS_DIR"
 
 # Execute python script
-SCRIPT_LOCATION=$PROJECT_DIR/src/pipeline.py
+SCRIPT_LOCATION=$PROJECT_DIR/src/protein_structure_analysis.py
 CONFIG_FILE=$2
-LOG_FILE=$RESULTS_DIR/hep_host_notransfer.$(date +%Y_%b_%d_%H_%M).log
+LOG_FILE=$LOGS_DIR/$3.$(date +%Y_%b_%d_%H_%M).log
 echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
 
-echo "Zoonosis bilstm model START"
+echo "Zoonosis baseline model START"
 date
 python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
-echo "Zoonosis bilstm model END"
+echo "Zoonosis baseline model END"
 date
 
 

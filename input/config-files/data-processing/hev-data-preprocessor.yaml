@@ -11,7 +11,7 @@ input_settings:
   dataset_dir: "hev"
 
   # Name of file(s) in subdirectory to be read and processed.
-  file_names: ["ORF2.fa", "ORF3.fa", "ORF4.fa"]
+  file_names: ["ORF1.fa","ORF2.fa", "ORF3.fa", "ORF4.fa"]
 
 
 processor_settings:

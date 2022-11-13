@@ -20,6 +20,9 @@ def execute(config):
     output_file_name = get_output_file_name(input_settings, output_settings)
     evaluation_output_file_base_path = os.path.join(output_dir, output_evaluation_dir, output_dataset_dir)
     visualization_output_file_base_path = os.path.join(output_dir, output_visualization_dir, output_dataset_dir)
+    # create any missing parent directories
+    Path(os.path.dirname(evaluation_output_file_base_path)).mkdir(parents=True, exist_ok=True)
+    Path(os.path.dirname(visualization_output_file_base_path)).mkdir(parents=True, exist_ok=True)
 
     if evaluation_type == "binary":
         evaluation_executor = BinaryClassEvaluation(df, evaluation_settings, evaluation_output_file_base_path, visualization_output_file_base_path, output_file_name)
