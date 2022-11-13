@@ -2,11 +2,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def box_plot(df, values_col, output_file_path, baseline=None):
+def box_plot(df, x_col, y_col, output_file_path, baseline=None):
     plt.clf()
     sns.set_theme()
 
-    ax = sns.boxplot(y=df[values_col])
+    ax = sns.boxplot(data=df, x=x_col, y=y_col)
 
     if baseline is not None:
         ax.axvline(baseline, color="gray", linestyle="--")
