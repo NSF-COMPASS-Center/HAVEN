@@ -1,0 +1,43 @@
+config_type: "prediction" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "input"
+
+  # Subdirectory of inputs that datasets are placed in
+  dataset_dir: "data/hev"
+
+  # Name of file(s) in subdirectory to be read and processed.
+  file_names: ["ORF1.fa_processed.csv"]
+
+
+classification_settings:
+  n_iterations: 10
+  kmer_settings:
+    k: 3
+  type: "multi"
+  train_proportion: 0.5
+  label_settings:
+    label_col: "genotype"
+    exclude_labels: ["unknown", "Could not assign"]
+    label_groupings:
+      "HEV_1_2" : ["HEV1", "HEV2"]
+      "HEV_3_4": ["HEV3", "HEV3ra", "HEV4"]
+      "HEV_others": ["HEV5", "HEV6", "HEV7"]
+  models:
+    - name: "lr"
+      active: True
+      C: [0.01, 0.03, 0.1, 0.3, 1, 3]
+
+    - name: "svm"
+      active: True
+      c: [0.01, 0.03, 0.1, 0.3, 1, 3]
+
+
+output_settings:
+  output_dir: "output/raw/hev"
+  dataset_dir: "orf1"
+  prefix: # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

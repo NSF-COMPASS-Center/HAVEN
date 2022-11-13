@@ -30,7 +30,7 @@ echo "Project directory: $PROJECT_DIR"
 SCRIPT_LOCATION=$PROJECT_DIR/src/protein_structure_analysis.py
 CONFIG_FILE=$2
 LOG_FILE=$LOGS_DIR/$3.$(date +%Y_%b_%d_%H_%M).log
-echo "Config File: $CONFIG_FILE"osi
+echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
 
 echo "Zoonosis baseline model START"
