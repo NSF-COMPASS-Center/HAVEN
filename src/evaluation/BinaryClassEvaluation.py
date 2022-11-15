@@ -16,7 +16,7 @@ class BinaryClassEvaluation(EvaluationBase):
         return f1_score(y_true=df_itr[self.y_true_col].values, y_pred=y_pred, pos_label="Human")
 
     def compute_auroc(self, df_itr):
-        return roc_auc_score(y_true=df_itr[self.y_true_col].values, y_score=df_itr["Human"].values, average="macro")
+        return roc_auc_score(y_true=df_itr[self.y_true_col].values, y_score=df_itr["Human"].values)
 
     def compute_auprc(self, df_itr):
         return average_precision_score(y_true=df_itr[self.y_true_col].values, y_score=df_itr["Human"].values, average="macro", pos_label="Human")

@@ -11,7 +11,10 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None):
     if baseline is not None:
         ax.axvline(baseline, color="gray", linestyle="--")
     ax.set_ylim(0, 1)
-    # plt.tight_layout()
+    plt.rcParams['xtick.labelsize'] = 8
+    plt.tight_layout()
+
+    plt.xticks(rotation=20)
     plt.savefig(output_file_path)
 
 
