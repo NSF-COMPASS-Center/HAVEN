@@ -35,7 +35,7 @@ def process_file(input_file_path, output_file_path, label_names):
     lines_read = 0
     with open(input_file_path, "r") as input_file, open(output_file_path, "w+") as output_file:
         # write the header line in output file
-        header_line = ["id", "region", *label_names, "sequence"]
+        header_line = ["id", "region", *label_names, "host-genotype", "sequence"]
         output_file.write(",".join(header_line) + "\n")
 
         while True:
@@ -48,7 +48,7 @@ def process_file(input_file_path, output_file_path, label_names):
                 # '>' indicates the start of a new sequence record.
                 if lines_read > 1:
                     # Unless the very first record, write the previously read sequence record
-                    sequence_record_str = ",".join([id, region, host, genotype, "".join(sequence_record)]) + "\n"
+                    sequence_record_str = ",".join([id, region, host, genotype, host + "-" + genotype, "".join(sequence_record)]) + "\n"
                     output_file.write(sequence_record_str)
 
                 # initialize a new sequence record
