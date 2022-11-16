@@ -8,9 +8,12 @@ from sklearn.preprocessing import MinMaxScaler
 
 from utils import kmer_utils, utils
 from prediction.models import logistic_regression
+from prediction import prediction_with_presplit_inputs
 
 
 def execute(config):
+    if not config["classification_settings"]["split_input"]:
+        prediction_with_presplit_inputs.execute(config)
     # input settings
     input_settings = config["input_settings"]
     input_dir = input_settings["input_dir"]
@@ -68,9 +71,8 @@ def execute(config):
         if model["name"] == "lr":
             print("Executing Logistic Regression")
             results_df = execute_lr_classification(kmer_df_with_transformed_label, model)
-        elif model["name"] == "svm":
-            print("Executing SVM")
-            return
+        else:
+            continue
         # Remap the class indices to original input labels
         results_df.rename(columns=idx_label_map, inplace=True)
         results_df["y_true"] = results_df["y_true"].map(idx_label_map)
