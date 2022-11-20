@@ -6,8 +6,8 @@
 
 #SBATCH --mem=32G
 #SBATCH --nodes=1
-#SBATCH -t 08:00:00 # wall-time required (
-# 8hrs)
+#SBATCH -t 24:00:00 # wall-time required (
+# 24hrs)
 
 
 # Load m
