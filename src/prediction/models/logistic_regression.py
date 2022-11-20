@@ -1,3 +1,4 @@
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import GridSearchCV
@@ -6,8 +7,8 @@ import random
 
 def run(X_train, X_test, y_train, lr_settings):
     lr_model = LogisticRegression(solver="sag", penalty="l2", class_weight="balanced", max_iter=1000)
-
-    if lr_settings["classification_type"] == "multi":
+    classification_type = lr_settings["classification_type"]
+    if classification_type == "multi":
         print("Multiclass Logistic Regression Model")
         # multinomial: multi-class cross-entropy loss
         lr_model.multi_class = "multinomial"
@@ -35,4 +36,17 @@ def run(X_train, X_test, y_train, lr_settings):
     # K-Fold Cross Validation: END #
 
     y_pred = classifier.predict_proba(X_test)
-    return y_pred
+    model_coefficients = get_coefficients(classifier, classification_type)
+    return y_pred, model_coefficients
+
+
+def get_coefficients(model, classification_type):
+    coefficients = model.coef_
+    if classification_type == "multi":
+        classes = model.classes_
+        model_coefficients = pd.DataFrame(coefficients, index=classes)
+    else:
+        model_coefficients = pd.DataFrame(coefficients)
+    return model_coefficients
+
+

@@ -13,13 +13,13 @@ from prediction import prediction_with_presplit_inputs
 
 def execute(config):
     if not config["classification_settings"]["split_input"]:
-        prediction_with_presplit_inputs.execute(config)
+        return prediction_with_presplit_inputs.execute(config)
     # input settings
     input_settings = config["input_settings"]
     input_dir = input_settings["input_dir"]
-    input_dataset_dir = input_settings["dataset_dir"]
+    # input_dataset_dir = input_settings["dataset_dir"]
     input_files = input_settings["file_names"]
-    input_files = [os.path.join(input_dir, input_dataset_dir, input_file) for input_file in input_files]
+    input_files = [os.path.join(input_dir, input_file) for input_file in input_files]
 
     # output settings
     output_settings = config["output_settings"]

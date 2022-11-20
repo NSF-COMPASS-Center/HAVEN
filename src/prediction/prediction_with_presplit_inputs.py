@@ -1,9 +1,7 @@
 import os
 import pandas as pd
-import random
 
 from pathlib import Path
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
 from utils import kmer_utils, utils
@@ -33,6 +31,7 @@ def execute(config):
     label_col = label_settings["label_col"]
 
     results = {}
+    feature_importance = {}
     itr = 0
     for input in inputs:
         print(f"Iteration {itr}")
@@ -60,6 +59,7 @@ def execute(config):
             if model_name not in results:
                 # first iteration
                 results[model_name] = []
+                feature_importance[model_name] = []
 
             # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
             model["label_col"] = label_col
@@ -67,7 +67,7 @@ def execute(config):
 
             if model["name"] == "lr":
                 print("Executing Logistic Regression")
-                result_df = execute_lr_classification(kmer_df_with_transformed_label, model, itr)
+                result_df, feature_importance_df = execute_lr_classification(kmer_df_with_transformed_label, model, itr)
             else:
                 continue
 
@@ -76,7 +76,12 @@ def execute(config):
             result_df["y_true"] = result_df["y_true"].map(idx_label_map)
             result_df["itr"] = itr
 
+            # Remap the class indices to original input labels
+            feature_importance_df.rename(index=idx_label_map, inplace=True)
+            feature_importance_df["itr"] = itr
+
             results[model_name].append(result_df)
+            feature_importance[model_name].append(feature_importance_df)
             itr += 1
 
     for model_name, result_dfs in results.items():
@@ -87,6 +92,15 @@ def execute(config):
         # 5. Write the classification output
         print(f"Writing results of {model_name} to {output_file_path}")
         pd.concat(result_dfs).to_csv(output_file_path, index=False)
+
+    for model_name, feature_importance_dfs in feature_importance.items():
+        output_file_name = f"kmer_k{k}_{model_name}_{label_col}_{classification_type}_presplit" + output_prefix + "_feature_imp.csv"
+        output_file_path = os.path.join(output_dir, output_dataset_dir, output_file_name)
+        # create any missing parent directories
+        Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
+        # 5. Write the classification output
+        print(f"Writing feature importance of {model_name} to {output_file_path}")
+        pd.concat(feature_importance_dfs).to_csv(output_file_path, index=True)
 
 
 def read_dataset(input_dir, input, label_col):
@@ -134,15 +148,20 @@ def execute_lr_classification(df, model, itr):
     X_test = test_df.drop(columns=drop_cols)
     y_test = test_df[label_col]
 
+    # to be used later while crafting the feature importance df
+    feature_names = X_test.columns
+
     # Standardize dataset
     min_max_scaler = MinMaxScaler()
     X_train = min_max_scaler.fit_transform(X_train)
     X_test = min_max_scaler.fit_transform(X_test)
     # Perform classification
-    y_pred = logistic_regression.run(X_train, X_test, y_train, model)
+    y_pred, feature_importance_df = logistic_regression.run(X_train, X_test, y_train, model)
 
     result_df = pd.DataFrame(y_pred)
     result_df["y_true"] = y_test.values
     print(f"result size = {result_df.shape}")
 
-    return result_df
+    feature_importance_df.columns = feature_names
+
+    return result_df, feature_importance_df
