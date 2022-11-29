@@ -5,14 +5,15 @@ config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "output/raw/hev/20221119"
+  input_dir: "output/raw/hev"
 
   file_names:
     # experiment_name (to be used as a key in comparative analysis): file_name
-    "orf1_2_3_4_tr0.8": "orf1_orf2_orf3_orf4/kmer_k3_lr_host_binary_presplit_output.csv"
-    "orf1_tr0.8": "orf1/kmer_k3_lr_host_binary_presplit_output.csv"
-    "orf2_tr0.8": "orf2/kmer_k3_lr_host_binary_presplit_output.csv"
-    "orf3_tr0.8": "orf3/kmer_k3_lr_host_binary_presplit_output.csv"
+    "orf1_2_3_4_tr0.8_lr": "20221119/orf1_orf2_orf3_orf4/kmer_k3_lr_host_binary_presplit_output.csv"
+#    "orf1_tr0.8": "orf1/kmer_k3_lr_host_binary_presplit_output.csv"
+#    "orf2_tr0.8": "orf2/kmer_k3_lr_host_binary_presplit_output.csv"
+#    "orf3_tr0.8": "orf3/kmer_k3_lr_host_binary_presplit_output.csv"
+    "orf1_2_3_4_tr0.8_rf": "orf1_orf2_orf3_orf4/kmer_k3_rf_host_binary_presplit_output.csv"
 
 evaluation_settings:
   type: "binary"

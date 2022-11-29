@@ -6,6 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 from utils import kmer_utils, utils
 from prediction.models import logistic_regression
+from prediction.models import random_forest
 
 
 def execute(config):
@@ -67,7 +68,10 @@ def execute(config):
 
             if model["name"] == "lr":
                 print("Executing Logistic Regression")
-                result_df, feature_importance_df = execute_lr_classification(kmer_df_with_transformed_label, model, itr)
+                result_df, feature_importance_df = execute_lr_classification(kmer_df_with_transformed_label, model)
+            elif model["name"] == "rf":
+                print("Executing Random Forest")
+                result_df, feature_importance_df = execute_rf_classification(kmer_df_with_transformed_label, model)
             else:
                 continue
 
@@ -135,8 +139,7 @@ def read_dataset(input_dir, input, label_col):
     return train_df, test_df
 
 
-def execute_lr_classification(df, model, itr):
-    label_col = model["label_col"]
+def get_standardized_datasets(df, label_col):
     drop_cols = ["split", label_col]
 
     train_df = df[df["split"] == "train"]
@@ -148,20 +151,40 @@ def execute_lr_classification(df, model, itr):
     X_test = test_df.drop(columns=drop_cols)
     y_test = test_df[label_col]
 
-    # to be used later while crafting the feature importance df
-    feature_names = X_test.columns
-
     # Standardize dataset
     min_max_scaler = MinMaxScaler()
-    X_train = min_max_scaler.fit_transform(X_train)
-    X_test = min_max_scaler.fit_transform(X_test)
+    min_max_scaler_fit = min_max_scaler.fit(X_train)
+    feature_names = min_max_scaler_fit.get_feature_names_out()
+
+    # creating a pandas df with column headers = feature names so that the prediction model can also have the same order of feature names
+    # this is needed while getting the feature_importances from the model and mapping it back to the feature names.
+    X_train = pd.DataFrame(min_max_scaler_fit.transform(X_train), columns=feature_names)
+    X_test = pd.DataFrame(min_max_scaler_fit.transform(X_test), columns=feature_names)
+
+    return X_train, X_test, y_train, y_test
+
+
+def execute_lr_classification(df, model):
     # Perform classification
+    X_train, X_test, y_train, y_test = get_standardized_datasets(df, label_col = model["label_col"])
     y_pred, feature_importance_df = logistic_regression.run(X_train, X_test, y_train, model)
 
     result_df = pd.DataFrame(y_pred)
     result_df["y_true"] = y_test.values
     print(f"result size = {result_df.shape}")
 
-    feature_importance_df.columns = feature_names
+    return result_df, feature_importance_df
+
+
+def execute_rf_classification(df, model):
+    # Perform classification
+    X_train, X_test, y_train, y_test = get_standardized_datasets(df, label_col=model["label_col"])
+
+    # Perform classification
+    y_pred, feature_importance_df = random_forest.run(X_train, X_test, y_train, model)
+
+    result_df = pd.DataFrame(y_pred)
+    result_df["y_true"] = y_test.values
+    print(f"result size = {result_df.shape}")
 
     return result_df, feature_importance_df
