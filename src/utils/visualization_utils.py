@@ -25,3 +25,39 @@ def class_distribution_plot(df, output_file_path):
     ax = sns.barplot(data=df, x="label", y="label_count", hue="group")
 
     plt.savefig(output_file_path)
+
+
+def feature_prevalence_distribution_plot(df, output_file_path):
+    plt.clf()
+    sns.set_theme()
+    ax = sns.displot(data=df)
+    ax.set_xlabels("Prevalence of feature (%)")
+    ax.set_ylabels("Number of features")
+
+    plt.rcParams['xtick.labelsize'] = 8
+    plt.tight_layout()
+    plt.savefig(output_file_path)
+
+
+def top_k_features_box_plot(df, output_file_path):
+    plt.clf()
+    sns.set_theme()
+    ax = sns.boxplot(data=df, x="value", y="variable")
+    ax.set_xlabel("Mean absolute coefficient across iterations")
+    ax.set_ylabel("3-mer")
+    plt.rcParams['ytick.labelsize'] = 8
+    plt.tight_layout()
+
+    plt.savefig(output_file_path)
+
+
+def feature_imp_by_prevalence_scatter_plot(df, output_file_path):
+    plt.clf()
+    sns.set_theme()
+    ax = sns.scatterplot(data=df, x="prevalence", y="imp", s=4)
+    ax.set_xlabel("Prevalence (%)")
+    ax.set_ylabel("Mean absolute coefficient across iterations")
+    # plt.rcParams['ytick.labelsize'] = 8
+    plt.tight_layout()
+
+    plt.savefig(output_file_path)
