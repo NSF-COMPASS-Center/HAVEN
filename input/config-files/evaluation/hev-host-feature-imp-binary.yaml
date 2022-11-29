@@ -17,9 +17,9 @@ input_settings:
     exclude_labels: [ "culture supernatant (Unknown map)", "Unknown"]
     positive_label: "Human"
 
-  feature_imp_dir: "output/raw/hev/20221119/orf1_orf2_orf3_orf4"
+  feature_imp_dir: "output/raw/hev/orf1_orf2_orf3_orf4"
 #  feature_imp_dir: "output/raw/hev/20221119/orf3"
-  feature_imp_file: "kmer_k3_lr_host_binary_presplit_feature_imp.csv"
+  feature_imp_file: "kmer_k3_rf_host_binary_presplit_feature_imp.csv"
 
 feature_importance_settings:
   prevalence: True
@@ -34,4 +34,4 @@ output_settings:
   feature_imp_dir: "feature_imp"
   visualization_dir: "visualization"
   dataset_dir: "hev/host_binary/orf1_orf2_orf3_orf4"
-  prefix: "host_binary"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  prefix: "rf"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
