@@ -54,7 +54,6 @@ class EvaluationBase:
         self.plot_visualizations()
         return
 
-
     def plot_visualizations(self):
         if self.evaluation_settings["auroc"]:
             visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auroc", self.visualization_output_file_path + "_auroc_boxplot.png")
