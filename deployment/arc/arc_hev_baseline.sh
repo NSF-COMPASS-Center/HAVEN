@@ -23,7 +23,6 @@ conda info
 # Setup project and result directories
 PROJECT_DIR=$1
 LOGS_DIR=$PROJECT_DIR/output/logs
-mkdir -p $RESULTS_DIR #ensure that the results directory exists
 echo "Project directory: $PROJECT_DIR"
 
 # Execute python script
@@ -35,7 +34,7 @@ echo "Log File: $LOG_FILE"
 
 echo "Zoonosis baseline model START"
 date
-python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
+~/anaconda3/envs/zoonosis-baseline/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
 echo "Zoonosis baseline model END"
 date
 
