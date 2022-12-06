@@ -7,18 +7,17 @@ input_settings:
   # Dataset directory
   dataset_dir: "input/data/hev"
   dataset_files:
-    - "ORF1.fa_processed.csv"
-    - "ORF2.fa_processed.csv"
     - "ORF3.fa_processed.csv"
-    - "ORF4.fa_processed.csv"
+#    - "ORF2.fa_processed.csv"
+#    - "ORF3.fa_processed.csv"
+#    - "ORF4.fa_processed.csv"
 
   label_settings:
     label_col: "host"
     exclude_labels: [ "culture supernatant (Unknown map)", "Unknown"]
     positive_label: "Human"
 
-  feature_imp_dir: "output/raw/hev/orf1_orf2_orf3_orf4"
-#  feature_imp_dir: "output/raw/hev/20221119/orf3"
+  feature_imp_dir: "output/raw/hev/20221128-rf/orf3"
   feature_imp_file: "kmer_k3_rf_host_binary_presplit_feature_imp.csv"
 
 feature_importance_settings:
@@ -33,5 +32,5 @@ output_settings:
   output_dir: "output"
   feature_imp_dir: "feature_imp"
   visualization_dir: "visualization"
-  dataset_dir: "hev/host_binary/orf1_orf2_orf3_orf4"
-  prefix: "rf"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "hev/host_binary/orf3"
+  prefix: "rf_orf3"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

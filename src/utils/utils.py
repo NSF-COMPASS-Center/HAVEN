@@ -1,5 +1,9 @@
-import numpy as np
+import random
 
+import numpy as np
+import pandas as pd
+from imblearn.over_sampling import RandomOverSampler
+from collections import Counter
 
 def filter_noise(df, label_settings):
     label_col = label_settings["label_col"]
@@ -48,3 +52,29 @@ def get_label_vocabulary(labels):
         label_idx_map[label] = idx
         idx_label_map[idx] = label
     return label_idx_map, idx_label_map
+
+
+def get_validation_scores(cv_model):
+    k = 5
+    params = cv_model["params"]
+    validation_scores = {}
+    for i, param in enumerate(params):
+        param_key = ""
+        for param_name, param_value in param.items():
+            param_key += (param_name + "_" + str(param_value) + "_")
+        param_scores = []
+        for itr in range(k):
+            param_score_key = "split" + str(itr) + "_test_score"
+            param_scores.append(cv_model[param_score_key][i])
+        validation_scores[param_key] = param_scores
+    return pd.DataFrame(validation_scores)
+
+
+def random_oversampling(X, y):
+    vals, count = np.unique(y, return_counts=True)
+    print(f"Label counts before resampling = {[*zip(vals, count)]}")
+    random_oversampler = RandomOverSampler(random_state=random.randint(0, 1000))
+    X_resampled, y_resampled = random_oversampler.fit_resample(X, y)
+    vals, count = np.unique(y_resampled, return_counts=True)
+    print(f"Label counts after resampling = {[*zip(vals, count)]}")
+    return X_resampled, y_resampled

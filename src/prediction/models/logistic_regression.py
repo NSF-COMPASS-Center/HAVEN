@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import GridSearchCV
+from utils import utils
 import random
 
 
@@ -26,7 +27,7 @@ def run(X_train, X_test, y_train, lr_settings):
 
     # refit=True : retrain the best model on the full training dataset
     cv_model = GridSearchCV(estimator=lr_model, param_grid=tuning_parameters, scoring=scoring_param,
-                            cv=kfold_cv_model, verbose=2, return_train_score=True, refit=True)
+                            cv=kfold_cv_model, verbose=2, refit=True)
     cv_model.fit(X_train, y_train)
 
     # The best values chosen by KFold-cross-validation
@@ -37,7 +38,9 @@ def run(X_train, X_test, y_train, lr_settings):
 
     y_pred = classifier.predict_proba(X_test)
     model_coefficients = get_coefficients(classifier, classification_type)
-    return y_pred, model_coefficients
+    validation_scores = utils.get_validation_scores(cv_model.cv_results_)
+
+    return y_pred, model_coefficients, validation_scores
 
 
 def get_coefficients(model, classification_type):
