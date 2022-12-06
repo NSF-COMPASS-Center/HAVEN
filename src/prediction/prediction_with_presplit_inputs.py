@@ -33,6 +33,7 @@ def execute(config):
 
     results = {}
     feature_importance = {}
+    validation_scores = {}
     itr = 0
     for input in inputs:
         print(f"Iteration {itr}")
@@ -61,6 +62,7 @@ def execute(config):
                 # first iteration
                 results[model_name] = []
                 feature_importance[model_name] = []
+                validation_scores[model_name] = []
 
             # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
             model["label_col"] = label_col
@@ -68,10 +70,10 @@ def execute(config):
 
             if model["name"] == "lr":
                 print("Executing Logistic Regression")
-                result_df, feature_importance_df = execute_lr_classification(kmer_df_with_transformed_label, model)
+                result_df, feature_importance_df, validation_scores_df = execute_lr_classification(kmer_df_with_transformed_label, model)
             elif model["name"] == "rf":
                 print("Executing Random Forest")
-                result_df, feature_importance_df = execute_rf_classification(kmer_df_with_transformed_label, model)
+                result_df, feature_importance_df, validation_scores_df = execute_rf_classification(kmer_df_with_transformed_label, model)
             else:
                 continue
 
@@ -84,27 +86,16 @@ def execute(config):
             feature_importance_df.rename(index=idx_label_map, inplace=True)
             feature_importance_df["itr"] = itr
 
+            validation_scores_df["itr"] = itr
+
             results[model_name].append(result_df)
             feature_importance[model_name].append(feature_importance_df)
+            validation_scores[model_name].append(validation_scores_df)
             itr += 1
 
-    for model_name, result_dfs in results.items():
-        output_file_name = f"kmer_k{k}_{model_name}_{label_col}_{classification_type}_presplit" + output_prefix + "_output.csv"
-        output_file_path = os.path.join(output_dir, output_dataset_dir, output_file_name)
-        # create any missing parent directories
-        Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
-        # 5. Write the classification output
-        print(f"Writing results of {model_name} to {output_file_path}")
-        pd.concat(result_dfs).to_csv(output_file_path, index=False)
-
-    for model_name, feature_importance_dfs in feature_importance.items():
-        output_file_name = f"kmer_k{k}_{model_name}_{label_col}_{classification_type}_presplit" + output_prefix + "_feature_imp.csv"
-        output_file_path = os.path.join(output_dir, output_dataset_dir, output_file_name)
-        # create any missing parent directories
-        Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
-        # 5. Write the classification output
-        print(f"Writing feature importance of {model_name} to {output_file_path}")
-        pd.concat(feature_importance_dfs).to_csv(output_file_path, index=True)
+    write_output(results, k, label_col, classification_type, output_prefix, output_dir, output_dataset_dir, "output")
+    write_output(feature_importance, k, label_col, classification_type, output_prefix, output_dir, output_dataset_dir, "feature_imp")
+    write_output(validation_scores, k, label_col, classification_type, output_prefix, output_dir, output_dataset_dir, "validation_scores")
 
 
 def read_dataset(input_dir, input, label_col):
@@ -161,7 +152,8 @@ def get_standardized_datasets(df, label_col):
     X_train = pd.DataFrame(min_max_scaler_fit.transform(X_train), columns=feature_names)
     X_test = pd.DataFrame(min_max_scaler_fit.transform(X_test), columns=feature_names)
 
-    return X_train, X_test, y_train, y_test
+    X_train_resampled, y_train_resampled = utils.random_oversampling(X_train, y_train)
+    return X_train_resampled, X_test, y_train_resampled, y_test
 
 
 def execute_lr_classification(df, model):
@@ -181,10 +173,21 @@ def execute_rf_classification(df, model):
     X_train, X_test, y_train, y_test = get_standardized_datasets(df, label_col=model["label_col"])
 
     # Perform classification
-    y_pred, feature_importance_df = random_forest.run(X_train, X_test, y_train, model)
+    y_pred, feature_importance_df, validation_scores_df = random_forest.run(X_train, X_test, y_train, model)
 
     result_df = pd.DataFrame(y_pred)
     result_df["y_true"] = y_test.values
     print(f"result size = {result_df.shape}")
 
-    return result_df, feature_importance_df
+    return result_df, feature_importance_df, validation_scores_df
+
+
+def write_output(model_dfs, k, label_col, classification_type, output_prefix, output_dir, output_dataset_dir, output_type):
+    for model_name, dfs in model_dfs.items():
+        output_file_name = f"kmer_k{k}_{model_name}_{label_col}_{classification_type}_presplit" + output_prefix + "_" + output_type + ".csv"
+        output_file_path = os.path.join(output_dir, output_dataset_dir, output_file_name)
+        # create any missing parent directories
+        Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
+        # 5. Write the classification output
+        print(f"Writing {output_type} of {model_name} to {output_file_path}")
+        pd.concat(dfs).to_csv(output_file_path, index=True)

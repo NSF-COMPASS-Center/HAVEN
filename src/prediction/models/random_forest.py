@@ -3,6 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import GridSearchCV
 import random
+from utils import utils
 
 
 def run(X_train, X_test, y_train, rf_settings):
@@ -25,7 +26,7 @@ def run(X_train, X_test, y_train, rf_settings):
 
     # refit=True : retrain the best model on the full training dataset
     cv_model = GridSearchCV(estimator=rf_model, param_grid=tuning_parameters, scoring=scoring_param,
-                            cv=kfold_cv_model, verbose=2, return_train_score=True, refit=True)
+                            cv=kfold_cv_model, verbose=2, return_train_score=False, refit=True)
     cv_model.fit(X_train, y_train)
 
     # The best values chosen by KFold-cross-validation
@@ -40,6 +41,8 @@ def run(X_train, X_test, y_train, rf_settings):
     feature_names = classifier.feature_names_in_
     n_features = len(feature_names)
     feature_importances = pd.DataFrame(classifier.feature_importances_.reshape(1, n_features), columns=classifier.feature_names_in_)
-    return y_pred, feature_importances
+    validation_scores = utils.get_validation_scores(cv_model.cv_results_)
+
+    return y_pred, feature_importances, validation_scores
 
 
