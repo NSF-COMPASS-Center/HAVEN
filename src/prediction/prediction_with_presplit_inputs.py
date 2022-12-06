@@ -159,13 +159,13 @@ def get_standardized_datasets(df, label_col):
 def execute_lr_classification(df, model):
     # Perform classification
     X_train, X_test, y_train, y_test = get_standardized_datasets(df, label_col = model["label_col"])
-    y_pred, feature_importance_df = logistic_regression.run(X_train, X_test, y_train, model)
+    y_pred, feature_importance_df, validation_scores_df = logistic_regression.run(X_train, X_test, y_train, model)
 
     result_df = pd.DataFrame(y_pred)
     result_df["y_true"] = y_test.values
     print(f"result size = {result_df.shape}")
 
-    return result_df, feature_importance_df
+    return result_df, feature_importance_df, validation_scores_df
 
 
 def execute_rf_classification(df, model):
