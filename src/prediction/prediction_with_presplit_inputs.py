@@ -18,8 +18,8 @@ def execute(config):
     # output settings
     output_settings = config["output_settings"]
     output_dir = output_settings["output_dir"]
-    results_dir = output_settings["raw"]
-    visualizations_dir = output_settings["visualizations"]
+    results_dir = output_settings["results_dir"]
+    visualizations_dir = output_settings["visualizations_dir"]
     sub_dir = output_settings["sub_dir"]
     output_prefix = output_settings["prefix"]
     output_prefix = "_" + output_prefix if output_prefix is not None else ""
