@@ -9,14 +9,14 @@ input_settings:
 
   file_names:
     # experiment_name (to be used as a key in comparative analysis): file_name
-    "orf1_2_3_4_tr0.8_lr": "20221119/orf1_orf2_orf3_orf4/kmer_k3_lr_host_binary_presplit_output.csv"
-    "orf1_tr0.8_lr": "20221119/orf1/kmer_k3_lr_host_binary_presplit_output.csv"
-    "orf2_tr0.8_lr": "20221119/orf2/kmer_k3_lr_host_binary_presplit_output.csv"
-    "orf3_tr0.8_lr": "20221119/orf3/kmer_k3_lr_host_binary_presplit_output.csv"
-    "orf1_2_3_4_tr0.8_rf": "20221128-rf/orf1_orf2_orf3_orf4/kmer_k3_rf_host_binary_presplit_output.csv"
-    "orf1_tr0.8_rf": "20221128-rf/orf1/kmer_k3_rf_host_binary_presplit_output.csv"
-    "orf2_tr0.8_rf": "20221128-rf/orf2/kmer_k3_rf_host_binary_presplit_output.csv"
-    "orf3_tr0.8_rf": "20221128-rf/orf3/kmer_k3_rf_host_binary_presplit_output.csv"
+    "orf1_2_3_4_tr0.8_lr": "20221206/orf1_orf2_orf3_orf4/kmer_k3_lr_host_binary_presplit_output.csv"
+    "orf1_tr0.8_lr": "20221206/orf1/kmer_k3_lr_host_binary_presplit_output.csv"
+    "orf2_tr0.8_lr": "20221206/orf2/kmer_k3_lr_host_binary_presplit_output.csv"
+    "orf3_tr0.8_lr": "20221206/orf3/kmer_k3_lr_host_binary_presplit_output.csv"
+    "orf1_2_3_4_tr0.8_rf": "20221206/orf1_orf2_orf3_orf4/kmer_k3_rf_host_binary_presplit_output.csv"
+    "orf1_tr0.8_rf": "20221206/orf1/kmer_k3_rf_host_binary_presplit_output.csv"
+    "orf2_tr0.8_rf": "20221206/orf2/kmer_k3_rf_host_binary_presplit_output.csv"
+    "orf3_tr0.8_rf": "20221206/orf3/kmer_k3_rf_host_binary_presplit_output.csv"
 
 evaluation_settings:
   type: "binary"
@@ -32,5 +32,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "hev/host_binary"
+  dataset_dir: "hev/host_binary/20221206"
   prefix: "host_binary_lr_rf_orf1_2_3_4"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

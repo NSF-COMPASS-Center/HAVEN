@@ -5,7 +5,7 @@ import yaml
 from data_processing import data_preprocessor
 from prediction import prediction
 from evaluation import evaluation
-from utils import feature_importance
+from utils import feature_importance, validation_scores
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Protein structure analysis pipeline')
@@ -38,6 +38,8 @@ def main():
         evaluation.execute(config)
     elif config_type == "feature_importance":
         feature_importance.execute(config)
+    elif config_type == "validation_scores":
+        validation_scores.execute(config)
     else:
         print("ERROR: Unsupported configuration for config_type. Supported values=data_preprocessor", "classification", "evaluation")
     return

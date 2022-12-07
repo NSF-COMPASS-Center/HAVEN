@@ -91,7 +91,7 @@ def execute(config):
             results[model_name].append(result_df)
             feature_importance[model_name].append(feature_importance_df)
             validation_scores[model_name].append(validation_scores_df)
-            itr += 1
+        itr += 1
 
     write_output(results, k, label_col, classification_type, output_prefix, output_dir, output_dataset_dir, "output")
     write_output(feature_importance, k, label_col, classification_type, output_prefix, output_dir, output_dataset_dir, "feature_imp")
