@@ -43,7 +43,7 @@ def read_inputs(input_settings):
     inputs = []
     for key, file_name in input_file_names.items():
         input_file_path = os.path.join(input_dir, file_name)
-        df = pd.read_csv(input_file_path)
+        df = pd.read_csv(input_file_path, index_col=0)
         print(f"input file = {input_file_path} --> results size = {df.shape}")
         df["experiment"] = key
         inputs.append(df)
