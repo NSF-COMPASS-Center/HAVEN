@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 from sklearn.preprocessing import MinMaxScaler
 
-from utils import kmer_utils, utils
+from utils import kmer_utils, utils, visualization_utils
 from prediction.models import logistic_regression
 from prediction.models import random_forest
 
@@ -18,7 +18,9 @@ def execute(config):
     # output settings
     output_settings = config["output_settings"]
     output_dir = output_settings["output_dir"]
-    output_dataset_dir = output_settings["dataset_dir"]
+    results_dir = output_settings["raw"]
+    visualizations_dir = output_settings["visualizations"]
+    sub_dir = output_settings["sub_dir"]
     output_prefix = output_settings["prefix"]
     output_prefix = "_" + output_prefix if output_prefix is not None else ""
 
@@ -93,9 +95,15 @@ def execute(config):
             validation_scores[model_name].append(validation_scores_df)
         itr += 1
 
-    write_output(results, k, label_col, classification_type, output_prefix, output_dir, output_dataset_dir, "output")
-    write_output(feature_importance, k, label_col, classification_type, output_prefix, output_dir, output_dataset_dir, "feature_imp")
-    write_output(validation_scores, k, label_col, classification_type, output_prefix, output_dir, output_dataset_dir, "validation_scores")
+    # write the raw results in csv files
+    output_filename_prefix = f"kmer_k{k}_{model_name}_{label_col}_{classification_type}_presplit" + output_prefix + "_"
+    output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
+    write_output(results, output_results_dir, output_filename_prefix, "output",)
+    write_output(feature_importance, output_results_dir, output_filename_prefix, "feature_imp")
+    write_output(validation_scores, output_results_dir, output_filename_prefix, "validation_scores")
+
+    # create plots for validation scores
+    plot_validation_scores(validation_scores, os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
 
 
 def read_dataset(input_dir, input, label_col):
@@ -182,12 +190,25 @@ def execute_rf_classification(df, model):
     return result_df, feature_importance_df, validation_scores_df
 
 
-def write_output(model_dfs, k, label_col, classification_type, output_prefix, output_dir, output_dataset_dir, output_type):
+def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
     for model_name, dfs in model_dfs.items():
-        output_file_name = f"kmer_k{k}_{model_name}_{label_col}_{classification_type}_presplit" + output_prefix + "_" + output_type + ".csv"
-        output_file_path = os.path.join(output_dir, output_dataset_dir, output_file_name)
+        output_file_path = os.path.join(output_dir, output_filename_prefix + output_type + ".csv")
         # create any missing parent directories
         Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
         # 5. Write the classification output
         print(f"Writing {output_type} of {model_name} to {output_file_path}")
         pd.concat(dfs).to_csv(output_file_path, index=True)
+
+
+def plot_validation_scores(df, output_dir, output_filename_prefix):
+    cols = list(df.columns)
+    # all columns without the itr column
+    cols.remove("itr")
+
+    # plot only for the first iteration
+    df = df[df["itr"] == 0]
+    df.drop(columns=["itr"], inplace=True)
+    df["split"] = range(1, 6)
+    transformed_df = pd.melt(df, id_vars=["split"])
+    output_file_path = os.path.join(output_dir, output_filename_prefix + "validation_scores.png")
+    visualization_utils.validation_scores_multiline_plot(transformed_df, output_file_path)

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 
 
 def box_plot(df, x_col, y_col, output_file_path, baseline=None):
@@ -60,4 +61,13 @@ def feature_imp_by_prevalence_scatter_plot(df, output_file_path):
     # plt.rcParams['ytick.labelsize'] = 8
     plt.tight_layout()
 
+    plt.savefig(output_file_path)
+
+
+def validation_scores_multiline_plot(df, output_file_path):
+    plt.clf()
+    sns.set_theme()
+    sns.lineplot(data=df, x="variable", y="value", hue="split")
+    plt.xticks(fontsize=8, rotation=90)
+    plt.tight_layout()
     plt.savefig(output_file_path)
