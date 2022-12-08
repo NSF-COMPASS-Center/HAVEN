@@ -64,6 +64,7 @@ def get_validation_scores(cv_model):
             param_key += (param_name + "_" + str(param_value) + "_")
         param_scores = []
         for itr in range(k):
+            # as per the key in the object returned by scikit
             param_score_key = "split" + str(itr) + "_test_score"
             param_scores.append(cv_model[param_score_key][i])
         validation_scores[param_key] = param_scores

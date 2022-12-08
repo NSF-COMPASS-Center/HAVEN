@@ -1,5 +1,5 @@
 from evaluation.EvaluationBase import EvaluationBase
-from sklearn.metrics import roc_auc_score, average_precision_score, accuracy_score, f1_score
+from sklearn.metrics import average_precision_score, accuracy_score, f1_score, roc_curve, auc
 
 
 class BinaryClassEvaluation(EvaluationBase):
@@ -16,7 +16,13 @@ class BinaryClassEvaluation(EvaluationBase):
         return f1_score(y_true=df_itr[self.y_true_col].values, y_pred=y_pred, pos_label="Human")
 
     def compute_auroc(self, df_itr):
-        return roc_auc_score(y_true=df_itr[self.y_true_col].values, y_score=df_itr["Human"].values)
+        # The function roc_auc_score returns {1 - true_AUROC_score}
+        # It considers the compliment of the prediction probabilities in the computation of the area
+        # roc_auc_score(y_true=df_itr[self.y_true_col].values, y_score=df_itr["Human"].values)
+
+        # Hence we use roc_curve to compute fpr, tpr followed by auc to compute the AUROC.
+        fpr, tpr, _ = roc_curve(y_true=df_itr[self.y_true_col].values, y_score=df_itr["Human"].values, pos_label="Human")
+        return auc(fpr, tpr)
 
     def compute_auprc(self, df_itr):
         return average_precision_score(y_true=df_itr[self.y_true_col].values, y_score=df_itr["Human"].values, average="macro", pos_label="Human")
