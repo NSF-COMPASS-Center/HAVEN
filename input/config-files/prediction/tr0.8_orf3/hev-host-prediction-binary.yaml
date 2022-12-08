@@ -48,7 +48,7 @@ classification_settings:
     - name: "rf"
       active: True
       n_estimators: [10, 50, 100, 500, 1000]
-      max_depth: [None, 3, 5]
+      max_depth: [3, 5]
 output_settings:
   output_dir: "output"
   results_dir: "raw"
