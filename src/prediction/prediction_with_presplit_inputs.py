@@ -103,7 +103,7 @@ def execute(config):
     write_output(validation_scores, output_results_dir, output_filename_prefix, "validation_scores")
 
     # create plots for validation scores
-    plot_validation_scores(validation_scores, os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
+    plot_validation_scores(pd.concat(validation_scores), os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
 
 
 def read_dataset(input_dir, input, label_col):
@@ -192,7 +192,8 @@ def execute_rf_classification(df, model):
 
 def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
     for model_name, dfs in model_dfs.items():
-        output_file_path = os.path.join(output_dir, output_filename_prefix + output_type + ".csv")
+        output_file_name = output_filename_prefix.format(model_name) + output_type + ".csv"
+        output_file_path = os.path.join(output_dir, output_file_name)
         # create any missing parent directories
         Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
         # 5. Write the classification output
@@ -200,15 +201,18 @@ def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
         pd.concat(dfs).to_csv(output_file_path, index=True)
 
 
-def plot_validation_scores(df, output_dir, output_filename_prefix):
-    cols = list(df.columns)
-    # all columns without the itr column
-    cols.remove("itr")
+def plot_validation_scores(model_dfs, output_dir, output_filename_prefix):
+    for model_name, dfs in model_dfs.items():
+        df = pd.concat(dfs)
 
-    # plot only for the first iteration
-    df = df[df["itr"] == 0]
-    df.drop(columns=["itr"], inplace=True)
-    df["split"] = range(1, 6)
-    transformed_df = pd.melt(df, id_vars=["split"])
-    output_file_path = os.path.join(output_dir, output_filename_prefix + "validation_scores.png")
-    visualization_utils.validation_scores_multiline_plot(transformed_df, output_file_path)
+        cols = list(df.columns)
+        # all columns without the itr column
+        cols.remove("itr")
+
+        # plot only for the first iteration
+        df = df[df["itr"] == 0]
+        df.drop(columns=["itr"], inplace=True)
+        df["split"] = range(1, 6)
+        transformed_df = pd.melt(df, id_vars=["split"])
+        output_file_name = output_filename_prefix.format(model_name) + "validation_scores.png"
+        visualization_utils.validation_scores_multiline_plot(transformed_df, os.path.join(output_dir, output_file_name))
