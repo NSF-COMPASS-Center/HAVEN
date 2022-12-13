@@ -7,7 +7,7 @@ import random
 
 
 def run(X_train, X_test, y_train, lr_settings):
-    lr_model = LogisticRegression(solver="sag", penalty="l2", class_weight="balanced", max_iter=1000)
+    lr_model = LogisticRegression(solver="saga", penalty="l1", class_weight="balanced", max_iter=5000)
     classification_type = lr_settings["classification_type"]
     if classification_type == "multi":
         print("Multiclass Logistic Regression Model")
