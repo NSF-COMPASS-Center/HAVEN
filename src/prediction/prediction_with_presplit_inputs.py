@@ -96,7 +96,7 @@ def execute(config):
         itr += 1
 
     # write the raw results in csv files
-    output_filename_prefix = f"kmer_k{k}_{model_name}_{label_col}_{classification_type}_presplit" + output_prefix + "_"
+    output_filename_prefix = f"kmer_k{k}_{label_col}_{classification_type}_presplit" + output_prefix + "_"
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
     write_output(results, output_results_dir, output_filename_prefix, "output",)
     write_output(feature_importance, output_results_dir, output_filename_prefix, "feature_imp")
@@ -192,7 +192,7 @@ def execute_rf_classification(df, model):
 
 def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
     for model_name, dfs in model_dfs.items():
-        output_file_name = output_filename_prefix.format(model_name) + output_type + ".csv"
+        output_file_name = output_filename_prefix + model_name + "_" + output_type + ".csv"
         output_file_path = os.path.join(output_dir, output_file_name)
         # create any missing parent directories
         Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
