@@ -68,7 +68,7 @@ classification_settings:
 
 output_settings:
   output_dir: "output"
-    results_dir: "raw"
-    visualizations_dir: "visualization"
-    sub_dir: "hev/20221214/host_multi/orf1_orf2_orf3_orf4"
-    prefix: # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  results_dir: "raw"
+  visualizations_dir: "visualization"
+  sub_dir: "hev/20221214/host_multi/orf1_orf2_orf3_orf4"
+  prefix: # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
