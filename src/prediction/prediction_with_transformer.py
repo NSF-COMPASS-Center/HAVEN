@@ -26,30 +26,26 @@ def execute(config):
 
     # classification settings
     classification_settings = config["classification_settings"]
-    k = classification_settings["kmer_settings"]["k"]
     classification_type = classification_settings["type"]
     models = classification_settings["models"]
-    sequence_col = classification_settings["sequence_col"]
 
     label_settings = classification_settings["label_settings"]
     label_col = label_settings["label_col"]
 
-
     results = {}
-    feature_importance = {}
     validation_scores = {}
     itr = 0
     for input in inputs:
         print(f"Iteration {itr}")
         # 1. Read the data files
-        train_df, test_df = read_dataset(input_dir, input, classification_settings["id_col"], sequence_col, label_col)
+        train_df, test_df = read_dataset(input_dir, input, label_col)
         df = pd.concat([train_df, test_df])
 
         # 2. filter out noise: labels configured to be excluded, NaN labels
         df = utils.filter_noise(df, label_settings)
 
         # 3. Compute kmer features
-        kmer_df = kmer_utils.compute_kmer_features(df, k, sequence_col, label_col)
+        kmer_df = kmer_utils.compute_kmer_features(df, k, label_col)
         # get the split column again to distinguish train and test datasets
         kmer_df = kmer_df.join(df["split"], on="id", how="left")
 
@@ -108,7 +104,9 @@ def execute(config):
     plot_validation_scores(validation_scores, os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
 
 
-def read_dataset(input_dir, input, id_col, sequence_col, label_col):
+def
+
+def read_dataset(input_dir, input, label_col):
     train_datasets = []
     test_datasets = []
     sub_dir = input["dir"]
@@ -116,25 +114,25 @@ def read_dataset(input_dir, input, id_col, sequence_col, label_col):
     train_files = input["train"]
     for train_file in train_files:
         input_file_path = os.path.join(input_dir, sub_dir, train_file)
-        df = pd.read_csv(input_file_path, usecols=[id_col, sequence_col, label_col])
+        df = pd.read_csv(input_file_path, usecols=["id", "sequence", label_col])
         print(f"input train file: {input_file_path}, size = {df.shape}")
         train_datasets.append(df)
 
     test_files = input["test"]
     for test_file in test_files:
         input_file_path = os.path.join(input_dir, sub_dir, test_file)
-        df = pd.read_csv(input_file_path, usecols=[id_col, sequence_col, label_col])
+        df = pd.read_csv(input_file_path, usecols=["id", "sequence", label_col])
         print(f"input test file: {input_file_path}, size = {df.shape}")
         test_datasets.append(df)
 
     train_df = pd.concat(train_datasets)
     train_df["split"] = "train"
-    train_df.set_index(id_col, inplace=True)
+    train_df.set_index("id", inplace=True)
     print(f"Size of input train dataset = {train_df.shape}")
 
     test_df = pd.concat(test_datasets)
     test_df["split"] = "test"
-    test_df.set_index(id_col, inplace=True)
+    test_df.set_index("id", inplace=True)
     print(f"Size of input test dataset = {test_df.shape}")
 
     return train_df, test_df

@@ -1,5 +1,6 @@
 #input files
 *.fasta
+input/**/*.csv
 # *.fa
 
 #output files
@@ -8,7 +9,7 @@ output/
 *.swp
 *.csv
 #do NOT ignore the processed data files
-!input/data/**/*.csv
+#!input/data/**/*.csv
 
 # log files
 *.log
