@@ -48,35 +48,27 @@ classification_settings:
   split_input: False
   kmer_settings:
     k: 3
-  type: "binary"
+  type: "multi"
   train_proportion: 0.8
   label_settings:
     label_col: "host"
     exclude_labels: [ "culture supernatant (Unknown map)", "Unknown"]
-    positive_label: "Human"
+    label_groupings:
+      "Human" : ["Human"]
+      "Boar": ["Boar"]
+      "Others": ["Leporidae", "Rodent", "Avian", "Ferret", "Camel", "Mongoose", "Bat", "Primate", "Shrew", "Deer", "Hare", "Canine"]
   models:
     - name: "lr"
       active: True
       C: [0.01, 0.03, 0.1, 0.3, 1, 3]
-
     - name: "rf"
       active: True
-      n_estimators: [10, 50, 100, 500, 1000]
-      max_depth: [3, 5]
-
-    - name: "transformer"
-      active: True
-      d: 512
-      n_heads: 8
-      depth: 6
-      seq_len:
-      seq_len_max:
-      n_tokens:
-      n_classes: 2
+      n_estimators: [ 10, 50, 100, 500, 1000 ]
+      max_depth: [ 3, 5 ]
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "hev/20221212/host_binary/orf1_orf2_orf3_orf4"
+  sub_dir: "hev/20221214/host_multi/orf1_orf2_orf3_orf4"
   prefix: # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

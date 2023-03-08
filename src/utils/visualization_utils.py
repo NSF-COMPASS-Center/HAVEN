@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-import pandas as pd
 
 
 def box_plot(df, x_col, y_col, output_file_path, baseline=None):

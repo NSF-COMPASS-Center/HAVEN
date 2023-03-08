@@ -3,10 +3,10 @@ from collections import Counter
 import pandas as pd
 
 
-def compute_kmer_features(df, k, label_col):
-    kmer_keys = get_kmer_keys(df, k)
-    df["features"] = df.apply(lambda row: get_kmer_vector(row["sequence"], k, kmer_keys), axis=1)
-    df.drop(columns=["sequence"], inplace=True)
+def compute_kmer_features(df, k, sequence_col, label_col):
+    kmer_keys = get_kmer_keys(df, k, sequence_col)
+    df["features"] = df.apply(lambda row: get_kmer_vector(row[sequence_col], k, kmer_keys), axis=1)
+    df.drop(columns=[sequence_col], inplace=True)
     kmer_df = pd.DataFrame.from_records(df["features"].values, index=df.index)
 
     # retain only those columns (kmers) that occur at least once in the dataset i.e. sum across all rows > 0
@@ -35,8 +35,8 @@ def initialize_kmer_counter(kmer_keys):
     return counter
 
 
-def get_kmer_keys(dataset, k):
-    sequences = dataset["sequence"].values
+def get_kmer_keys(dataset, k, sequence_col):
+    sequences = dataset[sequence_col].values
     print(f"Number of sequences = {len(sequences)}")
     unique_chars = list(set(''.join(sequences)))
 
