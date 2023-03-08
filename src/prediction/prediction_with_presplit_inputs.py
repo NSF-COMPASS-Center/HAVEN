@@ -50,6 +50,7 @@ def execute(config):
 
         # 3. Compute kmer features
         kmer_df = kmer_utils.compute_kmer_features(df, k, sequence_col, label_col)
+        print("here")
         # get the split column again to distinguish train and test datasets
         kmer_df = kmer_df.join(df["split"], on="id", how="left")
 
