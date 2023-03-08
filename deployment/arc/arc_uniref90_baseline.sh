@@ -6,7 +6,7 @@
 
 #SBATCH --mem=64G
 #SBATCH --nodes=1
-#SBATCH -t 48:00:00 # wall-time required (
+#SBATCH -t 24:00:00 # wall-time required (
 # 24hrs)
 
 
