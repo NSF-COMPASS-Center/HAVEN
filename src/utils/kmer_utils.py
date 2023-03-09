@@ -56,14 +56,25 @@ def get_kmer_keys(dataset, k, sequence_col):
     kmer_keys = ["".join(p) for p in product("".join(unique_chars), repeat=k)]
     print(f"Number of kmer_keys = {len(kmer_keys)}")
 
-    sequences_combined = ''.join(sequences)
-    # filter keys which do not occur in the the sequences
-    # for key in kmer_keys:
-    #     if key not in sequences_combined:
-    #         kmer_keys.remove(key)
-    n_kmers = len(sequences_combined) - k + 1
-    kmers = set()
-    for i in range(n_kmers):
-        kmers.add(sequences_combined[i:i + k])
-    print(f"Number of kmer_keys after filtering = {len(kmers)}")
-    return kmer_keys
+    kmers_occurrence_count_map = {}
+    for sequence in sequences:
+        kmers_in_seq = set()
+        n_kmers = len(sequence) - k + 1
+        for i in range(n_kmers):
+            kmer = sequence[i:i + k]
+            if kmer not in kmers_in_seq:
+                if kmer in kmers_occurrence_count_map:
+                    kmers_occurrence_count_map[kmer] += 1
+                else:
+                    kmers_occurrence_count_map[kmer] = 1
+            kmers_in_seq.add(kmer)
+
+    print(f"Number of kmer_keys BEFORE filtering for 10000 occurrences: {len(kmers_occurrence_count_map)}")
+
+    kmers_occurrence_count_map_filtered =  {}
+    for k, v in kmers_occurrence_count_map.items():
+        if v > 10000:
+            kmers_occurrence_count_map_filtered[k] = v
+    print(f"Number of kmer_keys AFTER filtering for 10000 occurrences: {len(kmers_occurrence_count_map_filtered)}")
+    kmers_occurrence_count_map.clear()
+    return list(kmers_occurrence_count_map_filtered.keys())
