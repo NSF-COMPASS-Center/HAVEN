@@ -46,6 +46,16 @@ def execute(config):
         train_df, test_df = read_dataset(input_dir, input, id_col, sequence_col, label_col)
 
         # downsizing to test end to end pipeline
+        print("Training dataset::::")
+        print(f"Size = {train_df.shape}")
+        print(f"Number of positive samples = {train_df[train_df[label_col] == 'Homo sapiens'].shape}")
+        print(f"Number of negative samples = {train_df[~train_df[label_col] == 'Homo sapiens'].shape}")
+
+        print("Testing dataset::::")
+        print(f"Size = {test_df.shape}")
+        print(f"Number of positive samples = {test_df[test_df[label_col] == 'Homo sapiens'].shape}")
+        print(f"Number of negative samples = {test_df[~test_df[label_col] == 'Homo sapiens'].shape}")
+
         train_df = train_df[0:10000]
         test_df = test_df[0:2000]
 

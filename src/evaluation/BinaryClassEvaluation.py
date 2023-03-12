@@ -5,7 +5,7 @@ from sklearn.metrics import average_precision_score, accuracy_score, f1_score, r
 class BinaryClassEvaluation(EvaluationBase):
     def __init__(self, df, evaluation_settings, evaluation_output_file_base_path, visualization_output_file_base_path, output_file_name):
         super().__init__(df, evaluation_settings, evaluation_output_file_base_path, visualization_output_file_base_path, output_file_name)
-        self.y_pred_column = "Human"
+        self.y_pred_column = "Homo sapiens"
 
     def compute_accuracy(self, df_itr):
         y_pred = self.convert_probability_to_prediction(df_itr)
@@ -13,7 +13,7 @@ class BinaryClassEvaluation(EvaluationBase):
 
     def compute_f1(self, df_itr):
         y_pred = self.convert_probability_to_prediction(df_itr)
-        return f1_score(y_true=df_itr[self.y_true_col].values, y_pred=y_pred, pos_label="Human")
+        return f1_score(y_true=df_itr[self.y_true_col].values, y_pred=y_pred, pos_label=self.y_pred_column)
 
     def compute_auroc(self, df_itr):
         # The function roc_auc_score returns {1 - true_AUROC_score}
@@ -21,13 +21,13 @@ class BinaryClassEvaluation(EvaluationBase):
         # roc_auc_score(y_true=df_itr[self.y_true_col].values, y_score=df_itr["Human"].values)
 
         # Hence we use roc_curve to compute fpr, tpr followed by auc to compute the AUROC.
-        fpr, tpr, _ = roc_curve(y_true=df_itr[self.y_true_col].values, y_score=df_itr["Human"].values, pos_label="Human")
+        fpr, tpr, _ = roc_curve(y_true=df_itr[self.y_true_col].values, y_score=df_itr[self.y_pred_column].values, pos_label=self.y_pred_column)
         return auc(fpr, tpr)
 
     def compute_auprc(self, df_itr):
-        return average_precision_score(y_true=df_itr[self.y_true_col].values, y_score=df_itr["Human"].values, average="macro", pos_label="Human")
+        return average_precision_score(y_true=df_itr[self.y_true_col].values, y_score=df_itr[self.y_pred_column].values, average="macro", pos_label=self.y_pred_column)
 
     def convert_probability_to_prediction(self, df_itr, threshold=0.5):
         y_pred_prob = df_itr[self.y_pred_column].values
-        y_pred = ["Human" if y >= threshold else "Not Human" for y in y_pred_prob]
+        y_pred = [self.y_pred_column if y >= threshold else "Not " + self.y_pred_column for y in y_pred_prob]
         return y_pred

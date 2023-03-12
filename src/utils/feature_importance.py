@@ -6,11 +6,11 @@ from utils import kmer_utils, utils, visualization_utils
 
 def execute(config):
     input_settings = config["input_settings"]
-    classification_settings = config["classification_settings"]
+    classification_settings = input_settings["classification_settings"]
     id_col = classification_settings["id_col"]
     sequence_col = classification_settings["sequence_col"]
     label_col = input_settings["label_settings"]["label_col"]
-    dataset_df = read_dataset(input_settings["dataset_dir"], input_settings["dataset_files"], input_settings["label_settings"])
+    dataset_df = read_dataset(input_settings["dataset_dir"], input_settings["dataset_files"], input_settings["classification_settings"], input_settings["label_settings"])
 
     kmer_binary_df = get_kmer_binary_df(dataset_df, id_col, sequence_col, label_col)
 
@@ -29,16 +29,18 @@ def execute(config):
         compute_feature_imp_prevalence_comparison(feature_imp_df, feature_prevalence_df, output_settings)
 
 
-def read_dataset(dataset_dir, dataset_files, label_settings):
+def read_dataset(dataset_dir, dataset_files, classification_settings, label_settings):
     datasets = []
-    label_col = "host"
+    id_col = classification_settings["id_col"]
+    sequence_col = classification_settings["sequence_col"]
+    label_col = label_settings["label_col"]
     for dataset_file in dataset_files:
-        df = pd.read_csv(os.path.join(dataset_dir, dataset_file), usecols=["id", "sequence", label_col])
+        df = pd.read_csv(os.path.join(dataset_dir, dataset_file), usecols=[id_col, sequence_col, label_col])
         print(f"input file: {dataset_file}, size = {df.shape}")
         datasets.append(df)
 
     dataset_df = pd.concat(datasets)
-    dataset_df.set_index("id", inplace=True)
+    dataset_df.set_index(id_col, inplace=True)
     print(f"Size of input dataset = {dataset_df.shape}")
 
     # 2. filter out noise: labels configured to be excluded, NaN labels
