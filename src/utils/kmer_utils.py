@@ -16,13 +16,6 @@ def compute_kmer_features(df, k, id_col, sequence_col, label_col):
 
     # retain only those columns (kmers) that occur at least once in the dataset i.e. sum across all rows > 0
     # kmer_df = kmer_df[kmer_df.columns[kmer_df.sum() > 0]]
-    print(f"kmer_df size = {kmer_df.shape}")
-    print("kmer_df \n>>>>>>>>>>>")
-    print(kmer_df.head())
-
-    print("df \n>>>>>>>")
-    print(df.head())
-
     kmer_df_with_label = kmer_df.join(df[label_col], on=id_col, how="left")
     print(f"Size of kmer dataset with label = {kmer_df_with_label.shape}")
     print(f"Validation: First row in kmer dataset with label = \n{kmer_df_with_label.head(1)}")
@@ -34,7 +27,9 @@ def get_kmer_vector(x, k, kmer_keys):
     n_kmers = len(x) - k + 1
     kmers = []
     for i in range(n_kmers):
-        kmers.append(x[i:i+k])
+        kmer = x[i:i+k]
+        if kmer in kmer_keys:
+            kmers.append(kmer)
     counter.update(kmers)
     return dict(counter)
 
