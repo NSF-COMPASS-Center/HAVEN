@@ -45,19 +45,26 @@ def execute(config):
         # 1. Read the data files
         train_df, test_df = read_dataset(input_dir, input, id_col, sequence_col, label_col)
 
-        # downsizing to test end to end pipeline
-        print("Training dataset::::")
-        print(f"Size = {train_df.shape}")
-        print(f"Number of positive samples = {train_df[train_df[label_col] == 'Homo sapiens'].shape}")
-        print(f"Number of negative samples = {train_df[~train_df[label_col] == 'Homo sapiens'].shape}")
+        # downsampling number of positives
+        print("Downsampling training dataset >")
+        print(f"Training dataset size before downsampling = {train_df.shape}")
+        pos_df = train_df[train_df[label_col] == 'Homo sapiens']
+        neg_df = train_df[train_df[label_col] != 'Homo sapiens']
+        print(f"Number of positive samples = {pos_df.shape}")
+        print(f"Number of negative samples = {neg_df.shape}")
+        train_df = pd.concat([pos_df[:neg_df.shape[0]], neg_df])
 
-        print("Testing dataset::::")
-        print(f"Size = {test_df.shape}")
-        print(f"Number of positive samples = {test_df[test_df[label_col] == 'Homo sapiens'].shape}")
-        print(f"Number of negative samples = {test_df[~test_df[label_col] == 'Homo sapiens'].shape}")
 
-        train_df = train_df[0:10000]
-        test_df = test_df[0:2000]
+        print("Downsampling testing dataset >")
+        print(f"Testing dataset size before downsampling = {test_df.shape}")
+        pos_df = test_df[test_df[label_col] == 'Homo sapiens']
+        neg_df = test_df[test_df[label_col] != 'Homo sapiens']
+        print(f"Number of positive samples = {pos_df.shape}")
+        print(f"Number of negative samples = {neg_df.shape}")
+        test_df = pd.concat([pos_df[:neg_df.shape[0]], neg_df])
+        print("==========")
+        print(f"Training dataset size after downsampling= {train_df.shape}")
+        print(f"Testing dataset size after downsampling= {test_df.shape}")
 
         df = pd.concat([train_df, test_df])
 
