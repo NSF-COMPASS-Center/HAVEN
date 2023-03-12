@@ -69,8 +69,9 @@ def get_kmer_keys(dataset, k, sequence_col):
     print(f"Number of kmer_keys BEFORE filtering for 10000 occurrences: {len(kmers_occurrence_count_map)}")
 
     kmers_filtered =  set()
+    filter_threshold = len(sequences) * 0.01 # 1% of the total number of sequences
     for k, v in kmers_occurrence_count_map.items():
-        if v > 10000:
+        if v > filter_threshold:
             kmers_filtered.add(k)
     print(f"Number of kmer_keys AFTER filtering for 10000 occurrences: {len(kmers_filtered)}")
     kmers_occurrence_count_map.clear()
