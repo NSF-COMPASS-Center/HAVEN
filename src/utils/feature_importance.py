@@ -6,10 +6,13 @@ from utils import kmer_utils, utils, visualization_utils
 
 def execute(config):
     input_settings = config["input_settings"]
+    classification_settings = config["classification_settings"]
+    id_col = classification_settings["id_col"]
+    sequence_col = classification_settings["sequence_col"]
     label_col = input_settings["label_settings"]["label_col"]
     dataset_df = read_dataset(input_settings["dataset_dir"], input_settings["dataset_files"], input_settings["label_settings"])
 
-    kmer_binary_df = get_kmer_binary_df(dataset_df, label_col)
+    kmer_binary_df = get_kmer_binary_df(dataset_df, id_col, sequence_col, label_col)
 
     feature_imp_df = read_feature_imp_file(input_settings["feature_imp_dir"], input_settings["feature_imp_file"])
     feature_imp_settings = config["feature_importance_settings"]
@@ -50,10 +53,10 @@ def read_feature_imp_file(feature_imp_dir, feature_imp_file):
     return feature_imp_df
 
 
-def get_kmer_binary_df(dataset_df, label_col):
+def get_kmer_binary_df(dataset_df, id_col, sequence_col, label_col):
     # Compute kmer features
     k = 3
-    kmer_df = kmer_utils.compute_kmer_features(dataset_df, k, label_col)
+    kmer_df = kmer_utils.compute_kmer_features(dataset_df, k, id_col, sequence_col, label_col)
     print(f"kmer_df shape = {kmer_df.shape}")
 
     kmer_df_wo_label = kmer_df.drop(columns=[label_col])
@@ -61,7 +64,7 @@ def get_kmer_binary_df(dataset_df, label_col):
     kmer_df_binary_wo_label = kmer_df_wo_label.mask(kmer_df_wo_label > 0, 1)
     print(f"kmer_df_binary shape = {kmer_df_binary_wo_label.shape}")
     # rejoin the label colum
-    kmer_df_binary_w_label = kmer_df_binary_wo_label.merge(kmer_df[label_col], how="left", on="id")
+    kmer_df_binary_w_label = kmer_df_binary_wo_label.merge(kmer_df[label_col], how="left", on=id_col)
     return kmer_df_binary_w_label
 
 

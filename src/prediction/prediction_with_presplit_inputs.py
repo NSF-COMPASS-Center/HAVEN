@@ -29,6 +29,7 @@ def execute(config):
     k = classification_settings["kmer_settings"]["k"]
     classification_type = classification_settings["type"]
     models = classification_settings["models"]
+    id_col = classification_settings["id_col"]
     sequence_col = classification_settings["sequence_col"]
 
     label_settings = classification_settings["label_settings"]
@@ -42,17 +43,17 @@ def execute(config):
     for input in inputs:
         print(f"Iteration {itr}")
         # 1. Read the data files
-        train_df, test_df = read_dataset(input_dir, input, classification_settings["id_col"], sequence_col, label_col)
+        train_df, test_df = read_dataset(input_dir, input, id_col, sequence_col, label_col)
         df = pd.concat([train_df, test_df])
 
         # 2. filter out noise: labels configured to be excluded, NaN labels
         df = utils.filter_noise(df, label_settings)
-
+        df = df[:100000]
         # 3. Compute kmer features
-        kmer_df = kmer_utils.compute_kmer_features(df, k, sequence_col, label_col)
+        kmer_df = kmer_utils.compute_kmer_features(df, k, id_col, sequence_col, label_col)
         print("here")
         # get the split column again to distinguish train and test datasets
-        kmer_df = kmer_df.join(df["split"], on="id", how="left")
+        kmer_df = kmer_df.join(df["split"], on=id_col, how="left")
 
         # 4. Group the labels (if applicable) and convert the string labels to mapped integer indices
         kmer_df_with_transformed_label, idx_label_map = utils.transform_labels(kmer_df, classification_type, label_settings)
