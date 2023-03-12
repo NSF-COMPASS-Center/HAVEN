@@ -6,12 +6,10 @@ import matplotlib.pyplot as plt
 
 
 def compute_kmer_features(df, k, id_col, sequence_col, label_col):
-    # select subsequences of length 1024
-    # df[sequence_col] = df.apply(lambda row: row[sequence_col][:1024] if len(row[sequence_col]) >= 1024 else row[sequence_col], axis=1)
-    # sns.distplot(seq_lengths)
-    # plt.show()
-    print(f"compute_kmer_features df size = {df.shape}")
+    print(f"Method:compute_kmer_features : df size = {df.shape}")
     kmer_keys = get_kmer_keys(df, k, sequence_col)
+    print(f"Number of kmer_keys derived = {len(kmer_keys)}")
+
     df["features"] = df.apply(lambda row: get_kmer_vector(row[sequence_col], k, kmer_keys), axis=1)
     df.drop(columns=[sequence_col], inplace=True)
     kmer_df = pd.DataFrame.from_records(df["features"].values, index=df.index)
@@ -19,6 +17,12 @@ def compute_kmer_features(df, k, id_col, sequence_col, label_col):
     # retain only those columns (kmers) that occur at least once in the dataset i.e. sum across all rows > 0
     # kmer_df = kmer_df[kmer_df.columns[kmer_df.sum() > 0]]
     print(f"kmer_df size = {kmer_df.shape}")
+    print("kmer_df \n>>>>>>>>>>>")
+    print(kmer_df.head())
+
+    print("df \n>>>>>>>")
+    print(df.head())
+
     kmer_df_with_label = kmer_df.join(df[label_col], on=id_col, how="left")
     print(f"Size of kmer dataset with label = {kmer_df_with_label.shape}")
     print(f"Validation: First row in kmer dataset with label = \n{kmer_df_with_label.head(1)}")
@@ -52,7 +56,7 @@ def get_kmer_keys(dataset, k, sequence_col):
     print(f"Number of unique characters in all sequences = {len(unique_chars)}")
 
     kmer_keys = ["".join(p) for p in product("".join(unique_chars), repeat=k)]
-    print(f"Number of kmer_keys = {len(kmer_keys)}")
+    print(f"Number of all possible kmer_keys = {len(kmer_keys)}")
 
     kmers_occurrence_count_map = {}
     for sequence in sequences:
@@ -65,16 +69,14 @@ def get_kmer_keys(dataset, k, sequence_col):
                     kmers_occurrence_count_map[kmer] += 1
                 else:
                     kmers_occurrence_count_map[kmer] = 1
-            kmers_in_seq.add(kmer)
+                kmers_in_seq.add(kmer)
 
     print(f"Number of kmer_keys BEFORE filtering for 10000 occurrences: {len(kmers_occurrence_count_map)}")
 
-    kmers_occurrence_count_map_filtered =  {}
+    kmers_filtered =  set()
     for k, v in kmers_occurrence_count_map.items():
         if v > 10000:
-            kmers_occurrence_count_map_filtered[k] = v
-    print(f"Number of kmer_keys AFTER filtering for 10000 occurrences: {len(kmers_occurrence_count_map_filtered)}")
-    keys = kmers_occurrence_count_map_filtered.keys()
+            kmers_filtered.add(k)
+    print(f"Number of kmer_keys AFTER filtering for 10000 occurrences: {len(kmers_filtered)}")
     kmers_occurrence_count_map.clear()
-    kmers_occurrence_count_map_filtered.clear()
-    return list(keys)
+    return list(kmers_filtered)

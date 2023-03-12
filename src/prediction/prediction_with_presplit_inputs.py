@@ -44,20 +44,27 @@ def execute(config):
         print(f"Iteration {itr}")
         # 1. Read the data files
         train_df, test_df = read_dataset(input_dir, input, id_col, sequence_col, label_col)
+
+        # downsizing to test end to end pipeline
+        train_df = train_df[0:10000]
+        test_df = test_df[0:2000]
+
         df = pd.concat([train_df, test_df])
 
         # 2. filter out noise: labels configured to be excluded, NaN labels
         df = utils.filter_noise(df, label_settings)
-        df = df[:100000]
+
         # 3. Compute kmer features
         kmer_df = kmer_utils.compute_kmer_features(df, k, id_col, sequence_col, label_col)
-        print("here")
+        print(f"back in prediction_with_inputs_split = {kmer_df.shape}")
+
         # get the split column again to distinguish train and test datasets
         kmer_df = kmer_df.join(df["split"], on=id_col, how="left")
+        print(f"kmer_df size after join with split on id = {kmer_df.shape}")
 
         # 4. Group the labels (if applicable) and convert the string labels to mapped integer indices
         kmer_df_with_transformed_label, idx_label_map = utils.transform_labels(kmer_df, classification_type, label_settings)
-
+        print(f"kmer_df_with_transformed_label size = {kmer_df_with_transformed_label.shape}")
         # 5. Perform classification
         for model in models:
             if model["active"] is False:
