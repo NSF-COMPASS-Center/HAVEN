@@ -74,5 +74,7 @@ def get_kmer_keys(dataset, k, sequence_col):
         if v > 10000:
             kmers_occurrence_count_map_filtered[k] = v
     print(f"Number of kmer_keys AFTER filtering for 10000 occurrences: {len(kmers_occurrence_count_map_filtered)}")
+    keys = kmers_occurrence_count_map_filtered.keys()
     kmers_occurrence_count_map.clear()
-    return list(kmers_occurrence_count_map_filtered.keys())
+    kmers_occurrence_count_map_filtered.clear()
+    return list(keys)
