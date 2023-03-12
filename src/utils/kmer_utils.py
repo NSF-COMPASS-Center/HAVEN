@@ -6,21 +6,19 @@ import matplotlib.pyplot as plt
 
 
 def compute_kmer_features(df, k, id_col, sequence_col, label_col):
-    # select subsequences of lenght 1024
-    df[sequence_col] = df.apply(lambda row: row[sequence_col][:1024] if len(row[sequence_col]) >= 1024 else row[sequence_col], axis=1)
-    df["seq_length"] = df.apply(lambda row: len(row[sequence_col]), axis=1)
-    seq_lengths = df['seq_length'].unique()
-    print(f"unique sequence lengths: {len(seq_lengths)} = {seq_lengths}")
+    # select subsequences of length 1024
+    # df[sequence_col] = df.apply(lambda row: row[sequence_col][:1024] if len(row[sequence_col]) >= 1024 else row[sequence_col], axis=1)
     # sns.distplot(seq_lengths)
     # plt.show()
-
+    print(f"compute_kmer_features df size = {df.shape}")
     kmer_keys = get_kmer_keys(df, k, sequence_col)
     df["features"] = df.apply(lambda row: get_kmer_vector(row[sequence_col], k, kmer_keys), axis=1)
     df.drop(columns=[sequence_col], inplace=True)
     kmer_df = pd.DataFrame.from_records(df["features"].values, index=df.index)
 
     # retain only those columns (kmers) that occur at least once in the dataset i.e. sum across all rows > 0
-    kmer_df = kmer_df[kmer_df.columns[kmer_df.sum() > 0]]
+    # kmer_df = kmer_df[kmer_df.columns[kmer_df.sum() > 0]]
+    print(f"kmer_df size = {kmer_df.shape}")
     kmer_df_with_label = kmer_df.join(df[label_col], on=id_col, how="left")
     print(f"Size of kmer dataset with label = {kmer_df_with_label.shape}")
     print(f"Validation: First row in kmer dataset with label = \n{kmer_df_with_label.head(1)}")
