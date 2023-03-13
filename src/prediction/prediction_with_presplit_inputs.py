@@ -53,7 +53,7 @@ def execute(config):
         print(f"Number of positive samples = {pos_df.shape}")
         print(f"Number of negative samples = {neg_df.shape}")
         train_df = pd.concat([pos_df[:neg_df.shape[0]], neg_df])
-
+        train_df = train_df[~train_df.index.duplicated()]
 
         print("Downsampling testing dataset >")
         print(f"Testing dataset size before downsampling = {test_df.shape}")
@@ -62,6 +62,7 @@ def execute(config):
         print(f"Number of positive samples = {pos_df.shape}")
         print(f"Number of negative samples = {neg_df.shape}")
         test_df = pd.concat([pos_df[:neg_df.shape[0]], neg_df])
+        test_df = test_df[~test_df.index.duplicated()]
         print("==========")
         print(f"Training dataset size after downsampling= {train_df.shape}")
         print(f"Testing dataset size after downsampling= {test_df.shape}")
