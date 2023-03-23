@@ -38,8 +38,17 @@ def transform_labels(df, classification_type, label_settings):
 
 
 def group_labels(df, label_col, label_grouping_config):
+    group_others = False
+    group_others_key = None
     for k, v in label_grouping_config.items():
+        if len(v) == 1 and v[0] == "*":
+            group_others = True
+            group_others_key = k
+            continue
         df.loc[df[label_col].isin(v), label_col] = k
+    if group_others:
+        values = list(label_grouping_config.keys())
+        df.loc[~df[label_col].isin(values), label_col] = group_others_key
     return df
 
 

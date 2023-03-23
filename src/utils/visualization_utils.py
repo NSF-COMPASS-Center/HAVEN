@@ -14,7 +14,7 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None):
     plt.rcParams['xtick.labelsize'] = 8
     plt.tight_layout()
 
-    plt.xticks(rotation=20)
+    #plt.xticks(rotation=20)
     plt.savefig(output_file_path)
 
 

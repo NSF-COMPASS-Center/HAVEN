@@ -107,7 +107,7 @@ def compute_prevalence_by_host(kmer_binary_df, label_col, output_settings):
     feature_prevalence_by_host_df_cols.remove(label_col)
 
     for col in feature_prevalence_by_host_df_cols:
-        feature_prevalence_by_host_df[col] = feature_prevalence_by_host_df[col] / feature_prevalence_by_host_df["host"] * 100
+        feature_prevalence_by_host_df[col] = feature_prevalence_by_host_df[col] / feature_prevalence_by_host_df[label_col] * 100
 
     output_dir = output_settings["output_dir"]
     output_file_path = os.path.join(output_dir, output_settings["feature_imp_dir"], output_settings["dataset_dir"], output_settings["prefix"] + "_feature_prevalence_by_host.csv")
