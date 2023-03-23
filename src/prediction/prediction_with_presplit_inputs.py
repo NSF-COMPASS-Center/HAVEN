@@ -44,14 +44,14 @@ def execute(config):
         print(f"Iteration {itr}")
         # 1. Read the data files
         train_df, test_df = read_dataset(input_dir, input, id_col, sequence_col, label_col)
-        pos_df = train_df[train_df[label_col] == 'Homo sapiens']
-        neg_df = train_df[train_df[label_col] != 'Homo sapiens']
-        print(f"Number of positive samples = {pos_df.shape}")
-        print(f"Number of negative samples = {neg_df.shape}")
-        pos_df = test_df[test_df[label_col] == 'Homo sapiens']
-        neg_df = test_df[test_df[label_col] != 'Homo sapiens']
-        print(f"Number of positive samples = {pos_df.shape}")
-        print(f"Number of negative samples = {neg_df.shape}")
+        # pos_df = train_df[train_df[label_col] == 'Homo sapiens']
+        # neg_df = train_df[train_df[label_col] != 'Homo sapiens']
+        # print(f"Number of positive samples = {pos_df.shape}")
+        # print(f"Number of negative samples = {neg_df.shape}")
+        # pos_df = test_df[test_df[label_col] == 'Homo sapiens']
+        # neg_df = test_df[test_df[label_col] != 'Homo sapiens']
+        # print(f"Number of positive samples = {pos_df.shape}")
+        # print(f"Number of negative samples = {neg_df.shape}")
 
 
         # downsampling number of positives
@@ -198,8 +198,9 @@ def get_standardized_datasets(df, label_col):
     X_train = pd.DataFrame(min_max_scaler_fit.transform(X_train), columns=feature_names)
     X_test = pd.DataFrame(min_max_scaler_fit.transform(X_test), columns=feature_names)
 
-    X_train_resampled, y_train_resampled = utils.random_oversampling(X_train, y_train)
-    return X_train_resampled, X_test, y_train_resampled, y_test
+    # X_train_resampled, y_train_resampled = utils.random_oversampling(X_train, y_train)
+    # return X_train_resampled, X_test, y_train_resampled, y_test
+    return X_train, X_test, y_train, y_test
 
 
 def execute_lr_classification(df, model):
