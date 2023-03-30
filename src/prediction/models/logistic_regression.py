@@ -12,7 +12,11 @@ def run(X_train, X_test, y_train, lr_settings):
     if classification_type == "multi":
         print("Multiclass Logistic Regression Model")
         # multinomial: multi-class cross-entropy loss
-        lr_model.multi_class = "multinomial"
+        # ovr: one-versus-rest
+        lr_model.multi_class = lr_settings["multiclass_type"]
+        # for multi_class=ovr, use all cores in the CPU for parallel processing.
+        # this settingis ignored and set to default=1 for multi_class=multinomial
+        lr_model.n_jobs = -1
 
     # K-Fold Cross Validation: START #
     # hyper-parameter tuning using K-Fold Cross Validation with K = 5;

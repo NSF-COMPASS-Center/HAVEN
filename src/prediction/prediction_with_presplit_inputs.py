@@ -44,6 +44,10 @@ def execute(config):
         print(f"Iteration {itr}")
         # 1. Read the data files
         train_df, test_df = read_dataset(input_dir, input, id_col, sequence_col, label_col)
+
+        # X_train_resampled, y_train_resampled = utils.random_oversampling(X_train, y_train)
+        # return X_train_resampled, X_test, y_train_resampled, y_test
+
         # pos_df = train_df[train_df[label_col] == 'Homo sapiens']
         # neg_df = train_df[train_df[label_col] != 'Homo sapiens']
         # print(f"Number of positive samples = {pos_df.shape}")
@@ -92,7 +96,10 @@ def execute(config):
         # 4. Group the labels (if applicable) and convert the string labels to mapped integer indices
         kmer_df_with_transformed_label, idx_label_map = utils.transform_labels(kmer_df, classification_type, label_settings)
         print(f"kmer_df_with_transformed_label size = {kmer_df_with_transformed_label.shape}")
+
         # 5. Perform classification
+        X_train, X_test, y_train, y_test = get_standardized_datasets(kmer_df_with_transformed_label, label_col=label_col)
+
         for model in models:
             if model["active"] is False:
                 print(f"Skipping {model['name']} ...")
@@ -110,14 +117,16 @@ def execute(config):
 
             if model["name"] == "lr":
                 print("Executing Logistic Regression")
-                result_df, feature_importance_df, validation_scores_df = execute_lr_classification(kmer_df_with_transformed_label, model)
+                y_pred, feature_importance_df, validation_scores_df = logistic_regression.run(X_train, X_test, y_train, model)
             elif model["name"] == "rf":
                 print("Executing Random Forest")
-                result_df, feature_importance_df, validation_scores_df = execute_rf_classification(kmer_df_with_transformed_label, model)
+                y_pred, feature_importance_df, validation_scores_df = random_forest.run(X_train, X_test, y_train, model)
             else:
                 continue
 
-            # Remap the class indices to original input labels
+            #  Create the result dataframe and remap the class indices to original input labels
+            result_df = pd.DataFrame(y_pred)
+            result_df["y_true"] = y_test.values
             result_df.rename(columns=idx_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(idx_label_map)
             result_df["itr"] = itr
@@ -198,35 +207,7 @@ def get_standardized_datasets(df, label_col):
     X_train = pd.DataFrame(min_max_scaler_fit.transform(X_train), columns=feature_names)
     X_test = pd.DataFrame(min_max_scaler_fit.transform(X_test), columns=feature_names)
 
-    # X_train_resampled, y_train_resampled = utils.random_oversampling(X_train, y_train)
-    # return X_train_resampled, X_test, y_train_resampled, y_test
     return X_train, X_test, y_train, y_test
-
-
-def execute_lr_classification(df, model):
-    # Perform classification
-    X_train, X_test, y_train, y_test = get_standardized_datasets(df, label_col = model["label_col"])
-    y_pred, feature_importance_df, validation_scores_df = logistic_regression.run(X_train, X_test, y_train, model)
-
-    result_df = pd.DataFrame(y_pred)
-    result_df["y_true"] = y_test.values
-    print(f"result size = {result_df.shape}")
-
-    return result_df, feature_importance_df, validation_scores_df
-
-
-def execute_rf_classification(df, model):
-    # Perform classification
-    X_train, X_test, y_train, y_test = get_standardized_datasets(df, label_col=model["label_col"])
-
-    # Perform classification
-    y_pred, feature_importance_df, validation_scores_df = random_forest.run(X_train, X_test, y_train, model)
-
-    result_df = pd.DataFrame(y_pred)
-    result_df["y_true"] = y_test.values
-    print(f"result size = {result_df.shape}")
-
-    return result_df, feature_importance_df, validation_scores_df
 
 
 def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
