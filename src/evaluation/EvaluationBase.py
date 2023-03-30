@@ -20,6 +20,8 @@ class EvaluationBase:
         Path(os.path.dirname(self.visualization_output_file_path)).mkdir(parents=True, exist_ok=True)
 
         self.evaluation_metrics_df = None
+        self.roc_curves_df = None
+        self.pr_curves_df = None
         self.itr_col = "itr"
         self.experiment_col = "experiment"
         self.y_true_col = "y_true"
@@ -28,16 +30,26 @@ class EvaluationBase:
     def execute(self):
         experiments = self.df[self.experiment_col].unique()
         result = []
+        roc_curves = []
+        pr_curves = []
         for experiment in experiments:
             experiment_df = self.df[self.df[self.experiment_col] == experiment]
             for itr in self.itrs:
                 result_itr = {self.itr_col: itr, self.experiment_col: experiment}
                 df_itr = experiment_df[experiment_df[self.itr_col] == itr]
                 if self.evaluation_settings["auroc"]:
-                    auroc_itr = self.compute_auroc(df_itr)
+                    roc_curve_itr, auroc_itr = self.compute_auroc(df_itr)
+                    # individual ROC curves
+                    roc_curve_itr[self.itr_col] = itr
+                    roc_curve_itr[self.experiment_col] = experiment
+                    roc_curves.append(roc_curve_itr)
                     result_itr["auroc"] = auroc_itr
                 if self.evaluation_settings["auprc"]:
-                    auprc_itr = self.compute_auprc(df_itr)
+                    pr_curve_itr, auprc_itr = self.compute_auprc(df_itr)
+                    # individual Precision-Recall curves
+                    pr_curve_itr[self.itr_col] = itr
+                    pr_curve_itr[self.experiment_col] = experiment
+                    pr_curves.append(pr_curve_itr)
                     result_itr["auprc"] = auprc_itr
                 if self.evaluation_settings["accuracy"]:
                     acc_itr = self.compute_accuracy(df_itr)
@@ -51,14 +63,17 @@ class EvaluationBase:
         self.evaluation_metrics_df = pd.DataFrame(result)
         self.evaluation_metrics_df.to_csv(self.evaluation_output_file_path + "_evaluation_metrics.csv")
 
+        if len(roc_curves) > 0:
+            self.roc_curves_df = pd.concat(roc_curves, ignore_index=True)
+            self.roc_curves_df.to_csv(self.evaluation_output_file_path + "_roc_curves.csv")
+        if len(roc_curves) > 0:
+            self.pr_curves_df = pd.concat(pr_curves, ignore_index=True)
+            self.pr_curves_df.to_csv(self.evaluation_output_file_path + "_pr_curves.csv")
+
         self.plot_visualizations()
         return
 
     def plot_visualizations(self):
-        if self.evaluation_settings["auroc"]:
-            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auroc", self.visualization_output_file_path + "_auroc_boxplot.png")
-        if self.evaluation_settings["auprc"]:
-            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auprc", self.visualization_output_file_path + "_auprc_boxplot.png")
         if self.evaluation_settings["accuracy"]:
             visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "accuracy", self.visualization_output_file_path + "_accuracy_boxplot.png")
         if self.evaluation_settings["f1"]:

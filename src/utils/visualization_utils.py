@@ -18,12 +18,26 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None):
     plt.savefig(output_file_path)
 
 
+def curve_plot(df, x_col, y_col, color_group_col, style_group_col, output_file_path):
+    plt.clf()
+    sns.set_theme()
+
+    ax = sns.lineplot(data=df, x=x_col, y=y_col, hue=color_group_col, style=style_group_col)
+
+    ax.set_ylim(0, 1)
+    plt.rcParams['xtick.labelsize'] = 8
+    plt.tight_layout()
+
+    #plt.xticks(rotation=20)
+    plt.savefig(output_file_path)
+
+
 def class_distribution_plot(df, output_file_path):
     plt.clf()
     sns.set_theme()
 
     ax = sns.barplot(data=df, x="label", y="label_count", hue="group")
-
+    plt.xticks(rotation=20)
     plt.savefig(output_file_path)
 
 
@@ -58,6 +72,8 @@ def feature_imp_by_prevalence_scatter_plot(df, output_file_path):
     ax.set_xlabel("Prevalence (%)")
     ax.set_ylabel("Mean absolute coefficient across iterations")
     # plt.rcParams['ytick.labelsize'] = 8
+
+
     plt.tight_layout()
 
     plt.savefig(output_file_path)

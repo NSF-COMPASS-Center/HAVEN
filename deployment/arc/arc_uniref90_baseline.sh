@@ -10,7 +10,7 @@
 # 24hrs)
 
 
-# Load m
+# Load modules
 module load
 module load Anaconda3
 
