@@ -11,9 +11,10 @@ class ProteinSequenceDataset(Dataset):
         super(ProteinSequenceDataset, self).__init__()
         self.sequence_col = sequence_col
         self.label_col = label_col
-        self.label_classes = label_classes
+        self.label_classes = label_classes.copy()
         self.n_label_classes = len(label_classes)
         self.sequence_max_length = sequence_max_length
+        self.others_class = "Others"
         self.initialize_references()
         self.data = self.read_dataset(filepath)
 
@@ -30,7 +31,7 @@ class ProteinSequenceDataset(Dataset):
 
         self.label_index_map = {}
         self.index_label_map = {}
-        self.label_classes.append("Others")
+        self.label_classes.append(self.others_class)
         for index, label in enumerate(self.label_classes):
             self.label_index_map[label] = index
             self.index_label_map[index] = label
@@ -50,7 +51,7 @@ class ProteinSequenceDataset(Dataset):
         sequence_vector = np.array([self.amino_acid_map[a] for a in sequence])
 
         if label not in self.label_index_map:
-            label = "Others"
+            label = self.others_class
 
         label_vector = np.array([self.label_index_map[label]])
 
