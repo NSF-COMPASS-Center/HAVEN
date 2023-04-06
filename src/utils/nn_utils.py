@@ -37,11 +37,11 @@ def get_device(tensor=None):
 
 
 def get_dataset_loader(input_dir, input, sequence_settings, label_settings, dataset_type=None):
-    seq_col = sequence_settings["sequence_col"],
-    label_col = label_settings["label_col"],
-    label_classes = label_settings["label_classes"],
-    batch_size = sequence_settings["batch_size"],
-    sequence_max_length = sequence_settings["sequence_max_length"],
+    seq_col = sequence_settings["sequence_col"]
+    label_col = label_settings["label_col"]
+    label_classes = label_settings["label_classes"]
+    batch_size = sequence_settings["batch_size"]
+    sequence_max_length = sequence_settings["sequence_max_length"]
     pad_sequence_val = sequence_settings["pad_sequence_val"]
     filepath = os.path.join(input_dir, input["dir"], input[dataset_type][0])
     dataset = ProteinSequenceDataset(filepath, seq_col, label_col, label_classes, sequence_max_length)
