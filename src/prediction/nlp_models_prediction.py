@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 
+from timm.utils.model_ema import ModelEmaV2
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
@@ -56,6 +57,11 @@ def execute(input_settings, output_settings, classification_settings):
                                                   d=model["dim"],
                                                   d_ff=2048,
                                                   h=model["n_heads"])
+
+                # For faster computation
+                nlp_model.ema_model = ModelEmaV2(nlp_model)
+                for param in nlp_model.ema_model.parameters():
+                    param.requires_grad = False
                 nlp_model.to(nn_utils.get_device())
                 result_df, model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["n_epochs"], model_name)
                 torch.save(model.state_dict(), os.path.join(output_dir, results_dir, sub_dir, "trained_transformer_model.pth"))
@@ -111,6 +117,7 @@ def run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optim
         loss.backward()
 
         optimizer.step()
+        model.ema_model.update(model)
         lr_scheduler.step()
 
         model.train_iter += 1
