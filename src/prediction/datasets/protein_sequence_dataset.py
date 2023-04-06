@@ -30,9 +30,8 @@ class ProteinSequenceDataset(Dataset):
 
         self.label_index_map = {}
         self.index_label_map = {}
-        # for some weird reason, yaml parses the label_classes as tuple (<list>, )
-        # with the second part of the tupe as None
-        for index, label in enumerate(self.label_classes[0]):
+        self.label_classes.append("Others")
+        for index, label in enumerate(self.label_classes):
             self.label_index_map[label] = index
             self.index_label_map[index] = label
 
