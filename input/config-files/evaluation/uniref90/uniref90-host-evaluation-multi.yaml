@@ -11,6 +11,7 @@ input_settings:
     # experiment_name (to be used as a key in comparative analysis): file_name
     "LR": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
     "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
+    "Transformer": "20230406/host_multi/transformer_presplit_nlp_transformer_output.csv"
 
 evaluation_settings:
   type: "multi"
@@ -26,5 +27,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230329/host_multi"
-  prefix: "host_multi_lr_rf"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "uniref90/20230406/host_multi"
+  prefix: "host_multi_lr_rf_transformer"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

@@ -3,6 +3,7 @@ import pandas as pd
 
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.tensorboard import SummaryWriter
+import torch.nn.functional as F
 import torch.nn as nn
 import torch
 import tqdm
@@ -56,7 +57,8 @@ def execute(input_settings, output_settings, classification_settings):
                                                   d_ff=2048,
                                                   h=model["n_heads"])
                 nlp_model.to(nn_utils.get_device())
-                result_df = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["n_epochs"], model_name)
+                result_df, model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["n_epochs"], model_name)
+                torch.save(model.state_dict(), os.path.join(output_dir, results_dir, sub_dir, "trained_transformer_model.pth"))
             else:
                 continue
 
@@ -91,7 +93,7 @@ def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, 
     for e in range(n_epochs):
         model = run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer,
                                            lr_scheduler, tbw, model_name, e)
-    return evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch=None, log_loss=False)
+    return evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch=None, log_loss=False), model
 
 
 def run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer, lr_scheduler, tbw, model_name, epoch):
@@ -141,6 +143,8 @@ def evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch
                 tbw.add_scalar(f"{model_name}/validation-loss", float(val_loss), model.test_iter)
                 pbar.set_description(
                     f"{model_name}/validation-loss = {float(val_loss)}, model.n_iter={model.test_iter}, epoch={epoch + 1}")
+            # to get probabilities of the output
+            output = F.softmax(output, dim=-1)
             result_df = pd.DataFrame(output.cpu().numpy())
             result_df["y_true"] = label.cpu().numpy()
             results.append(result_df)

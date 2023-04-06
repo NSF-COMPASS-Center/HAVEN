@@ -33,7 +33,7 @@ def scaled_dot_product_attention(Q, K, V, mask=None):
     # softmax
     attn = F.softmax(scores, dim=-1)
 
-    return torch.matmul(attn, V)
+    return torch.matmul(attn, V), attn
 
 
 class MultiHeadAttention(nn.Module):
@@ -65,7 +65,7 @@ class MultiHeadAttention(nn.Module):
         self.W_K = nn.Linear(d, d)
         self.W_V = nn.Linear(d, d)
         self.W_O = nn.Linear(d, d)
-        self.attn = None
+        self.self_attn = None
 
     def forward(self, Q_, K_, V_, mask=None):
         if mask is not None:
@@ -74,8 +74,6 @@ class MultiHeadAttention(nn.Module):
 
         # 1. Apply linear transformation (projection) in batches from
         # reshape to implement multihead attention using single head attention
-        # -1 it to infer the number of tokens
-        # this number of tokens will change during inference and hence it is not fixed unlike key and value
         # where n = Key.size(1)  b x n x d
         # .view => b x n x h x d_attn_head
         # .transpose(1, 2) => b x h x n x d_attn_head
@@ -84,7 +82,7 @@ class MultiHeadAttention(nn.Module):
         V = self.W_V(V_).view(batch_size, -1, self.h, self.d_attn_head).transpose(1, 2)
 
         # 2. Apply attention to all the projected vectors in batch
-        X = scaled_dot_product_attention(Q, K, V, mask=mask)
+        X, self.self_attn = scaled_dot_product_attention(Q, K, V, mask=mask)
 
         # 3. Concat all the heads
         X = X.transpose(1, 2).contiguous().view(batch_size, -1, self.h * self.d_attn_head)
