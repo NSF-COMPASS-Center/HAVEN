@@ -7,6 +7,7 @@ from prediction import prediction
 from evaluation import evaluation
 from utils import feature_importance, validation_scores
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Protein structure analysis pipeline')
     parser.add_argument('-c', '--config', required=True,

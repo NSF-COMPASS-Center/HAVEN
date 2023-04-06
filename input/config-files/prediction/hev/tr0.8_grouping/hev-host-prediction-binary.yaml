@@ -64,16 +64,6 @@ classification_settings:
       n_estimators: [10, 50, 100, 500, 1000]
       max_depth: [3, 5]
 
-    - name: "transformer"
-      active: True
-      d: 512
-      n_heads: 8
-      depth: 6
-      seq_len:
-      seq_len_max:
-      n_tokens:
-      n_classes: 2
-
 output_settings:
   output_dir: "output"
   results_dir: "raw"
