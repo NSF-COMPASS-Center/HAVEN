@@ -3,7 +3,9 @@ import random
 import numpy as np
 import pandas as pd
 from imblearn.over_sampling import RandomOverSampler
-from collections import Counter
+from pathlib import Path
+import os
+
 
 def filter_noise(df, label_settings):
     label_col = label_settings["label_col"]
@@ -88,3 +90,14 @@ def random_oversampling(X, y):
     vals, count = np.unique(y_resampled, return_counts=True)
     print(f"Label counts after resampling = {[*zip(vals, count)]}")
     return X_resampled, y_resampled
+
+
+def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
+    for model_name, dfs in model_dfs.items():
+        output_file_name = output_filename_prefix + model_name + "_" + output_type + ".csv"
+        output_file_path = os.path.join(output_dir, output_file_name)
+        # create any missing parent directories
+        Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
+        # 5. Write the classification output
+        print(f"Writing {output_type} of {model_name} to {output_file_path}")
+        pd.concat(dfs).to_csv(output_file_path, index=True)
