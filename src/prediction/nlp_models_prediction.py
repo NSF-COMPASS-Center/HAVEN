@@ -37,6 +37,7 @@ def execute(input_settings, output_settings, classification_settings):
         index_label_map, test_dataset_loader = nn_utils.get_dataset_loader(input_dir, input, sequence_settings,
                                                                             label_settings, dataset_type="test")
 
+        nlp_model = None
         for model in models:
             if model["active"] is False:
                 print(f"Skipping {model['name']} ...")
@@ -59,8 +60,7 @@ def execute(input_settings, output_settings, classification_settings):
 
                 # For faster computation
                 nlp_model.to(nn_utils.get_device())
-                result_df, model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["n_epochs"], model_name)
-                torch.save(model.state_dict(), os.path.join(output_dir, results_dir, sub_dir, "trained_transformer_model.pth"))
+                result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["n_epochs"], model_name)
             else:
                 continue
 
@@ -74,6 +74,7 @@ def execute(input_settings, output_settings, classification_settings):
     # write the raw results in csv files
     output_filename_prefix = f"{model_name}_presplit" + output_prefix + "_"
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
+    torch.save(nlp_model.state_dict(), os.path.join(output_dir, results_dir, sub_dir, "trained_transformer_model.pth"))
     utils.write_output(results, output_results_dir, output_filename_prefix, "output",)
 
 
