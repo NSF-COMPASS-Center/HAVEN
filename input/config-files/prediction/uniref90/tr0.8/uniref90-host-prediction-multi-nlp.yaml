@@ -50,7 +50,7 @@ classification_settings:
   sequence_settings:
     batch_size: 32
     sequence_col: "seq"
-    sequence_max_length: 512
+    sequence_max_length: 1024
     pad_sequence_val: 0
   label_settings:
     label_col: "virus_host_name"
@@ -70,5 +70,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230406-1/host_multi"
+  sub_dir: "uniref90/20230407/host_multi"
   prefix: "nlp" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
