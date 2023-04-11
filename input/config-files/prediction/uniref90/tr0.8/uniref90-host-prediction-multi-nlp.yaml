@@ -45,10 +45,10 @@ input_settings:
 
 classification_settings:
   model_type: "nlp"
-  n_iterations: 5
+  n_iterations: 2
   split_input: False
   sequence_settings:
-    batch_size: 32
+    batch_size: 16
     sequence_col: "seq"
     sequence_max_length: 1024
     pad_sequence_val: 0
@@ -63,7 +63,7 @@ classification_settings:
       depth: 6
       n_tokens: 27
       n_classes: 9
-      n_epochs: 10
+      n_epochs: 30
       dim: 512
 
 output_settings:
