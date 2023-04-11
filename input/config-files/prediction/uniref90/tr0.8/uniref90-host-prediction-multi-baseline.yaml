@@ -70,26 +70,16 @@ classification_settings:
     - name: "lr"
       active: True
       C: [0.01, 0.1, 1]
-      multiclass_type: "ovr"
+      multiclass_type: "multinomial"
 
-    - name: "rf"
-      active: True
-      n_estimators: [10, 100, 1000]
-      max_depth: [3, 5]
-
-#    - name: "transformer"
+#    - name: "rf"
 #      active: True
-#      d: 512
-#      n_heads: 8
-#      depth: 6
-#      seq_len:
-#      seq_len_max:
-#      n_tokens:
-#      n_classes: 2
+#      n_estimators: [10, 100, 1000]
+#      max_depth: [3, 5]
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230329/host_multi"
-  prefix: "" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230410/host_multi"
+  prefix: "lr_multinomial" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

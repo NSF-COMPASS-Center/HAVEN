@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-
+from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
@@ -74,8 +74,11 @@ def execute(input_settings, output_settings, classification_settings):
     # write the raw results in csv files
     output_filename_prefix = f"{model_name}_presplit" + output_prefix + "_"
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
-    torch.save(nlp_model.state_dict(), os.path.join(output_dir, results_dir, sub_dir, "trained_transformer_model.pth"))
-    utils.write_output(results, output_results_dir, output_filename_prefix, "output",)
+    utils.write_output(results, output_results_dir, output_filename_prefix, "output")
+
+    model_filepath = os.path.join(output_dir, results_dir, sub_dir, "trained_transformer_model.pth")
+    Path(os.path.dirname(model_filepath)).mkdir(parents=True, exist_ok=True)
+    torch.save(nlp_model.state_dict(), model_filepath)
 
 
 def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, model_name):
