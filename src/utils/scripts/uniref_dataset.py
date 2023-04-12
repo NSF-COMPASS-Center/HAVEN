@@ -363,8 +363,8 @@ def main():
     # 7.4 Remove duplicate sequences (same uniref90_id and sequence, but multiple hosts)
     df = remove_duplicate_sequences(df)
     # 8. Write the filtered dataset to a file
-    print(f"Writing to file {UNIREF90_DATA_FILTERED_FILENAME}")
-    df.to_csv(os.path.join(output_dir, UNIREF90_DATA_FILTERED_FILENAME), index=False)
+    print(f"Writing to file {UNIREF90_DATA_FINAL_FILENAME}")
+    df.to_csv(os.path.join(output_dir, UNIREF90_DATA_FINAL_FILENAME), index=False)
 
 
 if __name__ == '__main__':

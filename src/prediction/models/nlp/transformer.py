@@ -18,3 +18,13 @@ class ClassificationTransformer(nn.Module):
 
         y = self.linear(X)
         return y
+
+
+def get_transformer_model(model):
+    ClassificationTransformer(n_tokens=model["n_tokens"],
+                              seq_len=model["sequence_max_length"],
+                              n_classes=model["n_classes"],
+                              N=model["depth"],
+                              d=model["dim"],
+                              d_ff=2048,
+                              h=model["n_heads"])
