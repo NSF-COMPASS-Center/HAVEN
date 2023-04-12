@@ -21,7 +21,7 @@ class ClassificationTransformer(nn.Module):
 
 
 def get_transformer_model(model):
-    ClassificationTransformer(n_tokens=model["n_tokens"],
+    return ClassificationTransformer(n_tokens=model["n_tokens"],
                               seq_len=model["sequence_max_length"],
                               n_classes=model["n_classes"],
                               N=model["depth"],
