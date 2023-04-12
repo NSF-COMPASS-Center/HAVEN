@@ -59,6 +59,8 @@ classification_settings:
   models:
     - name: "transformer"
       active: True
+      mode: test # supported values: train, test
+      pretrained_model_path: # mandatory if the mode is set to test
       n_heads: 8
       depth: 6
       n_tokens: 27

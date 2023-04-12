@@ -9,7 +9,8 @@ import torch
 import tqdm
 
 from utils import utils, nn_utils, visualization_utils
-from prediction.models.nlp.transformer import ClassificationTransformer
+from prediction.models.nlp import transformer
+
 
 
 def execute(input_settings, output_settings, classification_settings):
@@ -39,6 +40,7 @@ def execute(input_settings, output_settings, classification_settings):
 
         nlp_model = None
         for model in models:
+            model["sequence_max_length"] = sequence_settings["sequence_max_length"] # setting arguments within model to avoid passing multiple arguments
             if model["active"] is False:
                 print(f"Skipping {model['name']} ...")
                 continue
@@ -49,18 +51,16 @@ def execute(input_settings, output_settings, classification_settings):
 
             # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
             if model["name"] == "transformer":
-                print("Executing Transformer")
-                nlp_model = ClassificationTransformer(n_tokens=model["n_tokens"],
-                                                  seq_len=sequence_settings["sequence_max_length"],
-                                                  n_classes=model["n_classes"],
-                                                  N=model["depth"],
-                                                  d=model["dim"],
-                                                  d_ff=2048,
-                                                  h=model["n_heads"])
+                mode = model["mode"]
+                print(f"Executing Transformer in {mode} mode")
+
+                nlp_model = transformer.get_transformer_model(model)
+                if model["mode"] == "test":
+                    nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
 
                 # For faster computation
                 nlp_model.to(nn_utils.get_device())
-                result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["n_epochs"], model_name)
+                result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["n_epochs"], model_name, mode)
             else:
                 continue
 
@@ -81,7 +81,7 @@ def execute(input_settings, output_settings, classification_settings):
     torch.save(nlp_model.state_dict(), model_filepath)
 
 
-def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, model_name):
+def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, model_name, mode):
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     lr_scheduler = OneCycleLR(
@@ -96,9 +96,11 @@ def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, 
     tbw = SummaryWriter()
     model.train_iter = 0
     model.test_iter = 0
-    for e in range(n_epochs):
-        model = run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer,
-                                           lr_scheduler, tbw, model_name, e)
+    if mode == "train":
+        # train the model only if set to train mode
+        for e in range(n_epochs):
+            model = run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer,
+                                               lr_scheduler, tbw, model_name, e)
     return evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch=None, log_loss=False), model
 
 
