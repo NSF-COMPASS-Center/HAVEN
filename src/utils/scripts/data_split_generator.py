@@ -18,8 +18,6 @@ def parse_args():
                         help="Seed to generate the split.\n")
     parser.add_argument('-od', '--output_dir', required=True,
                         help="Absolute path to output directory.\n")
-    parser.add_argument('-os', '--output_suffix', required=True,
-                        help="Suffix to be added to the file names.\n")
     parser.add_argument('-train', '--train', required=True,
                         help="Boolean. Generate training files\n")
     parser.add_argument('-test', '--test', required=True,
@@ -39,12 +37,12 @@ def parse_config(config_file_path):
     return config
 
 
-def generate_splits(input_files, train_proportion, seed, output_dir, output_suffix="", generate_train=True, generate_test=True):
+def generate_splits(input_files, train_proportion, seed, output_dir, generate_train=True, generate_test=True):
     for input_file in input_files:
         print(f"Input file = {input_file}")
         file_name = os.path.basename(input_file)
-        train_dataset_file_path = os.path.join(output_dir, file_name + f"_tr{train_proportion}_train{output_suffix}.csv")
-        test_dataset_file_path = os.path.join(output_dir, file_name + f"_tr{train_proportion}_test{output_suffix}.csv")
+        train_dataset_file_path = os.path.join(output_dir, file_name + f"_tr{train_proportion}_train.csv")
+        test_dataset_file_path = os.path.join(output_dir, file_name + f"_tr{train_proportion}_test.csv")
         # create any missing parent directories
         Path(os.path.dirname(train_dataset_file_path)).mkdir(parents=True, exist_ok=True)
         Path(os.path.dirname(test_dataset_file_path)).mkdir(parents=True, exist_ok=True)
@@ -65,10 +63,9 @@ def main():
     train_proportion = float(config.train_proportion)
     seed = int(config.seed)
     output_dir = config.output_dir
-    output_suffix = config.output_suffix
     generate_train = ast.literal_eval(config.train)
     generate_test = ast.literal_eval(config.test)
-    generate_splits(input_files, train_proportion, seed, output_dir, output_suffix, generate_train, generate_test)
+    generate_splits(input_files, train_proportion, seed, output_dir, generate_train, generate_test)
     return
 
 
