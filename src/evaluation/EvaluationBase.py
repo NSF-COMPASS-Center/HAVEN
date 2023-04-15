@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from utils import visualization_utils
+from utils import utils, visualization_utils
 
 
 class EvaluationBase:
@@ -22,6 +22,7 @@ class EvaluationBase:
         self.evaluation_metrics_df = None
         self.roc_curves_df = None
         self.pr_curves_df = None
+        self.metadata = None
         self.itr_col = "itr"
         self.experiment_col = "experiment"
         self.y_true_col = "y_true"
@@ -32,11 +33,15 @@ class EvaluationBase:
         result = []
         roc_curves = []
         pr_curves = []
+
         for experiment in experiments:
             experiment_df = self.df[self.df[self.experiment_col] == experiment]
             for itr in self.itrs:
                 result_itr = {self.itr_col: itr, self.experiment_col: experiment}
                 df_itr = experiment_df[experiment_df[self.itr_col] == itr]
+                if self.metadata is None:
+                    # compute the metadata only once
+                    self.metadata = utils.compute_class_distribution(df_itr, self.y_true_col, format=True)
                 if self.evaluation_settings["auroc"]:
                     roc_curve_itr, auroc_itr = self.compute_auroc(df_itr)
                     # individual ROC curves

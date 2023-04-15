@@ -9,9 +9,12 @@ input_settings:
 
   file_names:
     # experiment_name (to be used as a key in comparative analysis): file_name
-    "LR": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
+  #  "LR-ovr": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
+    "LR": "20230410/host_multi/kmer_k3_virus_host_name_multi_presplit_lr_multinomial_lr_output.csv"
     "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
-    "Transformer": "20230406/host_multi/transformer_presplit_nlp_transformer_output.csv"
+    #"Transformer-seq512": "20230406-1/host_multi/transformer_presplit_nlp_transformer_output.csv"
+    "Transformer": "20230407/host_multi/transformer_presplit_nlp_transformer_output.csv"
+    #"Transformer-300K": "20230411/host_multi/transformer_presplit_nlp_transformer_output.csv"
 
 evaluation_settings:
   type: "multi"
@@ -20,12 +23,21 @@ evaluation_settings:
   auprc: True
   f1: True
   accuracy: True
-  prediction_distribution: True
+  prediction_distribution: False
 
-
+label_mappings:
+  "Homo sapiens": "Human"
+  "Phacochoerus aethiopicus": "Desert warthog"
+  "Bandicota bengalensis": "Lesser bandicoot rat"
+  "Equus caballus": "Horse"
+  "Capra hircus": "Goat"
+  "Gallus gallus": "Red junglefowl"
+  "Apodemus sylvaticus": "Wood mouse"
+  "Bos taurus": "Cattle"
+  "Others": "Others"
 output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230406/host_multi"
-  prefix: "host_multi_lr_rf_transformer"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "uniref90/20230413/host_multi_final_dataset"
+  prefix: "lr_rf_transformer"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

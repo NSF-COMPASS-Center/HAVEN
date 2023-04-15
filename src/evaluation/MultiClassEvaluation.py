@@ -67,12 +67,12 @@ class MultiClassEvaluation(EvaluationBase):
 
             visualization_utils.curve_plot(df=self.roc_curves_df[self.roc_curves_df[self.itr_col] == itr_selected], x_col="fpr", y_col="tpr",
                                            color_group_col=self.class_col, style_group_col=self.experiment_col,
-                                           output_file_path=self.visualization_output_file_path + "_roc_curves.png")
+                                           output_file_path=self.visualization_output_file_path + "_roc_curves.png", metadata=self.metadata)
         if self.evaluation_settings["auprc"]:
             visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auprc",
                                          self.visualization_output_file_path + "_auprc_boxplot.png")
             visualization_utils.curve_plot(df=self.pr_curves_df[self.pr_curves_df[self.itr_col] == itr_selected], x_col="recall", y_col="precision",
                                            color_group_col=self.class_col, style_group_col=self.experiment_col,
-                                           output_file_path=self.visualization_output_file_path + "_precision_recall_curves.png")
+                                           output_file_path=self.visualization_output_file_path + "_precision_recall_curves.png", metadata=self.metadata)
         return
 
