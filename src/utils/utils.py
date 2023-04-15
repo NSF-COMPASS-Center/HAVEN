@@ -101,3 +101,15 @@ def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
         # 5. Write the classification output
         print(f"Writing {output_type} of {model_name} to {output_file_path}")
         pd.concat(dfs).to_csv(output_file_path, index=True)
+
+
+def compute_class_distribution(df, label_col, format=False):
+    labels_counts = df[label_col].value_counts()
+    n = labels_counts.sum()
+    labels_counts = labels_counts / n * 100
+    labels_counts = labels_counts.to_dict()
+    if format:
+        labels_counts = {k: f"{k} ({v:.2f}%)" for k, v, in labels_counts.items()}
+    return labels_counts
+
+

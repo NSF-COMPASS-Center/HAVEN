@@ -12,11 +12,12 @@ def execute(config):
     output_evaluation_dir = output_settings["evaluation_dir"]
     output_visualization_dir = output_settings["visualization_dir"]
     output_dataset_dir = output_settings["dataset_dir"]
+    label_mappings = config["label_mappings"]
 
     evaluation_settings = config["evaluation_settings"]
     evaluation_type = evaluation_settings["type"]
 
-    df = read_inputs(input_settings)
+    df = read_inputs(input_settings, label_mappings)
     output_file_name = get_output_file_name(input_settings, output_settings)
     evaluation_output_file_base_path = os.path.join(output_dir, output_evaluation_dir, output_dataset_dir)
     visualization_output_file_base_path = os.path.join(output_dir, output_visualization_dir, output_dataset_dir)
@@ -35,7 +36,7 @@ def execute(config):
     return
 
 
-def read_inputs(input_settings):
+def read_inputs(input_settings, label_mappings):
     input_dir = input_settings["input_dir"]
     input_file_names = input_settings["file_names"]
 
@@ -45,6 +46,8 @@ def read_inputs(input_settings):
         input_file_path = os.path.join(input_dir, file_name)
         df = pd.read_csv(input_file_path, index_col=0)
         print(f"input file = {input_file_path} --> results size = {df.shape}")
+        df.rename(columns=label_mappings, inplace=True)
+        df["y_true"] = df["y_true"].replace(label_mappings)
         df["experiment"] = key
         inputs.append(df)
     df = pd.concat(inputs)

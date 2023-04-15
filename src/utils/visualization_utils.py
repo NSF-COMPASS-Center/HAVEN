@@ -18,14 +18,19 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None):
     plt.savefig(output_file_path)
 
 
-def curve_plot(df, x_col, y_col, color_group_col, style_group_col, output_file_path):
+def curve_plot(df, x_col, y_col, color_group_col, style_group_col, output_file_path, metadata=None):
     plt.clf()
     sns.set_theme()
-
-    ax = sns.lineplot(data=df, x=x_col, y=y_col, hue=color_group_col, style=style_group_col)
+    hue_order = None
+    if metadata is not None:
+        df = df.replace({color_group_col: metadata})
+        hue_order = list(metadata.values())
+    plt.figure(figsize=(12,8))
+    ax = sns.lineplot(data=df, x=x_col, y=y_col, hue=color_group_col, style=style_group_col, hue_order=hue_order, ci=None)
 
     ax.set_ylim(0, 1)
     plt.rcParams['xtick.labelsize'] = 8
+    plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
     plt.tight_layout()
 
     #plt.xticks(rotation=20)
