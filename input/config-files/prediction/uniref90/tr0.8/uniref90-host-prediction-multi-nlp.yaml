@@ -45,7 +45,7 @@ input_settings:
 
 classification_settings:
   model_type: "nlp"
-  n_iterations: 2
+  n_iterations: 5
   split_input: False
   sequence_settings:
     batch_size: 16
