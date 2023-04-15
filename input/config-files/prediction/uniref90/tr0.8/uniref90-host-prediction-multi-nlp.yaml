@@ -59,8 +59,8 @@ classification_settings:
   models:
     - name: "transformer"
       active: True
-      mode: test # supported values: train, test
-      pretrained_model_path: "output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
+      mode: train # supported values: train, test
+      pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       n_heads: 8
       depth: 6
       n_tokens: 27
