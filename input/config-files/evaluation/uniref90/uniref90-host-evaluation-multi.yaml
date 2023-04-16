@@ -9,11 +9,11 @@ input_settings:
 
   file_names:
     # experiment_name (to be used as a key in comparative analysis): file_name
-  #  "LR-ovr": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
-    "LR": "20230410/host_multi/kmer_k3_virus_host_name_multi_presplit_lr_multinomial_lr_output.csv"
-    "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
+    # "LR-ovr": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
+    "LR": "20230412/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
+    "RF": "20230412/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
     #"Transformer-seq512": "20230406-1/host_multi/transformer_presplit_nlp_transformer_output.csv"
-    "Transformer": "20230407/host_multi/transformer_presplit_nlp_transformer_output.csv"
+    "Transformer": "20230411/host_multi/transformer_presplit_nlp_transformer_output.csv"
     #"Transformer-300K": "20230411/host_multi/transformer_presplit_nlp_transformer_output.csv"
 
 evaluation_settings:
@@ -39,5 +39,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230413/host_multi_final_dataset"
-  prefix: "lr_rf_transformer"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "uniref90/20230413-1/host_multi_tr19ktest300k"
+  prefix: ""# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
