@@ -65,7 +65,7 @@ classification_settings:
       depth: 6
       n_tokens: 27
       n_classes: 9
-      n_epochs: 30
+      n_epochs: 10
       dim: 512
 
 output_settings:
