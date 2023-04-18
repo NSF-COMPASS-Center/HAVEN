@@ -1,6 +1,19 @@
-# Content Organization
-- data: 
-    - raw: Folder containing raw protein sequences in fasta format. 
+# Zoonosis
+
+Machine learning and deep learning models to predict -- 
+- Will a given virus sequence infect humans?
+- What is the host of a given virus sequence?
+- What are the zoonotic mutations in an animal viral sequence?
+
+## Repository Organization
+- **deployment**
+  - arc: shell scripts for deployments in arc
+- **input**: 
+    - config-files: yaml config files for data-preprocessing, prediction, and evaluation tasks.
+    - data: raw fasta files of protein sequences and five independent splits with training and testing files
+      - HEV virus protein sequences downloaded from
+      - all mammlian and aves virus protein sequences download from UniRef90.
+  raw: Folder containing raw protein sequences in fasta format. 
     - processed: Folder containing all preprocessed protein sequences with labels to be supplied as input to classification models.
 - deployment:Scripts needed to execute the pipeline in remote servers like csbgpu and arc. 
     - arc: Scripts needed to execute the pipeline in arc.
@@ -39,6 +52,9 @@ General usage to call a yaml config and output to a log file.
 ```
 python src/pipeline.py -c config/hepConfig.yaml > $RESULTS_DIR/hep_host_transfer.$(date +%Y_%b_%d_%H_%M).log 2>&1
 ```
+
+### ARC Deployments
+- Instantiate conda environment
 
 
 

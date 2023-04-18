@@ -9,7 +9,7 @@ from utils import feature_importance, validation_scores
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Protein structure analysis pipeline')
+    parser = argparse.ArgumentParser(description="Zoonosis prediction pipeline")
     parser.add_argument('-c', '--config', required=True,
                         help="File containing configuration to execute the pipeline.\n")
     args = parser.parse_args()
