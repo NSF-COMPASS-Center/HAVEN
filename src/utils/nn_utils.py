@@ -11,7 +11,7 @@ from prediction.models.nlp.padding import Padding
 def create_clones(module, N):
     """
     Returns create N identical layers of a given neural network module,
-    examples of modules: feed-forward, multi-head attention, or even a layer of encoder (which has multiple layers multi-head attention and feed-foward layers within it)
+    examples of modules: feed-forward, multi-head attention, or even a layer of encoder (which has multiple layers multi-head attention and feed-forward layers within it)
     :param module: neural network module
     :param N: number of clones to be created
     :return: List of N clones of module
@@ -36,14 +36,13 @@ def get_device(tensor=None):
     return device
 
 
-def get_dataset_loader(input_dir, input, sequence_settings, label_settings, dataset_type=None):
+def get_dataset_loader(input_dir, input, sequence_settings, label_settings, classification_type, dataset_type=None):
     seq_col = sequence_settings["sequence_col"]
-    label_col = label_settings["label_col"]
-    label_classes = label_settings["label_classes"]
     batch_size = sequence_settings["batch_size"]
     sequence_max_length = sequence_settings["sequence_max_length"]
     pad_sequence_val = sequence_settings["pad_sequence_val"]
+    # TODO: add support for multiple files in the list. Current implementation supports only one train and one test file.
     filepath = os.path.join(input_dir, input["dir"], input[dataset_type][0])
-    dataset = ProteinSequenceDataset(filepath, seq_col, label_col, label_classes, sequence_max_length)
+    dataset = ProteinSequenceDataset(filepath, seq_col, sequence_max_length, label_settings, classification_type)
     return dataset.index_label_map, DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=Padding(sequence_max_length, pad_sequence_val))
 

@@ -47,7 +47,7 @@ classification_settings:
   model_type: "nlp"
   n_iterations: 5
   split_input: False
-  type : "multi" # binary or multi
+  type : "binary" # binary or multi
   sequence_settings:
     batch_size: 16
     sequence_col: "seq"

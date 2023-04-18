@@ -12,7 +12,6 @@ from utils import utils, nn_utils, visualization_utils
 from prediction.models.nlp import transformer
 
 
-
 def execute(input_settings, output_settings, classification_settings):
     # input settings
     input_dir = input_settings["input_dir"]
@@ -28,23 +27,32 @@ def execute(input_settings, output_settings, classification_settings):
     models = classification_settings["models"]
     label_settings = classification_settings["label_settings"]
     sequence_settings = classification_settings["sequence_settings"]
+    classification_type = classification_settings["type"]
 
     results = {}
     itr = 0
     for input in inputs:
         print(f"Iteration {itr}")
         # 1. Read the data files
-        index_label_map, train_dataset_loader = nn_utils.get_dataset_loader(input_dir, input, sequence_settings, label_settings, dataset_type="train")
+        index_label_map, train_dataset_loader = nn_utils.get_dataset_loader(input_dir, input, sequence_settings,
+                                                                            label_settings, classification_type,
+                                                                            dataset_type="train")
         index_label_map, test_dataset_loader = nn_utils.get_dataset_loader(input_dir, input, sequence_settings,
-                                                                            label_settings, dataset_type="test")
+                                                                           label_settings, classification_type,
+                                                                           dataset_type="test")
 
         nlp_model = None
+        model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{}_e{}.pth")
+        Path(os.path.dirname(model_filepath)).mkdir(parents=True, exist_ok=True)
+
         for model in models:
-            model["sequence_max_length"] = sequence_settings["sequence_max_length"] # setting arguments within model to avoid passing multiple arguments
-            if model["active"] is False:
-                print(f"Skipping {model['name']} ...")
-                continue
             model_name = model["name"]
+            model["sequence_max_length"] = sequence_settings[
+                "sequence_max_length"]  # setting arguments within model to avoid passing multiple arguments
+            if model["active"] is False:
+                print(f"Skipping {model_name} ...")
+                continue
+
             if model_name not in results:
                 # first iteration
                 results[model_name] = []
@@ -60,7 +68,8 @@ def execute(input_settings, output_settings, classification_settings):
 
                 # For faster computation
                 nlp_model.to(nn_utils.get_device())
-                result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["n_epochs"], model_name, mode)
+                result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader,
+                                                       model["n_epochs"], model_name, mode, model_filepath, itr)
             else:
                 continue
 
@@ -76,12 +85,8 @@ def execute(input_settings, output_settings, classification_settings):
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
     utils.write_output(results, output_results_dir, output_filename_prefix, "output")
 
-    model_filepath = os.path.join(output_dir, results_dir, sub_dir, "trained_transformer_model.pth")
-    Path(os.path.dirname(model_filepath)).mkdir(parents=True, exist_ok=True)
-    torch.save(nlp_model.state_dict(), model_filepath)
 
-
-def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, model_name, mode):
+def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, model_name, mode, model_filepath, itr):
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     lr_scheduler = OneCycleLR(
@@ -100,11 +105,13 @@ def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, 
         # train the model only if set to train mode
         for e in range(n_epochs):
             model = run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer,
-                                               lr_scheduler, tbw, model_name, e)
+                              lr_scheduler, tbw, model_name, e)
+            torch.save(model.state_dict(), model_filepath.format(model_name=model_name, itr=itr, e=e))
     return evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch=None, log_loss=False), model
 
 
-def run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer, lr_scheduler, tbw, model_name, epoch):
+def run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer, lr_scheduler, tbw, model_name,
+              epoch):
     # Training
     model.train()
     for _, record in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
@@ -126,7 +133,8 @@ def run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optim
         train_loss = loss.item()
         tbw.add_scalar(f"{model_name}/learning-rate", float(curr_lr), model.train_iter)
         tbw.add_scalar(f"{model_name}/training-loss", float(train_loss), model.train_iter)
-        pbar.set_description(f"{model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch+1}")
+        pbar.set_description(
+            f"{model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
 
     # Testing
     evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch, log_loss=True)

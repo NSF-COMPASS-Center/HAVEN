@@ -23,24 +23,24 @@ input_settings:
   # file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   file_names:
     - dir: "s10374872"
-      train: [ "ORF1.fa_processed.csv_tr0.8_train.csv", "ORF2.fa_processed.csv_tr0.8_train.csv", "ORF3.fa_processed.csv_tr0.8_train.csv", "ORF4.fa_processed.csv_tr0.8_train.csv" ]
-      test: [ "ORF1.fa_processed.csv_tr0.8_test.csv", "ORF2.fa_processed.csv_tr0.8_test.csv", "ORF3.fa_processed.csv_tr0.8_test.csv", "ORF4.fa_processed.csv_tr0.8_test.csv" ]
+      train: [ "ORF1.fa_processed.csv_tr0.8_train.csv"]
+      test: [ "ORF1.fa_processed.csv_tr0.8_test.csv"]
 
     - dir: "s44292027"
-      train: [ "ORF1.fa_processed.csv_tr0.8_train.csv", "ORF2.fa_processed.csv_tr0.8_train.csv", "ORF3.fa_processed.csv_tr0.8_train.csv", "ORF4.fa_processed.csv_tr0.8_train.csv" ]
-      test: [ "ORF1.fa_processed.csv_tr0.8_test.csv", "ORF2.fa_processed.csv_tr0.8_test.csv", "ORF3.fa_processed.csv_tr0.8_test.csv", "ORF4.fa_processed.csv_tr0.8_test.csv" ]
+      train: [ "ORF1.fa_processed.csv_tr0.8_train.csv"]
+      test: [ "ORF1.fa_processed.csv_tr0.8_test.csv"]
 
     - dir: "s224225183"
-      train: [ "ORF1.fa_processed.csv_tr0.8_train.csv", "ORF2.fa_processed.csv_tr0.8_train.csv", "ORF3.fa_processed.csv_tr0.8_train.csv", "ORF4.fa_processed.csv_tr0.8_train.csv" ]
-      test: [ "ORF1.fa_processed.csv_tr0.8_test.csv", "ORF2.fa_processed.csv_tr0.8_test.csv", "ORF3.fa_processed.csv_tr0.8_test.csv", "ORF4.fa_processed.csv_tr0.8_test.csv" ]
+      train: [ "ORF1.fa_processed.csv_tr0.8_train.csv"]
+      test: [ "ORF1.fa_processed.csv_tr0.8_test.csv"]
 
     - dir: "s331028508"
-      train: [ "ORF1.fa_processed.csv_tr0.8_train.csv", "ORF2.fa_processed.csv_tr0.8_train.csv", "ORF3.fa_processed.csv_tr0.8_train.csv", "ORF4.fa_processed.csv_tr0.8_train.csv" ]
-      test: [ "ORF1.fa_processed.csv_tr0.8_test.csv", "ORF2.fa_processed.csv_tr0.8_test.csv", "ORF3.fa_processed.csv_tr0.8_test.csv", "ORF4.fa_processed.csv_tr0.8_test.csv" ]
+      train: [ "ORF1.fa_processed.csv_tr0.8_train.csv"]
+      test: [ "ORF1.fa_processed.csv_tr0.8_test.csv"]
 
     - dir: "s752300722"
-      train: [ "ORF1.fa_processed.csv_tr0.8_train.csv", "ORF2.fa_processed.csv_tr0.8_train.csv", "ORF3.fa_processed.csv_tr0.8_train.csv", "ORF4.fa_processed.csv_tr0.8_train.csv" ]
-      test: [ "ORF1.fa_processed.csv_tr0.8_test.csv", "ORF2.fa_processed.csv_tr0.8_test.csv", "ORF3.fa_processed.csv_tr0.8_test.csv", "ORF4.fa_processed.csv_tr0.8_test.csv" ]
+      train: [ "ORF1.fa_processed.csv_tr0.8_train.csv"]
+      test: [ "ORF1.fa_processed.csv_tr0.8_test.csv"]
 
 
 classification_settings:
@@ -48,26 +48,32 @@ classification_settings:
   n_iterations: 5
   split_input: False
   type: "multi"
+  sequence_settings:
+    batch_size: 16
+    sequence_col: "sequence"
+    sequence_max_length: 1024
+    pad_sequence_val: 0
   label_settings:
     label_col: "host"
     exclude_labels: [ "culture supernatant (Unknown map)", "Unknown"]
     label_groupings:
       "Human" : ["Human"]
       "Boar": ["Boar"]
-      "Others": ["Leporidae", "Rodent", "Avian", "Ferret", "Camel", "Mongoose", "Bat", "Primate", "Shrew", "Deer", "Hare", "Canine"]
+      "Others": ["*"]
   models:
     - name: "transformer"
       active: True
-      d: 512
+      mode: train # supported values: train, test
+      pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       n_heads: 8
       depth: 6
-      seq_len:
-      seq_len_max:
-      n_tokens:
-      n_classes: 2
+      n_tokens: 27
+      n_classes: 3
+      n_epochs: 2
+      dim: 512
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "hev/20221214/host_multi/orf1_orf2_orf3_orf4"
-  prefix: # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "hev/20230418/host_multi/orf1"
+  prefix: nlp # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

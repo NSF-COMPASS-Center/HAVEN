@@ -47,6 +47,7 @@ classification_settings:
   model_type: "nlp"
   n_iterations: 5
   split_input: False
+  type : "multi" # binary or multi
   sequence_settings:
     batch_size: 16
     sequence_col: "seq"
@@ -55,7 +56,16 @@ classification_settings:
   label_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan"]
-    label_classes: [ "Homo sapiens", "Phacochoerus aethiopicus", "Bandicota bengalensis", "Equus caballus", "Capra hircus", "Gallus gallus", "Apodemus sylvaticus", "Bos taurus" ]
+    label_groupings:
+      "Human": [ "Homo sapiens" ]
+      "Desert warthog": [ "Phacochoerus aethiopicus" ]
+      "Lesser bandicoot rat": [ "Bandicota bengalensis" ]
+      "Horse": [ "Equus caballus" ]
+      "Goat": [ "Capra hircus" ]
+      "Red junglefowl": [ "Gallus gallus" ]
+      "Wood mouse": [ "Apodemus sylvaticus" ]
+      "Cattle": [ "Bos taurus" ]
+      "Others": [ "*" ]
   models:
     - name: "transformer"
       active: True
@@ -72,5 +82,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230414/host_multi"
+  sub_dir: "uniref90/20230418/host_multi"
   prefix: "nlp" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
