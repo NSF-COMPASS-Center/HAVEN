@@ -53,9 +53,14 @@ General usage to call a yaml config and output to a log file.
 python src/pipeline.py -c config/hepConfig.yaml > $RESULTS_DIR/hep_host_transfer.$(date +%Y_%b_%d_%H_%M).log 2>&1
 ```
 
-### ARC Deployments
+### ARC Setup
 - Instantiate conda environment
-
+```
+bash
+conda create -n zoonosis
+pip install numpy --pre torch --index-url https://download.pytorch.org/whl/cu117
+pip install -r requirements.txt
+```
 
 
 
