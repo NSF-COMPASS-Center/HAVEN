@@ -82,6 +82,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  logs_dir: "logs"
   sub_dir: "uniref90/20230418/host_multi"
   prefix: "nlp" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
