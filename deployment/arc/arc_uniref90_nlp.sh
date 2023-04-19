@@ -1,19 +1,23 @@
 #!/bin/bash
 
-#SBATCH -J zoonosis-uniref90-baseline
+#SBATCH -J zoonosis-uniref90-nlp
 #SBATCH --account=seqevol
-#SBATCH --partition=normal_q
+#SBATCH --partition=a100_normal_q
 
 #SBATCH --mem=64G
 #SBATCH --nodes=1
-#SBATCH -t 24:00:00 # wall-time required (
+#SBATCH --gres=gpu:1
+#SBATCH -t 72:00:00 # wall-time required (
 # 24hrs)
 
 
 # Load modules
+module reset
 module load
+# Load conda
 module load Anaconda3
-
+#Load CUDA
+module load cuda11.2/toolkit
 
 # Load conda environment
 source activate ~/anaconda3/envs/zoonosis
