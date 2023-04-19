@@ -21,10 +21,12 @@ class ClassificationTransformer(nn.Module):
 
 
 def get_transformer_model(model):
-    return ClassificationTransformer(n_tokens=model["n_tokens"],
+    model = ClassificationTransformer(n_tokens=model["n_tokens"],
                               seq_len=model["sequence_max_length"],
                               n_classes=model["n_classes"],
                               N=model["depth"],
                               d=model["dim"],
                               d_ff=2048,
                               h=model["n_heads"])
+    print(model)
+    print("Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
