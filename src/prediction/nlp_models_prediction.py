@@ -23,7 +23,7 @@ def execute(input_settings, output_settings, classification_settings):
     sub_dir = output_settings["sub_dir"]
     output_prefix = output_settings["prefix"]
     output_prefix = "_" + output_prefix if output_prefix is not None else ""
-    tbw = SummaryWriter(os.path.join(output_dir, output_settings["logs_dir"]))
+    tbw = SummaryWriter(os.path.join(output_dir, output_settings["logs_dir"], "runs"))
 
     models = classification_settings["models"]
     label_settings = classification_settings["label_settings"]
@@ -43,7 +43,7 @@ def execute(input_settings, output_settings, classification_settings):
                                                                            dataset_type="test")
 
         nlp_model = None
-        model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{}_e{}.pth")
+        model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}_e{e}.pth")
         Path(os.path.dirname(model_filepath)).mkdir(parents=True, exist_ok=True)
 
         for model in models:

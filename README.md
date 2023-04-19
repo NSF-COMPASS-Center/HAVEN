@@ -43,23 +43,32 @@ Data can be generated in GenbankData/ given you have an accession list.
 
 ### Dependencies
 Install python dependencies via 
-``` 
+```shell 
 pip install -R ./requirements.txt
 ```
 
 ### Usage
 General usage to call a yaml config and output to a log file.
-```
+```shell
 python src/pipeline.py -c config/hepConfig.yaml > $RESULTS_DIR/hep_host_transfer.$(date +%Y_%b_%d_%H_%M).log 2>&1
 ```
 
 ### ARC Setup
 - Instantiate conda environment
-```
+```shell
 bash
 conda create -n zoonosis
 pip install numpy --pre torch --index-url https://download.pytorch.org/whl/cu117
 pip install -r requirements.txt
+pip install pyyaml
+conda install pandas
+
+```
+
+### ARC Deployment
+
+```shell
+sbatch deployment/arc/arc_uniref90_nlp.sh . input/config-files/prediction/hev/tr0.8_grouping/hev-host-prediction-multi-nlp.yaml output/logs/
 ```
 
 
