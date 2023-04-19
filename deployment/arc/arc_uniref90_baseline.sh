@@ -4,10 +4,9 @@
 #SBATCH --account=seqevol
 #SBATCH --partition=normal_q
 
-#SBATCH --mem=64G
+#SBATCH --mem=128G
 #SBATCH --nodes=1
-#SBATCH -t 24:00:00 # wall-time required (
-# 24hrs)
+#SBATCH -t 24:00:00 # wall-time required (# 24hrs)
 
 
 # Load modules
@@ -34,7 +33,7 @@ echo "Log File: $LOG_FILE"
 
 echo "Zoonosis baseline model START"
 date
-~/anaconda3/envs/zoonosis-baseline/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
+~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
 echo "Zoonosis baseline model END"
 date
 
