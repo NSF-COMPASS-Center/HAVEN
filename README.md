@@ -70,7 +70,7 @@ conda install pandas
 ### ARC Deployment
 
 ```shell
-sbatch deployment/arc/arc_uniref90_nlp.sh . input/config-files/prediction/hev/tr0.8_grouping/hev-host-prediction-multi-nlp.yaml output/logs/
+sbatch deployment/arc/arc_uniref90_nlp.sh . input/config-files/prediction/uniref90/tr0.8/uniref90-host-prediction-multi-nlp.yaml 
 ```
 
 
