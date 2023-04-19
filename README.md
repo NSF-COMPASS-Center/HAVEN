@@ -31,10 +31,12 @@ Machine learning and deep learning models to predict --
 - src: source code
 
 
-# About
-Inspired by the UMAP projection clustering as pointed out in [Learning the language of viral evolution and escape](https://www.science.org/doi/10.1126/science.abd7331), language models seem to be able to cluster data very well during pretraining without supervision. We make a simple pipeline with yaml files that trains models and evaluates the predictive performance with and without pretraining.
+## Prerequisites:
+### Taxonkit and pytaxonkit
 
-# Prerequisites:
+```shell
+conda install -c bioconda pytaxonkit
+```
 To run on ARC, you must copy this directory to ~/ on ARC and run deployment/setup1.sh and deployment/setup2.sh, which will set up a conda env labeled BioNLP.
 
 ### Data
