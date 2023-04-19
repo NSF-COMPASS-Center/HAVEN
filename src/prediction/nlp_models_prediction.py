@@ -23,7 +23,6 @@ def execute(input_settings, output_settings, classification_settings):
     sub_dir = output_settings["sub_dir"]
     output_prefix = output_settings["prefix"]
     output_prefix = "_" + output_prefix if output_prefix is not None else ""
-    tbw = SummaryWriter(os.path.join(output_dir, output_settings["logs_dir"], "runs"))
 
     models = classification_settings["models"]
     label_settings = classification_settings["label_settings"]
@@ -70,7 +69,7 @@ def execute(input_settings, output_settings, classification_settings):
                 # For faster computation
                 nlp_model.to(nn_utils.get_device())
                 result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader,
-                                                       model["n_epochs"], tbw, model_name, mode, model_filepath, itr)
+                                                       model["n_epochs"], model_name, mode, model_filepath, itr)
             else:
                 continue
 
@@ -87,7 +86,8 @@ def execute(input_settings, output_settings, classification_settings):
     utils.write_output(results, output_results_dir, output_filename_prefix, "output")
 
 
-def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, tbw, model_name, mode, model_filepath, itr):
+def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, model_name, mode, model_filepath, itr):
+    tbw = SummaryWriter()
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     lr_scheduler = OneCycleLR(

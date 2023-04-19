@@ -14,8 +14,9 @@ from itertools import repeat
 UNIREF90_DATA_CSV_FILENAME = "uniref90_parsed.csv"
 UNIREF90_DATA_W_HOSTS_FILENAME = "uniref90_w_hosts.csv"
 UNIREF90_DATA_W_METADATA = "uniref90_w_metadata.csv"
-UNIREF90_DATA_FILTERED_FILENAME = "uniref90_mammals_aves_virus.csv"
-UNIREF90_DATA_FINAL_FILENAME = "uniref90_final.csv"
+UNIREF90_DATA_MAMMALS_AVES = "uniref90_mammals_aves_virus.csv"
+UNIREF90_DATA_W_SINGLE_HOST = "uniref90_mammals_aves_w_singlehost"
+UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_final.csv"
 
 # Column names at various stages of dataset curation
 UNIREF90_ID = "uniref90_id"
@@ -311,7 +312,7 @@ def get_mammals_aves_tax_ids(tax_ids):
 # Output: Filtered dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 def remove_sequences_of_virus_with_one_host(output_directory, df):
     print("\nRemoving sequences with one host.")
-    df = pd.read_csv(os.path.join(output_directory, UNIREF90_DATA_FILTERED_FILENAME))
+    df = pd.read_csv(os.path.join(output_directory, UNIREF90_DATA_MAMMALS_AVES))
     # group by virus name and count the number of unique hosts for each virus
     agg_df = df.groupby([VIRUS_NAME])[VIRUS_HOST_NAME].nunique()
     # list of viruses with only one unique host
@@ -341,30 +342,31 @@ def main():
     output_dir = config.output_dir
 
     # 1. Parse the Fasta file
-    parse_fasta_file(input_file_path, output_dir)
-    # 2. Get hosts of the virus from which the protein sequences were sampled
-    get_virus_hosts(output_dir)
-    # 3. Filter the dataset: Remove sequences with no hosts of the virus
-    df = remove_sequences_w_no_hosts(output_dir)
-    # 4. Explode the host column: Create multiple entries (duplicate the sequence) one for each host of the virus of the sequence
-    df = explode_virus_hosts(df)
-    # 5. Get metadata for each record: taxonomy name and rank of the virus and virus_hosts of the sequences
-    df = get_virus_metadata(df)
-    # Note: Data in steps 2, 3, 4, 5 do not contain the protein sequence. We dropped the sequence column in step 2 to save memory
-    # 6. Rejoin the sequence data using the parsed fasta file output from step 1 and write to an intermediary dataset file
-    join_metadata_with_sequences_data(df, output_dir)
-    # 7. Filters
-    # 7.1 Retain sequences with virus AND virus host with rank = "Species
-    df = get_sequences_at_species_level(output_dir)
-    # 7.2 Retain sequences with viruses hosts belonging to the class of Mammals OR Aves (birds)
-    df = get_sequences_from_mammals_aves_hosts(df)
+    # parse_fasta_file(input_file_path, output_dir)
+    # # 2. Get hosts of the virus from which the protein sequences were sampled
+    # get_virus_hosts(output_dir)
+    # # 3. Filter the dataset: Remove sequences with no hosts of the virus
+    # df = remove_sequences_w_no_hosts(output_dir)
+    # # 4. Explode the host column: Create multiple entries (duplicate the sequence) one for each host of the virus of the sequence
+    # df = explode_virus_hosts(df)
+    # # 5. Get metadata for each record: taxonomy name and rank of the virus and virus_hosts of the sequences
+    # df = get_virus_metadata(df)
+    # # Note: Data in steps 2, 3, 4, 5 do not contain the protein sequence. We dropped the sequence column in step 2 to save memory
+    # # 6. Rejoin the sequence data using the parsed fasta file output from step 1 and write to an intermediary dataset file
+    # join_metadata_with_sequences_data(df, output_dir)
+    # # 7. Filters
+    # # 7.1 Retain sequences with virus AND virus host with rank = "Species
+    # df = get_sequences_at_species_level(output_dir)
+    # # 7.2 Retain sequences with viruses hosts belonging to the class of Mammals OR Aves (birds)
+    # df = get_sequences_from_mammals_aves_hosts(df)
     # 7.3 Remove viruses with only one unique virus host
-    df = remove_sequences_of_virus_with_one_host(output_dir, df)
+    # df = remove_sequences_of_virus_with_one_host(output_dir, df)
     # 7.4 Remove duplicate sequences (same uniref90_id and sequence, but multiple hosts)
+    df = pd.read_csv(os.path.join(output_dir, UNIREF90_DATA_MAMMALS_AVES))
     df = remove_duplicate_sequences(df)
     # 8. Write the filtered dataset to a file
-    print(f"Writing to file {UNIREF90_DATA_FINAL_FILENAME}")
-    df.to_csv(os.path.join(output_dir, UNIREF90_DATA_FINAL_FILENAME), index=False)
+    print(f"Writing to file {UNIREF90_DATA_W_SINGLE_HOST}")
+    df.to_csv(os.path.join(output_dir, UNIREF90_DATA_W_SINGLE_HOST), index=False)
 
 
 if __name__ == '__main__':
