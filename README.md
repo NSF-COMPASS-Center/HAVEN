@@ -70,6 +70,7 @@ conda install pandas
 ### ARC Deployment
 
 ```shell
+sbatch deployment/arc/arc_uniref90_baseline.sh . input/config-files/prediction/uniref90/tr0.8/uniref90-host-prediction-multi-baseline.yaml baseline
 sbatch deployment/arc/arc_uniref90_nlp.sh . input/config-files/prediction/uniref90/tr0.8/uniref90-host-prediction-multi-nlp.yaml 
 ```
 

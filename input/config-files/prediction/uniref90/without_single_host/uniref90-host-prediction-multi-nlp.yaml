@@ -1,0 +1,86 @@
+config_type: "prediction" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "input/data/uniref90/splits"
+
+  # Name of file(s) in subdirectory to be read and processed.
+  # Two forms of inputs:
+  # Example: With pre split input files [NOTE: classification_settings.split_input MUST be set to False]
+  #  file_names:
+  #    - dir: "<dir_1>"
+  #      train: ["train_file_1_1.csv", "train_file_1_2.csv", "train_file_1_3.csv"]
+  #      test: ["test_file_1_1.csv", "test_file_1_2.csv", "test_file_1_3.csv"]
+  #
+  #    - dir: "<dir_2>"
+  #      train: ["train_file_2_1.csv", "train_file_2_2.csv"]
+  #      test: ["test_file_2_1.csv", "test_file_2_2.csv"]
+  #
+  # Example: Without presplit input files
+  # file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
+  file_names:
+    - dir: "s12612648"
+      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
+      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+
+    - dir: "s31062180"
+      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
+      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+
+    - dir: "s48918293"
+      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
+      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+
+    - dir: "s55631155"
+      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
+      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+
+    - dir: "s79221635"
+      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
+      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+
+
+classification_settings:
+  model_type: "nlp"
+  n_iterations: 5
+  split_input: False
+  type : "multi" # binary or multi
+  sequence_settings:
+    batch_size: 128
+    sequence_col: "seq"
+    max_sequence_length: 1024
+    pad_sequence_val: 0
+  label_settings:
+    label_col: "virus_host_name"
+    exclude_labels: [ "nan"]
+    label_groupings:
+      "Human": [ "Homo sapiens" ]
+      "Desert warthog": [ "Phacochoerus aethiopicus" ]
+      "Lesser bandicoot rat": [ "Bandicota bengalensis" ]
+      "Horse": [ "Equus caballus" ]
+      "Goat": [ "Capra hircus" ]
+      "Red junglefowl": [ "Gallus gallus" ]
+      "Wood mouse": [ "Apodemus sylvaticus" ]
+      "Cattle": [ "Bos taurus" ]
+      "Others": [ "*" ]
+  models:
+    - name: "transformer"
+      active: True
+      mode: train # supported values: train, test
+      pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
+      n_heads: 8
+      depth: 6
+      n_tokens: 27
+      n_classes: 9
+      n_epochs: 10
+      dim: 512
+
+output_settings:
+  output_dir: "output"
+  results_dir: "raw"
+  visualizations_dir: "visualization"
+  sub_dir: "uniref90/20230418/host_multi"
+  prefix: "vanilla-transformer" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

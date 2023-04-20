@@ -51,7 +51,7 @@ classification_settings:
   sequence_settings:
     batch_size: 16
     sequence_col: "sequence"
-    sequence_max_length: 1024
+    max_sequence_length: 1800
     pad_sequence_val: 0
   label_settings:
     label_col: "host"

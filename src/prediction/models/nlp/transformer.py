@@ -4,9 +4,9 @@ from prediction.models.nlp.encoder import EncoderLayer, Encoder
 
 
 class ClassificationTransformer(nn.Module):
-    def __init__(self, n_tokens, seq_len, n_classes, N=6, d=512, d_ff=2048, h=8):
+    def __init__(self, n_tokens, max_seq_len, n_classes, N=6, d=512, d_ff=2048, h=8):
         super(ClassificationTransformer, self).__init__()
-        self.embedding = EmbeddingLayer(vocab_size=n_tokens, seq_len=seq_len, dim=d)
+        self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=d)
         self.encoder = Encoder(EncoderLayer(h, d, d_ff), N)
         self.linear = nn.Linear(d, n_classes)
 
@@ -22,7 +22,7 @@ class ClassificationTransformer(nn.Module):
 
 def get_transformer_model(model):
     model = ClassificationTransformer(n_tokens=model["n_tokens"],
-                              seq_len=model["sequence_max_length"],
+                              max_seq_len=model["max_sequence_length"],
                               n_classes=model["n_classes"],
                               N=model["depth"],
                               d=model["dim"],
@@ -30,3 +30,4 @@ def get_transformer_model(model):
                               h=model["n_heads"])
     print(model)
     print("Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
+    return model
