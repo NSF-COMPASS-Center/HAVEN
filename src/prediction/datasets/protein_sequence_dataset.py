@@ -7,11 +7,10 @@ import torch
 
 
 class ProteinSequenceDataset(Dataset):
-    def __init__(self, filepath, sequence_col, sequence_max_length, label_settings, classification_type):
+    def __init__(self, filepath, sequence_col, label_settings, classification_type):
         super(ProteinSequenceDataset, self).__init__()
         self.sequence_col = sequence_col
         self.label_col = label_settings["label_col"]
-        self.sequence_max_length = sequence_max_length
         self.label_settings = label_settings
         self.classification_type = classification_type
         self.amino_acid_map = {'A': 1, 'R': 2, 'N': 3, 'D': 4, 'C': 5,
@@ -33,8 +32,6 @@ class ProteinSequenceDataset(Dataset):
     def read_dataset(self, filepath):
         df = pd.read_csv(filepath, usecols=[self.sequence_col, self.label_col])
         print(f"Read dataset from {filepath}, size = {df.shape}")
-        # Truncating sequences to fixed length of sequence_max_length
-        df[self.sequence_col] = df[self.sequence_col].apply(lambda x: x[0:self.sequence_max_length])
         return df
 
     def __getitem__(self, idx: int):

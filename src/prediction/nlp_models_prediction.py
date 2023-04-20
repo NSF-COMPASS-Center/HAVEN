@@ -47,8 +47,8 @@ def execute(input_settings, output_settings, classification_settings):
 
         for model in models:
             model_name = model["name"]
-            model["sequence_max_length"] = sequence_settings[
-                "sequence_max_length"]  # setting arguments within model to avoid passing multiple arguments
+            # setting arguments within model to avoid passing multiple arguments
+            model["max_sequence_length"] = sequence_settings["max_sequence_length"]
             if model["active"] is False:
                 print(f"Skipping {model_name} ...")
                 continue

@@ -13,7 +13,7 @@ class Padding:
         sequences, labels = zip(*batch)
         sequences = [seq.clone().detach() for seq in sequences]
         # pad the first sequence to the desired fixed length
-        # NOTE: the fixed length padding will work only if all size of all sequences are less than or equal to the desired max_length
+        # NOTE: the fixed length padding will work only if size of all sequences are less than or equal to the desired max_length
         sequences[0] = nn.ConstantPad1d((0, self.max_length - sequences[0].shape[0]), self.pad_value)(sequences[0])
 
         # use pytorch utility pad_sequences for variable length padding w.r.t to the first sequence
