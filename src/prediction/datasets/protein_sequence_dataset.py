@@ -11,7 +11,7 @@ class ProteinSequenceDataset(Dataset):
     def __init__(self, filepath, sequence_col, max_seq_len, label_settings, classification_type):
         super(ProteinSequenceDataset, self).__init__()
         self.sequence_col = sequence_col
-        self.max_seq_len = max_seq_len
+        self.max_seq_len = max_seq_len # TODO: remove this field if positional encoding with convolution works
         self.label_col = label_settings["label_col"]
         self.label_settings = label_settings
         self.classification_type = classification_type
@@ -42,12 +42,12 @@ class ProteinSequenceDataset(Dataset):
         label = record[self.label_col]
 
         sequence_vector = np.array([self.amino_acid_map[a] for a in sequence])
-        seq_len = len(sequence_vector)
-        if seq_len > self.max_seq_len:
-            # select a random sub-string
-            start_index = random.randint(0, seq_len - self.max_seq_len)
-            end_index = start_index + self.max_seq_len
-            sequence_vector = sequence_vector[start_index:end_index]
+        # seq_len = len(sequence_vector)
+        # if seq_len > self.max_seq_len:
+        #     # select a random sub-string
+        #     start_index = random.randint(0, seq_len - self.max_seq_len)
+        #     end_index = start_index + self.max_seq_len
+        #     sequence_vector = sequence_vector[start_index:end_index]
         label_vector = np.array([label])
 
         return torch.tensor(sequence_vector, device=nn_utils.get_device()), torch.tensor(label_vector, device=nn_utils.get_device())

@@ -48,15 +48,15 @@ def get_transformer_model(model):
                                                  n_classes=model["n_classes"],
                                                  N=model["depth"],
                                                  d=model["dim"],
-                                                 d_ff=2048,
-                                             h=model["n_heads"])
+                                                 d_ff=2 * model["dim"],
+                                                 h=model["n_heads"])
     else:
         model = ClassificationTransformer(n_tokens=model["n_tokens"],
                                           max_seq_len=model["max_sequence_length"],
                                           n_classes=model["n_classes"],
                                           N=model["depth"],
                                           d=model["dim"],
-                                          d_ff=2048,
+                                          d_ff=2 * model["dim"],
                                           h=model["n_heads"])
     print(model)
     print("Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))

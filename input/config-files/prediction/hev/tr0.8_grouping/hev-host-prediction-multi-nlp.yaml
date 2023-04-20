@@ -49,7 +49,7 @@ classification_settings:
   split_input: False
   type: "multi"
   sequence_settings:
-    batch_size: 16
+    batch_size: 128
     sequence_col: "sequence"
     max_sequence_length: 1800
     pad_sequence_val: 0
@@ -88,7 +88,7 @@ classification_settings:
       dim: 512
 
     - name: "transformer-conv1d-crossentropy"
-      active: True
+      active: False
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "CrossEntropyLoss"
@@ -104,13 +104,13 @@ classification_settings:
       dim: 512
 
     - name: "transformer-conv1d-maxmargin"
-      active: False
+      active: True
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "MultiMarginLoss"
       with_convolution: True
-      kernel_size: 3
-      stride: 1
+      kernel_size: 16
+      stride: 16
       padding: 0
       n_heads: 8
       depth: 6

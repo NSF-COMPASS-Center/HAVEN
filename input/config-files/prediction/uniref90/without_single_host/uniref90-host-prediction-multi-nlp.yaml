@@ -49,9 +49,9 @@ classification_settings:
   split_input: False
   type : "multi" # binary or multi
   sequence_settings:
-    batch_size: 32
+    batch_size: 128
     sequence_col: "seq"
-    max_sequence_length: 1024
+    max_sequence_length: 8000
     pad_sequence_val: 0
   label_settings:
     label_col: "virus_host_name"
@@ -78,10 +78,10 @@ classification_settings:
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
-      dim: 128
+      dim: 512
 
     - name: "transformer-maxmargin"
-      active: True
+      active: False
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "MultiMarginLoss"
@@ -91,7 +91,7 @@ classification_settings:
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
-      dim: 128
+      dim: 512
 
     - name: "transformer-conv1d-crossentropy"
       active: False
@@ -110,13 +110,13 @@ classification_settings:
       dim: 128
 
     - name: "transformer-conv1d-maxmargin"
-      active: False
+      active: True
       mode: train # supported values: train, test
       pretrained_model_path: None #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "MultiMarginLoss"
       with_convolution: True
-      kernel_size: 3
-      stride: 1
+      kernel_size: 32
+      stride: 32
       padding: 0
       n_heads: 8
       depth: 6
@@ -130,4 +130,4 @@ output_settings:
   results_dir: "raw"
   visualizations_dir: "visualization"
   sub_dir: "uniref90/20230420-2/host_multi"
-  prefix: "transformer-vanilla1024" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "transformer-vanillaMM1024" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
