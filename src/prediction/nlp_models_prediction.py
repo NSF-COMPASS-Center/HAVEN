@@ -58,7 +58,7 @@ def execute(input_settings, output_settings, classification_settings):
                 results[model_name] = []
 
             # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
-            if model["name"] == "transformer":
+            if "transformer" in model_name:
                 mode = model["mode"]
                 print(f"Executing Transformer in {mode} mode")
 
@@ -68,7 +68,7 @@ def execute(input_settings, output_settings, classification_settings):
 
                 # For faster computation
                 nlp_model.to(nn_utils.get_device())
-                result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader,
+                result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["loss"],
                                                        model["n_epochs"], model_name, mode, model_filepath, itr)
             else:
                 continue
@@ -86,9 +86,9 @@ def execute(input_settings, output_settings, classification_settings):
     utils.write_output(results, output_results_dir, output_filename_prefix, "output")
 
 
-def run_transformer(model, train_dataset_loader, test_dataset_loader, n_epochs, model_name, mode, model_filepath, itr):
+def run_transformer(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, model_name, mode, model_filepath, itr):
     tbw = SummaryWriter()
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn_utils.get_criterion(loss)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     lr_scheduler = OneCycleLR(
         optimizer=optimizer,

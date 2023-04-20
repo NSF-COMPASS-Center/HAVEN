@@ -46,3 +46,9 @@ def get_dataset_loader(input_dir, input, sequence_settings, label_settings, clas
     dataset = ProteinSequenceDataset(filepath, seq_col, max_seq_len, label_settings, classification_type)
     return dataset.index_label_map, DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=Padding(max_seq_len, pad_sequence_val))
 
+
+def get_criterion(loss):
+    criterion = nn.CrossEntropyLoss() # default
+    if loss == "MultiMarginLoss":
+        criterion = nn.MultiMarginLoss()
+    return criterion
