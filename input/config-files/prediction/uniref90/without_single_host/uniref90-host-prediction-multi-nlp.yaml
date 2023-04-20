@@ -49,9 +49,9 @@ classification_settings:
   split_input: False
   type : "multi" # binary or multi
   sequence_settings:
-    batch_size: 128
+    batch_size: 32
     sequence_col: "seq"
-    max_sequence_length: 3000
+    max_sequence_length: 2000
     pad_sequence_val: 0
   label_settings:
     label_col: "virus_host_name"
@@ -67,10 +67,23 @@ classification_settings:
       "Cattle": [ "Bos taurus" ]
       "Others": [ "*" ]
   models:
-    - name: "transformer"
+    - name: "transformer-crossentropy"
+      active: False
+      mode: train # supported values: train, test
+      pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
+      loss: "CrossEntropyLoss"
+      n_heads: 8
+      depth: 6
+      n_tokens: 27
+      n_classes: 9
+      n_epochs: 10
+      dim: 512
+
+    - name: "transformer-maxmargin"
       active: True
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
+      loss: "MultiMarginLoss"
       n_heads: 8
       depth: 6
       n_tokens: 27
@@ -83,4 +96,4 @@ output_settings:
   results_dir: "raw"
   visualizations_dir: "visualization"
   sub_dir: "uniref90/20230420/host_multi"
-  prefix: "vanilla-transformer-pos_enc" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "multimargin-transformer-pos_enc" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
