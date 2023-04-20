@@ -51,7 +51,7 @@ classification_settings:
   sequence_settings:
     batch_size: 128
     sequence_col: "seq"
-    max_sequence_length: 1024
+    max_sequence_length: 6630
     pad_sequence_val: 0
   label_settings:
     label_col: "virus_host_name"
@@ -82,5 +82,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230418/host_multi"
-  prefix: "vanilla-transformer" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230420/host_multi"
+  prefix: "vanilla-transformer-pos_enc" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

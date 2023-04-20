@@ -16,7 +16,7 @@ UNIREF90_DATA_W_HOSTS_FILENAME = "uniref90_w_hosts.csv"
 UNIREF90_DATA_W_METADATA = "uniref90_w_metadata.csv"
 UNIREF90_DATA_MAMMALS_AVES = "uniref90_mammals_aves_virus.csv"
 UNIREF90_DATA_W_SINGLE_HOST = "uniref90_mammals_aves_w_singlehost.csv"
-UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_final.csv"
+UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_mammals_aves_wo_singlehost.csv"
 
 # Column names at various stages of dataset curation
 UNIREF90_ID = "uniref90_id"
@@ -310,9 +310,8 @@ def get_mammals_aves_tax_ids(tax_ids):
 # Remove sequences of virus with only one host
 # Input: Dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 # Output: Filtered dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
-def remove_sequences_of_virus_with_one_host(output_directory, df):
+def remove_sequences_of_virus_with_one_host(df):
     print("\nRemoving sequences with one host.")
-    df = pd.read_csv(os.path.join(output_directory, UNIREF90_DATA_MAMMALS_AVES))
     # group by virus name and count the number of unique hosts for each virus
     agg_df = df.groupby([VIRUS_NAME])[VIRUS_HOST_NAME].nunique()
     # list of viruses with only one unique host
@@ -359,10 +358,10 @@ def main():
     # df = get_sequences_at_species_level(output_dir)
     # # 7.2 Retain sequences with viruses hosts belonging to the class of Mammals OR Aves (birds)
     # df = get_sequences_from_mammals_aves_hosts(df)
-    # # 7.3 Remove viruses with only one unique virus host
-    # df = remove_sequences_of_virus_with_one_host(output_dir, df)
-    # 7.4 Remove duplicate sequences (same uniref90_id and sequence, but multiple hosts)
     df = pd.read_csv(os.path.join(output_dir, UNIREF90_DATA_MAMMALS_AVES))
+    # 7.3 Remove viruses with only one unique virus host
+    df = remove_sequences_of_virus_with_one_host(df)
+    # 7.4 Remove duplicate sequences (same uniref90_id and sequence, but multiple hosts)
     df = remove_duplicate_sequences(df)
     # 8. Write the filtered dataset to a file
     print(f"Writing to file {UNIREF90_DATA_W_SINGLE_HOST}")
