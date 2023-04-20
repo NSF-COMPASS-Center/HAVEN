@@ -51,7 +51,7 @@ classification_settings:
   sequence_settings:
     batch_size: 128
     sequence_col: "seq"
-    max_sequence_length: 6630
+    max_sequence_length: 3000
     pad_sequence_val: 0
   label_settings:
     label_col: "virus_host_name"

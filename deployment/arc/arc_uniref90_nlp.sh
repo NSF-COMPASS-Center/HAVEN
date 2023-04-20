@@ -4,7 +4,7 @@
 #SBATCH --account=seqevol
 #SBATCH --partition=a100_normal_q
 
-#SBATCH --mem=64G
+#SBATCH --mem=128G
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
 #SBATCH -t 72:00:00 # wall-time required (# 72hrs)
@@ -34,7 +34,6 @@ CONFIG_FILE=$2
 LOG_FILE=$LOGS_DIR/$3.$(date +%Y_%b_%d_%H_%M).log
 echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
-
 echo "GPU check"
 python -c "import torch; print(f'GPU available: {torch.cuda.is_available()}')"
 echo "Zoonosis NLP models START"

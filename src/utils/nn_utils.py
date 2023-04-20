@@ -43,6 +43,6 @@ def get_dataset_loader(input_dir, input, sequence_settings, label_settings, clas
     pad_sequence_val = sequence_settings["pad_sequence_val"]
     # TODO: add support for multiple files in the list. Current implementation supports only one train and one test file.
     filepath = os.path.join(input_dir, input["dir"], input[dataset_type][0])
-    dataset = ProteinSequenceDataset(filepath, seq_col, label_settings, classification_type)
+    dataset = ProteinSequenceDataset(filepath, seq_col, max_seq_len, label_settings, classification_type)
     return dataset.index_label_map, DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=Padding(max_seq_len, pad_sequence_val))
 
