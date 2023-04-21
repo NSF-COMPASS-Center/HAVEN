@@ -25,7 +25,7 @@ def curve_plot(df, x_col, y_col, color_group_col, style_group_col, output_file_p
     if metadata is not None:
         df = df.replace({color_group_col: metadata})
         hue_order = list(metadata.values())
-    plt.figure(figsize=(12,8))
+    #plt.figure(figsize=(12,8))
     ax = sns.lineplot(data=df, x=x_col, y=y_col, hue=color_group_col, style=style_group_col, hue_order=hue_order, ci=None)
 
     ax.set_ylim(0, 1)
