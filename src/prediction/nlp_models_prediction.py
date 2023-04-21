@@ -69,7 +69,7 @@ def execute(input_settings, output_settings, classification_settings):
                 # For faster computation
                 nlp_model.to(nn_utils.get_device())
                 result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["loss"],
-                                                       model["n_epochs"], model_name, mode, model_filepath, itr)
+                                                       model["n_epochs"], model_name, mode)
             else:
                 continue
 
