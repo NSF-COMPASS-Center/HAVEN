@@ -12,12 +12,12 @@ def execute(config):
     output_evaluation_dir = output_settings["evaluation_dir"]
     output_visualization_dir = output_settings["visualization_dir"]
     output_dataset_dir = output_settings["dataset_dir"]
-    #label_mappings = config["label_mappings"]
+    label_mappings = config["label_mappings"]
 
     evaluation_settings = config["evaluation_settings"]
     evaluation_type = evaluation_settings["type"]
 
-    df = read_inputs(input_settings, label_mappings=None)
+    df = read_inputs(input_settings, label_mappings=label_mappings)
     output_file_name = get_output_file_name(input_settings, output_settings)
     evaluation_output_file_base_path = os.path.join(output_dir, output_evaluation_dir, output_dataset_dir)
     visualization_output_file_base_path = os.path.join(output_dir, output_visualization_dir, output_dataset_dir)

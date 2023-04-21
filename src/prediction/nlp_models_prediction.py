@@ -42,7 +42,7 @@ def execute(input_settings, output_settings, classification_settings):
                                                                            dataset_type="test")
 
         nlp_model = None
-        model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}_e{e}.pth")
+        model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
         Path(os.path.dirname(model_filepath)).mkdir(parents=True, exist_ok=True)
 
         for model in models:
@@ -78,6 +78,7 @@ def execute(input_settings, output_settings, classification_settings):
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = itr
             results[model_name].append(result_df)
+            torch.save(model.state_dict(), model_filepath.format(model_name=model_name, itr=itr))
         itr += 1
 
     # write the raw results in csv files
@@ -86,7 +87,7 @@ def execute(input_settings, output_settings, classification_settings):
     utils.write_output(results, output_results_dir, output_filename_prefix, "output")
 
 
-def run_transformer(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, model_name, mode, model_filepath, itr):
+def run_transformer(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, model_name, mode):
     tbw = SummaryWriter()
     criterion = nn_utils.get_criterion(loss)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -106,7 +107,7 @@ def run_transformer(model, train_dataset_loader, test_dataset_loader, loss, n_ep
         for e in range(n_epochs):
             model = run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer,
                               lr_scheduler, tbw, model_name, e)
-            torch.save(model.state_dict(), model_filepath.format(model_name=model_name, itr=itr, e=e))
+
     return evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch=None, log_loss=False), model
 
 
