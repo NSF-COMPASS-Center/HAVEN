@@ -78,7 +78,7 @@ def execute(input_settings, output_settings, classification_settings):
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = itr
             results[model_name].append(result_df)
-            torch.save(model.state_dict(), model_filepath.format(model_name=model_name, itr=itr))
+            torch.save(nlp_model.state_dict(), model_filepath.format(model_name=model_name, itr=itr))
         itr += 1
 
     # write the raw results in csv files
