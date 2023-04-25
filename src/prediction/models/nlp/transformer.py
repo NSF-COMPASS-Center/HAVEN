@@ -56,7 +56,7 @@ def get_transformer_model(model):
                                           n_classes=model["n_classes"],
                                           N=model["depth"],
                                           d=model["dim"],
-                                          d_ff=2 * model["dim"],
+                                          d_ff=2048,
                                           h=model["n_heads"])
     print(model)
     print("Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))

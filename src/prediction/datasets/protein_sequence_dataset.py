@@ -34,6 +34,8 @@ class ProteinSequenceDataset(Dataset):
     def read_dataset(self, filepath):
         df = pd.read_csv(filepath, usecols=[self.sequence_col, self.label_col])
         print(f"Read dataset from {filepath}, size = {df.shape}")
+        # Truncating sequences to fixed length of sequence_max_length
+        df[self.sequence_col] = df[self.sequence_col].apply(lambda x: x[0:self.sequence_max_length])
         return df
 
     def __getitem__(self, idx: int):
@@ -42,12 +44,12 @@ class ProteinSequenceDataset(Dataset):
         label = record[self.label_col]
 
         sequence_vector = np.array([self.amino_acid_map[a] for a in sequence])
-        seq_len = len(sequence_vector)
-        if seq_len > self.max_seq_len:
-            # select a random sub-string
-            start_index = random.randint(0, seq_len - self.max_seq_len)
-            end_index = start_index + self.max_seq_len
-            sequence_vector = sequence_vector[start_index:end_index]
+        # seq_len = len(sequence_vector)
+        # if seq_len > self.max_seq_len:
+        #     # select a random sub-string
+        #     start_index = random.randint(0, seq_len - self.max_seq_len)
+        #     end_index = start_index + self.max_seq_len
+        #     sequence_vector = sequence_vector[start_index:end_index]
         label_vector = np.array([label])
 
         return torch.tensor(sequence_vector, device=nn_utils.get_device()), torch.tensor(label_vector, device=nn_utils.get_device())
