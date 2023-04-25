@@ -35,7 +35,7 @@ class ProteinSequenceDataset(Dataset):
         df = pd.read_csv(filepath, usecols=[self.sequence_col, self.label_col])
         print(f"Read dataset from {filepath}, size = {df.shape}")
         # Truncating sequences to fixed length of sequence_max_length
-        df[self.sequence_col] = df[self.sequence_col].apply(lambda x: x[0:self.sequence_max_length])
+        df[self.sequence_col] = df[self.sequence_col].apply(lambda x: x[0:self.max_seq_len])
         return df
 
     def __getitem__(self, idx: int):
