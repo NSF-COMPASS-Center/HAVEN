@@ -39,13 +39,12 @@ def execute(input_settings, output_settings, classification_settings):
                                                                            label_settings, dataset_type="test")
 
         nlp_model = None
+        # model store filepath
         model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
         Path(os.path.dirname(model_filepath)).mkdir(parents=True, exist_ok=True)
 
         for model in models:
             model_name = model["name"]
-            # setting arguments within model to avoid passing multiple arguments
-            model["max_sequence_length"] = sequence_settings["max_sequence_length"]
             if model["active"] is False:
                 print(f"Skipping {model_name} ...")
                 continue
@@ -54,16 +53,16 @@ def execute(input_settings, output_settings, classification_settings):
                 # first iteration
                 results[model_name] = []
 
-            # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
             if "transformer" in model_name:
+                # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
+                model["max_seq_len"] = sequence_settings["max_sequence_length"]
                 mode = model["mode"]
                 print(f"Executing Transformer in {mode} mode")
 
                 nlp_model = transformer.get_transformer_model(model)
-                if model["mode"] == "test":
+                if mode == "test":
                     nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
 
-                # For faster computation
                 nlp_model.to(nn_utils.get_device())
                 result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["loss"],
                                                        model["n_epochs"], model_name, mode)

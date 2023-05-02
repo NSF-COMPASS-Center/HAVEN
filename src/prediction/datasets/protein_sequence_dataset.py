@@ -11,7 +11,7 @@ class ProteinSequenceDataset(Dataset):
     def __init__(self, filepath, sequence_col, max_seq_len, truncate, label_settings):
         super(ProteinSequenceDataset, self).__init__()
         self.sequence_col = sequence_col
-        # self.max_seq_len = max_seq_len # TODO: remove this field if positional encoding with convolution works
+        self.max_seq_len = max_seq_len
         self.label_col = label_settings["label_col"]
         self.label_settings = label_settings
         self.amino_acid_map = {'A': 1, 'R': 2, 'N': 3, 'D': 4, 'C': 5,
