@@ -1,11 +1,12 @@
 import torch.nn as nn
-from prediction.models.nlp.embedding import EmbeddingLayer, ConvolutionEmbeddingLayer
+from prediction.models.nlp.embedding import EmbeddingLayer, ConvolutionEmbeddingLayer, PositionalEmbeddingLayer
 from prediction.models.nlp.encoder import EncoderLayer, Encoder
 
 
 class ClassificationTransformer(nn.Module):
     def __init__(self, n_tokens, max_seq_len, n_classes, N=6, d=512, d_ff=2048, h=8):
         super(ClassificationTransformer, self).__init__()
+        #self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=d)
         self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=d)
         self.encoder = Encoder(EncoderLayer(h, d, d_ff), N)
         self.linear = nn.Linear(d, n_classes)
@@ -20,9 +21,9 @@ class ClassificationTransformer(nn.Module):
         return y
 
 
-class ClassificationTransformer_Conv1D(nn.Module):
+class ClassificationTransformer_PosConv1D(nn.Module):
     def __init__(self, n_tokens, kernel_size, stride, padding, max_seq_len, n_classes, N=6, d=512, d_ff=2048, h=8):
-        super(ClassificationTransformer_Conv1D, self).__init__()
+        super(ClassificationTransformer_PosConv1D, self).__init__()
 
         self.embedding = ConvolutionEmbeddingLayer(n_tokens, max_seq_len, d, kernel_size, stride, padding)
         self.encoder = Encoder(EncoderLayer(h, d, d_ff), N)
@@ -40,7 +41,7 @@ class ClassificationTransformer_Conv1D(nn.Module):
 
 def get_transformer_model(model):
     if model["with_convolution"]:
-        model = ClassificationTransformer_Conv1D(n_tokens=model["n_tokens"],
+        model = ClassificationTransformer_PosConv1D(n_tokens=model["n_tokens"],
                                                  kernel_size=model["kernel_size"],
                                                  stride=model["stride"],
                                                  padding=model["padding"],

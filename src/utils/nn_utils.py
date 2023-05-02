@@ -36,14 +36,15 @@ def get_device(tensor=None):
     return device
 
 
-def get_dataset_loader(input_dir, input, sequence_settings, label_settings, classification_type, dataset_type=None):
+def get_dataset_loader(input_dir, input, sequence_settings, label_settings, dataset_type=None):
     seq_col = sequence_settings["sequence_col"]
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
     pad_sequence_val = sequence_settings["pad_sequence_val"]
+    truncate = sequence_settings["truncate"]
     # TODO: add support for multiple files in the list. Current implementation supports only one train and one test file.
     filepath = os.path.join(input_dir, input["dir"], input[dataset_type][0])
-    dataset = ProteinSequenceDataset(filepath, seq_col, max_seq_len, label_settings, classification_type)
+    dataset = ProteinSequenceDataset(filepath, seq_col, max_seq_len, truncate, label_settings)
     return dataset.index_label_map, DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=Padding(max_seq_len, pad_sequence_val))
 
 

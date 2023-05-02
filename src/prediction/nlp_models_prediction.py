@@ -27,7 +27,6 @@ def execute(input_settings, output_settings, classification_settings):
     models = classification_settings["models"]
     label_settings = classification_settings["label_settings"]
     sequence_settings = classification_settings["sequence_settings"]
-    classification_type = classification_settings["type"]
 
     results = {}
     itr = 0
@@ -35,11 +34,9 @@ def execute(input_settings, output_settings, classification_settings):
         print(f"Iteration {itr}")
         # 1. Read the data files
         index_label_map, train_dataset_loader = nn_utils.get_dataset_loader(input_dir, input, sequence_settings,
-                                                                            label_settings, classification_type,
-                                                                            dataset_type="train")
+                                                                            label_settings, dataset_type="train")
         index_label_map, test_dataset_loader = nn_utils.get_dataset_loader(input_dir, input, sequence_settings,
-                                                                           label_settings, classification_type,
-                                                                           dataset_type="test")
+                                                                           label_settings, dataset_type="test")
 
         nlp_model = None
         model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
@@ -82,9 +79,8 @@ def execute(input_settings, output_settings, classification_settings):
         itr += 1
 
     # write the raw results in csv files
-    output_filename_prefix = f"{model_name}_presplit" + output_prefix + "_"
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
-    utils.write_output(results, output_results_dir, output_filename_prefix, "output")
+    utils.write_output(results, output_results_dir, output_prefix + "_", "output")
 
 
 def run_transformer(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, model_name, mode):
