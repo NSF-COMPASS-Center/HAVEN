@@ -55,7 +55,7 @@ def group_labels(df, label_col, label_grouping_config):
 
 
 def get_label_vocabulary(labels):
-    print(labels)
+    labels.sort()
     label_idx_map = {}
     idx_label_map = {}
 
