@@ -16,7 +16,7 @@ def filter_noise(df, label_settings):
     return df
 
 
-def transform_labels(df, classification_type, label_settings):
+def transform_labels(df, label_settings):
     label_col = label_settings["label_col"]
     if "label_groupings" in label_settings.keys():
         label_grouping_config = label_settings["label_groupings"]
@@ -24,13 +24,6 @@ def transform_labels(df, classification_type, label_settings):
         df = group_labels(df, label_col, label_grouping_config)
 
     labels = df[label_col].unique()
-
-    if classification_type == "binary":
-        positive_label = label_settings["positive_label"]
-        negative_label = "Not " + positive_label
-        df[label_col] = np.where(df[label_col] == positive_label, positive_label, negative_label)
-        labels = [negative_label, positive_label]
-
     label_idx_map, idx_label_map = get_label_vocabulary(labels)
     print(f"label_idx_map={label_idx_map}\nidx_label_map={idx_label_map}")
 

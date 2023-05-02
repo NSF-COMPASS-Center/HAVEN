@@ -18,7 +18,9 @@ input_settings:
     #"TF-MM": "20230420/host_multi/transformer-conv1d-maxmargin_presplit_maxmargin-transformer-pos_enc_transformer-maxmargin_output.csv"
     #"TF-CNV-CE": "20230420-4/host_multi/transformer-conv1d-maxmargin_presplit_tf-conv1d-ce_transformer-conv1d-crossentropy_output.csv"
     #"TF-CNV-MM": "20230420-4/host_multi/transformer-conv1d-maxmargin_presplit_tf-conv1d-mm_transformer-conv1d-maxmargin_output.csv"
-    "Transformer": "20230407/host_multi/transformer_presplit_nlp_transformer_output.csv"
+    "TF": "20230407/host_multi/transformer_presplit_nlp_transformer_output.csv"
+    "TF-ARC": "20230501/host_multi/transformer-conv1d-maxmargin_presplit_tf-ce-arc_transformer-crossentropy_output.csv"
+    "TF-CSB": "20230501/host_multi/transformer-conv1d-maxmargin_presplit_tf-ce-csbgpu2_transformer-crossentropy_output.csv"
     #"Transformer-300K": "20230411/host_multi/transformer_presplit_nlp_transformer_output.csv"
 
 evaluation_settings:
@@ -44,5 +46,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230420-3/host_multi_tr19ktest19k"
+  dataset_dir: "uniref90/20230501/host_multi_tr19ktest19k"
   prefix: ""# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

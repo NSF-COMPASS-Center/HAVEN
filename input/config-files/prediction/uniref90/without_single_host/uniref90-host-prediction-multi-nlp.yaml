@@ -47,11 +47,11 @@ classification_settings:
   model_type: "nlp"
   n_iterations: 5
   split_input: False
-  type : "multi" # binary or multi
   sequence_settings:
     batch_size: 32
     sequence_col: "seq"
     max_sequence_length: 1024
+    truncate: False
     pad_sequence_val: 0
   label_settings:
     label_col: "virus_host_name"
@@ -68,24 +68,11 @@ classification_settings:
       "Others": [ "*" ]
   models:
     - name: "transformer-crossentropy"
-      active: True
-      mode: train # supported values: train, test
-      pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
-      loss: "CrossEntropyLoss"
-      with_convolution: False
-      n_heads: 8
-      depth: 6
-      n_tokens: 27
-      n_classes: 9
-      n_epochs: 10
-      dim: 512
-
-    - name: "transformer-maxmargin"
       active: False
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
-      loss: "MultiMarginLoss"
-      with_convolution: False
+      loss: "CrossEntropyLoss"
+      with_convolution: False # ensure that truncate is set to True in sequence_settings if convolution is not being used
       n_heads: 8
       depth: 6
       n_tokens: 27
@@ -94,27 +81,11 @@ classification_settings:
       dim: 512
 
     - name: "transformer-conv1d-crossentropy"
-      active: False
+      active: True
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "CrossEntropyLoss"
-      with_convolution: True
-      kernel_size: 32
-      stride: 32
-      padding: 0
-      n_heads: 8
-      depth: 6
-      n_tokens: 27
-      n_classes: 9
-      n_epochs: 10
-      dim: 128
-
-    - name: "transformer-conv1d-maxmargin"
-      active: False
-      mode: train # supported values: train, test
-      pretrained_model_path: None #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
-      loss: "MultiMarginLoss"
-      with_convolution: True
+      with_convolution: True # ensure that truncate is set to False in sequence_settings if convolution is being used
       kernel_size: 32
       stride: 32
       padding: 0
@@ -129,5 +100,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230501/host_multi"
-  prefix: "tf-ce-arc" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230502/host_multi"
+  prefix: "tf-ce-cnv" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
