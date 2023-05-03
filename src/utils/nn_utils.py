@@ -53,3 +53,16 @@ def get_criterion(loss):
     if loss == "MultiMarginLoss":
         criterion = nn.MultiMarginLoss()
     return criterion
+
+
+def get_id_mapping(filepath):
+    print(f"Reading protein ids from {filepath}")
+    prot_ids = None
+    prot_ids_map = {}
+    with open(filepath, "r") as f:
+        prot_ids = f.read().split("\n")
+
+    for idx, prot_id in enumerate(prot_ids):
+        prot_ids_map[idx] = prot_id
+
+    return prot_ids

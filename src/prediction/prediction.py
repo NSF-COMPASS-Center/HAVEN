@@ -1,4 +1,4 @@
-from prediction import baseline_models_prediction, nlp_models_prediction
+from prediction import baseline_models_prediction, nlp_models_prediction, tf_gnn_models_prediction
 
 
 def execute(config):
@@ -16,3 +16,5 @@ def execute(config):
         baseline_models_prediction.execute(input_settings, output_settings, classification_settings)
     elif type == "nlp":
         nlp_models_prediction.execute(input_settings, output_settings, classification_settings)
+    elif type == "tf_gnn":
+        tf_gnn_models_prediction.execute(input_settings, output_settings, classification_settings)

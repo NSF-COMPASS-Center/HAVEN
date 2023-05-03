@@ -1,0 +1,78 @@
+config_type: "prediction" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory for protein sequences data
+  seq_input_dir: "input/data/sars-cov-2/prot-sequences/splits"
+  seq_file_names:
+    - dir: "s12612648"
+      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
+      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+
+    - dir: "s31062180"
+      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
+      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+
+    - dir: "s48918293"
+      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
+      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+
+    - dir: "s55631155"
+      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
+      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+
+    - dir: "s79221635"
+      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
+      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+
+  # Base input directory for protein structure data
+  struct_input_dir: "input/data/sars-cov-2/prot-structures"
+  ace2_prot_struct: "h_ace2.gpickle"
+
+
+classification_settings:
+  model_type: "tf-gnn"
+  n_iterations: 5
+  split_input: False
+  sequence_settings:
+    batch_size: 32
+    sequence_col: "seq"
+    max_sequence_length: 6630 # 1024
+    truncate: False
+    pad_sequence_val: 0
+  label_settings:
+    label_col: "virus_host_name"
+    exclude_labels: [ "nan"]
+    label_groupings:
+      "Human": [ "Human" ]
+      "Not Human": [ "Not Human" ]
+  models:
+    - name: "tf-gnn"
+      active: True
+      mode: train # supported values: train, test
+      pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
+      loss: "CrossEntropyLoss"
+      with_convolution: True # ensure that truncate is set to False in sequence_settings if convolution is being used
+      kernel_size: 8  #tf
+      stride: 8  #tf
+      padding: 0  #tf
+      n_heads: 8  #tf
+      depth: 6  #tf
+      n_tokens: 27  #tf
+      n_classes: 2
+      n_epochs: 10
+      dim: 512  #tf
+      n_node_features:  #gnn
+      gnn_h:  #gnn
+      n_gnn_output_features:  #gnn
+      mlp_h:  #gnn
+
+
+output_settings:
+  output_dir: "output"
+  results_dir: "raw"
+  visualizations_dir: "visualization"
+  sub_dir: "sars-cov-2/20230502/host_binary"
+  prefix: "tf-gnn" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
