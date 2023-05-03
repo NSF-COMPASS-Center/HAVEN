@@ -94,11 +94,11 @@ classification_settings:
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
-      dim: 128
+      dim: 512
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
   sub_dir: "uniref90/20230502/host_multi"
-  prefix: "tf-cnv-ce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "tf-cnv-ce-ks8-d512" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
