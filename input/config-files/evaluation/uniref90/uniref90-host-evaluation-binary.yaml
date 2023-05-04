@@ -22,6 +22,16 @@ evaluation_settings:
   accuracy: True
   prediction_distribution: False
 
+label_mappings:
+  "Homo sapiens": "Human"
+  "Phacochoerus aethiopicus": "Desert warthog"
+  "Bandicota bengalensis": "Lesser bandicoot rat"
+  "Equus caballus": "Horse"
+  "Capra hircus": "Goat"
+  "Gallus gallus": "Red junglefowl"
+  "Apodemus sylvaticus": "Wood mouse"
+  "Bos taurus": "Cattle"
+  "Others": "Others"
 
 output_settings:
   output_dir: "output"

@@ -1,0 +1,36 @@
+config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw/coronaviridae"
+
+  file_names:
+    # experiment_name (to be used as a key in comparative analysis): file_name
+    #"LR": "20230315/host_binary/kmer_k3_virus_host_name_binary_presplit__lr_output.csv"
+    #"RF": "20230315/host_binary/kmer_k3_virus_host_name_binary_presplit__rf_output.csv"
+    "TF-CNV-ks8d512": "20230503/host_binary/_tf-cnv-ce-ks8-d512_transformer-conv1d-crossentropy_output.csv"
+
+label_mappings:
+  "Human": "Human"
+  "Not Human": "Not Human"
+
+evaluation_settings:
+  type: "binary"
+  positive_label: "Human"
+  # metrics
+  auroc: True
+  auprc: True
+  f1: True
+  accuracy: True
+  prediction_distribution: False
+
+
+output_settings:
+  output_dir: "output"
+  evaluation_dir: "evaluation"
+  visualization_dir: "visualization"
+  dataset_dir: "coronaviridae/20230503/host_binary"
+  prefix: "host_binary_lr_rf_tf"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
