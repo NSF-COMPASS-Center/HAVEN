@@ -18,7 +18,7 @@ def execute(config):
     evaluation_type = evaluation_settings["type"]
 
     df = read_inputs(input_settings, label_mappings=label_mappings)
-    output_file_name = get_output_file_name(input_settings, output_settings)
+    output_file_name = get_output_file_name(output_settings)
     evaluation_output_file_base_path = os.path.join(output_dir, output_evaluation_dir, output_dataset_dir)
     visualization_output_file_base_path = os.path.join(output_dir, output_visualization_dir, output_dataset_dir)
     # create any missing parent directories
@@ -55,17 +55,9 @@ def read_inputs(input_settings, label_mappings=None):
     return df
 
 
-def get_output_file_name(input_settings, output_settings):
-    input_dir = input_settings["input_dir"]
-    input_file_names = input_settings["file_names"]
+def get_output_file_name(output_settings):
     output_prefix = output_settings["prefix"]
+    output_prefix = "evaluation" if output_prefix is None else output_prefix
+    output_file_name = output_prefix
 
-    if len(input_file_names) > 1:
-        # multiple fines for comparison
-        output_prefix = "evaluation" if output_prefix is None else output_prefix
-        output_file_name = output_prefix
-    elif len(input_file_names) == 1:
-        # only one file.
-        input_file_path = os.path.join(input_dir, input_file_names)
-        output_file_name = Path(input_file_path).stem + "_" + output_prefix
     return output_file_name
