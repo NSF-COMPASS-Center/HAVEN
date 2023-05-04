@@ -9,9 +9,10 @@ input_settings:
 
   file_names:
     # experiment_name (to be used as a key in comparative analysis): file_name
-    #"LR": "20230315/host_binary/kmer_k3_virus_host_name_binary_presplit__lr_output.csv"
-    #"RF": "20230315/host_binary/kmer_k3_virus_host_name_binary_presplit__rf_output.csv"
+    "LR": "20230503/host_binary/kmer_k3_binary_label_binary_presplit__lr_output.csv"
+    "RF": "20230503/host_binary/kmer_k3_binary_label_binary_presplit__rf_output.csv"
     "TF-CNV-ks8d512": "20230503/host_binary/_tf-cnv-ce-ks8-d512_transformer-conv1d-crossentropy_output.csv"
+    "TF-CNV-k3s1d512": "20230503/host_binary/_tf-cnv-ce-k3s1-d512_transformer-conv1d-crossentropy_output.csv"
 
 label_mappings:
   "Human": "Human"
