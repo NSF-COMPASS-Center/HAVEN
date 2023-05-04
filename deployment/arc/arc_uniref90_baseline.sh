@@ -10,6 +10,7 @@
 
 
 # Load modules
+module reset
 module load
 module load Anaconda3
 
