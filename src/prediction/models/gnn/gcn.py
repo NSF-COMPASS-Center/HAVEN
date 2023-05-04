@@ -3,9 +3,9 @@ import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 
 
-class c(torch.nn.Module):
+class GCN_2L(torch.nn.Module):
     def __init__(self, n_node_features, h, n_output_features):
-        super().__init__()
+        super(GCN_2L, self).__init__()
         self.gcn_l1 = GCNConv(n_node_features, h)
         self.gcn_l2 = GCNConv(h, n_output_features)
 

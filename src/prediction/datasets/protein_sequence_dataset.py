@@ -7,9 +7,8 @@ import torch
 
 
 class ProteinSequenceDataset(Dataset):
-    def __init__(self, filepath, id_col, sequence_col, max_seq_len, truncate, label_settings, id_filepath):
+    def __init__(self, filepath, sequence_col, max_seq_len, truncate, label_settings):
         super(ProteinSequenceDataset, self).__init__()
-        self.id_col = id_col
         self.sequence_col = sequence_col
         self.max_seq_len = max_seq_len
         self.label_col = label_settings["label_col"]
@@ -22,17 +21,12 @@ class ProteinSequenceDataset(Dataset):
                                'J': 26}
         self.data = self.read_dataset(filepath, truncate)
         self.data, self.index_label_map = utils.transform_labels(self.data, self.label_settings)
-        self.id_map = utils.get_id_mapping(id_filepath)
 
     def __len__(self) -> int:
-        n = self.data.shape[0]
-        if n != len(self.id_map):
-            print("ERROR: Number of sequences different from number of ids.")
-            return None
-        return n
+        return self.data.shape[0]
 
     def read_dataset(self, filepath, truncate):
-        df = pd.read_csv(filepath, usecols=[self.sequence_col, self.label_col], index_col=self.id_col)
+        df = pd.read_csv(filepath, usecols=[self.sequence_col, self.label_col])
         print(f"Read dataset from {filepath}, size = {df.shape}")
         if truncate:
             # Truncating sequences to fixed length of sequence_max_length
@@ -40,7 +34,7 @@ class ProteinSequenceDataset(Dataset):
         return df
 
     def __getitem__(self, idx: int):
-        record = self.data.loc[self.id_map[idx], :]
+        record = self.data.loc[idx, :]
         sequence = record[self.sequence_col]
         label = record[self.label_col]
 

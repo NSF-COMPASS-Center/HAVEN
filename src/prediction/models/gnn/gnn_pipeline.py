@@ -23,14 +23,15 @@ class GNN_Pipeline(torch.nn.ModuleList):
         x_virus_prot = self.receptor_gcn(data_virus_prot)
 
         # Readout layer: graph embedding = average of all node embeddings
-        x_host_prot = global_mean_pool(x_host_prot)  # b X n_gnn_output_features
+        x_host_prot = global_mean_pool(x_host_prot)  # 1 X n_gnn_output_features
         x_virus_prot = global_mean_pool(x_virus_prot)  # b X n_gnn_output_features
 
         # MLP layer for classification
-        x_prot_interaction = torch.concat((x_host_prot, x_virus_prot), dim=1)  # b X 2*n_gnn_output_features
+        x_prot_interaction = torch.cat((x_host_prot, x_virus_prot), dim=1)  # b X 2*n_gnn_output_features (host features are broadcasted)
         x_prot_interaction = F.relu(self.linear_1(x_prot_interaction))  # b X mlp_h
 
-        return self.linear_2(x_prot_interaction)  # b X n_classes
+        # return the embedding of the  along with the output
+        return self.linear_2(x_prot_interaction), x_virus_prot  # b X n_classes, b X n_gnn_output_features
 
 
 def get_gnn_model(model):
@@ -39,6 +40,7 @@ def get_gnn_model(model):
                              n_gnn_output_features=model["n_gnn_output_features"],
                              mlp_h=model["mlp_h"],
                              n_classes=model["n_classes"])
+    print("GNN model")
     print(gnn_model)
     print("Number of parameters = ", sum(p.numel() for p in gnn_model.parameters() if p.requires_grad))
     return gnn_model

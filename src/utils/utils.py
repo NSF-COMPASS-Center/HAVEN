@@ -104,5 +104,3 @@ def compute_class_distribution(df, label_col, format=False):
     if format:
         labels_counts = {k: f"{k} ({v:.2f}%)" for k, v, in labels_counts.items()}
     return labels_counts
-
-
