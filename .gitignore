@@ -1,6 +1,7 @@
 #input files
 *.fasta
 input/**/*.csv
+input/**/*.tsv
 # *.fa
 
 #output files
