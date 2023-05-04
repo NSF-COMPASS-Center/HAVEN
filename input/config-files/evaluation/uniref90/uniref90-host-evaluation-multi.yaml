@@ -13,8 +13,10 @@ input_settings:
     "LR": "20230410/host_multi/kmer_k3_virus_host_name_multi_presplit_lr_multinomial_lr_output.csv"
     "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
     "TF-1024": "20230501/host_multi/transformer-conv1d-maxmargin_presplit_tf-ce-arc_transformer-crossentropy_output.csv"
-    "TF-CNV-ks8": "20230502/host_multi/_tf-cnv-ce_transformer-conv1d-crossentropy_output.csv"
-    "TF-CNV-ks4": "20230502/host_multi/_tf-cnv-ce-ks4_transformer-conv1d-crossentropy_output.csv"
+    "TF-CNV-ks8d128": "20230502/host_multi/_tf-cnv-ce_transformer-conv1d-crossentropy_output.csv"
+    "TF-CNV-ks4d128": "20230502/host_multi/_tf-cnv-ce-ks4_transformer-conv1d-crossentropy_output.csv"
+    "TF-CNV-ks4d512": "20230502/host_multi/_tf-cnv-ce-ks4-d512_transformer-conv1d-crossentropy_output.csv"
+    "TF-CNV-ks8d512": "20230502/host_multi/_tf-cnv-ce-ks8-d512_transformer-conv1d-crossentropy_output.csv"
 
 evaluation_settings:
   type: "multi"

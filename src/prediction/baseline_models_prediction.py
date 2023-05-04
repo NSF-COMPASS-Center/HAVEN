@@ -90,7 +90,7 @@ def execute(input_settings, output_settings, classification_settings):
         print(f"kmer_df size after join with split on id = {kmer_df.shape}")
 
         # 4. Group the labels (if applicable) and convert the string labels to mapped integer indices
-        kmer_df_with_transformed_label, idx_label_map = utils.transform_labels(kmer_df, classification_type, label_settings)
+        kmer_df_with_transformed_label, idx_label_map = utils.transform_labels(kmer_df, label_settings, classification_type)
         print(f"kmer_df_with_transformed_label size = {kmer_df_with_transformed_label.shape}")
 
         # 5. Perform classification
