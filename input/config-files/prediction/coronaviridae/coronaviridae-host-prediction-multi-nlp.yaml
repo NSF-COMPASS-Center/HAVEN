@@ -23,24 +23,24 @@ input_settings:
   # file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   file_names:
     - dir: "s12612648"
-      train: [ "coronaviridae_final.csv_tr0.8_train.csv" ]
-      test: [ "coronaviridae_final.csv_tr0.8_test.csv" ]
+      train: [ "coronaviridae_top_6_hosts.csv_tr0.8_train.csv" ]
+      test: [ "coronaviridae_top_6_hosts.csv_tr0.8_test.csv" ]
 
     - dir: "s31062180"
-      train: [ "coronaviridae_final.csv_tr0.8_train.csv" ]
-      test: [ "coronaviridae_final.csv_tr0.8_test.csv" ]
+      train: [ "coronaviridae_top_6_hosts.csv_tr0.8_train.csv" ]
+      test: [ "coronaviridae_top_6_hosts.csv_tr0.8_test.csv" ]
 
     - dir: "s48918293"
-      train: [ "coronaviridae_final.csv_tr0.8_train.csv" ]
-      test: [ "coronaviridae_final.csv_tr0.8_test.csv" ]
+      train: [ "coronaviridae_top_6_hosts.csv_tr0.8_train.csv" ]
+      test: [ "coronaviridae_top_6_hosts.csv_tr0.8_test.csv" ]
 
     - dir: "s55631155"
-      train: [ "coronaviridae_final.csv_tr0.8_train.csv" ]
-      test: [ "coronaviridae_final.csv_tr0.8_test.csv" ]
+      train: [ "coronaviridae_top_6_hosts.csv_tr0.8_train.csv" ]
+      test: [ "coronaviridae_top_6_hosts.csv_tr0.8_test.csv" ]
 
     - dir: "s79221635"
-      train: [ "coronaviridae_final.csv_tr0.8_train.csv" ]
-      test: [ "coronaviridae_final.csv_tr0.8_test.csv" ]
+      train: [ "coronaviridae_top_6_hosts.csv_tr0.8_train.csv" ]
+      test: [ "coronaviridae_top_6_hosts.csv_tr0.8_test.csv" ]
 
 
 classification_settings:
@@ -64,15 +64,6 @@ classification_settings:
       "Lesser bamboo bat": ["Tylonycteris pachypus (Lesser bamboo bat) (Vespertilio pachypus) [TaxID: 258959]"]
       "Chicken": ["Gallus gallus (Chicken) [TaxID: 9031]"]
       "Bovine": ["Bos taurus (Bovine) [TaxID: 9913]"]
-      "Mouse": ["Mus musculus (Mouse) [TaxID: 10090]"]
-      "Chinese rufous horseshoe bat": ["Rhinolophus sinicus (Chinese rufous horseshoe bat) [TaxID: 89399]"]
-      "Canis familiaris": ["Canis lupus familiaris (Dog) (Canis familiaris) [TaxID: 9615]"]
-      "Leschenault's rousette": ["Rousettus leschenaultii (Leschenault's rousette) [TaxID: 9408]"]
-      "Big-eared horseshoe bat": ["Rhinolophus macrotis (Big-eared horseshoe bat) [TaxID: 196889]"]
-      "Rat": ["Rattus norvegicus (Rat) [TaxID: 10116]"]
-      "cat family": ["Felidae (cat family) [TaxID: 9681]"]
-      "Lesser asiatic yellow bat": ["Scotophilus kuhlii (Lesser asiatic yellow bat) [TaxID: 153297]"]
-      "Horse": ["Equus caballus (Horse) [TaxID:9796]"]
 
   models:
     - name: "transformer-crossentropy"
@@ -84,7 +75,7 @@ classification_settings:
       n_heads: 8
       depth: 6
       n_tokens: 27
-      n_classes: 16
+      n_classes: 7
       n_epochs: 10
       dim: 512
 
@@ -109,4 +100,4 @@ output_settings:
   results_dir: "raw"
   visualizations_dir: "visualization"
   sub_dir: "coronaviridae/20230503/host_multi"
-  prefix: "tf-cnv-ce-ks8-d512" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "tf-cnv-ce-ks8-d512-top7" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

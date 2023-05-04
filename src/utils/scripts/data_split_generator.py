@@ -22,6 +22,8 @@ def parse_args():
                         help="Boolean. Generate training files\n")
     parser.add_argument('-test', '--test', required=True,
                         help="Boolean. Generate testing files\n")
+    parser.add_argument('-stratify', '--stratify', required=False, default=None,
+                        help="Array: list of variables for stratified split.\n")
     args = parser.parse_args()
     return args
 
@@ -37,7 +39,7 @@ def parse_config(config_file_path):
     return config
 
 
-def generate_splits(input_files, train_proportion, seed, output_dir, generate_train=True, generate_test=True):
+def generate_splits(input_files, train_proportion, seed, output_dir, generate_train=True, generate_test=True, stratify=None):
     for input_file in input_files:
         print(f"Input file = {input_file}")
         file_name = os.path.basename(input_file)
@@ -48,7 +50,8 @@ def generate_splits(input_files, train_proportion, seed, output_dir, generate_tr
         Path(os.path.dirname(test_dataset_file_path)).mkdir(parents=True, exist_ok=True)
 
         df = pd.read_csv(input_file)
-        train_df, test_df = train_test_split(df, train_size=train_proportion, random_state=seed)
+        print("stratify = ", stratify)
+        train_df, test_df = train_test_split(df, train_size=train_proportion, random_state=seed, stratify=df[stratify])
         if generate_train:
             train_df.to_csv(train_dataset_file_path, index=False)
             print(f"Train file = {train_dataset_file_path}")
@@ -65,9 +68,11 @@ def main():
     output_dir = config.output_dir
     generate_train = ast.literal_eval(config.train)
     generate_test = ast.literal_eval(config.test)
-    generate_splits(input_files, train_proportion, seed, output_dir, generate_train, generate_test)
+    stratify = config.stratify
+    generate_splits(input_files, train_proportion, seed, output_dir, generate_train, generate_test, stratify)
     return
 
 
 if __name__ == '__main__':
     main()
+    exit(0)
