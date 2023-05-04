@@ -11,7 +11,7 @@ input_settings:
     # experiment_name (to be used as a key in comparative analysis): file_name
     # "LR": "20230503/host_binary/kmer_k3_binary_label_binary_presplit__lr_output.csv"
     # "RF": "20230503/host_binary/kmer_k3_binary_label_binary_presplit__rf_output.csv"
-    "TF-CNV-ks8d512": "20230503/host_multi/_tf-cnv-ce-ks8-d512_transformer-conv1d-crossentropy_output.csv"
+    "TF-CNV-ks8d512": "20230503/host_multi/_tf-cnv-ce-ks8-d512-top7_transformer-conv1d-crossentropy_output.csv"
     # "TF-CNV-k3s1d512": "20230503/host_binary/_tf-cnv-ce-k3s1-d512_transformer-conv1d-crossentropy_output.csv"
 
 label_mappings:
@@ -22,15 +22,6 @@ label_mappings:
   "Tylonycteris pachypus (Lesser bamboo bat) (Vespertilio pachypus) [TaxID: 258959]" : "Lesser bamboo bat"
   "Gallus gallus (Chicken) [TaxID: 9031]" : "Chicken"
   "Bos taurus (Bovine) [TaxID: 9913]" : "Bovine"
-  "Mus musculus (Mouse) [TaxID: 10090]" : "Mouse"
-  "Rhinolophus sinicus (Chinese rufous horseshoe bat) [TaxID: 89399]" : "Chinese rufous horseshoe bat"
-  "Canis lupus familiaris (Dog) (Canis familiaris) [TaxID: 9615]" : "Canis familiaris"
-  "Rousettus leschenaultii (Leschenault's rousette) [TaxID: 9408]" : "Leschenault's rousette"
-  "Rhinolophus macrotis (Big-eared horseshoe bat) [TaxID: 196889]" : "Big-eared horseshoe bat"
-  "Rattus norvegicus (Rat) [TaxID: 10116]" : "Rat"
-  "Felidae (cat family) [TaxID: 9681]" : "cat family"
-  "Scotophilus kuhlii (Lesser asiatic yellow bat) [TaxID: 153297]" : "Lesser asiatic yellow bat"
-  "Equus caballus (Horse) [TaxID:9796]" : "Horse"
 
 evaluation_settings:
   type: "multi"
