@@ -5,7 +5,7 @@ config_type: "prediction" # options: data_preprocessor, prediction, evaluation
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/uniref90/splits"
+  input_dir: "input/data/coronaviridae/splits"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Two forms of inputs:
@@ -23,24 +23,24 @@ input_settings:
   # file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   file_names:
     - dir: "s12612648"
-      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
-      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+      train: [ "coronaviridae_final.csv_tr0.8_train.csv" ]
+      test: [ "coronaviridae_final.csv_tr0.8_test.csv" ]
 
     - dir: "s31062180"
-      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
-      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+      train: [ "coronaviridae_final.csv_tr0.8_train.csv" ]
+      test: [ "coronaviridae_final.csv_tr0.8_test.csv" ]
 
     - dir: "s48918293"
-      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
-      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+      train: [ "coronaviridae_final.csv_tr0.8_train.csv" ]
+      test: [ "coronaviridae_final.csv_tr0.8_test.csv" ]
 
     - dir: "s55631155"
-      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
-      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+      train: [ "coronaviridae_final.csv_tr0.8_train.csv" ]
+      test: [ "coronaviridae_final.csv_tr0.8_test.csv" ]
 
     - dir: "s79221635"
-      train: [ "uniref90_final.csv_tr0.8_train.csv" ]
-      test: [ "uniref90_final.csv_tr0.8_test.csv" ]
+      train: [ "coronaviridae_final.csv_tr0.8_train.csv" ]
+      test: [ "coronaviridae_final.csv_tr0.8_test.csv" ]
 
 
 classification_settings:
@@ -50,22 +50,15 @@ classification_settings:
   sequence_settings:
     batch_size: 32
     sequence_col: "seq"
-    max_sequence_length: 6630 # 1024
+    max_sequence_length: 2048 # 1024
     truncate: False
     pad_sequence_val: 0
   label_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan"]
     label_groupings:
-      "Human": [ "Homo sapiens" ]
-      "Desert warthog": [ "Phacochoerus aethiopicus" ]
-      "Lesser bandicoot rat": [ "Bandicota bengalensis" ]
-      "Horse": [ "Equus caballus" ]
-      "Goat": [ "Capra hircus" ]
-      "Red junglefowl": [ "Gallus gallus" ]
-      "Wood mouse": [ "Apodemus sylvaticus" ]
-      "Cattle": [ "Bos taurus" ]
-      "Others": [ "*" ]
+      "Human": [ "Human" ]
+      "Not Human": [ "Not Human" ]
   models:
     - name: "transformer-crossentropy"
       active: False
@@ -76,7 +69,7 @@ classification_settings:
       n_heads: 8
       depth: 6
       n_tokens: 27
-      n_classes: 9
+      n_classes: 2
       n_epochs: 10
       dim: 512
 
@@ -92,7 +85,7 @@ classification_settings:
       n_heads: 8
       depth: 6
       n_tokens: 27
-      n_classes: 9
+      n_classes: 2
       n_epochs: 10
       dim: 512
 
@@ -100,5 +93,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230502/host_multi"
+  sub_dir: "coronaviridae/20230503/host_binary"
   prefix: "tf-cnv-ce-ks8-d512" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
