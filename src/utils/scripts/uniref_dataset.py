@@ -345,26 +345,26 @@ def main():
     # 2. Get hosts of the virus from which the protein sequences were sampled
     get_virus_hosts(output_dir)
     # 3. Filter the dataset: Remove sequences with no hosts of the virus
-    df = remove_sequences_w_no_hosts(output_dir)
-    # 4. Explode the host column: Create multiple entries (duplicate the sequence) one for each host of the virus of the sequence
-    df = explode_virus_hosts(df)
-    # 5. Get metadata for each record: taxonomy name and rank of the virus and virus_hosts of the sequences
-    df = get_virus_metadata(df)
-    # Note: Data in steps 2, 3, 4, 5 do not contain the protein sequence. We dropped the sequence column in step 2 to save memory
-    # 6. Rejoin the sequence data using the parsed fasta file output from step 1 and write to an intermediary dataset file
-    join_metadata_with_sequences_data(df, output_dir)
-    # 7. Filters
-    # 7.1 Retain sequences with virus AND virus host with rank = "Species
-    df = get_sequences_at_species_level(output_dir)
-    # 7.2 Retain sequences with viruses hosts belonging to the class of Mammals OR Aves (birds)
-    df = get_sequences_from_mammals_aves_hosts(df)
-    # 7.3 Remove viruses with only one unique virus host
-    df = remove_sequences_of_virus_with_one_host(df)
-    # 7.4 Remove duplicate sequences (same uniref90_id and sequence, but multiple hosts)
-    df = remove_duplicate_sequences(df)
+    # df = remove_sequences_w_no_hosts(output_dir)
+    # # 4. Explode the host column: Create multiple entries (duplicate the sequence) one for each host of the virus of the sequence
+    # df = explode_virus_hosts(df)
+    # # 5. Get metadata for each record: taxonomy name and rank of the virus and virus_hosts of the sequences
+    # df = get_virus_metadata(df)
+    # # Note: Data in steps 2, 3, 4, 5 do not contain the protein sequence. We dropped the sequence column in step 2 to save memory
+    # # 6. Rejoin the sequence data using the parsed fasta file output from step 1 and write to an intermediary dataset file
+    # join_metadata_with_sequences_data(df, output_dir)
+    # # 7. Filters
+    # # 7.1 Retain sequences with virus AND virus host with rank = "Species
+    # df = get_sequences_at_species_level(output_dir)
+    # # 7.2 Retain sequences with viruses hosts belonging to the class of Mammals OR Aves (birds)
+    # df = get_sequences_from_mammals_aves_hosts(df)
+    # # 7.3 Remove viruses with only one unique virus host
+    # df = remove_sequences_of_virus_with_one_host(df)
+    # # 7.4 Remove duplicate sequences (same uniref90_id and sequence, but multiple hosts)
+    # df = remove_duplicate_sequences(df)
     # 8. Write the filtered dataset to a file
-    print(f"Writing to file {UNIREF90_DATA_WO_SINGLE_HOST}")
-    df.to_csv(os.path.join(output_dir, UNIREF90_DATA_WO_SINGLE_HOST))
+    # print(f"Writing to file {UNIREF90_DATA_WO_SINGLE_HOST}")
+    # df.to_csv(os.path.join(output_dir, UNIREF90_DATA_WO_SINGLE_HOST))
 
 
 if __name__ == '__main__':

@@ -55,7 +55,7 @@ classification_settings:
   id_col: "id"
   sequence_col: "seq"
   label_settings:
-    label_col: "virus_host_name"
+    label_col: "virus_host"
     exclude_labels: [ "nan"]
     label_groupings:
       "Pig": [ "Sus scrofa (Pig) [TaxID: 9823]" ]
