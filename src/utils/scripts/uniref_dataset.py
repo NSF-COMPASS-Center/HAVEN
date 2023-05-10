@@ -109,8 +109,9 @@ def get_virus_hosts(output_directory):
     # no straightforward way to implement this filter
     # hack: 1. left join with indicator=True creates an additional column named '_merge' with values 'both' or 'left_only'
     #       2. retain only the rows with '_merge' column value == 'left_only'
-    df = pd.merge(df, df_host, how="left", on=[UNIREF90_ID], indicator=True)
-    df = df[df["_merge"] == "left_only"][[UNIREF90_ID, TAX_ID]]
+    if df_host.shape[0] != 0:
+        df = pd.merge(df, df_host, how="left", on=[UNIREF90_ID], indicator=True)
+        df = df[df["_merge"] == "left_only"][[UNIREF90_ID, TAX_ID]]
     print(f"Number of records TO BE processed = {df.shape[0]}")
 
     # split into sub dfs for parallel processing
@@ -136,6 +137,7 @@ def get_virus_hosts(output_directory):
 def get_virus_host(df, output_file_path):
     # get virus hosts
     for row in df.iterrows():
+        row = row[1]
         # query uniprot
         uniref90_id = row[UNIREF90_ID]
         tax_id = row[TAX_ID]
@@ -144,7 +146,7 @@ def get_virus_host(df, output_file_path):
 
         # write output to file
         f = open(output_file_path, mode="a")
-        f.write(",".join([uniref90_id, tax_id, "\"" + str(host_tax_ids) + "\""]) + "\n")
+        f.write(",".join([str(uniref90_id), str(tax_id), "\"" + str(host_tax_ids) + "\""]) + "\n")
         f.close()
 
 

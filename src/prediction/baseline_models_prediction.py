@@ -41,41 +41,6 @@ def execute(input_settings, output_settings, classification_settings):
         # 1. Read the data files
         train_df, test_df = read_dataset(input_dir, input, id_col, sequence_col, label_col)
 
-        # X_train_resampled, y_train_resampled = utils.random_oversampling(X_train, y_train)
-        # return X_train_resampled, X_test, y_train_resampled, y_test
-
-        # pos_df = train_df[train_df[label_col] == 'Homo sapiens']
-        # neg_df = train_df[train_df[label_col] != 'Homo sapiens']
-        # print(f"Number of positive samples = {pos_df.shape}")
-        # print(f"Number of negative samples = {neg_df.shape}")
-        # pos_df = test_df[test_df[label_col] == 'Homo sapiens']
-        # neg_df = test_df[test_df[label_col] != 'Homo sapiens']
-        # print(f"Number of positive samples = {pos_df.shape}")
-        # print(f"Number of negative samples = {neg_df.shape}")
-
-
-        # downsampling number of positives
-        # print("Downsampling training dataset >")
-        # print(f"Training dataset size before downsampling = {train_df.shape}")
-        # pos_df = train_df[train_df[label_col] == 'Homo sapiens']
-        # neg_df = train_df[train_df[label_col] != 'Homo sapiens']
-        # print(f"Number of positive samples = {pos_df.shape}")
-        # print(f"Number of negative samples = {neg_df.shape}")
-        # train_df = pd.concat([pos_df[:neg_df.shape[0]], neg_df])
-        # train_df = train_df[~train_df.index.duplicated()]
-        #
-        # print("Downsampling testing dataset >")
-        # print(f"Testing dataset size before downsampling = {test_df.shape}")
-        # pos_df = test_df[test_df[label_col] == 'Homo sapiens']
-        # neg_df = test_df[test_df[label_col] != 'Homo sapiens']
-        # print(f"Number of positive samples = {pos_df.shape}")
-        # print(f"Number of negative samples = {neg_df.shape}")
-        # test_df = pd.concat([pos_df[:neg_df.shape[0]], neg_df])
-        # test_df = test_df[~test_df.index.duplicated()]
-        # print("==========")
-        # print(f"Training dataset size after downsampling= {train_df.shape}")
-        # print(f"Testing dataset size after downsampling= {test_df.shape}")
-
         df = pd.concat([train_df, test_df])
 
         # 2. filter out noise: labels configured to be excluded, NaN labels
