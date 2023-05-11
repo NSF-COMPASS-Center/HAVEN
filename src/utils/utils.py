@@ -114,7 +114,7 @@ def compute_class_distribution(df, label_col, format=False):
     return labels_counts
 
 
-def read_n_split_dataset(input_dir, input_file_names, seed, train_proportion, cols, stratify_col=None):
+def read_dataset(input_dir, input_file_names, cols):
     datasets = []
     for input_file_name in input_file_names:
         input_file_path = os.path.join(input_dir, input_file_name)
@@ -124,6 +124,10 @@ def read_n_split_dataset(input_dir, input_file_names, seed, train_proportion, co
 
     df = pd.concat(datasets)
     print(f"Size of input dataset = {df.shape}")
+    return df
+
+
+def split_dataset(df, seed, train_proportion, stratify_col=None):
     print(f"Splitting dataset with seed={seed}, train_proportion={train_proportion}, stratify_col={stratify_col}")
     train_df, test_df = train_test_split(df, train_size=train_proportion, random_state=seed, stratify=df[stratify_col])
     print(f"Size of train_dataset = {train_df.shape}")

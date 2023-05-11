@@ -35,16 +35,17 @@ def execute(input_settings, output_settings, classification_settings):
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
-        train_df, test_df = utils.read_n_split_dataset(input_dir, input_file_names,
-                                                       seed=input_split_seeds[iter],
-                                                       train_proportion=classification_settings["train_proportion"],
-                                                       cols=[sequence_col, label_col],
-                                                       stratify_col=label_col)
+        df = utils.read_dataset(input_dir, input_file_names,
+                                cols=[sequence_col, label_col])
+        # 2. Transform labels
+        df, index_label_map = utils.transform_labels(df, label_settings,
+                                                           classification_type=classification_settings["type"])
+        # 3. Split dataset
+        train_df, test_df = utils.split_dataset(df, input_split_seeds[iter],
+                                                classification_settings["train_proportion"], stratify_col=label_col)
 
-        index_label_map, train_dataset_loader = nn_utils.get_dataset_loader(train_df, sequence_settings,
-                                                                            label_settings, dataset_type="train")
-        index_label_map, test_dataset_loader = nn_utils.get_dataset_loader(test_df, sequence_settings,
-                                                                           label_settings, dataset_type="test")
+        train_dataset_loader = nn_utils.get_dataset_loader(train_df, sequence_settings, label_col)
+        test_dataset_loader = nn_utils.get_dataset_loader(test_df, sequence_settings, label_col)
 
         nlp_model = None
         # model store filepath
@@ -72,7 +73,8 @@ def execute(input_settings, output_settings, classification_settings):
                     nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
 
                 nlp_model.to(nn_utils.get_device())
-                result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader, model["loss"],
+                result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader,
+                                                       model["loss"],
                                                        model["n_epochs"], model_name, mode)
             else:
                 continue
