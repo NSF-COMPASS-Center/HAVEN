@@ -3,6 +3,7 @@ import random
 import numpy as np
 import pandas as pd
 from imblearn.over_sampling import RandomOverSampler
+from sklearn.model_selection import train_test_split
 from pathlib import Path
 import os
 
@@ -113,3 +114,17 @@ def compute_class_distribution(df, label_col, format=False):
     return labels_counts
 
 
+def read_n_split_dataset(input_dir, input_file_names, seed, train_proportion, cols, stratify_col=None):
+    datasets = []
+    for input_file_name in input_file_names:
+        input_file_path = os.path.join(input_dir, input_file_name)
+        df = pd.read_csv(input_file_path, usecols=cols)
+        print(f"input file: {input_file_path}, size = {df.shape}")
+
+    df = pd.concat(datasets)
+    print(f"Size of input dataset = {df.shape}")
+    print(f"Splitting dataset with seed={seed}, train_proportion={train_proportion}, stratify_col={stratify_col}")
+    train_df, test_df = train_test_split(df, train_size=train_proportion, random_state=seed, stratify=df[stratify_col])
+    print(f"Size of train_dataset = {train_df.shape}")
+    print(f"Size of test_dataset = {test_df.shape}")
+    return train_df, test_df

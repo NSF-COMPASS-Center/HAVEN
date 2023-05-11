@@ -5,42 +5,13 @@ config_type: "prediction" # options: data_preprocessor, prediction, evaluation
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/uniref90/splits"
+  input_dir: "input/data/uniref90"
 
   # Name of file(s) in subdirectory to be read and processed.
-  # Two forms of inputs:
-  # Example: With pre split input files [NOTE: classification_settings.split_input MUST be set to False]
-  #  file_names:
-  #    - dir: "<dir_1>"
-  #      train: ["train_file_1_1.csv", "train_file_1_2.csv", "train_file_1_3.csv"]
-  #      test: ["test_file_1_1.csv", "test_file_1_2.csv", "test_file_1_3.csv"]
-  #
-  #    - dir: "<dir_2>"
-  #      train: ["train_file_2_1.csv", "train_file_2_2.csv"]
-  #      test: ["test_file_2_1.csv", "test_file_2_2.csv"]
-  #
-  # Example: Without presplit input files
-  # file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
+  # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   file_names:
-    - dir: "s12612648"
-      train: [ "uniref90_mammals_aves_w_singlehost.csv_tr0.8_train.csv" ]
-      test: [ "uniref90_mammals_aves_w_singlehost.csv_tr0.8_test.csv" ]
-
-    - dir: "s31062180"
-      train: [ "uniref90_mammals_aves_w_singlehost.csv_tr0.8_train.csv" ]
-      test: [ "uniref90_mammals_aves_w_singlehost.csv_tr0.8_test.csv" ]
-
-    - dir: "s48918293"
-      train: [ "uniref90_mammals_aves_w_singlehost.csv_tr0.8_train.csv" ]
-      test: [ "uniref90_mammals_aves_w_singlehost.csv_tr0.8_test.csv" ]
-
-    - dir: "s55631155"
-      train: [ "uniref90_mammals_aves_w_singlehost.csv_tr0.8_train.csv" ]
-      test: [ "uniref90_mammals_aves_w_singlehost.csv_tr0.8_test.csv" ]
-
-    - dir: "s79221635"
-      train: [ "uniref90_mammals_aves_w_singlehost.csv_tr0.8_train.csv" ]
-      test: [ "uniref90_mammals_aves_w_singlehost.csv_tr0.8_test.csv" ]
+  # seeds to split the files into training and testing
+  split_seeds: [ "s12612648", "s31062180", "s48918293", "s55631155", "s79221635" ]
 
 
 classification_settings:

@@ -12,7 +12,8 @@ from prediction.models.baseline import random_forest
 def execute(input_settings, output_settings, classification_settings):
     # input settings
     input_dir = input_settings["input_dir"]
-    inputs = input_settings["file_names"]
+    input_file_names = input_settings["file_names"]
+    input_split_seeds = input_settings["split_seeds"]
 
     # output settings
     output_dir = output_settings["output_dir"]
@@ -28,6 +29,7 @@ def execute(input_settings, output_settings, classification_settings):
     models = classification_settings["models"]
     id_col = classification_settings["id_col"]
     sequence_col = classification_settings["sequence_col"]
+    n_iters = classification_settings["n_iterations"]
 
     label_settings = classification_settings["label_settings"]
     label_col = label_settings["label_col"]
@@ -35,11 +37,14 @@ def execute(input_settings, output_settings, classification_settings):
     results = {}
     feature_importance = {}
     validation_scores = {}
-    itr = 0
-    for input in inputs:
-        print(f"Iteration {itr}")
+    for iter in n_iters:
+        print(f"Iteration {iter}")
         # 1. Read the data files
-        train_df, test_df = read_dataset(input_dir, input, id_col, sequence_col, label_col)
+        train_df, test_df = utils.read_n_split_dataset(input_dir, input_file_names,
+                                                       seed=input_split_seeds[iter],
+                                                       train_proportion=classification_settings["train_proportion"],
+                                                       cols=[id_col, sequence_col, label_col],
+                                                       stratify_col=label_col)
 
         df = pd.concat([train_df, test_df])
 
@@ -90,21 +95,20 @@ def execute(input_settings, output_settings, classification_settings):
             result_df["y_true"] = y_test.values
             result_df.rename(columns=idx_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(idx_label_map)
-            result_df["itr"] = itr
+            result_df["itr"] = iter
 
             # Remap the class indices to original input labels
             feature_importance_df.rename(index=idx_label_map, inplace=True)
-            feature_importance_df["itr"] = itr
+            feature_importance_df["itr"] = iter
 
-            validation_scores_df["itr"] = itr
+            validation_scores_df["itr"] = iter
 
             results[model_name].append(result_df)
             feature_importance[model_name].append(feature_importance_df)
             validation_scores[model_name].append(validation_scores_df)
-        itr += 1
 
     # write the raw results in csv files
-    output_filename_prefix = f"kmer_k{k}_{label_col}_{classification_type}_presplit" + output_prefix + "_"
+    output_filename_prefix = f"kmer_k{k}_{label_col}_{classification_type}" + output_prefix + "_"
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
     utils.write_output(results, output_results_dir, output_filename_prefix, "output",)
     utils.write_output(feature_importance, output_results_dir, output_filename_prefix, "feature_imp")
@@ -112,38 +116,6 @@ def execute(input_settings, output_settings, classification_settings):
 
     # create plots for validation scores
     plot_validation_scores(validation_scores, os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
-
-
-def read_dataset(input_dir, input, id_col, sequence_col, label_col):
-    train_datasets = []
-    test_datasets = []
-    sub_dir = input["dir"]
-
-    train_files = input["train"]
-    for train_file in train_files:
-        input_file_path = os.path.join(input_dir, sub_dir, train_file)
-        df = pd.read_csv(input_file_path, usecols=[id_col, sequence_col, label_col])
-        print(f"input train file: {input_file_path}, size = {df.shape}")
-        train_datasets.append(df)
-
-    test_files = input["test"]
-    for test_file in test_files:
-        input_file_path = os.path.join(input_dir, sub_dir, test_file)
-        df = pd.read_csv(input_file_path, usecols=[id_col, sequence_col, label_col])
-        print(f"input test file: {input_file_path}, size = {df.shape}")
-        test_datasets.append(df)
-
-    train_df = pd.concat(train_datasets)
-    train_df["split"] = "train"
-    train_df.set_index(id_col, inplace=True)
-    print(f"Size of input train dataset = {train_df.shape}")
-
-    test_df = pd.concat(test_datasets)
-    test_df["split"] = "test"
-    test_df.set_index(id_col, inplace=True)
-    print(f"Size of input test dataset = {test_df.shape}")
-
-    return train_df, test_df
 
 
 def get_standardized_datasets(df, label_col):
