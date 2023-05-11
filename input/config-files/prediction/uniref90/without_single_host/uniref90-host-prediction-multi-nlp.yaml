@@ -24,8 +24,8 @@ classification_settings:
   sequence_settings:
     batch_size: 64
     sequence_col: "seq"
-    max_sequence_length: 6630 # 1024
-    truncate: False
+    max_sequence_length: 1024 # 6630
+    truncate: True
     pad_sequence_val: 0
   label_settings:
     label_col: "virus_host_name"
@@ -42,7 +42,7 @@ classification_settings:
       "Others": [ "*" ]
   models:
     - name: "transformer-crossentropy"
-      active: False
+      active: True
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "CrossEntropyLoss"
@@ -55,13 +55,13 @@ classification_settings:
       dim: 512
 
     - name: "transformer-conv1d-crossentropy"
-      active: True
+      active: False
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "CrossEntropyLoss"
       with_convolution: True # ensure that truncate is set to False in sequence_settings if convolution is being used
-      kernel_size: 8
-      stride: 8
+      kernel_size: 3
+      stride: 1
       padding: 0
       n_heads: 8
       depth: 6
@@ -75,4 +75,4 @@ output_settings:
   results_dir: "raw"
   visualizations_dir: "visualization"
   sub_dir: "uniref90/20230510/host_multi"
-  prefix: "tf-ce-ks8-d128" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "tf-msl1024-d128" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
