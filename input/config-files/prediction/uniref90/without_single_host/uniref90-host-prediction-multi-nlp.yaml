@@ -18,9 +18,9 @@ input_settings:
 classification_settings:
   model_type: "nlp"
   n_iterations: 5
-  split_input: False
+  split_input: True
   sequence_settings:
-    batch_size: 32
+    batch_size: 64
     sequence_col: "seq"
     max_sequence_length: 6630 # 1024
     truncate: False
@@ -66,11 +66,11 @@ classification_settings:
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
-      dim: 512
+      dim: 128
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
   sub_dir: "uniref90/20230510/host_multi"
-  prefix: "tf-ce-ks8-d512" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "tf-ce-ks8-d128" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

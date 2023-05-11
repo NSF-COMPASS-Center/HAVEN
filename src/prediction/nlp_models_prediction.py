@@ -32,7 +32,7 @@ def execute(input_settings, output_settings, classification_settings):
     sequence_col = sequence_settings["sequence_col"]
     label_col = label_settings["label_col"]
     results = {}
-    for iter in n_iters:
+    for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
         train_df, test_df = utils.read_n_split_dataset(input_dir, input_file_names,

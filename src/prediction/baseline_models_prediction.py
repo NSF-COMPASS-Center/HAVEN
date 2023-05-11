@@ -37,7 +37,7 @@ def execute(input_settings, output_settings, classification_settings):
     results = {}
     feature_importance = {}
     validation_scores = {}
-    for iter in n_iters:
+    for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
         train_df, test_df = utils.read_n_split_dataset(input_dir, input_file_names,
