@@ -4,7 +4,6 @@ from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
-import torch.nn as nn
 import torch
 import tqdm
 
@@ -15,7 +14,8 @@ from prediction.models.nlp import transformer
 def execute(input_settings, output_settings, classification_settings):
     # input settings
     input_dir = input_settings["input_dir"]
-    inputs = input_settings["file_names"]
+    input_file_names = input_settings["file_names"]
+    input_split_seeds = input_settings["split_seeds"]
 
     # output settings
     output_dir = output_settings["output_dir"]
@@ -27,15 +27,23 @@ def execute(input_settings, output_settings, classification_settings):
     models = classification_settings["models"]
     label_settings = classification_settings["label_settings"]
     sequence_settings = classification_settings["sequence_settings"]
+    n_iters = classification_settings["n_iterations"]
 
+    sequence_col = sequence_settings["sequence_col"]
+    label_col = label_settings["label_col"]
     results = {}
-    itr = 0
-    for input in inputs:
-        print(f"Iteration {itr}")
+    for iter in n_iters:
+        print(f"Iteration {iter}")
         # 1. Read the data files
-        index_label_map, train_dataset_loader = nn_utils.get_dataset_loader(input_dir, input, sequence_settings,
+        train_df, test_df = utils.read_n_split_dataset(input_dir, input_file_names,
+                                                       seed=input_split_seeds[iter],
+                                                       train_proportion=classification_settings["train_proportion"],
+                                                       cols=[sequence_col, label_col],
+                                                       stratify_col=label_col)
+
+        index_label_map, train_dataset_loader = nn_utils.get_dataset_loader(train_df, sequence_settings,
                                                                             label_settings, dataset_type="train")
-        index_label_map, test_dataset_loader = nn_utils.get_dataset_loader(input_dir, input, sequence_settings,
+        index_label_map, test_dataset_loader = nn_utils.get_dataset_loader(test_df, sequence_settings,
                                                                            label_settings, dataset_type="test")
 
         nlp_model = None
@@ -72,10 +80,9 @@ def execute(input_settings, output_settings, classification_settings):
             #  Create the result dataframe and remap the class indices to original input labels
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
-            result_df["itr"] = itr
+            result_df["itr"] = iter
             results[model_name].append(result_df)
             torch.save(nlp_model.state_dict(), model_filepath.format(model_name=model_name, itr=itr))
-        itr += 1
 
     # write the raw results in csv files
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)

@@ -8,7 +8,7 @@ import random
 
 
 class ProteinSequenceDataset(Dataset):
-    def __init__(self, filepath, sequence_col, max_seq_len, truncate, label_settings):
+    def __init__(self, df, sequence_col, max_seq_len, truncate, label_settings):
         super(ProteinSequenceDataset, self).__init__()
         self.sequence_col = sequence_col
         self.max_seq_len = max_seq_len
@@ -20,18 +20,17 @@ class ProteinSequenceDataset(Dataset):
                                'O': 16, 'S': 17, 'U': 18, 'T': 19, 'W': 20,
                                'Y': 21, 'V': 22, 'B': 23, 'Z': 24, 'X': 25,
                                'J': 26}
-        self.data = self.read_dataset(filepath, truncate)
+        self.data = self.df
+        if self.truncate:
+            self.data = self.truncate_dataset(df)
         self.data, self.index_label_map = utils.transform_labels(self.data, self.label_settings)
 
     def __len__(self) -> int:
         return self.data.shape[0]
 
-    def read_dataset(self, filepath, truncate):
-        df = pd.read_csv(filepath, usecols=[self.sequence_col, self.label_col])
-        print(f"Read dataset from {filepath}, size = {df.shape}")
-        if truncate:
-            # Truncating sequences to fixed length of sequence_max_length
-            df[self.sequence_col] = df[self.sequence_col].apply(lambda x: x[0:self.max_seq_len])
+    def truncate_dataset(self, df):
+        # Truncating sequences to fixed length of sequence_max_length
+        df[self.sequence_col] = df[self.sequence_col].apply(lambda x: x[0:self.max_seq_len])
         return df
 
     def __getitem__(self, idx: int):
