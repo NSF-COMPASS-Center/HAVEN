@@ -120,6 +120,7 @@ def read_n_split_dataset(input_dir, input_file_names, seed, train_proportion, co
         input_file_path = os.path.join(input_dir, input_file_name)
         df = pd.read_csv(input_file_path, usecols=cols)
         print(f"input file: {input_file_path}, size = {df.shape}")
+        datasets.append(df)
 
     df = pd.concat(datasets)
     print(f"Size of input dataset = {df.shape}")
