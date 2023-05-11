@@ -36,14 +36,14 @@ def get_device(tensor=None):
     return device
 
 
-def get_dataset_loader(df, sequence_settings, label_settings):
+def get_dataset_loader(df, sequence_settings, label_col):
     seq_col = sequence_settings["sequence_col"]
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
     pad_sequence_val = sequence_settings["pad_sequence_val"]
     truncate = sequence_settings["truncate"]
-    dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, label_settings)
-    return dataset.index_label_map, DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=Padding(max_seq_len, pad_sequence_val))
+    dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, label_col)
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=Padding(max_seq_len, pad_sequence_val))
 
 
 def get_criterion(loss):

@@ -40,31 +40,31 @@ def execute(input_settings, output_settings, classification_settings):
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
-        train_df, test_df = utils.read_n_split_dataset(input_dir, input_file_names,
-                                                       seed=input_split_seeds[iter],
-                                                       train_proportion=classification_settings["train_proportion"],
-                                                       cols=[id_col, sequence_col, label_col],
-                                                       stratify_col=label_col)
+        df = utils.read_dataset(input_dir, input_file_names,
+                                cols=[id_col, sequence_col, label_col])
+        # 2. Transform labels
+        df, index_label_map = utils.transform_labels(df, label_settings,
+                                                     classification_type=classification_settings["type"])
+        # 3. Split dataset
+        train_df, test_df = utils.split_dataset(df, input_split_seeds[iter],
+                                                classification_settings["train_proportion"], stratify_col=label_col)
 
         df = pd.concat([train_df, test_df])
 
-        # 2. filter out noise: labels configured to be excluded, NaN labels
+        # 4. filter out noise: labels configured to be excluded, NaN labels
         df = utils.filter_noise(df, label_settings)
 
-        # 3. Compute kmer features
+        # 5. Compute kmer features
         kmer_df = kmer_utils.compute_kmer_features(df, k, id_col, sequence_col, label_col)
         print(f"back in prediction_with_inputs_split = {kmer_df.shape}")
 
-        # get the split column again to distinguish train and test datasets
+        # 6. get the split column again to distinguish train and test datasets
         kmer_df = kmer_df.join(df["split"], on=id_col, how="left")
         print(f"kmer_df size after join with split on id = {kmer_df.shape}")
 
-        # 4. Group the labels (if applicable) and convert the string labels to mapped integer indices
-        kmer_df_with_transformed_label, idx_label_map = utils.transform_labels(kmer_df, label_settings, classification_type)
-        print(f"kmer_df_with_transformed_label size = {kmer_df_with_transformed_label.shape}")
 
-        # 5. Perform classification
-        X_train, X_test, y_train, y_test = get_standardized_datasets(kmer_df_with_transformed_label, label_col=label_col)
+        # 7. Perform classification
+        X_train, X_test, y_train, y_test = get_standardized_datasets(kmer_df, label_col=label_col)
 
         for model in models:
             if model["active"] is False:
@@ -93,12 +93,12 @@ def execute(input_settings, output_settings, classification_settings):
             #  Create the result dataframe and remap the class indices to original input labels
             result_df = pd.DataFrame(y_pred)
             result_df["y_true"] = y_test.values
-            result_df.rename(columns=idx_label_map, inplace=True)
-            result_df["y_true"] = result_df["y_true"].map(idx_label_map)
+            result_df.rename(columns=index_label_map, inplace=True)
+            result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = iter
 
             # Remap the class indices to original input labels
-            feature_importance_df.rename(index=idx_label_map, inplace=True)
+            feature_importance_df.rename(index=index_label_map, inplace=True)
             feature_importance_df["itr"] = iter
 
             validation_scores_df["itr"] = iter

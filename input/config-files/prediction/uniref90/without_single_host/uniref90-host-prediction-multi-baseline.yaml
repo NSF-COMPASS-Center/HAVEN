@@ -12,7 +12,7 @@ input_settings:
   file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ "s12612648", "s31062180", "s48918293", "s55631155", "s79221635" ]
+  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 
 classification_settings:
