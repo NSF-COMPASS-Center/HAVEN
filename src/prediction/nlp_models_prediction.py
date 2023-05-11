@@ -22,7 +22,7 @@ def execute(input_settings, output_settings, classification_settings):
     results_dir = output_settings["results_dir"]
     sub_dir = output_settings["sub_dir"]
     output_prefix = output_settings["prefix"]
-    output_prefix = "_" + output_prefix if output_prefix is not None else ""
+    output_prefix = output_prefix if output_prefix is not None else ""
 
     models = classification_settings["models"]
     label_settings = classification_settings["label_settings"]
@@ -82,11 +82,11 @@ def execute(input_settings, output_settings, classification_settings):
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = iter
             results[model_name].append(result_df)
-            torch.save(nlp_model.state_dict(), model_filepath.format(model_name=model_name, itr=itr))
+            torch.save(nlp_model.state_dict(), model_filepath.format(model_name=model_name, itr=iter))
 
     # write the raw results in csv files
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
-    utils.write_output(results, output_results_dir, output_prefix + "_", "output")
+    utils.write_output(results, output_results_dir, output_prefix, "_output")
 
 
 def run_transformer(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, model_name, mode):
