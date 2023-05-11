@@ -19,6 +19,7 @@ classification_settings:
   model_type: "nlp"
   n_iterations: 5
   split_input: True
+  train_proportion: 0.8
   sequence_settings:
     batch_size: 64
     sequence_col: "seq"
