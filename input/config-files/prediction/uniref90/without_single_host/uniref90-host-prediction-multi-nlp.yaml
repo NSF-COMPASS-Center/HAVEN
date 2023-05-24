@@ -75,4 +75,4 @@ output_settings:
   results_dir: "raw"
   visualizations_dir: "visualization"
   sub_dir: "uniref90/20230524/host_multi"
-  prefix: "tf-emb_lin-msl_1024-d_128" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "tfcnv-emb_lin-msl_1024-d_512-k8s8" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
