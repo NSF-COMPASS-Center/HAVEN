@@ -23,9 +23,11 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         self.layers = nn_utils.create_clones(layer, N)
         self.norm = NormalizationLayer()
+        self.encoding = None
 
     def forward(self, X):
         # pass through each layer sequentially
         for layer in self.layers:
             X = layer(X)
-        return self.norm(X)
+        self.encoding = self.norm(X)
+        return self.encoding
