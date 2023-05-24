@@ -42,7 +42,7 @@ classification_settings:
       "Others": [ "*" ]
   models:
     - name: "transformer-crossentropy"
-      active: True
+      active: False
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "CrossEntropyLoss"
@@ -55,20 +55,20 @@ classification_settings:
       dim: 128
 
     - name: "transformer-conv1d-crossentropy"
-      active: False
+      active: True
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "CrossEntropyLoss"
       with_convolution: True # ensure that truncate is set to False in sequence_settings if convolution is being used
-      kernel_size: 3
-      stride: 1
+      kernel_size: 8
+      stride: 8
       padding: 0
       n_heads: 8
       depth: 6
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
-      dim: 128
+      dim: 512
 
 output_settings:
   output_dir: "output"
