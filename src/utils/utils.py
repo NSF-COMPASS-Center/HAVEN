@@ -25,6 +25,7 @@ def transform_labels(df, label_settings, classification_type=None):
         df = group_labels(df, label_col, label_grouping_config)
 
     labels = df[label_col].unique()
+    # labels = list(label_grouping_config.keys())
 
     if classification_type == "binary":
         positive_label = label_settings["positive_label"]
@@ -95,7 +96,7 @@ def random_oversampling(X, y):
 
 def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
     for model_name, dfs in model_dfs.items():
-        output_file_name = f"{output_filename_prefix}_{model_name}_{output_type}.csv"
+        output_file_name = f"{output_filename_prefix}_{model_name}{output_type}.csv"
         output_file_path = os.path.join(output_dir, output_file_name)
         # create any missing parent directories
         Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
