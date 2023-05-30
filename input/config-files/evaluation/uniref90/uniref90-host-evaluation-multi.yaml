@@ -12,22 +12,36 @@ input_settings:
     # "LR-ovr": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
     "LR": "20230410/host_multi/kmer_k3_virus_host_name_multi_presplit_lr_multinomial_lr_output.csv"
     "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
+
     "TF-msl1024-embLIN-d128": "20230524/host_multi/tf-emb_lin-msl_1024-d_128_transformer-crossentropy__output.csv"
     "TF-msl1024-embLIN-d512": "20230501/host_multi/transformer-conv1d-maxmargin_presplit_tf-ce-arc_transformer-crossentropy_output.csv"
-    "TF-msl1024-embSINCOS-d128": "20230510/host_multi/tf-msl1024-d128transformer-crossentropy__output.csv"
-    "TF-msl1024-embSINCOS-d512": "20230510/host_multi/tf-msl1024-d512transformer-crossentropy__output.csv"
-    "TF-msl1024-embLIN-d128-CNV-k8s8": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_128-k8s8_transformer-conv1d-crossentropy__output.csv"
-    "TF-msl1024-embLIN-d128-CNV-k4s4": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_128-k4s4_transformer-conv1d-crossentropy__output.csv"
-    "TF-msl1024-embLIN-d128-CNV-k3s1": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_128-k3s1_transformer-conv1d-crossentropy__output.csv"
-    "TF-msl1024-embLIN-d512-CNV-k8s8": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_512-k8s8_transformer-conv1d-crossentropy__output.csv"
-    "TF-msl1024-embLIN-d512-CNV-k4s4": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_512-k4s4_transformer-conv1d-crossentropy__output.csv"
-    "TF-msl1024-embLIN-d512-CNV-k3s1": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_512-k3s1_transformer-conv1d-crossentropy__output.csv"
-    "TF-embSINCOS-d128-CNV-k8s8": ""
-    "TF-embSINCOS-d128-CNV-k4s4": ""
-    "TF-embSINCOS-d512-CNV-k8s8": ""
-    "TF-embSINCOS-d512-CNV-k4s4": ""
-    "TF-CNV-ks4d512": "20230502/host_multi/_tf-cnv-ce-ks4-d512_transformer-conv1d-crossentropy_output.csv"
-    "TF-CNV-ks8d512": "20230502/host_multi/_tf-cnv-ce-ks8-d512_transformer-conv1d-crossentropy_output.csv"
+
+    "TF-msl1024-embLIN-CNV-k8s8-d128": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_128-k8s8_transformer-conv1d-crossentropy__output.csv"
+    "TF-msl1024-embLIN-CNV-k4s4-d128": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_128-k4s4_transformer-conv1d-crossentropy__output.csv"
+    "TF-msl1024-embLIN-CNV-k3s1-d128": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_128-k3s1_transformer-conv1d-crossentropy__output.csv"
+    "TF-msl1024-embLIN-CNV-k8s8-d512": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_512-k8s8_transformer-conv1d-crossentropy__output.csv"
+    "TF-msl1024-embLIN-CNV-k4s4-d512": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_512-k4s4_transformer-conv1d-crossentropy__output.csv"
+    "TF-msl1024-embLIN-CNV-k3s1-d512": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_512-k3s1_transformer-conv1d-crossentropy__output.csv"
+
+    "TF-msl1024-embSINCOS-d128": "20230510/host_multi/tf-emb_sincos-msl_1024-d_128-transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512": "20230510/host_multi/tf-emb_sincos-msl_1024-d_512-transformer-crossentropy_output.csv"
+
+    "TF-msl1024-embSINCOS-CNV-k8s8-d128": "20230524/host_multi/tfcnv-emb_sincos-msl_1024-d_128-k8s8_transformer-conv1d-crossentropy__output.csv"
+    "TF-msl1024-embSINCOS-CNV-k4s4-d128": "20230524/host_multi/tfcnv-emb_sincos-msl_1024-d_128-k4s4_transformer-conv1d-crossentropy__output.csv"
+    "TF-msl1024-embSINCOS-CNV-k3s1-d128": "20230524/host_multi/tfcnv-emb_sincos-msl_1024-d_128-k3s1_transformer-conv1d-crossentropy__output.csv"
+    "TF-msl1024-embSINCOS-CNV-k8s8-d512": "20230524/host_multi/tfcnv-emb_sincos-msl_1024-d_512-k8s8_transformer-conv1d-crossentropy__output.csv"
+    "TF-msl1024-embSINCOS-CNV-k4s4-d512": "20230524/host_multi/tfcnv-emb_sincos-msl_1024-d_512-k4s4_transformer-conv1d-crossentropy__output.csv"
+    "TF-msl1024-embSINCOS-CNV-k3s1-d512": "20230524/host_multi/tfcnv-emb_sincos-msl_1024-d_512-k3s1_transformer-conv1d-crossentropy__output.csv"
+
+    "TF-embLIN-CNV-k8s8-d128": "20230525/host_multi/tfcnv-emb_lin-d_128-k8s8_transformer-conv1d-crossentropy_output.csv"
+    "TF-embLIN-CNV-k4s4-d128": "20230525/host_multi/tfcnv-emb_lin-d_128-k4s4_transformer-conv1d-crossentropy_output.csv"
+    "TF-embLIN-CNV-k8s8-d512": "20230525/host_multi/tfcnv-emb_lin-d_512-k8s8_transformer-conv1d-crossentropy_output.csv"
+
+    "TF-embSINCOS-CNV-k8s8-d128": "20230502/host_multi/_tf-cnv-ce_transformer-conv1d-crossentropy_output.csv"
+    "TF-embSINCOS-CNV-k4s4-d128": "20230502/host_multi/_tf-cnv-ce-ks4_transformer-conv1d-crossentropy_output.csv"
+    "TF-embSINCOS-CNV-k8s8-d512": "20230502/host_multi/_tf-cnv-ce-ks8-d512_transformer-conv1d-crossentropy_output.csv"
+    "TF-embSINCOS-CNV-k4s4-d512": "20230502/host_multi/_tf-cnv-ce-ks4-d512_transformer-conv1d-crossentropy_output.csv"
+
 
 evaluation_settings:
   type: "multi"
@@ -52,5 +66,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230502/host_multi_tr19ktest19k"
-  prefix: ""# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "uniref90/20230525/host_multi_tr19ktest19k"
+  prefix: "tf-msl-emb-cnv-ablation"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

@@ -8,7 +8,7 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None):
 
     plt.rcParams['xtick.labelsize'] = 10
     plt.rcParams['figure.autolayout'] = True
-    plt.figure(figsize=(10, 7))
+    plt.figure(figsize=(10, 10))
     ax = sns.boxplot(data=df, x=x_col, y=y_col)
     # sns.stripplot(data=df, x=x_col, y=y_col, jitter=False, marker="o", color="black", alpha=0.7, linewidth=0.5, ax=ax)
     if baseline is not None:
