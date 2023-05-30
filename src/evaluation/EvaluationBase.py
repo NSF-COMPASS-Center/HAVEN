@@ -26,7 +26,7 @@ class EvaluationBase:
         self.itr_col = "itr"
         self.experiment_col = "experiment"
         self.y_true_col = "y_true"
-        self.itrs = df["itr"].unique()
+        self.itrs = df[self.itr_col].unique()
 
     def execute(self):
         experiments = self.df[self.experiment_col].unique()
