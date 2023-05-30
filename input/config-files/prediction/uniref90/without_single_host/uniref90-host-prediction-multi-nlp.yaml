@@ -9,7 +9,7 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_final.csv" ]
+  file_names: [ "uniref90_final_msl1114.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -24,7 +24,7 @@ classification_settings:
   sequence_settings:
     batch_size: 64
     sequence_col: "seq"
-    max_sequence_length: 6630 # 6630
+    max_sequence_length: 1115 # 6630 # 1024 # 1115
     truncate: False
     pad_sequence_val: 0
   label_settings:
@@ -42,7 +42,7 @@ classification_settings:
       "Others": [ "*" ]
   models:
     - name: "transformer-crossentropy"
-      active: False
+      active: True
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "CrossEntropyLoss"
@@ -55,7 +55,7 @@ classification_settings:
       dim: 128
 
     - name: "transformer-conv1d-crossentropy"
-      active: True
+      active: False
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "CrossEntropyLoss"
@@ -74,5 +74,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230525/host_multi"
-  prefix: "tfcnv-emb_lin-d_128-k3s1" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230530/host_multi"
+  prefix: "tf-emb_lin-sincos_d1114-d_128" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
