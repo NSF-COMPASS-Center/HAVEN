@@ -2,7 +2,6 @@ from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch
 import copy
-import os
 
 from prediction.datasets.protein_sequence_dataset import ProteinSequenceDataset
 from prediction.models.nlp.padding import Padding
@@ -51,3 +50,24 @@ def get_criterion(loss):
     if loss == "MultiMarginLoss":
         criterion = nn.MultiMarginLoss()
     return criterion
+
+
+def init_weights(module: nn.Module, initialization_type: str, bias_init_value=0):
+    if initialization_type == "uniform":
+        # drawn from uniform distribution between 0 and 1
+        torch.nn.init.uniform_(module.weight, a=0., b=1.)
+    elif initialization_type == "normal":
+        # drawn from normal distribution with mean 0 and standard deviation 1
+        torch.nn.init.normal_(module.weight, mean=0., std=1.)
+    elif initialization_type == "zeros":
+        # initialize with all zeros
+        torch.nn.init.zeros_(module.weight)
+    elif initialization_type == "ones":
+        # initialize with all ones
+        torch.nn.init.ones_(module.weight)
+    else:
+        print(f"ERROR: Unsupported module weight initialization type {initialization_type}")
+
+    # initialize bias with bias_init_value
+    # default bias_init_value=0
+    module.bias.data.fill_(bias_init_value)

@@ -1,6 +1,7 @@
 import torch.nn as nn
 from prediction.models.nlp.embedding import EmbeddingLayer, ConvolutionEmbeddingLayer
 from prediction.models.nlp.encoder import EncoderLayer, Encoder
+from utils import nn_utils
 
 
 class Transformer(nn.Module):
@@ -28,7 +29,7 @@ class Transformer_Conv1D(Transformer):
 
 def get_transformer_model(model):
     if model["with_convolution"]:
-        model = Transformer_Conv1D(n_tokens=model["n_tokens"],
+        tf_model = Transformer_Conv1D(n_tokens=model["n_tokens"],
                                                  kernel_size=model["kernel_size"],
                                                  stride=model["stride"],
                                                  padding=model["padding"],
@@ -39,13 +40,19 @@ def get_transformer_model(model):
                                                  d_ff=2 * model["dim"],
                                                  h=model["n_heads"])
     else:
-        model = Transformer(n_tokens=model["n_tokens"],
+        tf_model = Transformer(n_tokens=model["n_tokens"],
                                           max_seq_len=model["max_seq_len"],
                                           n_classes=model["n_classes"],
                                           N=model["depth"],
                                           d=model["dim"],
                                           d_ff=2048,
                                           h=model["n_heads"])
-    print(model)
+    # initialize model
+    nn_utils.init_weights(model=tf_model,
+                          initialization_type=model["weight_initialization"],
+                          bias_init_value=0)
+    print(tf_model)
     print("Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
-    return model
+    print("Model weights =")
+    print(tf_model.weight)
+    return tf_model
