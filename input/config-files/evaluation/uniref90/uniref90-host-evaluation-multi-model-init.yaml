@@ -1,0 +1,47 @@
+config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw/uniref90"
+
+  file_names:
+    # experiment_name (to be used as a key in comparative analysis): file_name
+    # "LR-ovr": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
+    "LR": "20230410/host_multi/kmer_k3_virus_host_name_multi_presplit_lr_multinomial_lr_output.csv"
+    "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
+
+    "TF-msl1024-embSINCOS-d512-random": "20230510/host_multi/tf-emb_sincos-msl_1024-d_512-transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512-normal": "20230531/host_multi-w_normal/tf-emb_sincos-msl_1024-d_512-w_normal_transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512-uniform": "20230531/host_multi-w_uniform/tf-emb_sincos-msl_1024-d_512-w_uniform_transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512-zeros": "20230531/host_multi-w_zeros/tf-emb_sincos-msl_1024-d_512-w_zeros_transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512-ones": "20230531/host_multi-w_ones/tf-emb_sincos-msl_1024-d_512-w_ones_transformer-crossentropy_output.csv"
+
+
+evaluation_settings:
+  type: "multi"
+  # metrics
+  auroc: True
+  auprc: True
+  f1: True
+  accuracy: True
+  prediction_distribution: False
+
+label_mappings:
+  "Homo sapiens": "Human"
+  "Phacochoerus aethiopicus": "Desert warthog"
+  "Bandicota bengalensis": "Lesser bandicoot rat"
+  "Equus caballus": "Horse"
+  "Capra hircus": "Goat"
+  "Gallus gallus": "Red junglefowl"
+  "Apodemus sylvaticus": "Wood mouse"
+  "Bos taurus": "Cattle"
+  "Others": "Others"
+output_settings:
+  output_dir: "output"
+  evaluation_dir: "evaluation"
+  visualization_dir: "visualization"
+  dataset_dir: "uniref90/20230531/host_multi_tr19ktest19k"
+  prefix: "tf-weight-init-ablation"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
