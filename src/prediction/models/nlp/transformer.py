@@ -54,6 +54,5 @@ def get_transformer_model(model):
 
     print(tf_model)
     print("Number of parameters = ", sum(p.numel() for p in tf_model.parameters() if p.requires_grad))
-    print("Model weights =")
-    print(tf_model.weight)
+    print(f"Weight initialization = {model['weight_initialization']}")
     return tf_model
