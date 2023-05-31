@@ -48,7 +48,7 @@ def get_transformer_model(model):
                                           d_ff=2048,
                                           h=model["n_heads"])
     # initialize model
-    nn_utils.init_weights(model=tf_model,
+    nn_utils.init_weights(module=tf_model,
                           initialization_type=model["weight_initialization"],
                           bias_init_value=0)
     print(tf_model)
