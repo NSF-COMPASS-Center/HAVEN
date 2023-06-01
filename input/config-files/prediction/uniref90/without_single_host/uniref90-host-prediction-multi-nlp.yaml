@@ -70,7 +70,7 @@ classification_settings:
       n_classes: 9
       n_epochs: 10
       dim: 128
-      weight_initialization: "normal" # supported values : uniform, normal, zeros, ones
+      manual_seed: 0 # whole numbers
 
 output_settings:
   output_dir: "output"

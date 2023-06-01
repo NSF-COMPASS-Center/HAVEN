@@ -64,7 +64,7 @@ def execute(input_settings, output_settings, classification_settings):
 
             if "transformer" in model_name:
                 manual_seed = model["manual_seed"]
-                if manual_seed:
+                if manual_seed is not None:
                     print(f"Setting manual seed to {manual_seed}")
                     torch.manual_seed(manual_seed)
                 # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
