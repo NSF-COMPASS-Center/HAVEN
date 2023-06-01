@@ -53,7 +53,7 @@ classification_settings:
       n_classes: 9
       n_epochs: 10
       dim: 512
-      weight_initialization: "normal" # supported values : uniform, normal, zeros, ones
+      manual_seed: 0 # whole numbers
 
     - name: "transformer-conv1d-crossentropy"
       active: False
@@ -76,5 +76,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230531/host_multi-w_normal"
-  prefix: "tf-emb_sincos-msl_1024-d_512-w_normal" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230531/host_multi-seed0"
+  prefix: "tf-emb_sincos-msl_1024-d_512-seed0" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

@@ -63,6 +63,10 @@ def execute(input_settings, output_settings, classification_settings):
                 results[model_name] = []
 
             if "transformer" in model_name:
+                manual_seed = model["manual_seed"]
+                if manual_seed:
+                    print(f"Setting manual seed to {manual_seed}")
+                    torch.manual_seed(manual_seed)
                 # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
                 model["max_seq_len"] = sequence_settings["max_sequence_length"]
                 mode = model["mode"]
