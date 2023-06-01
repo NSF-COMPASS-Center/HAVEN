@@ -14,10 +14,9 @@ input_settings:
     "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
 
     "TF-msl1024-embSINCOS-d512-random": "20230510/host_multi/tf-emb_sincos-msl_1024-d_512-transformer-crossentropy_output.csv"
-    "TF-msl1024-embSINCOS-d512-normal": "20230531/host_multi-w_normal/tf-emb_sincos-msl_1024-d_512-w_normal_transformer-crossentropy_output.csv"
-    "TF-msl1024-embSINCOS-d512-uniform": "20230531/host_multi-w_uniform/tf-emb_sincos-msl_1024-d_512-w_uniform_transformer-crossentropy_output.csv"
-    "TF-msl1024-embSINCOS-d512-zeros": "20230531/host_multi-w_zeros/tf-emb_sincos-msl_1024-d_512-w_zeros_transformer-crossentropy_output.csv"
-    "TF-msl1024-embSINCOS-d512-ones": "20230531/host_multi-w_ones/tf-emb_sincos-msl_1024-d_512-w_ones_transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512-seed0": "20230531/host_multi-seed0/tf-emb_sincos-msl_1024-d_512-seed0_transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512-seed170638": "20230531/host_multi-seed170638/tf-emb_sincos-msl_1024-d_512-seed170638_transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512-seed745540": "20230531/host_multi-seed745540/tf-emb_sincos-msl_1024-d_512-seed745540_transformer-crossentropy_output.csv"
 
 
 evaluation_settings:
