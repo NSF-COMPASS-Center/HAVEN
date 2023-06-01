@@ -48,11 +48,11 @@ def get_transformer_model(model):
                                           d_ff=2048,
                                           h=model["n_heads"])
     # initialize model
-    tf_model.apply(lambda m: nn_utils.init_weights(module=m,
-                                                   initialization_type=model["weight_initialization"],
-                                                   bias_init_value=0))
+    # tf_model.apply(lambda m: nn_utils.init_weights(module=m,
+    #                                                initialization_type=model["weight_initialization"],
+    #                                                bias_init_value=0))
 
     print(tf_model)
     print("Number of parameters = ", sum(p.numel() for p in tf_model.parameters() if p.requires_grad))
-    print(f"Weight initialization = {model['weight_initialization']}")
+    # print(f"Weight initialization = {model['weight_initialization']}")
     return tf_model
