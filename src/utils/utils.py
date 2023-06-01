@@ -24,8 +24,8 @@ def transform_labels(df, label_settings, classification_type=None):
         print(f"Grouping labels using config : {label_grouping_config}")
         df = group_labels(df, label_col, label_grouping_config)
 
-    labels = df[label_col].unique()
-    # labels = list(label_grouping_config.keys())
+    # labels = df[label_col].unique()
+    labels = list(label_grouping_config.keys())
 
     if classification_type == "binary":
         positive_label = label_settings["positive_label"]
