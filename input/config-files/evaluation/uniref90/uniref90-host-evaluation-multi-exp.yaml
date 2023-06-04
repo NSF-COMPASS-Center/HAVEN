@@ -1,0 +1,44 @@
+config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw/uniref90"
+
+  file_names:
+    # experiment_name (to be used as a key in comparative analysis): file_name
+    # "LR-ovr": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
+    "LR": "20230410/host_multi/kmer_k3_virus_host_name_multi_presplit_lr_multinomial_lr_output.csv"
+    "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
+
+    "TF-msl1024-embSINCOS-d512": "20230510/host_multi/tf-emb_sincos-msl_1024-d_512-transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512-withouthumans": "20230604/host_multi-withouthumans/tf-emb_sincos-msl_1024-d_512_transformer-crossentropy_output.csv"
+
+
+evaluation_settings:
+  type: "multi"
+  # metrics
+  auroc: True
+  auprc: True
+  f1: True
+  accuracy: True
+  prediction_distribution: False
+
+label_mappings:
+  "Homo sapiens": "Human"
+  "Phacochoerus aethiopicus": "Desert warthog"
+  "Bandicota bengalensis": "Lesser bandicoot rat"
+  "Equus caballus": "Horse"
+  "Capra hircus": "Goat"
+  "Gallus gallus": "Red junglefowl"
+  "Apodemus sylvaticus": "Wood mouse"
+  "Bos taurus": "Cattle"
+  "Others": "Others"
+output_settings:
+  output_dir: "output"
+  evaluation_dir: "evaluation"
+  visualization_dir: "visualization"
+  dataset_dir: "uniref90/20230604/host_multi"
+  prefix: "tf-datasets-exp"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
