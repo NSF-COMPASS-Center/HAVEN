@@ -9,7 +9,7 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_final.csv" ]
+  file_names: [ "uniref90_final_without_humans.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -53,7 +53,7 @@ classification_settings:
       n_classes: 9
       n_epochs: 10
       dim: 512
-      manual_seed: 0 # whole numbers
+      manual_seed:  # whole numbers
 
     - name: "transformer-conv1d-crossentropy"
       active: False
@@ -76,5 +76,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230531/host_multi-seed0"
-  prefix: "tf-emb_sincos-msl_1024-d_512-seed0" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230604/host_multi-withouthumans"
+  prefix: "tf-emb_sincos-msl_1024-d_512" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
