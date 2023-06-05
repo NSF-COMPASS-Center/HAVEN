@@ -1,5 +1,6 @@
 import random
 
+import joblib
 import numpy as np
 import pandas as pd
 from imblearn.over_sampling import RandomOverSampler
@@ -103,6 +104,15 @@ def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
         # 5. Write the classification output
         print(f"Writing {output_type} of {model_name} to {output_file_path}")
         pd.concat(dfs).to_csv(output_file_path, index=True)
+
+
+def write_output_model(model, output_dir, output_filename_prefix, model_name):
+    output_file_name = f"{output_filename_prefix}_{model_name}_model.joblib"
+    output_file_path = os.path.join(output_dir, output_file_name)
+    # create any missing parent directories
+    Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
+
+    joblib.dump(model, output_file_path)
 
 
 def compute_class_distribution(df, label_col, format=False):

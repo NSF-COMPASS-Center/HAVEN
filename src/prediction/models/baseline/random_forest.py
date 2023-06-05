@@ -43,6 +43,6 @@ def run(X_train, X_test, y_train, rf_settings):
     feature_importances = pd.DataFrame(classifier.feature_importances_.reshape(1, n_features), columns=classifier.feature_names_in_)
     validation_scores = utils.get_validation_scores(cv_model.cv_results_)
 
-    return y_pred, feature_importances, validation_scores
+    return y_pred, feature_importances, validation_scores, classifier
 
 

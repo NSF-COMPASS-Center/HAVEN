@@ -34,6 +34,9 @@ def execute(input_settings, output_settings, classification_settings):
     label_settings = classification_settings["label_settings"]
     label_col = label_settings["label_col"]
 
+    output_filename_prefix = f"kmer_k{k}_{label_col}_{classification_type}" + output_prefix + "_"
+    output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
+
     results = {}
     feature_importance = {}
     validation_scores = {}
@@ -83,10 +86,10 @@ def execute(input_settings, output_settings, classification_settings):
 
             if model["name"] == "lr":
                 print("Executing Logistic Regression")
-                y_pred, feature_importance_df, validation_scores_df = logistic_regression.run(X_train, X_test, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = logistic_regression.run(X_train, X_test, y_train, model)
             elif model["name"] == "rf":
                 print("Executing Random Forest")
-                y_pred, feature_importance_df, validation_scores_df = random_forest.run(X_train, X_test, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = random_forest.run(X_train, X_test, y_train, model)
             else:
                 continue
 
@@ -107,9 +110,10 @@ def execute(input_settings, output_settings, classification_settings):
             feature_importance[model_name].append(feature_importance_df)
             validation_scores[model_name].append(validation_scores_df)
 
+            # write the classification model
+            utils.write_output_model(classifier, output_dir, output_filename_prefix + f"itr{iter}", model_name)
+
     # write the raw results in csv files
-    output_filename_prefix = f"kmer_k{k}_{label_col}_{classification_type}" + output_prefix + "_"
-    output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
     utils.write_output(results, output_results_dir, output_filename_prefix, "output",)
     utils.write_output(feature_importance, output_results_dir, output_filename_prefix, "feature_imp")
     utils.write_output(validation_scores, output_results_dir, output_filename_prefix, "validation_scores")
