@@ -52,10 +52,12 @@ def execute(input_settings, output_settings, classification_settings):
         train_df, test_df = utils.split_dataset(df, input_split_seeds[iter],
                                                 classification_settings["train_proportion"], stratify_col=label_col)
 
+        train_df["split"] = "train"
+        test_df["split"] = "test"
         df = pd.concat([train_df, test_df])
 
-        # 4. filter out noise: labels configured to be excluded, NaN labels
-        df = utils.filter_noise(df, label_settings)
+        # # 4. filter out noise: labels configured to be excluded, NaN labels
+        # df = utils.filter_noise(df, label_settings)
 
         # 5. Compute kmer features
         kmer_df = kmer_utils.compute_kmer_features(df, k, id_col, sequence_col, label_col)

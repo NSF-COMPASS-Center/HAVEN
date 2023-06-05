@@ -12,6 +12,7 @@ def compute_kmer_features(df, k, id_col, sequence_col, label_col):
 
     df["features"] = df.apply(lambda row: get_kmer_vector(row[sequence_col], k, kmer_keys), axis=1)
     df.drop(columns=[sequence_col], inplace=True)
+    df.set_index(id_col, inplace=True)
     kmer_df = pd.DataFrame.from_records(df["features"].values, index=df.index)
 
     # retain only those columns (kmers) that occur at least once in the dataset i.e. sum across all rows > 0
