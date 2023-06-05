@@ -44,7 +44,7 @@ def run(X_train, X_test, y_train, lr_settings):
     model_coefficients = get_coefficients(classifier, classification_type)
     validation_scores = utils.get_validation_scores(cv_model.cv_results_)
 
-    return y_pred, model_coefficients, validation_scores
+    return y_pred, model_coefficients, validation_scores, classifier
 
 
 def get_coefficients(model, classification_type):
