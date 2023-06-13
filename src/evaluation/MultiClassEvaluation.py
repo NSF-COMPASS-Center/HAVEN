@@ -35,6 +35,7 @@ class MultiClassEvaluation(EvaluationBase):
         roc_curves = []
         aurocs = []
         for y_pred_column in self.y_pred_columns:
+            print(f"AUROC: {y_pred_column}")
             fpr, tpr, _ = roc_curve(y_true=df_itr[self.y_true_col].values, y_score=df_itr[y_pred_column].values, pos_label=y_pred_column)
             roc_curves.append(pd.DataFrame({"fpr": fpr, "tpr": tpr, self.class_col: y_pred_column}))
             aurocs.append(auc(fpr, tpr))
@@ -47,6 +48,7 @@ class MultiClassEvaluation(EvaluationBase):
         pr_curves = []
         auprcs = []
         for y_pred_column in self.y_pred_columns:
+            print(f"AUPRC: {y_pred_column}")
             precision, recall, _ = precision_recall_curve(y_true=df_itr[self.y_true_col].values, probas_pred=df_itr[y_pred_column].values, pos_label=y_pred_column)
             pr_curves.append(pd.DataFrame({"precision": precision, "recall": recall, self.class_col: y_pred_column}))
             auprcs.append(auc(recall, precision))
