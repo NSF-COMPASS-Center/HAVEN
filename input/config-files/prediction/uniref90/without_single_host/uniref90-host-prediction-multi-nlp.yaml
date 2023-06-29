@@ -31,7 +31,7 @@ classification_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan"]
     label_groupings:
-      # "Human": [ "Homo sapiens" ]
+      "Human": [ "Homo sapiens" ]
       "Desert warthog": [ "Phacochoerus aethiopicus" ]
       "Lesser bandicoot rat": [ "Bandicota bengalensis" ]
       "Horse": [ "Equus caballus" ]
@@ -50,7 +50,7 @@ classification_settings:
       n_heads: 8
       depth: 6
       n_tokens: 27
-      n_classes: 8
+      n_classes: 9
       n_epochs: 10
       dim: 512
       manual_seed:  # whole numbers
@@ -69,7 +69,7 @@ classification_settings:
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
-      dim: 128
+      dim: 512
       manual_seed: 0 # whole numbers
 
 output_settings:
