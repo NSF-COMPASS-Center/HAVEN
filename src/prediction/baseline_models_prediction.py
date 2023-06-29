@@ -113,7 +113,7 @@ def execute(input_settings, output_settings, classification_settings):
             validation_scores[model_name].append(validation_scores_df)
 
             # write the classification model
-            utils.write_output_model(classifier, output_dir, output_filename_prefix + f"itr{iter}", model_name)
+            utils.write_output_model(classifier, output_results_dir, output_filename_prefix + f"itr{iter}", model_name)
 
     # write the raw results in csv files
     utils.write_output(results, output_results_dir, output_filename_prefix, "output",)

@@ -16,6 +16,9 @@ input_settings:
     "TF-msl1024-embLIN-d128": "20230524/host_multi/tf-emb_lin-msl_1024-d_128_transformer-crossentropy__output.csv"
     "TF-msl1024-embLIN-d512": "20230501/host_multi/transformer-conv1d-maxmargin_presplit_tf-ce-arc_transformer-crossentropy_output.csv"
 
+    "TF-msl1024-(msl-d1114)-embLIN-d128": "20230613/host_multi/tf-emb_lin-msl_1024-d1114-d_128_transformer-crossentropy_output.csv"
+    "TF-msl1024-(msl-d1114)-embLIN-d512": "20230613/host_multi/tf-emb_lin-msl_1024-d1114-d_512_transformer-crossentropy_output.csv"
+
     "TF-msl1024-embLIN-CNV-k8s8-d128": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_128-k8s8_transformer-conv1d-crossentropy__output.csv"
     "TF-msl1024-embLIN-CNV-k4s4-d128": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_128-k4s4_transformer-conv1d-crossentropy__output.csv"
     "TF-msl1024-embLIN-CNV-k3s1-d128": "20230524/host_multi/tfcnv-emb_lin-msl_1024-d_128-k3s1_transformer-conv1d-crossentropy__output.csv"
@@ -25,6 +28,9 @@ input_settings:
 
     "TF-msl1024-embSINCOS-d128": "20230510/host_multi/tf-emb_sincos-msl_1024-d_128-transformer-crossentropy_output.csv"
     "TF-msl1024-embSINCOS-d512": "20230510/host_multi/tf-emb_sincos-msl_1024-d_512-transformer-crossentropy_output.csv"
+
+    "TF-msl1024-(msl-d1114)-embSINCOS-d128": "20230613/host_multi/tf-emb_sincos-msl_1024-d1114-d_128_transformer-crossentropy_output.csv"
+    "TF-msl1024-(msl-d1114)-embSINCOS-d512": "20230613/host_multi/tf-emb_sincos-msl_1024-d1114-d_512_transformer-crossentropy_output.csv"
 
     "TF-msl1024-embSINCOS-CNV-k8s8-d128": "20230524/host_multi/tfcnv-emb_sincos-msl_1024-d_128-k8s8_transformer-conv1d-crossentropy__output.csv"
     "TF-msl1024-embSINCOS-CNV-k4s4-d128": "20230524/host_multi/tfcnv-emb_sincos-msl_1024-d_128-k4s4_transformer-conv1d-crossentropy__output.csv"
