@@ -48,12 +48,12 @@ def get_dataset_loader(df, sequence_settings, label_col):
                       collate_fn=Padding(max_seq_len, pad_sequence_val))
 
 
-def get_criterion(loss, class_weight=None):
+def get_criterion(loss, class_weights=None):
     criterion = nn.CrossEntropyLoss()  # default
     if loss == "MultiMarginLoss":
         criterion = nn.MultiMarginLoss()
     if loss == "FocalLoss":
-        criterion = FocalLoss(alpha=class_weight, gamma=2)
+        criterion = FocalLoss(alpha=class_weights, gamma=2)
     return criterion
 
 

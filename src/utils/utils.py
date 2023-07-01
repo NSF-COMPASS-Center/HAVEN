@@ -3,6 +3,7 @@ import random
 import joblib
 import numpy as np
 import pandas as pd
+import torch
 from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
 from pathlib import Path
@@ -148,8 +149,9 @@ def split_dataset(df, seed, train_proportion, stratify_col=None):
     return train_df, test_df
 
 
-def get_class_weight(datasetloader):
+def get_class_weights(datasetloader):
     labels = datasetloader.dataset.get_labels()
-    return compute_class_weight(class_weight="balanced",
+    class_weights = compute_class_weight(class_weight="balanced",
                                 classes=np.unique(labels),
                                 y=labels)
+    return torch.tensor(class_weights, dtype=torch.float)
