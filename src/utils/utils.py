@@ -7,6 +7,8 @@ from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
 from pathlib import Path
 import os
+from sklearn.utils.class_weight import compute_class_weight
+import numpy as np
 
 
 def filter_noise(df, label_settings):
@@ -144,3 +146,10 @@ def split_dataset(df, seed, train_proportion, stratify_col=None):
     print(f"Size of train_dataset = {train_df.shape}")
     print(f"Size of test_dataset = {test_df.shape}")
     return train_df, test_df
+
+
+def get_class_weight(datasetloader):
+    labels = datasetloader.dataset.get_labels()
+    return compute_class_weight(class_weight="balanced",
+                                classes=np.unique(labels),
+                                y=labels)

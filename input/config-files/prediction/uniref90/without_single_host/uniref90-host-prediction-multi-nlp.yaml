@@ -9,7 +9,8 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_final_msl1114.csv" ]
+  # file_names: [ "uniref90_final_msl1114.csv" ]
+  file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -45,7 +46,7 @@ classification_settings:
       active: True
       mode: train # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
-      loss: "CrossEntropyLoss"
+      loss: "FocalLoss"
       with_convolution: False # ensure that truncate is set to True in sequence_settings if convolution is not being used
       n_heads: 8
       depth: 6
@@ -76,5 +77,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230613/host_multi"
-  prefix: "tf-emb_sincos-msl_1024-d1114-d_512" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230630/host_multi"
+  prefix: "tf-emb_sincos-msl_1024-d_512-focalloss" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
