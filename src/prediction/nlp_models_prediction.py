@@ -97,7 +97,7 @@ def execute(input_settings, output_settings, classification_settings):
 
 def run_transformer(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, model_name, mode):
     tbw = SummaryWriter()
-    class_weights = utils.get_class_weights(train_dataset_loader)
+    class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     lr_scheduler = OneCycleLR(
