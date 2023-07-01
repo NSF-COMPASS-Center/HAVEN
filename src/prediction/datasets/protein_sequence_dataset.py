@@ -31,6 +31,9 @@ class ProteinSequenceDataset(Dataset):
         df[self.sequence_col] = df[self.sequence_col].apply(lambda x: x[0:self.max_seq_len])
         return df
 
+    def get_labels(self):
+        return self.data[self.label_col]
+
     def __getitem__(self, idx: int):
         # loc selects based on index in df
         # iloc selects based on integer location (0, 1, 2, ...)

@@ -6,6 +6,8 @@ import copy
 from prediction.datasets.protein_sequence_dataset import ProteinSequenceDataset
 from prediction.models.nlp.padding import Padding
 
+from utils.focal_loss import FocalLoss
+
 
 def create_clones(module, N):
     """
@@ -42,13 +44,16 @@ def get_dataset_loader(df, sequence_settings, label_col):
     pad_sequence_val = sequence_settings["pad_sequence_val"]
     truncate = sequence_settings["truncate"]
     dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, label_col)
-    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=Padding(max_seq_len, pad_sequence_val))
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
+                      collate_fn=Padding(max_seq_len, pad_sequence_val))
 
 
-def get_criterion(loss):
-    criterion = nn.CrossEntropyLoss() # default
+def get_criterion(loss, class_weight=None):
+    criterion = nn.CrossEntropyLoss()  # default
     if loss == "MultiMarginLoss":
         criterion = nn.MultiMarginLoss()
+    if loss == "FocalLoss":
+        criterion = FocalLoss(alpha=class_weight, gamma=2)
     return criterion
 
 
