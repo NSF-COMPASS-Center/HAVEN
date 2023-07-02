@@ -77,7 +77,6 @@ def execute(input_settings, output_settings, classification_settings):
                 continue
 
             # Execute the NLP model
-            nlp_model.to(nn_utils.get_device())
             if mode == "test":
                 nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
             result_df, nlp_model = run_model(nlp_model, train_dataset_loader, test_dataset_loader,

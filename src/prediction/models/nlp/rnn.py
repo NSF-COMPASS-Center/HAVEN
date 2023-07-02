@@ -31,7 +31,7 @@ class RNN_Model(nn.Module):
 
     def init_hidden(self, batch_size):
         # dimensions: N (num of rnn layers) X batch_size X hidden_layer_dimension
-        return torch.zeros(self.N, batch_size, self.hidden_dim)
+        return torch.zeros(self.N, batch_size, self.hidden_dim).to(nn_utils.get_device())
 
 
 def get_rnn_model(model):
@@ -44,4 +44,4 @@ def get_rnn_model(model):
 
     print(rnn_model)
     print("Number of parameters = ", sum(p.numel() for p in rnn_model.parameters() if p.requires_grad))
-    return rnn_model
+    return rnn_model.to(nn_utils.get_device())
