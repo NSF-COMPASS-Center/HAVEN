@@ -8,7 +8,7 @@ import torch
 import tqdm
 
 from utils import utils, nn_utils, visualization_utils
-from prediction.models.nlp import transformer
+from prediction.models.nlp import transformer, rnn
 
 
 def execute(input_settings, output_settings, classification_settings):
@@ -54,6 +54,10 @@ def execute(input_settings, output_settings, classification_settings):
 
         for model in models:
             model_name = model["name"]
+            # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
+            model["max_seq_len"] = sequence_settings["max_sequence_length"]
+            mode = model["mode"]
+
             if model["active"] is False:
                 print(f"Skipping {model_name} ...")
                 continue
@@ -63,21 +67,19 @@ def execute(input_settings, output_settings, classification_settings):
                 results[model_name] = []
 
             if "transformer" in model_name:
-                manual_seed = model["manual_seed"]
-                if manual_seed is not None:
-                    print(f"Setting manual seed to {manual_seed}")
-                    torch.manual_seed(manual_seed)
-                # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
-                model["max_seq_len"] = sequence_settings["max_sequence_length"]
-                mode = model["mode"]
                 print(f"Executing Transformer in {mode} mode")
-
                 nlp_model = transformer.get_transformer_model(model)
                 if mode == "test":
                     nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
-
-                nlp_model.to(nn_utils.get_device())
-                result_df, nlp_model = run_transformer(nlp_model, train_dataset_loader, test_dataset_loader,
+                result_df, nlp_model = run_model(nlp_model, train_dataset_loader, test_dataset_loader,
+                                                       model["loss"],
+                                                       model["n_epochs"], model_name, mode)
+            elif "rnn" in model_name:
+                print(f"Executing RNN in {mode} mode")
+                nlp_model = rnn.get_rnn_model(model)
+                if mode == "test":
+                    nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
+                result_df, nlp_model = run_model(nlp_model, train_dataset_loader, test_dataset_loader,
                                                        model["loss"],
                                                        model["n_epochs"], model_name, mode)
             else:
@@ -92,10 +94,10 @@ def execute(input_settings, output_settings, classification_settings):
 
     # write the raw results in csv files
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
-    utils.write_output(results, output_results_dir, output_prefix, "_output")
+    utils.write_output(results, output_results_dir, output_prefix, "output")
 
 
-def run_transformer(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, model_name, mode):
+def run_model(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, model_name, mode):
     tbw = SummaryWriter()
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)

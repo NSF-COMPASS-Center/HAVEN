@@ -4,7 +4,7 @@ import torch
 import copy
 
 from prediction.datasets.protein_sequence_dataset import ProteinSequenceDataset
-from prediction.models.nlp.padding import Padding
+from utils.nlp_utils.padding import Padding
 
 from utils.focal_loss import FocalLoss
 
