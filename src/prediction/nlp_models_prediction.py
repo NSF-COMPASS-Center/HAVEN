@@ -69,22 +69,20 @@ def execute(input_settings, output_settings, classification_settings):
             if "transformer" in model_name:
                 print(f"Executing Transformer in {mode} mode")
                 nlp_model = transformer.get_transformer_model(model)
-                if mode == "test":
-                    nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
-                result_df, nlp_model = run_model(nlp_model, train_dataset_loader, test_dataset_loader,
-                                                       model["loss"],
-                                                       model["n_epochs"], model_name, mode)
+
             elif "rnn" in model_name:
                 print(f"Executing RNN in {mode} mode")
                 nlp_model = rnn.get_rnn_model(model)
-                if mode == "test":
-                    nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
-                result_df, nlp_model = run_model(nlp_model, train_dataset_loader, test_dataset_loader,
-                                                       model["loss"],
-                                                       model["n_epochs"], model_name, mode)
             else:
                 continue
 
+            # Execute the NLP model
+            nlp_model.to(nn_utils.get_device())
+            if mode == "test":
+                nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
+            result_df, nlp_model = run_model(nlp_model, train_dataset_loader, test_dataset_loader,
+                                             model["loss"],
+                                             model["n_epochs"], model_name, mode)
             #  Create the result dataframe and remap the class indices to original input labels
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
