@@ -10,11 +10,12 @@ input_settings:
   file_names:
     # experiment_name (to be used as a key in comparative analysis): file_name
     # "LR-ovr": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
-#    "LR": "20230410/host_multi/kmer_k3_virus_host_name_multi_presplit_lr_multinomial_lr_output.csv"
-#    "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
+    "LR": "20230410/host_multi/kmer_k3_virus_host_name_multi_presplit_lr_multinomial_lr_output.csv"
+    "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
 #
-#    "TF-msl1024-embSINCOS-d512": "20230510/host_multi/tf-emb_sincos-msl_1024-d_512-transformer-crossentropy_output.csv"
-    "TF-msl1024-embSINCOS-d512-withouthumans": "20230604/host_multi-withouthumans/tf-emb_sincos-msl_1024-d_512_transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512": "20230510/host_multi/tf-emb_sincos-msl_1024-d_512-transformer-crossentropy_output.csv"
+    "TF-msl1024-embSINCOS-d512-FocalLoss": "20230630/host_multi/tf-emb_sincos-msl_1024-d_512-focallosstransformer-crossentropy__output.csv"
+#    "TF-msl1024-embSINCOS-d512-withouthumans": "20230604/host_multi-withouthumans/tf-emb_sincos-msl_1024-d_512_transformer-crossentropy_output.csv"
 
 
 evaluation_settings:
@@ -27,7 +28,7 @@ evaluation_settings:
   prediction_distribution: False
 
 label_mappings:
-  #"Homo sapiens": "Human"
+  "Homo sapiens": "Human"
   "Phacochoerus aethiopicus": "Desert warthog"
   "Bandicota bengalensis": "Lesser bandicoot rat"
   "Equus caballus": "Horse"
@@ -40,5 +41,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230604/host_multi"
+  dataset_dir: "uniref90/20230630/host_multi"
   prefix: "tf-datasets-exp"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
