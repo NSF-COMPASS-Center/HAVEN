@@ -44,4 +44,4 @@ def get_rnn_model(model):
 
     print(rnn_model)
     print("Number of parameters = ", sum(p.numel() for p in rnn_model.parameters() if p.requires_grad))
-    return rnn_model.to(nn_utils.get_device())
+    return rnn_model
