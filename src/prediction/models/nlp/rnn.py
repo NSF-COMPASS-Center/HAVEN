@@ -4,10 +4,11 @@ from utils.nlp_utils.embedding import EmbeddingLayer
 from torch.nn import RNN
 from utils import nn_utils
 
+
 class RNN_Model(nn.Module):
     def __init__(self, n_tokens, max_seq_len, n_classes, N, input_dim, hidden_dim):
         super(RNN_Model, self).__init__()
-        self.hidden_dim=hidden_dim
+        self.hidden_dim = hidden_dim
         self.N = N
         self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
         self.rnn = RNN(input_size=input_dim,
@@ -28,7 +29,6 @@ class RNN_Model(nn.Module):
         output, hidden_output = self.rnn(X, hidden_input)
 
         # aggregate the embeddings from rnn
-        # squeeze the first dimension since we are using only one rnn layer
         # mean of the representations of all tokens
         rnn_emb = output.squeeze().mean(dim=1)
         y = self.linear(rnn_emb)

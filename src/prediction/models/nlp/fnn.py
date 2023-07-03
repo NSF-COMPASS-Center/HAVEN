@@ -8,16 +8,15 @@ from utils import nn_utils
 class FNN_Model(nn.Module):
     def __init__(self, n_tokens, max_seq_len, n_classes, N, input_dim, hidden_dim):
         super(FNN_Model, self).__init__()
-        self.hidden_dim=hidden_dim
+        self.hidden_dim = hidden_dim
         self.N = N
         self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
         # first linear layer: input_dim --> hidden_dim
         self.linear_ip = nn.Linear(input_dim, hidden_dim)
 
-        self.linear_hidden = []
+        self.linear_hidden = nn.Linear(hidden_dim, hidden_dim)
         # intermediate hidden layers (number = N): hidden_dim --> hidden_dim
-        for i in range(N):
-            self.linear_hidden.append(nn.Linear(hidden_dim, hidden_dim))
+        self.linear_hidden_n = nn_utils.create_clones(self.linear_hidden, N)
 
         # last linear layer: hidden_dim--> n_classes
         self.linear_op = nn.Linear(hidden_dim, n_classes)
@@ -27,7 +26,7 @@ class FNN_Model(nn.Module):
         # input linear layer
         X = F.relu(self.linear_ip(X))
         # hidden
-        for linear_layer in self.linear_hidden:
+        for linear_layer in self.linear_hidden_n:
             X = F.relu(linear_layer(X))
         # mean of the representations of all tokens
         fnn_emb = X.squeeze().mean(dim=1)

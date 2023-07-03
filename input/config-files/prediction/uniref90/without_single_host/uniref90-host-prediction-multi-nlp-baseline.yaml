@@ -44,6 +44,30 @@ classification_settings:
   models:
     - name: "fnn"
       mode: "train" # supported values: train, test
+      active: False
+      loss: FocalLoss
+      depth: 2
+      n_tokens: 27
+      n_classes: 9
+      n_epochs: 10
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 2048
+      manual_seed:  # whole numbers
+
+    - name: "rnn"
+      active: False
+      mode: "train" # supported values: train, test
+      loss: FocalLoss
+      depth: 2 # number of rnn layers
+      n_tokens: 27
+      n_classes: 9
+      n_epochs: 10
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+      manual_seed:  # whole numbers
+
+    - name: "lstm"
+      mode: "train" # supported values: train, test
       active: True
       loss: FocalLoss
       depth: 2
@@ -60,18 +84,6 @@ classification_settings:
       loss: FocalLoss
       n_heads: 8
       depth: 6
-      n_tokens: 27
-      n_classes: 9
-      n_epochs: 10
-      input_dim: 512 # input embedding dimension
-      hidden_dim: 1024
-      manual_seed:  # whole numbers
-
-    - name: "rnn"
-      active: False
-      mode: "train" # supported values: train, test
-      loss: FocalLoss
-      depth: 2 # number of rnn layers
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
