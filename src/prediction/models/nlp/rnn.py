@@ -26,7 +26,12 @@ class RNN_Model(nn.Module):
         # hidden_output: final hidden state (embedding) for each sequence: num_rnn_layers x batch_size X hidden_dim
         # the hidden output is essentially the hidden state of the last token of the sequence
         output, hidden_output = self.rnn(X, hidden_input)
-        y = self.linear(hidden_output.squeeze()) # squeeze the first dimension since we are using only one rnn layer
+
+        # aggregate the embeddings from rnn
+        # squeeze the first dimension since we are using only one rnn layer
+        # mean of the representations of all tokens
+        rnn_emb = output.squeeze().mean(dim=1)
+        y = self.linear(rnn_emb)
         return y
 
     def init_hidden(self, batch_size):

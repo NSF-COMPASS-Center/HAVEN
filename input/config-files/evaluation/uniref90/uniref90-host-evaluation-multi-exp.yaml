@@ -15,6 +15,7 @@ input_settings:
 #
     "TF-msl1024-embSINCOS-d512": "20230510/host_multi/tf-emb_sincos-msl_1024-d_512-transformer-crossentropy_output.csv"
     "TF-msl1024-embSINCOS-d512-FocalLoss": "20230630/host_multi/tf-emb_sincos-msl_1024-d_512-focallosstransformer-crossentropy__output.csv"
+    "RNN-msl1024-embSINCOS-d512-FocalLoss": "20230702/host_multi_nlp_baseline/rnn-emb_sincos-msl_1024-d_512-focallossrnn_output.csv"
 #    "TF-msl1024-embSINCOS-d512-withouthumans": "20230604/host_multi-withouthumans/tf-emb_sincos-msl_1024-d_512_transformer-crossentropy_output.csv"
 
 
@@ -42,4 +43,4 @@ output_settings:
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
   dataset_dir: "uniref90/20230630/host_multi"
-  prefix: "tf-datasets-exp"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  prefix: "tf-exp"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
