@@ -8,7 +8,7 @@ import torch
 import tqdm
 
 from utils import utils, nn_utils, visualization_utils
-from prediction.models.nlp import transformer, rnn, fnn
+from prediction.models.nlp import fnn, rnn, lstm, transformer
 
 
 def execute(input_settings, output_settings, classification_settings):
@@ -70,13 +70,17 @@ def execute(input_settings, output_settings, classification_settings):
                 print(f"Executing FNN in {mode} mode")
                 nlp_model = fnn.get_fnn_model(model)
 
-            elif "transformer" in model_name:
-                print(f"Executing Transformer in {mode} mode")
-                nlp_model = transformer.get_transformer_model(model)
-
             elif "rnn" in model_name:
                 print(f"Executing RNN in {mode} mode")
                 nlp_model = rnn.get_rnn_model(model)
+
+            elif "lstm" in model_name:
+                print(f"Executing LSTM in {mode} mode")
+                nlp_model = lstm.get_lstm_model(model)
+
+            elif "transformer" in model_name:
+                print(f"Executing Transformer in {mode} mode")
+                nlp_model = transformer.get_transformer_model(model)
 
             else:
                 continue
