@@ -12,11 +12,12 @@ input_settings:
     # "LR-ovr": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__lr_output.csv"
     "LR": "20230410/host_multi/kmer_k3_virus_host_name_multi_presplit_lr_multinomial_lr_output.csv"
     "RF": "20230329/host_multi/kmer_k3_virus_host_name_multi_presplit__rf_output.csv"
-#
+    "FNN-msl1024-embSINCOS-d512-FocalLos-N2": "20230702/host_multi_nlp_baseline/fnn-emb_sincos-msl_1024-d_512-n_2-focallossfnn_output.csv"
+    #"RNN-msl1024-embSINCOS-d512-FocalLoss": "20230702/host_multi_nlp_baseline/rnn-emb_sincos-msl_1024-d_512-focallossrnn_output.csv"
+    "RNN-msl1024-embSINCOS-d512-FocalLos-N2": "20230702/host_multi_nlp_baseline/rnn-emb_sincos-msl_1024-d_512-n_2-focallossrnn_output.csv"
+    "LSTM-msl1024-embSINCOS-d512-FocalLos-N2": "20230702/host_multi_nlp_baseline/lstm-emb_sincos-msl_1024-d_512-n_2-focallosslstm_output.csv"
     "TF-msl1024-embSINCOS-d512": "20230510/host_multi/tf-emb_sincos-msl_1024-d_512-transformer-crossentropy_output.csv"
     "TF-msl1024-embSINCOS-d512-FocalLoss": "20230630/host_multi/tf-emb_sincos-msl_1024-d_512-focallosstransformer-crossentropy__output.csv"
-    "RNN-msl1024-embSINCOS-d512-FocalLoss": "20230702/host_multi_nlp_baseline/rnn-emb_sincos-msl_1024-d_512-focallossrnn_output.csv"
-    "RNN-msl1024-embSINCOS-d512-FocalLos-N2": "20230702/host_multi_nlp_baseline/rnn-emb_sincos-msl_1024-d_512-n_2-focallossrnn_output.csv"
 #    "TF-msl1024-embSINCOS-d512-withouthumans": "20230604/host_multi-withouthumans/tf-emb_sincos-msl_1024-d_512_transformer-crossentropy_output.csv"
 
 
