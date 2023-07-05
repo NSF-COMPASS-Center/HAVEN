@@ -4,7 +4,7 @@ import requests
 import numpy as np
 import argparse
 import re
-import pytaxonkit
+# import pytaxonkit
 from ast import literal_eval
 from Bio import SeqIO
 from multiprocessing import Pool
@@ -12,7 +12,8 @@ from itertools import repeat
 
 # Filenames
 UNIREF90_DATA_CSV_FILENAME = "uniref90_parsed.csv"
-UNIREF90_DATA_W_HOSTS_FILENAME = "uniref90_w_hosts.csv"
+# UNIREF90_DATA_W_HOSTS_FILENAME = "uniref90_w_hosts.csv"
+UNIREF90_DATA_W_HOSTS_FILENAME = "uniref90_w_hosts_virushostdb.csv"
 UNIREF90_DATA_W_METADATA = "uniref90_w_metadata.csv"
 UNIREF90_DATA_MAMMALS_AVES = "uniref90_mammals_aves_virus.csv"
 UNIREF90_DATA_W_SINGLE_HOST = "uniref90_mammals_aves_w_singlehost.csv"
@@ -80,10 +81,46 @@ def parse_fasta_file(fasta_file_path, output_directory):
 
     # write the parsed dataframe to a csv file
     print(f"Writing to file {UNIREF90_DATA_CSV_FILENAME}")
-    df.to_csv(os.path.join(output_directory, UNIREF90_DATA_CSV_FILENAME))
+    df.to_csv(os.path.join(output_directory, UNIREF90_DATA_CSV_FILENAME), index=False)
 
 
-# Get hosts of virus from UniPROT using unireg90_id of protein sequences
+# Get hosts of virus from virus_host db using virus tax id
+# input: parsed csv file of all sequences
+# output: csv file with hosts of virus. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
+# The sequences will be joined back and compiled into one dataset at a later stage
+def get_virus_hosts_from_virushostdb(output_directory):
+    # read the parsed uniref90_data csv file
+    virushostdb_file = os.path.join(output_directory, "..", "virushostdb", "mapping_files", "virushostdb_human_animals.csv")
+
+    mapping_df = pd.read_csv(virushostdb_file)
+    print(f"Mapping dataset size = {mapping_df.shape}")
+    df = pd.read_csv(os.path.join(output_directory, UNIREF90_DATA_CSV_FILENAME))
+    print(f"Uniref90 dataset size = {df.shape}")
+
+    # retain only uniref90_ids to save memory
+    df = df[[UNIREF90_ID, TAX_ID]]
+    # join the two dfs on the virus tax id
+    mapped_df = df.merge(mapping_df, how="left", left_on=TAX_ID, right_on="virus tax id")
+    print(f"Mapped dataset size = {mapped_df.shape}")
+
+    # rename "host tax id" to HOST_TAX_IDS
+    mapped_df.rename(columns={"host tax id": HOST_TAX_IDS}, inplace=True)
+
+    # retain only [UNIREF90_ID, TAX_ID, HOST_TAX_IDS]
+    mapped_df = mapped_df[[UNIREF90_ID, TAX_ID, HOST_TAX_IDS]]
+
+    # remove records with no hosts
+    mapped_df = mapped_df[~mapped_df[HOST_TAX_IDS].isna()]
+    print(f"Mapped dataset size after removing sequences with no hosts =  {mapped_df.shape}")
+
+    # aggregate the sequences with multiple hosts to one record with a list of host tax ids
+    mapped_df_agg = mapped_df.groupby([UNIREF90_ID, TAX_ID]).agg({HOST_TAX_IDS: lambda x: list(x)})
+    mapped_df_agg.reset_index(inplace=True)
+    print(f"Mapped dataset size after aggregating hosts =  {mapped_df_agg.shape}")
+    mapped_df_agg.to_csv(os.path.join(output_directory, UNIREF90_DATA_W_HOSTS_FILENAME), index=False)
+
+
+# Get hosts of virus from UniPROT using uniref90_id of protein sequences
 # input: parsed csv file of all sequences
 # output: csv file with hosts of virus. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
 # Use multiprocessing to speed up the process
@@ -343,13 +380,14 @@ def main():
     output_dir = config.output_dir
 
     # 1. Parse the Fasta file
-    parse_fasta_file(input_file_path, output_dir)
+    # parse_fasta_file(input_file_path, output_dir)
     # 2. Get hosts of the virus from which the protein sequences were sampled
-    get_virus_hosts(output_dir)
+    # get_virus_hosts(output_dir)
+    # get_virus_hosts_from_virushostdb(output_dir)
     # 3. Filter the dataset: Remove sequences with no hosts of the virus
-    # df = remove_sequences_w_no_hosts(output_dir)
+    df = remove_sequences_w_no_hosts(output_dir)
     # # 4. Explode the host column: Create multiple entries (duplicate the sequence) one for each host of the virus of the sequence
-    # df = explode_virus_hosts(df)
+    df = explode_virus_hosts(df)
     # # 5. Get metadata for each record: taxonomy name and rank of the virus and virus_hosts of the sequences
     # df = get_virus_metadata(df)
     # # Note: Data in steps 2, 3, 4, 5 do not contain the protein sequence. We dropped the sequence column in step 2 to save memory
