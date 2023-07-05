@@ -2,6 +2,7 @@
 *.fasta
 input/**/*.csv
 input/**/*.tsv
+input/**/*.gz
 # *.fa
 
 #output files
