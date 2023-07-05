@@ -9,8 +9,8 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  # file_names: [ "uniref90_final_msl1114.csv" ]
-  file_names: [ "uniref90_final.csv" ]
+  file_names: [ "uniref90_final_msl1114.csv" ]
+  # file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -25,8 +25,8 @@ classification_settings:
   sequence_settings:
     batch_size: 64
     sequence_col: "seq"
-    max_sequence_length: 1024 # 6630 # 1024 # 1115
-    truncate: True
+    max_sequence_length: 1115 # 6630 # 1024 # 1115
+    truncate: False
     pad_sequence_val: 0
   label_settings:
     label_col: "virus_host_name"
@@ -43,21 +43,21 @@ classification_settings:
       "Others": [ "*" ]
   models:
     - name: "fnn"
-      mode: "train" # supported values: train, test
       active: False
-      loss: FocalLoss
+      mode: "train" # supported values: train, test
+      loss: "CrossEntropyLoss"
       depth: 2
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
       input_dim: 512 # input embedding dimension
-      hidden_dim: 2048
+      hidden_dim: 1024
       manual_seed:  # whole numbers
 
     - name: "rnn"
       active: False
       mode: "train" # supported values: train, test
-      loss: FocalLoss
+      loss: "CrossEntropyLoss"
       depth: 2 # number of rnn layers
       n_tokens: 27
       n_classes: 9
@@ -67,21 +67,21 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "lstm"
+      active: False
       mode: "train" # supported values: train, test
-      active: True
-      loss: FocalLoss
+      loss: "CrossEntropyLoss"
       depth: 2
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
       input_dim: 512 # input embedding dimension
-      hidden_dim: 2048
+      hidden_dim: 1024
       manual_seed:  # whole numbers
 
     - name: "transformer"
+      active: True
       mode: "train" # supported values: train, test
-      active: False
-      loss: FocalLoss
+      loss: "CrossEntropyLoss"
       n_heads: 8
       depth: 6
       n_tokens: 27
@@ -91,8 +91,25 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
+    - name: "transformer-conv"
+      active: True
+      mode: "train" # supported values: train, test
+      pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
+      loss: "CrossEntropyLoss"
+      with_convolution: True # ensure that truncate is set to False in sequence_settings if convolution is being used
+      kernel_size: 3
+      stride: 1
+      padding: 0
+      n_heads: 8
+      depth: 6
+      n_tokens: 27
+      n_classes: 9
+      n_epochs: 10
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+      manual_seed: 0 # whole numbers
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90/20230702/host_multi_nlp_baseline"
-  prefix: "lstm-emb_sincos-msl_1024-d_512-n_2-focalloss" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230705/host_multi_msl1114_baseline"
+  prefix: "emb_sincos-d_1024-n_2-loss_ce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
