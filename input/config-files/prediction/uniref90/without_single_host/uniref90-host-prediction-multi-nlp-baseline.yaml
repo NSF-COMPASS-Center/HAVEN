@@ -43,7 +43,7 @@ classification_settings:
       "Others": [ "*" ]
   models:
     - name: "fnn"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "CrossEntropyLoss"
       depth: 2
@@ -55,7 +55,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "rnn"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "CrossEntropyLoss"
       depth: 2 # number of rnn layers
@@ -67,7 +67,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "lstm"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "CrossEntropyLoss"
       depth: 2
@@ -79,9 +79,10 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "CrossEntropyLoss"
+      with_convolution: False
       n_heads: 8
       depth: 6
       n_tokens: 27
@@ -92,7 +93,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-conv"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "CrossEntropyLoss"
