@@ -18,7 +18,7 @@ input_settings:
 
 classification_settings:
   model_type: "baseline"
-  n_iterations: 1
+  n_iterations: 5
   split_input: True
   kmer_settings:
     k: 3
