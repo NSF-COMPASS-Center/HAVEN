@@ -9,15 +9,16 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_final.csv" ]
+  # file_names: [ "uniref90_final.csv" ]
+  file_names: [ "uniref90_final_msl1114.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ 12612648 ] #, 31062180, 48918293, 55631155, 79221635 ]
+  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 
 classification_settings:
   model_type: "baseline"
-  n_iterations: 1
+  n_iterations: 5
   split_input: True
   kmer_settings:
     k: 3
@@ -53,5 +54,5 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   visualizations_dir: "visualization"
-  sub_dir: "uniref90/20230605/host_multi"
-  prefix: "itrs_1" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230705/host_multi_msl1114_baseline"
+  prefix: "kmer_k3-loss_ce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
