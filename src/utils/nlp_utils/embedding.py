@@ -11,7 +11,7 @@ class EmbeddingLayer(nn.Module):
         self.positional_embedding = PositionalEncoding(dim, max_seq_len)
 
     def forward(self, X):
-        tokens = self.token_embedding(X)
+        tokens = self.token_embedding(X.long())
         return self.positional_embedding(tokens)
 
 
