@@ -25,8 +25,8 @@ classification_settings:
   sequence_settings:
     batch_size: 64
     sequence_col: "seq"
-    max_sequence_length: 1024 # 6630 # 1024 # 1115
-    truncate: True
+    max_sequence_length: 1115 # 6630 # 1024 # 1115
+    truncate: False
     pad_sequence_val: 0
   label_settings:
     label_col: "virus_host_name"
@@ -42,8 +42,32 @@ classification_settings:
       "Cattle": [ "Bos taurus" ]
       "Others": [ "*" ]
   models:
-    - name: "fnn"
-      active: False
+    - name: "fnn-l_10"
+      active: True
+      mode: "train" # supported values: train, test
+      loss: "FocalLoss"
+      depth: 10
+      n_tokens: 27
+      n_classes: 9
+      n_epochs: 10
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+      manual_seed:  # whole numbers
+
+    - name: "rnn-l_6"
+      active: True
+      mode: "train" # supported values: train, test
+      loss: "FocalLoss"
+      depth: 6 # number of rnn layers
+      n_tokens: 27
+      n_classes: 9
+      n_epochs: 10
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+      manual_seed:  # whole numbers
+
+    - name: "lstm-l_2"
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
@@ -54,32 +78,8 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "rnn"
-      active: False
-      mode: "train" # supported values: train, test
-      loss: "FocalLoss"
-      depth: 2 # number of rnn layers
-      n_tokens: 27
-      n_classes: 9
-      n_epochs: 10
-      input_dim: 512 # input embedding dimension
-      hidden_dim: 1024
-      manual_seed:  # whole numbers
-
-    - name: "lstm"
-      active: False
-      mode: "train" # supported values: train, test
-      loss: "FocalLoss"
-      depth: 2
-      n_tokens: 27
-      n_classes: 9
-      n_epochs: 10
-      input_dim: 512 # input embedding dimension
-      hidden_dim: 1024
-      manual_seed:  # whole numbers
-
-    - name: "transformer"
-      active: False
+    - name: "transformer-l_6-h_8"
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
@@ -93,7 +93,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-conv-k4s4"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "FocalLoss"
@@ -112,5 +112,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90/20230705/host_multi_msl1114_baseline_focal"
-  prefix: "msl_1024-emb_sincos-d_1024-n_2-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230709/host_multi_baseline_focal"
+  prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
