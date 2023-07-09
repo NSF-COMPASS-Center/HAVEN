@@ -5,10 +5,14 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def compute_kmer_features(df, k, id_col, sequence_col, label_col):
+def compute_kmer_features(df, k, id_col, sequence_col, label_col, kmer_keys=None):
     print(f"Method:compute_kmer_features : df size = {df.shape}")
-    kmer_keys = get_kmer_keys(df, k, sequence_col)
-    print(f"Number of kmer_keys derived = {len(kmer_keys)}")
+    if kmer_keys:
+        print(f"Using provided {len(kmer_keys)} kmer_keys = {kmer_keys}")
+    else:
+        print("Computing kmer_keys")
+        kmer_keys = get_kmer_keys(df, k, sequence_col)
+    print(f"Number of kmer_keys = {len(kmer_keys)}")
 
     df["features"] = df.apply(lambda row: get_kmer_vector(row[sequence_col], k, kmer_keys), axis=1)
     df.drop(columns=[sequence_col], inplace=True)

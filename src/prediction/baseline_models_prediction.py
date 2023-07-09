@@ -67,10 +67,9 @@ def execute(input_settings, output_settings, classification_settings):
         kmer_df = kmer_df.join(df["split"], on=id_col, how="left")
         print(f"kmer_df size after join with split on id = {kmer_df.shape}")
 
-
-        # 7. Perform classification
         X_train, X_test, y_train, y_test = get_standardized_datasets(kmer_df, label_col=label_col)
 
+        # 7. Perform classification
         for model in models:
             if model["active"] is False:
                 print(f"Skipping {model['name']} ...")
