@@ -15,7 +15,7 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None):
         ax.axhline(baseline, color="gray", linestyle="--")
     ax.set_ylim(0, 1)
     plt.tight_layout()
-    plt.xticks(rotation=-90)
+    e
     plt.savefig(output_file_path)
 
 
