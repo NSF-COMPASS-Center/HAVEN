@@ -79,7 +79,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
@@ -92,14 +92,14 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "transformer-conv"
+    - name: "transformer-conv-k4s4"
       active: True
       mode: "train" # supported values: train, test
       pretrained_model_path: #"output/raw/uniref90/20230407/host_multi/trained_transformer_model.pth" # mandatory if the mode is set to test
       loss: "FocalLoss"
       with_convolution: True # ensure that truncate is set to False in sequence_settings if convolution is being used
-      kernel_size: 3
-      stride: 1
+      kernel_size: 4
+      stride: 4
       padding: 0
       n_heads: 8
       depth: 6
