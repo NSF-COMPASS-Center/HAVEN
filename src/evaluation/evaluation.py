@@ -1,8 +1,8 @@
 import os
 import pandas as pd
 from pathlib import Path
-from evaluation.BinaryClassEvaluation import BinaryClassEvaluation
-from evaluation.MultiClassEvaluation import MultiClassEvaluation
+from evaluation.binary_class_evaluation import BinaryClassEvaluation
+from evaluation.multi_class_evaluation import MultiClassEvaluation
 
 
 def execute(config):

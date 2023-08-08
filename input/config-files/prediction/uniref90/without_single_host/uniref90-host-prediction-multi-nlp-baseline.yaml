@@ -28,6 +28,7 @@ classification_settings:
     max_sequence_length: 1115 # 6630 # 1024 # 1115
     truncate: False
     pad_sequence_val: 0
+    kmer_input: False
   label_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan"]
@@ -55,7 +56,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "rnn-l_6"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
@@ -67,7 +68,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
@@ -79,7 +80,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
@@ -112,5 +113,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90/20230709/host_multi_baseline_focal"
+  sub_dir: "uniref90/20230808/host_multi_baseline_focal"
   prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
