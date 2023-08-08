@@ -24,20 +24,21 @@ input_settings:
     "LR-CE": "20230705/host_multi_msl1114_baseline/kmer_k3_virus_host_name_multi_kmer_k3-loss_ce__lr_output.csv"
     "RF-CE": "20230705/host_multi_msl1114_baseline/kmer_k3_virus_host_name_multi_kmer_k3-loss_ce__rf_output.csv"
 #    "FNN-CE": "20230705/host_multi_msl1114_baseline/emb_sincos-d_1024-n_2-loss_ce_fnn_output.csv"
-    "FNN-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_fnn_output.csv"
+#    "FNN-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_fnn_output.csv"
     "FNN-10L-Focal": "20230709/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_fnn-l_10_output.csv"
+#    "FNN-10L-Kmer-Focal": "20230712/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_kmer-fnn-l_10_output.csv"
 #    "RNN-CE": "20230705/host_multi_msl1114_baseline/emb_sincos-d_1024-n_2-loss_ce_rnn_output.csv"
-    "RNN-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_rnn_output.csv"
+#    "RNN-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_rnn_output.csv"
     "RNN-6L-Focal": "20230709/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_rnn-l_6_output.csv"
 #    "LSTM-CE": "20230705/host_multi_msl1114_baseline/emb_sincos-d_1024-n_2-loss_ce_lstm_output.csv"
-    "LSTM-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_lstm_output.csv"
+#    "LSTM-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_lstm_output.csv"
     "LSTM-2L-Focal": "20230709/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_lstm-l_2_output.csv"
-    "TF-CE": "20230705/host_multi_msl1114_baseline/emb_sincos-d_1024-n_2-loss_ce_transformer_output.csv"
+#    "TF-CE": "20230705/host_multi_msl1114_baseline/emb_sincos-d_1024-n_2-loss_ce_transformer_output.csv"
     "TF-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_transformer_output.csv"
-    "TF-6L-Focal": "20230709/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_transformer-l_6-h_8_output.csv"
+#    "TF-6L-Focal": "20230709/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_transformer-l_6-h_8_output.csv"
 #    "TF-MSL1024-Focal": "20230705/host_multi_msl1114_baseline_focal/msl_1024-emb_sincos-d_1024-n_2-loss_focalce_transformer_output.csv"
-    "TF-CNV-k3s1-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_transformer-conv_output.csv"
-    "TF-CNV-k4s4-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_transformer-conv-k4s4_output.csv"
+#    "TF-CNV-k3s1-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_transformer-conv_output.csv"
+#    "TF-CNV-k4s4-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_transformer-conv-k4s4_output.csv"
 #    "TF-CNV-k3s1-MSL1024-Focal": "20230705/host_multi_msl1114_baseline_focal/msl_1024-emb_sincos-d_1024-n_2-loss_focalce_transformer-conv_output.csv"
 #    "TF-CNV-k4s4-MSL1024-Focal": "20230705/host_multi_msl1114_baseline_focal/msl_1024-emb_sincos-d_1024-n_2-loss_focalce_transformer-conv-k4s4_output.csv"
 
@@ -46,8 +47,8 @@ evaluation_settings:
   # metrics
   auroc: True
   auprc: True
-  f1: True
-  accuracy: True
+  f1: False
+  accuracy: False
   prediction_distribution: False
 
 label_mappings:
@@ -64,5 +65,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230711/host_multi"
+  dataset_dir: "uniref90/20230713/host_multi_ismb"
   prefix: "exp-focalloss-models-params-same"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
