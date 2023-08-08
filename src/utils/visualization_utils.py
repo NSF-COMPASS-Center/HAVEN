@@ -14,8 +14,8 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None):
     if baseline is not None:
         ax.axhline(baseline, color="gray", linestyle="--")
     ax.set_ylim(0, 1)
+    plt.xticks(rotation=-90)
     plt.tight_layout()
-    e
     plt.savefig(output_file_path)
 
 

@@ -7,7 +7,7 @@ input_settings:
   # Dataset directory
   dataset_dir: "input/data/uniref90"
   dataset_files:
-    - "uniref90_final.csv"
+    - "uniref90_final_msl1114.csv"
 
   classification_settings:
     id_col: "uniref90_id"
@@ -17,8 +17,8 @@ input_settings:
     exclude_labels: [ "nan" ]
     positive_label: "Homo sapiens"
 
-  feature_imp_dir: "output/raw/uniref90/20230315/host_binary"
-  feature_imp_file: "kmer_k3_virus_host_name_binary_presplit__rf_feature_imp.csv"
+  feature_imp_dir: "output/raw/uniref90/20230705/host_multi_msl1114_baseline"
+  feature_imp_file: "kmer_k3_virus_host_name_multi_kmer_k3-loss_ce__rf_feature_imp.csv"
 
 feature_importance_settings:
   prevalence: True
@@ -32,5 +32,5 @@ output_settings:
   output_dir: "output"
   feature_imp_dir: "feature_imp"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230315/host_binary"
+  dataset_dir: "uniref90/20230705/host_multi"
   prefix: "rf"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
