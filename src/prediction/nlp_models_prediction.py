@@ -8,7 +8,7 @@ import torch
 import tqdm
 
 from utils import utils, nn_utils, kmer_utils, visualization_utils
-from prediction.models.nlp import fnn, rnn, lstm, transformer, kmer_fnn
+from prediction.models.nlp import fnn, cnn, rnn, lstm, transformer, kmer_fnn
 
 
 def execute(input_settings, output_settings, classification_settings):
@@ -82,6 +82,10 @@ def execute(input_settings, output_settings, classification_settings):
             elif "fnn" in model_name:
                 print(f"Executing FNN in {mode} mode")
                 nlp_model = fnn.get_fnn_model(model)
+
+            elif "cnn" in model_name:
+                print(f"Executing CNN in {mode} mode")
+                nlp_model = cnn.get_cnn_model(model)
 
             elif "rnn" in model_name:
                 print(f"Executing RNN in {mode} mode")
