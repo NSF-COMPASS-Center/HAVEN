@@ -44,7 +44,7 @@ classification_settings:
       "Others": [ "*" ]
   models:
     - name: "fnn-l_10"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
@@ -53,6 +53,19 @@ classification_settings:
       n_epochs: 10
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
+      manual_seed:  # whole numbers
+
+    - name: "cnn-l_1"
+      active: True
+      mode: "train" # supported values: train, test
+      loss: "FocalLoss"
+      n_tokens: 27
+      n_classes: 9
+      n_epochs: 10
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+      kernel_size: 3
+      stride: 1
       manual_seed:  # whole numbers
 
     - name: "rnn-l_6"
