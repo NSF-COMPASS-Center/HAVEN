@@ -26,6 +26,7 @@ input_settings:
 #    "FNN-CE": "20230705/host_multi_msl1114_baseline/emb_sincos-d_1024-n_2-loss_ce_fnn_output.csv"
 #    "FNN-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_fnn_output.csv"
     "FNN-10L-Focal": "20230709/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_fnn-l_10_output.csv"
+    "CNN-1L-Focal": "20230808/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_cnn-l_1_output.csv"
 #    "FNN-10L-Kmer-Focal": "20230712/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_kmer-fnn-l_10_output.csv"
 #    "RNN-CE": "20230705/host_multi_msl1114_baseline/emb_sincos-d_1024-n_2-loss_ce_rnn_output.csv"
 #    "RNN-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_rnn_output.csv"
@@ -65,5 +66,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230713/host_multi_ismb"
+  dataset_dir: "uniref90/20230809/host_multi"
   prefix: "exp-focalloss-models-params-same"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
