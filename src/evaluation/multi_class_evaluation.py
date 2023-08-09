@@ -1,4 +1,4 @@
-from evaluation.EvaluationBase import EvaluationBase
+from evaluation.evaluation_base import EvaluationBase
 from sklearn.metrics import roc_curve, accuracy_score, f1_score, auc, precision_recall_curve
 import pandas as pd
 from statistics import mean
