@@ -8,7 +8,7 @@ import torch
 import tqdm
 
 from utils import utils, nn_utils, kmer_utils, visualization_utils
-from prediction.models.nlp import fnn, rnn, lstm, transformer, kmer_fnn
+from prediction.models.nlp import fnn, cnn, rnn, lstm, transformer, kmer_fnn
 
 
 def execute(input_settings, output_settings, classification_settings):
@@ -29,7 +29,7 @@ def execute(input_settings, output_settings, classification_settings):
     sequence_settings = classification_settings["sequence_settings"]
     n_iters = classification_settings["n_iterations"]
 
-    id_col = sequence_settings["id_col"]
+    # id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
     label_col = label_settings["label_col"]
     results = {}
@@ -37,7 +37,8 @@ def execute(input_settings, output_settings, classification_settings):
         print(f"Iteration {iter}")
         # 1. Read the data files
         df = utils.read_dataset(input_dir, input_file_names,
-                                cols=[id_col, sequence_col, label_col])
+                                cols=[sequence_col, label_col])
+                                # cols=[id_col, sequence_col, label_col])
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                            classification_type=classification_settings["type"])
@@ -81,6 +82,10 @@ def execute(input_settings, output_settings, classification_settings):
             elif "fnn" in model_name:
                 print(f"Executing FNN in {mode} mode")
                 nlp_model = fnn.get_fnn_model(model)
+
+            elif "cnn" in model_name:
+                print(f"Executing CNN in {mode} mode")
+                nlp_model = cnn.get_cnn_model(model)
 
             elif "rnn" in model_name:
                 print(f"Executing RNN in {mode} mode")
