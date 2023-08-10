@@ -3,6 +3,7 @@
 input/**/*.csv
 input/**/*.tsv
 input/**/*.gz
+input/**/*.png
 # *.fa
 
 #output files
