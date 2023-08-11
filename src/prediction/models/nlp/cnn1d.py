@@ -6,9 +6,9 @@ from torch.nn import Conv1d
 from utils import nn_utils
 
 
-class CNN_Model(nn.Module):
+class CNN_1D_Model(nn.Module):
     def __init__(self, n_tokens, max_seq_len, n_classes, N, input_dim, hidden_dim, kernel_size, stride):
-        super(CNN_Model, self).__init__()
+        super(CNN_1D_Model, self).__init__()
         self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
         self.conv1d = Conv1d(in_channels=input_dim,
                              out_channels=hidden_dim,
@@ -46,7 +46,7 @@ class CNN_Model(nn.Module):
 
 
 def get_cnn_model(model):
-    cnn_model = CNN_Model(n_tokens=model["n_tokens"],
+    cnn_model = CNN_1D_Model(n_tokens=model["n_tokens"],
                           max_seq_len=model["max_seq_len"],
                           n_classes=model["n_classes"],
                           N = model["depth"],
