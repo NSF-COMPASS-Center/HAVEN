@@ -8,8 +8,8 @@ import torch
 import tqdm
 
 from utils import utils, nn_utils, kmer_utils, visualization_utils
-from prediction.models.nlp import fnn, cnn, rnn, lstm, transformer, kmer_fnn
-
+from prediction.models.nlp import fnn, cnn1d, rnn, lstm, transformer, kmer_fnn
+from prediction.models.cv import cnn2d
 
 def execute(input_settings, output_settings, classification_settings):
     # input settings
@@ -29,7 +29,7 @@ def execute(input_settings, output_settings, classification_settings):
     sequence_settings = classification_settings["sequence_settings"]
     n_iters = classification_settings["n_iterations"]
 
-    # id_col = sequence_settings["id_col"]
+    id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
     label_col = label_settings["label_col"]
     results = {}
@@ -37,15 +37,17 @@ def execute(input_settings, output_settings, classification_settings):
         print(f"Iteration {iter}")
         # 1. Read the data files
         df = utils.read_dataset(input_dir, input_file_names,
-                                cols=[sequence_col, label_col])
-                                # cols=[id_col, sequence_col, label_col])
+                                cols=[id_col, sequence_col, label_col])
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                            classification_type=classification_settings["type"])
+
+        # only if the feature type is kmer, computer the kmer features over the entire datatset
+        # TODO: can this be moved to nn_utils and computer kmer features only over the training dataset? will that affect the performance? how will we compute features for the testing dataset
         kmer_keys = None
-        if sequence_settings["kmer_input"]:
+        if sequence_settings["feature_type"] == "kmer":
             kmer_keys = kmer_utils.get_kmer_keys(df,
-                                                 k = sequence_settings["kmer_settings"]["k"],
+                                                 k=sequence_settings["kmer_settings"]["k"],
                                                  sequence_col=sequence_col)
             sequence_settings["kmer_keys"] = kmer_keys
         # 3. Split dataset
@@ -83,9 +85,14 @@ def execute(input_settings, output_settings, classification_settings):
                 print(f"Executing FNN in {mode} mode")
                 nlp_model = fnn.get_fnn_model(model)
 
+            elif "cgr-cnn" in model_name:
+                print(f"Executing CGR-CNN in {mode} mode")
+                model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
+                nlp_model = cnn2d.get_cnn_model(model)
+
             elif "cnn" in model_name:
                 print(f"Executing CNN in {mode} mode")
-                nlp_model = cnn.get_cnn_model(model)
+                nlp_model = cnn1d.get_cnn_model(model)
 
             elif "rnn" in model_name:
                 print(f"Executing RNN in {mode} mode")

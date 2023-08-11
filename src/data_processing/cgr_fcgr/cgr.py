@@ -1,6 +1,8 @@
 from PIL import Image
 import numpy as np
 from matplotlib import pyplot as plt
+
+
 class CGR:
     def __init__(self, n=None, vertex_coordinates=None):
         self.n = n  # number of vertices
@@ -29,12 +31,10 @@ class CGR:
     def save_image(self, output_filepath):
         print(output_filepath)
 
-        plt.clf()
-        plt.scatter(*np.array(self.points).T, s=2, c="black")
-        plt.xlim([-1, 1])
-        plt.ylim([-1, 1])
-        plt.savefig(output_filepath)
-        # point_coords = self.points + list(self.vertex_coordinates.values())
-        # image = Image.fromarray(np.array(point_coords), mode="L")
-        # image.save(output_filepath, "PNG")
-
+        # plt.clf()
+        # plt.scatter(*np.array(self.points).T, s=2, c="black")
+        # plt.xlim([-1, 1])
+        # plt.ylim([-1, 1])
+        # plt.savefig(output_filepath)
+        image = Image.fromarray(np.array(self.points), mode="L")
+        image.save(output_filepath, "PNG")

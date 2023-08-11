@@ -5,6 +5,7 @@ import copy
 
 from prediction.datasets.protein_sequence_dataset import ProteinSequenceDataset
 from prediction.datasets.protein_sequence_kmer_dataset import ProteinSequenceKmerDataset
+from prediction.datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
 from utils.nlp_utils.padding import Padding
 
 from utils.focal_loss import FocalLoss
@@ -39,8 +40,19 @@ def get_device(tensor=None):
 
 
 def get_dataset_loader(df, sequence_settings, label_col):
-    if sequence_settings["kmer_input"]:
+    feature_type = sequence_settings["feature_type"]
+    # supported values: kmer, cgr, token
+    if feature_type == "kmer":
         return get_kmer_dataset_loader(df, sequence_settings, label_col)
+    elif feature_type == "cgr":
+        return get_cgr_dataset_loader(df, sequence_settings, label_col)
+    elif feature_type == "token":
+        return get_token_dataset_loader(df, sequence_settings, label_col)
+    else:
+        print(f"ERROR: Unsupported feature type: {feature_type}")
+
+
+def get_token_dataset_loader(df, sequence_settings, label_col):
     seq_col = sequence_settings["sequence_col"]
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
@@ -58,6 +70,15 @@ def get_kmer_dataset_loader(df, sequence_settings, label_col):
                                          label_col=label_col,
                                          k=sequence_settings["kmer_settings"]["k"],
                                          kmer_keys=sequence_settings["kmer_keys"])
+    return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
+
+
+def get_cgr_dataset_loader(df, sequence_settings, label_col):
+    dataset = ProteinSequenceCGRDataset(df,
+                                        id_col=sequence_settings["id_col"],
+                                        label_col=label_col,
+                                        img_dir=sequence_settings["cgr_settings"]["img_dir"],
+                                        img_size=sequence_settings["cgr_settings"]["img_size"])
     return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
 
 

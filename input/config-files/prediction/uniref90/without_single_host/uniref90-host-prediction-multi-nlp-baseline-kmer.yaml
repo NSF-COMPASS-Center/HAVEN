@@ -29,9 +29,12 @@ classification_settings:
     max_sequence_length: 1115 # 6630 # 1024 # 1115
     truncate: False
     pad_sequence_val: 0
-    kmer_input: True
+    feature_type: "kmer"  # supported values 'kmer', 'cgr', 'tokens'
     kmer_settings:
       k: 3
+    cgr_settings:
+      img_size: 64
+      img_dir: "input/data/uniref90/cgr_images"
   label_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan"]
@@ -46,15 +49,19 @@ classification_settings:
       "Cattle": [ "Bos taurus" ]
       "Others": [ "*" ]
   models:
-    - name: "kmer-fnn-l_10"
+
+
+    - name: "cgr-cnn-l_2"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
-      depth: 10
+      depth: 2
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
       hidden_dim: 1024
+      kernel: 3
+      stride: 1
       manual_seed:  # whole numbers
 
 output_settings:
