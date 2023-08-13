@@ -55,10 +55,11 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "cnn-l_1"
+    - name: "cnn-l_2"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
+      depth: 2
       n_tokens: 27
       n_classes: 9
       n_epochs: 10
