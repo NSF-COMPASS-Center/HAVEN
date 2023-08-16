@@ -1,10 +1,8 @@
 from torch.utils.data import Dataset
 from utils import utils, nn_utils
 
-import pandas as pd
 import numpy as np
 import torch
-import random
 
 
 class ProteinSequenceDataset(Dataset):

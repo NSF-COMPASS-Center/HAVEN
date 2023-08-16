@@ -8,8 +8,10 @@ import torch
 import tqdm
 
 from utils import utils, nn_utils, kmer_utils, visualization_utils
+from utils.early_stopping import EarlyStopping
 from prediction.models.nlp import fnn, cnn1d, rnn, lstm, transformer, kmer_fnn
 from prediction.models.cv import cnn2d
+
 
 def execute(input_settings, output_settings, classification_settings):
     # input settings
@@ -134,25 +136,29 @@ def run_model(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, 
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     lr_scheduler = OneCycleLR(
         optimizer=optimizer,
-        max_lr=1e-4,
+        max_lr=1e-6,
         epochs=n_epochs,
         steps_per_epoch=len(train_dataset_loader),
-        pct_start=0.1,
+        pct_start=0.25,
         anneal_strategy='cos',
         div_factor=25.0,
         final_div_factor=10000.0)
+    early_stopper = EarlyStopping(patience=10, min_delta=0)
     model.train_iter = 0
     model.test_iter = 0
     if mode == "train":
         # train the model only if set to train mode
         for e in range(n_epochs):
             model = run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer,
-                              lr_scheduler, tbw, model_name, e)
+                              lr_scheduler, early_stopper, tbw, model_name, e)
+            # check if early stopping condition was satisfied and stop accordingly
+            if early_stopper.early_stop:
+                break
 
     return evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch=None, log_loss=False), model
 
 
-def run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer, lr_scheduler, tbw, model_name,
+def run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw, model_name,
               epoch):
     # Training
     model.train()
@@ -179,11 +185,11 @@ def run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optim
             f"{model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
 
     # Testing
-    evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch, log_loss=True)
+    evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch, log_loss=True, early_stopper=early_stopper)
     return model
 
 
-def evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch, log_loss=False):
+def evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch, log_loss=False, early_stopper=None):
     with torch.no_grad():
         model.eval()
 
@@ -201,6 +207,8 @@ def evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch
                 tbw.add_scalar(f"{model_name}/validation-loss", float(val_loss), model.test_iter)
                 pbar.set_description(
                     f"{model_name}/validation-loss = {float(val_loss)}, model.n_iter={model.test_iter}, epoch={epoch + 1}")
+            if early_stopper:
+                early_stopper(val_loss)
             # to get probabilities of the output
             output = F.softmax(output, dim=-1)
             result_df = pd.DataFrame(output.cpu().numpy())

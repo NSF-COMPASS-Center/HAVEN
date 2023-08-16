@@ -39,6 +39,7 @@ input_settings:
     "LSTM-2L-Focal": "20230709/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_lstm-l_2_output.csv"
 #    "TF-CE": "20230705/host_multi_msl1114_baseline/emb_sincos-d_1024-n_2-loss_ce_transformer_output.csv"
     "TF-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_transformer_output.csv"
+    "CNN-CGR": "20230813/host_multi_baseline_focal/cgr-loss_focalce_cgr-cnn-l_2_output.csv"
 #    "TF-6L-Focal": "20230709/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_transformer-l_6-h_8_output.csv"
 #    "TF-MSL1024-Focal": "20230705/host_multi_msl1114_baseline_focal/msl_1024-emb_sincos-d_1024-n_2-loss_focalce_transformer_output.csv"
 #    "TF-CNV-k3s1-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_transformer-conv_output.csv"
@@ -69,5 +70,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230809/host_multi"
-  prefix: "exp-focalloss-models-params-same"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "uniref90/20230813/host_multi"
+  prefix: "exp-focalloss-cgr"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

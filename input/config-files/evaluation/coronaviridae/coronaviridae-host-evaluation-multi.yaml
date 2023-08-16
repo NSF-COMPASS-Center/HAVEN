@@ -9,10 +9,12 @@ input_settings:
 
   file_names:
     # experiment_name (to be used as a key in comparative analysis): file_name
-    # "LR": "20230503/host_binary/kmer_k3_binary_label_binary_presplit__lr_output.csv"
-    # "RF": "20230503/host_binary/kmer_k3_binary_label_binary_presplit__rf_output.csv"
-    "TF-CNV-ks8d512": "20230503/host_multi/_tf-cnv-ce-ks8-d512-top7_transformer-conv1d-crossentropy_output.csv"
-    # "TF-CNV-k3s1d512": "20230503/host_binary/_tf-cnv-ce-k3s1-d512_transformer-conv1d-crossentropy_output.csv"
+    "FNN-10L-Focal": "20230813/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_fnn-l_10_output.csv"
+    "CNN-4L-Focal": "20230813/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_cnn-l_4_output.csv"
+    # "RNN-6L-Focal": "20230709/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_rnn-l_6_output.csv"
+    "LSTM-2L-Focal": "20230813/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_lstm-l_2_output.csv"
+    "TF-Focal": "20230813/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_transformer-l_6-h_8_output.csv"
+
 
 label_mappings:
   "Sus scrofa (Pig) [TaxID: 9823]" : "Pig"
@@ -37,5 +39,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "coronaviridae/20230503/host_multi"
-  prefix: "host_multi_lr_rf_tf"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "coronaviridae/20230813/host_multi"
+  prefix: "exp-focalloss"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
