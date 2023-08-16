@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 config_type: "prediction" # options: data_preprocessor, prediction, evaluation
 
 # Input Settings:
@@ -159,6 +160,8 @@ output_settings:
   sub_dir: "coronaviridae/20230813/host_multi_baseline_focal"
   prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
 =======
+=======
+>>>>>>> b35c16ca3179743cc150feb4eeaeaec6dcb6a404
 config_type: "prediction" # options: data_preprocessor, prediction, evaluation
 
 # Input Settings:
@@ -318,4 +321,7 @@ output_settings:
   results_dir: "raw"
   sub_dir: "coronaviridae/20230816/host_multi_baseline_focal"
   prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+<<<<<<< HEAD
+>>>>>>> b35c16ca3179743cc150feb4eeaeaec6dcb6a404
+=======
 >>>>>>> b35c16ca3179743cc150feb4eeaeaec6dcb6a404
