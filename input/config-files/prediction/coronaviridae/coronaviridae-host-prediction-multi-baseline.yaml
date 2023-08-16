@@ -9,10 +9,10 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: ["coronaviridae_final.csv"]
+  file_names: ["coronaviridae_top_7_hosts.csv"]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ "s12612648", "s31062180", "s48918293", "s55631155", "s79221635"]]
+  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 
 
@@ -23,8 +23,8 @@ classification_settings:
   train_proportion: 0.8
   type: "multi"
   sequence_settings:
-    batch_size: 64
-    id_col: "uniref90_id"
+    batch_size: 8
+    id_col: "id"
     sequence_col: "seq"
     max_sequence_length: 1453 # max=1453
     truncate: True
@@ -36,7 +36,7 @@ classification_settings:
       img_size: 8
       img_dir: "input/data/coronaviridae/cgr_images"
   label_settings:
-    label_col: "virus_host_name"
+    label_col: "virus_host"
     exclude_labels: [ "nan"]
     label_groupings:
       "Pig": [ "Sus scrofa (Pig) [TaxID: 9823]" ]
@@ -98,7 +98,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "rnn-l_6"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
@@ -122,7 +122,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
