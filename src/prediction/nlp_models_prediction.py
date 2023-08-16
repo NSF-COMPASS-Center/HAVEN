@@ -6,6 +6,7 @@ from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
 import torch
 import tqdm
+from statistics import mean
 
 from utils import utils, nn_utils, kmer_utils, visualization_utils
 from utils.early_stopping import EarlyStopping
@@ -153,9 +154,11 @@ def run_model(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, 
                               lr_scheduler, early_stopper, tbw, model_name, e)
             # check if early stopping condition was satisfied and stop accordingly
             if early_stopper.early_stop:
+                print("Breaking off training loop due to early stop")
                 break
 
-    return evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch=None, log_loss=False), model
+    result_df, _ = evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch=None, log_loss=False)
+    return result_df, model
 
 
 def run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw, model_name,
@@ -185,15 +188,17 @@ def run_epoch(model, train_dataset_loader, test_dataset_loader, criterion, optim
             f"{model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
 
     # Testing
-    evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch, log_loss=True, early_stopper=early_stopper)
+    _, val_loss = evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch, log_loss=True)
+    early_stopper(val_loss)
     return model
 
 
-def evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch, log_loss=False, early_stopper=None):
+def evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch, log_loss=False):
     with torch.no_grad():
         model.eval()
 
         results = []
+        val_loss = []
         for _, record in enumerate(pbar := tqdm.tqdm(test_dataset_loader)):
             input, label = record
 
@@ -201,17 +206,16 @@ def evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch
             output = output.to(nn_utils.get_device())
 
             loss = criterion(output, label.long())
-            val_loss = loss.item()
+            curr_val_loss = loss.item()
             model.test_iter += 1
             if log_loss:
-                tbw.add_scalar(f"{model_name}/validation-loss", float(val_loss), model.test_iter)
+                tbw.add_scalar(f"{model_name}/validation-loss", float(curr_val_loss), model.test_iter)
                 pbar.set_description(
-                    f"{model_name}/validation-loss = {float(val_loss)}, model.n_iter={model.test_iter}, epoch={epoch + 1}")
-            if early_stopper:
-                early_stopper(val_loss)
+                    f"{model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.test_iter}, epoch={epoch + 1}")
+            val_loss.append(curr_val_loss)
             # to get probabilities of the output
             output = F.softmax(output, dim=-1)
             result_df = pd.DataFrame(output.cpu().numpy())
             result_df["y_true"] = label.cpu().numpy()
             results.append(result_df)
-    return pd.concat(results, ignore_index=True)
+    return pd.concat(results, ignore_index=True), mean(val_loss)
