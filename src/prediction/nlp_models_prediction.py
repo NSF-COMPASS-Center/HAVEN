@@ -144,7 +144,7 @@ def run_model(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, 
         anneal_strategy='cos',
         div_factor=25.0,
         final_div_factor=10000.0)
-    early_stopper = EarlyStopping(patience=10, min_delta=0)
+    early_stopper = EarlyStopping(patience=10, min_delta=1e-4)
     model.train_iter = 0
     model.test_iter = 0
     if mode == "train":

@@ -54,7 +54,7 @@ classification_settings:
       depth: 10
       n_tokens: 27
       n_classes: 7
-      n_epochs: 100
+      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -77,7 +77,7 @@ classification_settings:
       depth: 4
       n_tokens: 27
       n_classes: 7
-      n_epochs: 100
+      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       kernel_size: 3
@@ -116,7 +116,7 @@ classification_settings:
       depth: 2
       n_tokens: 27
       n_classes: 7
-      n_epochs: 100
+      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -130,7 +130,7 @@ classification_settings:
       depth: 6
       n_tokens: 27
       n_classes: 7
-      n_epochs: 100
+      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
