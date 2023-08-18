@@ -29,7 +29,7 @@ classification_settings:
     max_sequence_length: 1115 # 6630 # 1024 # 1115
     truncate: False
     pad_sequence_val: 0
-    feature_type: "cgr"  # supported values 'kmer', 'cgr', 'tokens'
+    feature_type: "token"  # supported values 'kmer', 'cgr', 'tokens'
     kmer_settings:
       k: 3
     cgr_settings:
@@ -50,13 +50,13 @@ classification_settings:
       "Others": [ "*" ]
   models:
     - name: "fnn-l_10"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
       n_tokens: 27
       n_classes: 9
-      n_epochs: 10
+      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -73,13 +73,13 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "cnn-l_4"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 4
       n_tokens: 27
       n_classes: 9
-      n_epochs: 10
+      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       kernel_size: 3
@@ -87,7 +87,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "cgr-cnn-l_2"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
@@ -100,31 +100,31 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "rnn-l_6"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
       n_tokens: 27
       n_classes: 9
-      n_epochs: 10
+      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
       n_tokens: 27
       n_classes: 9
-      n_epochs: 10
+      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
@@ -132,7 +132,7 @@ classification_settings:
       depth: 6
       n_tokens: 27
       n_classes: 9
-      n_epochs: 10
+      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -157,5 +157,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90/20230813/host_multi_baseline_focal"
-  prefix: "cgr-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20230818/host_multi_baseline_focal"
+  prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
