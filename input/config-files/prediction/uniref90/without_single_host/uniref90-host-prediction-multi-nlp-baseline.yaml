@@ -157,5 +157,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90/20230818/host_multi_baseline_focal"
+  sub_dir: "uniref90/20230821/host_multi_baseline_focal"
   prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

@@ -137,14 +137,14 @@ def run_model(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, 
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     lr_scheduler = OneCycleLR(
         optimizer=optimizer,
-        max_lr=1e-6,
+        max_lr=1e-7,
         epochs=n_epochs,
         steps_per_epoch=len(train_dataset_loader),
         pct_start=0.25,
         anneal_strategy='cos',
         div_factor=25.0,
         final_div_factor=10000.0)
-    early_stopper = EarlyStopping(patience=10, min_delta=1e-4)
+    early_stopper = EarlyStopping(patience=10, min_delta=1e-5)
     model.train_iter = 0
     model.test_iter = 0
     if mode == "train":
