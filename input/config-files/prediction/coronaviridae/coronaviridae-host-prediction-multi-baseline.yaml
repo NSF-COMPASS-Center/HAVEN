@@ -48,7 +48,7 @@ classification_settings:
       "Bovine": [ "Bos taurus (Bovine) [TaxID: 9913]" ]
   models:
     - name: "fnn-l_10"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
@@ -68,10 +68,10 @@ classification_settings:
       n_classes: 9
       n_epochs: 10
       hidden_dim: 1024
-      manual_seed:  # whole numbers
+      manual_seed:  # whole numbersgit
 
     - name: "cnn-l_4"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 4
@@ -110,7 +110,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
@@ -122,7 +122,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
