@@ -11,7 +11,7 @@ from statistics import mean
 from utils import utils, nn_utils, kmer_utils, visualization_utils
 from utils.early_stopping import EarlyStopping
 from prediction.models.nlp import fnn, cnn1d, rnn, lstm, transformer, kmer_fnn
-from prediction.models.cv import cnn2d
+from prediction.models.cv import cnn2d, cnn2d_pool
 
 
 def execute(input_settings, output_settings, classification_settings):
@@ -93,6 +93,11 @@ def execute(input_settings, output_settings, classification_settings):
                 print(f"Executing CGR-CNN in {mode} mode")
                 model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
                 nlp_model = cnn2d.get_cnn_model(model)
+
+            elif "cgr-cnn-pool" in model_name:
+                print(f"Executing CGR-CNN-Pool in {mode} mode")
+                model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
+                nlp_model = cnn2d_pool.get_cnn_model(model)
 
             elif "cnn" in model_name:
                 print(f"Executing CNN in {mode} mode")
