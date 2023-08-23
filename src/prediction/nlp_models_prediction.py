@@ -139,7 +139,7 @@ def run_model(model, train_dataset_loader, test_dataset_loader, loss, training_s
     n_epochs = training_settings["n_epochs"]
     lr_scheduler = OneCycleLR(
         optimizer=optimizer,
-        max_lr=training_settings["max_lr"],
+        max_lr=float(training_settings["max_lr"]),
         epochs=n_epochs,
         steps_per_epoch=len(train_dataset_loader),
         pct_start=training_settings["pct_start"],
