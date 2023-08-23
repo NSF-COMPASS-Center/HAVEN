@@ -48,15 +48,20 @@ classification_settings:
       "Wood mouse": [ "Apodemus sylvaticus" ]
       "Cattle": [ "Bos taurus" ]
       "Others": [ "*" ]
+  training_settings:
+    n_epochs: 10
+    max_lr: 1e-7
+    pct_start: 0.10
+    div_factor: 25.0
+    final_div_factor: 10000.0
   models:
-    - name: "fnn-l_10"
+    - name: "fnn-l_10-lr1e-7"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
       n_tokens: 27
       n_classes: 9
-      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -68,62 +73,57 @@ classification_settings:
       depth: 10
       n_tokens: 27
       n_classes: 9
-      n_epochs: 10
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "cnn-l_4"
+    - name: "cnn-l_4-lr1e-7"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 4
       n_tokens: 27
       n_classes: 9
-      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       kernel_size: 3
       stride: 1
       manual_seed:  # whole numbers
 
-    - name: "cgr-cnn-l_2"
+    - name: "cgr-cnn-l_2-lr1e-7"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
       n_tokens: 27
       n_classes: 9
-      n_epochs: 50
       n_filters: 3
       kernel_size: 3
       stride: 1
       manual_seed:  # whole numbers
 
-    - name: "rnn-l_6"
+    - name: "rnn-l_6-lr1e-7"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
       n_tokens: 27
       n_classes: 9
-      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "lstm-l_2"
+    - name: "lstm-l_2-lr1e-7"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
       n_tokens: 27
       n_classes: 9
-      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "transformer-l_6-h_8"
+    - name: "transformer-l_6-h_8-lr1e-7"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
@@ -132,7 +132,6 @@ classification_settings:
       depth: 6
       n_tokens: 27
       n_classes: 9
-      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -150,12 +149,11 @@ classification_settings:
       depth: 6
       n_tokens: 27
       n_classes: 9
-      n_epochs: 10
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed: 0 # whole numbers
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90/20230821/host_multi_baseline_focal"
+  sub_dir: "uniref90/20230823/host_multi_baseline_focal-lr1e-7"
   prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

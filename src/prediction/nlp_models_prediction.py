@@ -30,6 +30,7 @@ def execute(input_settings, output_settings, classification_settings):
     models = classification_settings["models"]
     label_settings = classification_settings["label_settings"]
     sequence_settings = classification_settings["sequence_settings"]
+    training_settings = classification_settings["training_settings"]
     n_iters = classification_settings["n_iterations"]
 
     id_col = sequence_settings["id_col"]
@@ -117,7 +118,7 @@ def execute(input_settings, output_settings, classification_settings):
                 nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
             result_df, nlp_model = run_model(nlp_model, train_dataset_loader, test_dataset_loader,
                                              model["loss"],
-                                             model["n_epochs"], model_name, mode)
+                                             training_settings, model_name, mode)
             #  Create the result dataframe and remap the class indices to original input labels
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
@@ -130,21 +131,22 @@ def execute(input_settings, output_settings, classification_settings):
     utils.write_output(results, output_results_dir, output_prefix, "output")
 
 
-def run_model(model, train_dataset_loader, test_dataset_loader, loss, n_epochs, model_name, mode):
+def run_model(model, train_dataset_loader, test_dataset_loader, loss, training_settings, model_name, mode):
     tbw = SummaryWriter()
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
+    n_epochs = training_settings["n_epochs"]
     lr_scheduler = OneCycleLR(
         optimizer=optimizer,
-        max_lr=1e-7,
+        max_lr=training_settings["max_lr"],
         epochs=n_epochs,
         steps_per_epoch=len(train_dataset_loader),
-        pct_start=0.25,
+        pct_start=training_settings["pct_start"],
         anneal_strategy='cos',
-        div_factor=25.0,
-        final_div_factor=10000.0)
-    early_stopper = EarlyStopping(patience=10, min_delta=1e-5)
+        div_factor=training_settings["div_factor"],
+        final_div_factor=training_settings["final_div_factor"])
+    early_stopper = EarlyStopping(patience=10, min_delta=0)
     model.train_iter = 0
     model.test_iter = 0
     if mode == "train":
