@@ -89,15 +89,15 @@ def execute(input_settings, output_settings, classification_settings):
                 print(f"Executing FNN in {mode} mode")
                 nlp_model = fnn.get_fnn_model(model)
 
-            elif "cgr-cnn" in model_name:
-                print(f"Executing CGR-CNN in {mode} mode")
-                model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
-                nlp_model = cnn2d.get_cnn_model(model)
-
             elif "cgr-cnn-pool" in model_name:
                 print(f"Executing CGR-CNN-Pool in {mode} mode")
                 model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
                 nlp_model = cnn2d_pool.get_cnn_model(model)
+
+            elif "cgr-cnn" in model_name:
+                print(f"Executing CGR-CNN in {mode} mode")
+                model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
+                nlp_model = cnn2d.get_cnn_model(model)
 
             elif "cnn" in model_name:
                 print(f"Executing CNN in {mode} mode")
