@@ -1,4 +1,5 @@
 import torch.nn as nn
+from utils import nn_utils
 from utils.nlp_utils.embedding import EmbeddingLayer
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
@@ -31,10 +32,13 @@ class TransformerModel(nn.Module):
 
 
 def get_transformer_model(model):
-    return TransformerModel(n_tokens=model["n_tokens"],
-                            max_seq_len=model["max_seq_len"],
-                            n_classes=model["n_classes"],
-                            N=model["depth"],
-                            input_dim=model["input_dim"],
-                            hidden_dim=model["hidden_dim"],
-                            h=model["n_heads"])
+    tf_model = TransformerModel(n_tokens=model["n_tokens"],
+                                max_seq_len=model["max_seq_len"],
+                                n_classes=model["n_classes"],
+                                N=model["depth"],
+                                input_dim=model["input_dim"],
+                                hidden_dim=model["hidden_dim"],
+                                h=model["n_heads"])
+    print(tf_model)
+    print("Number of parameters = ", sum(p.numel() for p in tf_model.parameters() if p.requires_grad))
+    return tf_model.to(nn_utils.get_device())
