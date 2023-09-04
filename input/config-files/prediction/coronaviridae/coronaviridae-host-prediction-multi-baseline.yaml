@@ -35,6 +35,12 @@ classification_settings:
     cgr_settings:
       img_size: 8
       img_dir: "input/data/coronaviridae/cgr_images"
+  training_settings:
+    n_epochs: 10
+    max_lr: 1e-4
+    pct_start: 0.10
+    div_factor: 25.0
+    final_div_factor: 10000.0
   label_settings:
     label_col: "virus_host"
     exclude_labels: [ "nan"]
@@ -155,5 +161,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae/20230816/host_multi_baseline_focal"
+  sub_dir: "coronaviridae/20230904/host_multi_baseline_focal_pytorchtf"
   prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

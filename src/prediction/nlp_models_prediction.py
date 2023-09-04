@@ -10,7 +10,7 @@ from statistics import mean
 
 from utils import utils, nn_utils, kmer_utils, visualization_utils
 from utils.early_stopping import EarlyStopping
-from prediction.models.nlp import fnn, cnn1d, rnn, lstm, transformer, kmer_fnn
+from prediction.models.nlp import fnn, cnn1d, rnn, lstm, transformer, kmer_fnn, transformer_model
 from prediction.models.cv import cnn2d, cnn2d_pool
 
 
@@ -117,7 +117,7 @@ def execute(input_settings, output_settings, classification_settings):
 
             elif "transformer" in model_name:
                 print(f"Executing Transformer in {mode} mode")
-                nlp_model = transformer.get_transformer_model(model)
+                nlp_model = transformer_model.get_transformer_model(model)
 
             else:
                 continue
