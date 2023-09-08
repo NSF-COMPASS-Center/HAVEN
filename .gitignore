@@ -31,3 +31,6 @@ output/
 
 #tensorboard files
 **/runs*/**
+
+#ARC logs
+**/arc-logs*/**
