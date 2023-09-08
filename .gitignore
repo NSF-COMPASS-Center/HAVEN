@@ -30,4 +30,4 @@ output/
 **/jupyter_notebooks/runs/*
 
 #tensorboard files
-runs/**
+**/runs*/**
