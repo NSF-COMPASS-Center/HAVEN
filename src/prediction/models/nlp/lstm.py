@@ -32,7 +32,7 @@ class LSTM_Model(nn.Module):
 
         # aggregate the embeddings from lstm
         # mean of the representations of all tokens
-        self.lstm_emb = output.squeeze().mean(dim=1)
+        self.lstm_emb = output.mean(dim=1)
         y = self.linear(self.lstm_emb)
         return y
 

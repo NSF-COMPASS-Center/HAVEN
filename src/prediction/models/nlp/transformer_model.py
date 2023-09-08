@@ -4,6 +4,7 @@ from utils.nlp_utils.embedding import EmbeddingLayer
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
 
+# pytorch implementation
 class TransformerModel(nn.Module):
     def __init__(self, n_tokens, max_seq_len, n_classes, N=6, input_dim=512, hidden_dim=1024, h=8):
         super(TransformerModel, self).__init__()

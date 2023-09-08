@@ -29,7 +29,7 @@ class FNN_Model(nn.Module):
         for linear_layer in self.linear_hidden_n:
             X = F.relu(linear_layer(X))
         # mean of the representations of all tokens
-        self.fnn_emb = X.squeeze().mean(dim=1)
+        self.fnn_emb = X.mean(dim=1)
         y = self.linear_op(self.fnn_emb)
         return y
 

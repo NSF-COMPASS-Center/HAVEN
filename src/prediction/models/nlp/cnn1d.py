@@ -40,7 +40,7 @@ class CNN_1D_Model(nn.Module):
 
         # aggregate the embeddings from cnn
         # mean of the representations of all tokens
-        self.cnn_emb = X.squeeze().mean(dim=1)
+        self.cnn_emb = X.mean(dim=1)
         y = self.linear(self.cnn_emb)
         return y
 

@@ -30,7 +30,7 @@ class RNN_Model(nn.Module):
 
         # aggregate the embeddings from rnn
         # mean of the representations of all tokens
-        self.rnn_emb = output.squeeze().mean(dim=1)
+        self.rnn_emb = output.mean(dim=1)
         y = self.linear(self.rnn_emb)
         return y
 

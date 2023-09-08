@@ -4,6 +4,7 @@ from prediction.models.nlp.encoder import EncoderLayer, Encoder
 from utils import nn_utils
 
 
+# self implementation
 class Transformer(nn.Module):
     def __init__(self, n_tokens, max_seq_len, n_classes, N=6, input_dim=512, hidden_dim=1024, h=8):
         super(Transformer, self).__init__()
