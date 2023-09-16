@@ -9,20 +9,20 @@ import ast
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Generate datasplits')
-    parser.add_argument('-if', '--input_files', required=True,
+    parser = argparse.ArgumentParser(description="Generate datasplits")
+    parser.add_argument("-if", "--input_files", required=True,
                         help="File(s) to be split into training and testing sets.\n")
-    parser.add_argument('-tp', '--train_proportion', required=True,
+    parser.add_argument("-tp", "--train_proportion", required=True,
                         help="Fraction of dataset to be used for training.\n")
-    parser.add_argument('-s', '--seed', required=True,
+    parser.add_argument("-s", "--seed", required=True,
                         help="Seed to generate the split.\n")
-    parser.add_argument('-od', '--output_dir', required=True,
+    parser.add_argument("-od", "--output_dir", required=True,
                         help="Absolute path to output directory.\n")
-    parser.add_argument('-train', '--train', required=True,
+    parser.add_argument("-train", "--train", required=True,
                         help="Boolean. Generate training files\n")
-    parser.add_argument('-test', '--test', required=True,
+    parser.add_argument("-test", "--test", required=True,
                         help="Boolean. Generate testing files\n")
-    parser.add_argument('-stratify', '--stratify', required=False, default=None,
+    parser.add_argument("-stratify", "--stratify", required=False, default=None,
                         help="Array: list of variables for stratified split.\n")
     args = parser.parse_args()
     return args
@@ -32,7 +32,7 @@ def parse_args():
 def parse_config(config_file_path):
     config = None
     try:
-        with open(config_file_path, 'r') as f:
+        with open(config_file_path, "r") as f:
             config = yaml.load(f, Loader=yaml.SafeLoader)
     except yaml.YAMLError as err:
         print(f"Error parsing config file: {err}")
@@ -73,6 +73,6 @@ def main():
     return
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
     exit(0)

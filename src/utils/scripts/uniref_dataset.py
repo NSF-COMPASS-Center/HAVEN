@@ -46,10 +46,10 @@ N_CPU = 6
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Parse and create UniRef Dataset')
-    parser.add_argument('-if', '--input_file', required=True,
+    parser = argparse.ArgumentParser(description="Parse and create UniRef Dataset")
+    parser.add_argument("-if", "--input_file", required=True,
                         help="Absolute path to the input file in fasta format\n")
-    parser.add_argument('-od', '--output_dir', required=True,
+    parser.add_argument("-od", "--output_dir", required=True,
                         help="Absolute path to output directory to create intermediate file.\n")
     args = parser.parse_args()
     return args
@@ -147,8 +147,8 @@ def get_virus_hosts(output_directory):
 
     # remove the uniref_ids which have already been processed in the previous executions.
     # no straightforward way to implement this filter
-    # hack: 1. left join with indicator=True creates an additional column named '_merge' with values 'both' or 'left_only'
-    #       2. retain only the rows with '_merge' column value == 'left_only'
+    # hack: 1. left join with indicator=True creates an additional column named "_merge" with values "both" or "left_only"
+    #       2. retain only the rows with "_merge" column value == "left_only"
     if df_host.shape[0] != 0:
         df = pd.merge(df, df_host, how="left", on=[UNIREF90_ID], indicator=True)
         df = df[df["_merge"] == "left_only"][[UNIREF90_ID, TAX_ID]]
@@ -303,7 +303,7 @@ def join_metadata_with_sequences_data(df, output_directory):
     uniref90_df.to_csv(os.path.join(output_directory, UNIREF90_DATA_W_METADATA), index=False)
 
 
-# Filter for records with virus_name and virus_host_name at 'Species' level
+# Filter for records with virus_name and virus_host_name at "Species" level
 # Input: Dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 # Output: Filtered dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 def get_sequences_at_species_level(output_directory):
@@ -344,7 +344,7 @@ def get_sequences_from_mammals_aves_hosts(df):
 def get_mammals_aves_tax_ids(tax_ids):
     mammals_aves_tax_ids = []
     for i, tax_id in enumerate(tax_ids):
-        tax_class = pytaxonkit.lineage([tax_id], formatstr='{c}')['Lineage'].iloc[0]
+        tax_class = pytaxonkit.lineage([tax_id], formatstr="{c}")["Lineage"].iloc[0]
         print(f"{i}: {tax_id} = {tax_class}")
         if tax_class == "Mammalia" or tax_class == "Aves":
             mammals_aves_tax_ids.append(tax_id)
@@ -412,5 +412,5 @@ def main():
     df.to_csv(os.path.join(output_dir, UNIREF90_DATA_WO_SINGLE_HOST))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

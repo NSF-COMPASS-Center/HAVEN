@@ -8,16 +8,16 @@ from src.data_processing.cgr_fcgr.cgr import CGR
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Generate CGR images for sequences')
-    parser.add_argument('-if', '--input_file', required=True,
+    parser = argparse.ArgumentParser(description="Generate CGR images for sequences")
+    parser.add_argument("-if", "--input_file", required=True,
                         help="File with sequences.\n")
-    parser.add_argument('-id_col', '--id_col', required=True,
+    parser.add_argument("-id_col", "--id_col", required=True,
                         help="Name of the column containing the id\n")
-    parser.add_argument('-seq_col', '--seq_col', required=True,
+    parser.add_argument("-seq_col", "--seq_col", required=True,
                         help="Name of the column containing the sequence\n")
-    parser.add_argument('-st', '--sequence_type', required=True,
+    parser.add_argument("-st", "--sequence_type", required=True,
                         help="Type of sequence. Supported values: 'nucleotide', 'aminoacid'\n")
-    parser.add_argument('-od', '--output_dir', required=True,
+    parser.add_argument("-od", "--output_dir", required=True,
                         help="Absolute path to output directory.\n")
     args = parser.parse_args()
     return args
@@ -27,7 +27,7 @@ def parse_args():
 def parse_config(config_file_path):
     config = None
     try:
-        with open(config_file_path, 'r') as f:
+        with open(config_file_path, "r") as f:
             config = yaml.load(f, Loader=yaml.SafeLoader)
     except yaml.YAMLError as err:
         print(f"Error parsing config file: {err}")
@@ -80,6 +80,6 @@ def main():
     return
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
     exit(0)
