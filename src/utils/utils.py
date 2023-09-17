@@ -21,11 +21,12 @@ def filter_noise(df, label_settings):
     return df
 
 
-def transform_labels(df, label_settings, classification_type=None):
+def transform_labels(df, label_settings, classification_type=None, silent=False):
     label_col = label_settings["label_col"]
     if "label_groupings" in label_settings.keys():
         label_grouping_config = label_settings["label_groupings"]
-        print(f"Grouping labels using config : {label_grouping_config}")
+        if not silent:
+            print(f"Grouping labels using config : {label_grouping_config}")
         df = group_labels(df, label_col, label_grouping_config)
 
     # labels = df[label_col].unique()
@@ -38,7 +39,8 @@ def transform_labels(df, label_settings, classification_type=None):
         labels = [negative_label, positive_label]
 
     label_idx_map, idx_label_map = get_label_vocabulary(labels)
-    print(f"label_idx_map={label_idx_map}\nidx_label_map={idx_label_map}")
+    if not silent:
+        print(f"label_idx_map={label_idx_map}\nidx_label_map={idx_label_map}")
 
     df[label_col] = df[label_col].transform(lambda x: label_idx_map[x])
     print(df[label_col].unique())
