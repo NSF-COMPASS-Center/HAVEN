@@ -109,9 +109,9 @@ def execute(input_settings, output_settings, classification_settings):
         result_df["y_true"] = result_df["y_true"].map(index_label_map)
 
         # 6. Write the raw results in csv files
-        output_prefix += ("_" + Path(input_file).stem)
+        output_prefix_curr = output_prefix + "_" + Path(input_file).stem
         output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
-        write_output(result_df, output_results_dir, output_prefix, output_type="output")
+        write_output(result_df, output_results_dir, output_prefix_curr, output_type="output")
 
         # 7. clear memory
         del df, test_dataset_loader, result_df
