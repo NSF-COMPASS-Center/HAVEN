@@ -4,9 +4,11 @@ import torch
 import copy
 
 from prediction.datasets.protein_sequence_dataset import ProteinSequenceDataset
+from prediction.datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWithID
 from prediction.datasets.protein_sequence_kmer_dataset import ProteinSequenceKmerDataset
 from prediction.datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
 from utils.nlp_utils.padding import Padding
+from utils.nlp_utils.padding_with_id import PaddingWithID
 
 from utils.focal_loss import FocalLoss
 
@@ -39,7 +41,7 @@ def get_device(tensor=None):
     return device
 
 
-def get_dataset_loader(df, sequence_settings, label_col):
+def get_dataset_loader(df, sequence_settings, label_col, include_id_col=False):
     feature_type = sequence_settings["feature_type"]
     # supported values: kmer, cgr, token
     if feature_type == "kmer":
@@ -47,7 +49,10 @@ def get_dataset_loader(df, sequence_settings, label_col):
     elif feature_type == "cgr":
         return get_cgr_dataset_loader(df, sequence_settings, label_col)
     elif feature_type == "token":
-        return get_token_dataset_loader(df, sequence_settings, label_col)
+        if include_id_col:
+            return get_token_with_id_dataset_loader(df, sequence_settings, label_col)
+        else:
+            return get_token_dataset_loader(df, sequence_settings, label_col)
     else:
         print(f"ERROR: Unsupported feature type: {feature_type}")
 
@@ -58,9 +63,25 @@ def get_token_dataset_loader(df, sequence_settings, label_col):
     max_seq_len = sequence_settings["max_sequence_length"]
     pad_sequence_val = sequence_settings["pad_sequence_val"]
     truncate = sequence_settings["truncate"]
+
     dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, label_col)
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
                       collate_fn=Padding(max_seq_len, pad_sequence_val))
+
+
+def get_token_with_id_dataset_loader(df, sequence_settings, label_col):
+    seq_col = sequence_settings["sequence_col"]
+    id_col = sequence_settings["id_col"]
+    batch_size = sequence_settings["batch_size"]
+    max_seq_len = sequence_settings["max_sequence_length"]
+    pad_sequence_val = sequence_settings["pad_sequence_val"]
+    truncate = sequence_settings["truncate"]
+
+
+    dataset = ProteinSequenceDatasetWithID(df, id_col, seq_col, max_seq_len, truncate, label_col)
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
+                      collate_fn=PaddingWithID(max_seq_len, pad_sequence_val))
+
 
 
 def get_kmer_dataset_loader(df, sequence_settings, label_col):

@@ -99,10 +99,10 @@ def execute(input_settings, output_settings, classification_settings):
                                                      classification_type=classification_settings["type"], silent=True)
 
         # 3. Get dataset loader
-        test_dataset_loader = nn_utils.get_dataset_loader(df, sequence_settings, label_col)
+        test_dataset_loader = nn_utils.get_dataset_loader(df, sequence_settings, label_col, include_id_col=True)
 
         # 4. Generate predictions
-        result_df = evaluate_model(nlp_model, test_dataset_loader)
+        result_df = evaluate_model(nlp_model, test_dataset_loader, id_col)
 
         # 5. Create the result dataframe and remap the class indices to original input labels
         result_df.rename(columns=index_label_map, inplace=True)
@@ -117,7 +117,7 @@ def execute(input_settings, output_settings, classification_settings):
         del df, test_dataset_loader, result_df
 
 
-def evaluate_model(model, dataset_loader):
+def evaluate_model(model, dataset_loader, id_col):
     tbw = SummaryWriter()
     with torch.no_grad():
         model.eval()
@@ -125,7 +125,7 @@ def evaluate_model(model, dataset_loader):
         results = []
         val_loss = []
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
-            input, label = record
+            id, input, label = record
 
             output = model(input)  # b x n_classes
             output = output.to(nn_utils.get_device())
@@ -133,6 +133,7 @@ def evaluate_model(model, dataset_loader):
             # to get probabilities of the output
             output = F.softmax(output, dim=-1)
             result_df = pd.DataFrame(output.cpu().numpy())
+            result_df[id_col] = id
             result_df["y_true"] = label.cpu().numpy()
             results.append(result_df)
     return pd.concat(results, ignore_index=True)
@@ -144,4 +145,5 @@ def write_output(df, output_dir, output_prefix, output_type):
     # create any missing parent directories
     Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
     # 5. Write the classification output
-    print(f"Writing {output_type} to {output_file_path}")
+    print(f"Writing {output_type} to {output_file_path}: {df.shape}")
+    df.to_csv(output_file_path, index=False)
