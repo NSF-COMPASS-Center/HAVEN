@@ -22,26 +22,14 @@ def parse_args():
     return args
 
 
-def parse_output(df):
-    df[perturb_pos_col] = None
-    df[orig_token_col] = None
-    df[new_token_col] = None
-
-    for _, row in df.iterrows():
-        id = row[id_col].pop()
-        contents = id.split("_")
-        row[id_col] = contents[0]
-        row[orig_token_col] = contents[1]
-        row[perturb_pos_col] = contents[2]
-        row[new_token_col] = contents[3]
-
-    return df
-
-
 def post_process_output(input_dir, output_dir):
     input_files = os.listdir(input_dir)
     for input_file in input_files:
-        df = parse_output(pd.read_csv(os.path.join(input_dir, input_file), converters={id_col: ast.literal_eval}))
+        print(f"{input_file}")
+        df = pd.read_csv(os.path.join(input_dir, input_file), converters={id_col: ast.literal_eval})
+        df[id_col] = df[id_col].map(lambda x: x.pop())
+        df[[id_col, orig_token_col, perturb_pos_col, new_token_col]] = df[id_col].str.split("_", expand=True)
+
         output_file_name = os.path.basename(input_file)
         # create any missing parent directories
         output_file_path = os.path.join(output_dir, output_file_name)
