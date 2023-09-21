@@ -43,7 +43,6 @@ def transform_labels(df, label_settings, classification_type=None, silent=False)
         print(f"label_idx_map={label_idx_map}\nidx_label_map={idx_label_map}")
 
     df[label_col] = df[label_col].transform(lambda x: label_idx_map[x])
-    print(df[label_col].unique())
     return df, idx_label_map
 
 
