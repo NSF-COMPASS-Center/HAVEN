@@ -87,7 +87,18 @@ def execute(input_settings, output_settings, classification_settings):
             nlp_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
 
 
+    output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
+    # create any missing parent directories
+    Path(os.path.dirname(output_results_dir)).mkdir(parents=True, exist_ok=True)
+
+    # already present output files
+    preexisting_output_files = os.listdir(output_results_dir)
     for input_file in input_files:
+        # check if the input file has already been processed
+        if is_input_file_processed(input_file, preexisting_output_files):
+            print(f"Skipping preprocessed input: {input_file}")
+            continue
+
         # 1. Read the input data file
         df = utils.read_dataset(input_dir, [input_file],
                                 cols=[id_col, sequence_col])
@@ -110,7 +121,6 @@ def execute(input_settings, output_settings, classification_settings):
 
         # 6. Write the raw results in csv files
         output_prefix_curr = output_prefix + "_" + Path(input_file).stem
-        output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
         write_output(result_df, output_results_dir, output_prefix_curr, output_type="output")
 
         # 7. clear memory
@@ -142,8 +152,17 @@ def evaluate_model(model, dataset_loader, id_col):
 def write_output(df, output_dir, output_prefix, output_type):
     output_file_name = f"{output_prefix}.csv"
     output_file_path = os.path.join(output_dir, output_file_name)
-    # create any missing parent directories
-    Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
     # 5. Write the classification output
     print(f"Writing {output_type} to {output_file_path}: {df.shape}")
     df.to_csv(output_file_path, index=False)
+
+
+def is_input_file_processed(input_file, preexisiting_output_files):
+    is_present = False
+
+    for f in preexisting_output_files:
+        if f.contains(input_file):
+            is_present = True
+            break
+
+    return is_present
