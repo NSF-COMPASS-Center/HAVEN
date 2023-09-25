@@ -23,7 +23,8 @@ def parse_args():
 
 
 def post_process_output(input_dir, output_dir):
-    input_files = os.listdir(input_dir)
+    input_files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
+    print()
     for input_file in input_files:
         print(f"{input_file}")
         df = pd.read_csv(os.path.join(input_dir, input_file), converters={id_col: ast.literal_eval})
