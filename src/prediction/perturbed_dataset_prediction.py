@@ -157,11 +157,11 @@ def write_output(df, output_dir, output_prefix, output_type):
     df.to_csv(output_file_path, index=False)
 
 
-def is_input_file_processed(input_file, preexisiting_output_files):
+def is_input_file_processed(input_file, preexisting_output_files):
     is_present = False
 
     for f in preexisting_output_files:
-        if f.contains(input_file):
+        if input_file in f:
             is_present = True
             break
 
