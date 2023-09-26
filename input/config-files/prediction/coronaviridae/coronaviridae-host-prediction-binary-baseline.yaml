@@ -1,0 +1,48 @@
+config_type: "prediction" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "input/data/coronaviridae"
+
+  # Name of file(s) in subdirectory to be read and processed.
+  # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
+  file_names: ["coronaviridae_final.csv"]
+  # seeds to split the files into training and testing
+  # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
+  split_seeds: [ "s12612648", "s31062180", "s48918293", "s55631155", "s79221635"]
+
+classification_settings:
+  model_type: "baseline"
+  n_iterations: 5
+  split_input: False
+  kmer_settings:
+    k: 3
+  type: "binary"
+  train_proportion: 0.8
+  id_col: "id"
+  sequence_col: "seq"
+  label_settings:
+    label_col: "binary_label"
+    exclude_labels: [ "nan"]
+    positive_label: "Human"
+
+  models:
+    - name: "lr"
+      active: True
+      C: [0.01, 0.1, 1]
+      multiclass_type: "multinomial"
+
+    - name: "rf"
+      active: True
+      n_estimators: [10, 100, 1000]
+      max_depth: [3, 5]
+
+output_settings:
+  output_dir: "output"
+  results_dir: "raw"
+  visualizations_dir: "visualization"
+  sub_dir: "coronaviridae/20230503/host_binary"
+  prefix: "" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

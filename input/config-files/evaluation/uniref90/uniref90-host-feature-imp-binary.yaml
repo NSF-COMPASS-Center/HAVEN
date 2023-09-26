@@ -1,0 +1,36 @@
+config_type: "feature_importance" # options: data_preprocessor, prediction, evaluation, feature_importance
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Dataset directory
+  dataset_dir: "input/data/uniref90"
+  dataset_files:
+    - "uniref90_final_msl1114.csv"
+
+  classification_settings:
+    id_col: "uniref90_id"
+    sequence_col: "seq"
+  label_settings:
+    label_col: "virus_host_name"
+    exclude_labels: [ "nan" ]
+    positive_label: "Homo sapiens"
+
+  feature_imp_dir: "output/raw/uniref90/20230705/host_multi_msl1114_baseline"
+  feature_imp_file: "kmer_k3_virus_host_name_multi_kmer_k3-loss_ce__rf_feature_imp.csv"
+
+feature_importance_settings:
+  prevalence: True
+  prevalence_by_host: True
+  feature_imp: True
+  feature_imp_k: 20
+  feature_imp_by_prevalence: True
+
+
+output_settings:
+  output_dir: "output"
+  feature_imp_dir: "feature_imp"
+  visualization_dir: "visualization"
+  dataset_dir: "uniref90/20230705/host_multi"
+  prefix: "rf"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

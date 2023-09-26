@@ -1,0 +1,41 @@
+config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw/uniref90"
+
+  file_names:
+    # experiment_name (to be used as a key in comparative analysis): file_name
+    "LR": "20230315/host_binary/kmer_k3_virus_host_name_binary_presplit__lr_output.csv"
+    "RF": "20230315/host_binary/kmer_k3_virus_host_name_binary_presplit__rf_output.csv"
+
+evaluation_settings:
+  type: "binary"
+  positive_label: "Homo sapiens"
+  # metrics
+  auroc: True
+  auprc: True
+  f1: True
+  accuracy: True
+  prediction_distribution: False
+
+label_mappings:
+  "Homo sapiens": "Human"
+  "Phacochoerus aethiopicus": "Desert warthog"
+  "Bandicota bengalensis": "Lesser bandicoot rat"
+  "Equus caballus": "Horse"
+  "Capra hircus": "Goat"
+  "Gallus gallus": "Red junglefowl"
+  "Apodemus sylvaticus": "Wood mouse"
+  "Bos taurus": "Cattle"
+  "Others": "Others"
+
+output_settings:
+  output_dir: "output"
+  evaluation_dir: "evaluation"
+  visualization_dir: "visualization"
+  dataset_dir: "uniref90/20230315/host_binary"
+  prefix: "host_binary_lr_rf"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

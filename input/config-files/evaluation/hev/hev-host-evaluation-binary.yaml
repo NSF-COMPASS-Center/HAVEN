@@ -1,0 +1,36 @@
+config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw/hev"
+
+  file_names:
+    # experiment_name (to be used as a key in comparative analysis): file_name
+    "orf1_2_3_4_tr0.8_lr": "20221206/host_binary/orf1_orf2_orf3_orf4/kmer_k3_host_binary_presplit_lr_output.csv"
+    "orf1_tr0.8_lr": "20221206/host_binary/orf1/kmer_k3_host_binary_presplit_lr_output.csv"
+    "orf2_tr0.8_lr": "20221206/host_binary/orf2/kmer_k3_host_binary_presplit_lr_output.csv"
+    "orf3_tr0.8_lr": "20221206/host_binary/orf3/kmer_k3_host_binary_presplit_lr_output.csv"
+    "orf1_2_3_4_tr0.8_rf": "20221206/host_binary/orf1_orf2_orf3_orf4/kmer_k3_host_binary_presplit_rf_output.csv"
+    "orf1_tr0.8_rf": "20221206/host_binary/orf1/kmer_k3_host_binary_presplit_rf_output.csv"
+    "orf2_tr0.8_rf": "20221206/host_binary/orf2/kmer_k3_host_binary_presplit_rf_output.csv"
+    "orf3_tr0.8_rf": "20221206/host_binary/orf3/kmer_k3_host_binary_presplit_rf_output.csv"
+
+evaluation_settings:
+  type: "binary"
+  # metrics
+  auroc: True
+  auprc: False
+  f1: True
+  accuracy: True
+  prediction_distribution: False
+
+
+output_settings:
+  output_dir: "output"
+  evaluation_dir: "evaluation"
+  visualization_dir: "visualization"
+  dataset_dir: "hev/20221206/host_binary"
+  prefix: "host_binary_lr_rf_orf1_2_3_4"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

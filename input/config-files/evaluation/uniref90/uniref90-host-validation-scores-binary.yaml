@@ -1,0 +1,13 @@
+config_type: "validation_scores" # options: data_preprocessor, prediction, evaluation, feature_importance
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Dataset directory
+  val_scores_dir: "output/raw/uniref90/20230315/host_binary"
+  val_scores_file: "kmer_k3_virus_host_name_binary_presplit__rf_validation_scores.csv"
+
+output_settings:
+  output_dir: "output/visualization/uniref90/20230315/host_binary"
+  prefix: "rf"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

@@ -1,0 +1,36 @@
+config_type: "feature_importance" # options: data_preprocessor, prediction, evaluation, feature_importance
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Dataset directory
+  dataset_dir: "input/data/hev"
+  dataset_files:
+    - "ORF1.fa_processed.csv"
+    - "ORF2.fa_processed.csv"
+    - "ORF3.fa_processed.csv"
+    - "ORF4.fa_processed.csv"
+
+  label_settings:
+    label_col: "host"
+    exclude_labels: [ "culture supernatant (Unknown map)", "Unknown"]
+    positive_label: "Human"
+
+  feature_imp_dir: "output/raw/hev/20221206/host_binary/orf1_orf2_orf3_orf4"
+  feature_imp_file: "kmer_k3_host_binary_presplit_lr_feature_imp.csv"
+
+feature_importance_settings:
+  prevalence: True
+  prevalence_by_host: True
+  feature_imp: True
+  feature_imp_k: 20
+  feature_imp_by_prevalence: True
+
+
+output_settings:
+  output_dir: "output"
+  feature_imp_dir: "feature_imp"
+  visualization_dir: "visualization"
+  dataset_dir: "hev/20221206/host_binary/orf1_orf2_orf3_orf4"
+  prefix: "lr_orf1_orf2_orf3_orf4"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
