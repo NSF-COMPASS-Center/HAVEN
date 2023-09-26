@@ -1,36 +1,36 @@
-#input files
+# input files
 *.fasta
-input/**/*.csv
-input/**/*.tsv
-input/**/*.gz
-input/**/*.png
-# *.fa
+*.fa
+*.csv
+*.tsv
+*.gz
+*.aln*
 
-#output files
+# output files
 output/
 *.out
 *.swp
-*.csv
-#do NOT ignore the processed data files
-#!input/data/**/*.csv
+
+# figures
+*.png
 
 # log files
 *.log
 
-#IDE files (PyCharm/ IntelliJ)
+# IDE files (PyCharm/ IntelliJ)
 .idea/
 
-#pycache
+# pycache
 **/__pycache__/**
 *.pyc
 
 
-#jupyter-notebook cache
+# jupyter-notebook cache
 **/.ipynb_checkpoints/*
 **/jupyter_notebooks/runs/*
 
-#tensorboard files
+# tensorboard files
 **/runs*/**
 
-#ARC logs
+# ARC logs
 **/arc-logs*/**
