@@ -1,31 +1,37 @@
-*.egg-info
-*.pyc
-*~
-.#*
-R/*
-ZIFA*
-build/
-data*
-dist/
-plots*
-target*
-temp*
-*__pycache__
-sshUtil.sh
-deployment/slurm*
-
 #input files
 *.fasta
+input/**/*.csv
+input/**/*.tsv
+input/**/*.gz
+input/**/*.png
+input/**/*.aln*
+# *.fa
 
-#output and log files
+#output files
 output/
 *.out
 *.swp
+*.csv
+#do NOT ignore the processed data files
+#!input/data/**/*.csv
+
+# log files
 *.log
-
-
-# input files
-*.fasta
 
 #IDE files (PyCharm/ IntelliJ)
 .idea/
+
+#pycache
+**/__pycache__/**
+*.pyc
+
+
+#jupyter-notebook cache
+**/.ipynb_checkpoints/*
+**/jupyter_notebooks/runs/*
+
+#tensorboard files
+**/runs*/**
+
+#ARC logs
+**/arc-logs*/**
