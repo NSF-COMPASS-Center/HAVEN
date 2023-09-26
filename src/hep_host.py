@@ -63,13 +63,14 @@ class HepHost():
         np.random.seed(self.args.seed)
         random.seed(self.args.seed)
         tf.random.set_seed(self.args.seed)
+        tf.config.experimental.enable_tensor_float_32_execution(False)
 
     def start(self):
         # Initialization
-        vocabulary = DataProcessor.initilizeVocab(AAs)
-        vocab_size = len(vocabulary) + 2  # For padding characters
-        yVocab = DataProcessor.initilizeVocab(self.args.targetNames)
-        yVocab['not-in-dictionary'] = 0
+        inputVocab = DataProcessor.initilizeVocab(AAs)
+        vocab_size = len(inputVocab) + 2  # For padding characters
+        targetVocab = DataProcessor.initilizeVocab(self.args.targetNames)
+        targetVocab['not-in-dictionary'] = 0
 
         # Load dataframe
         df = Ingestion.loadFastaFiles(self.args.datasets)
@@ -82,7 +83,7 @@ class HepHost():
                 plt.show()
 
         seq_len = int(df.seq.map(len).max()) + 2
-        df = DataProcessor.featurize_df(df, vocabulary, yVocab, self.args.targetKey)
+        df = DataProcessor.featurize_df(df, inputVocab, targetVocab, self.args.targetKey)
 
         model = None
         # Load in for transfer learning and if we won't overwrite it later
@@ -92,7 +93,7 @@ class HepHost():
             model.summary()
 
         # Make host model
-        hostModel = get_target_model(self.args, model, seq_len, vocab_size, len(yVocab))
+        hostModel = get_target_model(self.args, model, seq_len, vocab_size, len(targetVocab))
 
         # Regular checkpoint of weights
         if self.args.checkpoint:
@@ -109,7 +110,7 @@ class HepHost():
         date = datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
         if self.args.train:
             print("DEBUG: Training start")
-            trainHistory = TransferModel.Models.Utils.fit_model(hostModel, train_df, test_df, yVocab, date)
+            trainHistory = TransferModel.Models.Utils.fit_model(hostModel, train_df, test_df, targetVocab, date)
 
         if self.args.test:
             print("DEBUG: Testing start")
@@ -119,7 +120,7 @@ class HepHost():
             print(train_df)
             print(test_df)
             '''
-            TransferModel.Models.Utils.test_model(self.args, hostModel, test_df, yVocab, date)
+            TransferModel.Models.Utils.test_model(self.args, hostModel, test_df, inputVocab, targetVocab, date)
 
         if self.args.embed:
             print("DEBUG: Testing embedding")

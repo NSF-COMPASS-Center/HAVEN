@@ -50,4 +50,5 @@ output_settings:
     # Base output directory
     namespace: "hepHostNoTransfrer"
     output_dir: "output"
+    model_name: "hep_host_nontransfer_l2_512-117_80.hdf5"
 

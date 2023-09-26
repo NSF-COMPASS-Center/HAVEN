@@ -42,8 +42,11 @@ def featurize_host(target, vocabulary):
     assert (vocabulary)
     return vocabulary[target] if target in vocabulary else 0
 
+def unfeaturize_host(target, vocab):
+    revVocab = {v:k for k, v in vocab.items()}
+    return revVocab[target] if target in revVocab else "Unmapped"
 
-def featurize_seqs_host(seq, vocabulary):
+def featurize_seqs_input(seq, vocabulary):
     # First two in vocabulary are paddings
     start_int = len(vocabulary) + 1
 
@@ -54,6 +57,13 @@ def featurize_seqs_host(seq, vocabulary):
     return np.array([start_int] + [
         vocabulary[word] for word in seq
     ], dtype=np.int8)
+
+def unfeaturize_seqs_input(inputSeqs, vocabulary):
+    reverseVocab = {v:k for k, v in vocabulary.items()}
+    tmp = []
+    for sentence in inputSeqs:
+        tmp.append(np.array([reverseVocab[s] if s in reverseVocab else "PAD" for s in sentence]))
+    return np.array(tmp)
 
 
 def featurize_df(df, inputVocab, targetVocab, targetKey):
@@ -67,7 +77,7 @@ def featurize_df(df, inputVocab, targetVocab, targetKey):
     Returns: The dataframe, but with two new columns, X, y with featurized results
 
     """
-    df['X'] = df['seq'].apply(lambda x: featurize_seqs_host(x, inputVocab))
+    df['X'] = df['seq'].apply(lambda x: featurize_seqs_input(x, inputVocab))
     df['y'] = df[targetKey].apply(lambda x: featurize_host(x, targetVocab))
     return df
 

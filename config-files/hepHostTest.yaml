@@ -34,13 +34,13 @@ input_settings:
                 embedding_cache: False
                 should_train: False
                 should_embed: False
-                should_visualize_data: True
-                train_split: 0
+                should_visualize_data: False
+                train_split: .8
                 batch_size: 64
                 inf_batch_size: 144
                 should_test: True
                 transfer_learning: False
-                checkpoint: "target/hep/checkpoints/bilstm_host/bilstm_host_512-195.hdf5"
+                checkpoint: "models/Aug-10/hep_host_transfer_l2_512-6_80.hdf5"
                 targetKey: "Host"
                 # e.g, the output heads would be ["Human", "Non-Human"]
                 targetNames: ["Human"]
@@ -48,6 +48,6 @@ input_settings:
 # Output Settings: initialize base output folder names
 output_settings:
     # Base output directory
-    namespace: "hep"
+    namespace: "hep_host_transfer_l2_512-6_80"
     output_dir: "Output"
-
+    model_name: "hep_host_transfer_l2_512-6_80"

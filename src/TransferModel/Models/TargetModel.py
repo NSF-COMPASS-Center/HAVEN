@@ -86,7 +86,7 @@ class TargetModel(object):
         X = self.split_and_pad(X)
         y_pred = self.model_.predict(X, batch_size=self.inference_batch_size_)
         if not sparse:
-            y_pred = y_pred.argmax(y_pred, axis=1)
+            y_pred = np.argmax(y_pred, axis=1)
         return y_pred
 
     def transform(self, X):

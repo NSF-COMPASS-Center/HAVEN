@@ -50,4 +50,5 @@ output_settings:
     # Base output directory
     namespace: "hep"
     output_dir: "Output"
+    model_name: "bilstm_host_512-128.hdf5"
 
