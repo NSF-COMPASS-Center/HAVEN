@@ -2,6 +2,17 @@ import os
 import re
 from pathlib import Path
 
+# Input config file: input/config-files/data-processing/hev-dataset-processor.yaml
+# Usage python src/data_processing/hev_dataset_processor.py --config <absolute path to this config file>
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Parse and create HEV Dataset")
+    parser.add_argument("-c", "--config", required=True,
+                        help="Absolute path to the config file\n")
+    args = parser.parse_args()
+    return args
+
 def execute(config):
     input_settings = config["input_settings"]
     input_dir = input_settings["input_dir"]
@@ -67,3 +78,11 @@ def process_file(input_file_path, output_file_path, label_names):
                 # if line does not begin with '>', it is a part of the protein sequence
                 # append to the existing list of sequence record parts.
                 sequence_record.append(line)
+
+
+def main():
+    config = parse_args()
+    execute(config)
+
+if __name__ == "__main__":
+    main()

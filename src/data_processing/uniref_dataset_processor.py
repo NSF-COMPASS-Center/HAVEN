@@ -10,6 +10,10 @@ from Bio import SeqIO
 from multiprocessing import Pool
 from itertools import repeat
 
+
+# Script to parse and create uniref90 dataset
+# Usage: python src/data_processing/uniref_dataset_processor.py -if <absolute path to input fasta file> -od <absolute path output directory>
+
 # Filenames
 UNIREF90_DATA_CSV_FILENAME = "uniref90_parsed.csv"
 # UNIREF90_DATA_W_HOSTS_FILENAME = "uniref90_w_hosts.csv"
@@ -91,7 +95,7 @@ def parse_fasta_file(fasta_file_path, output_directory):
 # The sequences will be joined back and compiled into one dataset at a later stage
 def get_virus_hosts_from_virushostdb(output_directory):
     # read the parsed uniref90_data csv file
-    virushostdb_file = os.path.join(output_directory, "..", "virushostdb", "mapping_files", "virushostdb_human_animals.csv")
+    virushostdb_file = os.path.join(output_directory, "../utils", "virushostdb", "mapping_files", "virushostdb_human_animals.csv")
 
     mapping_df = pd.read_csv(virushostdb_file)
     print(f"Mapping dataset size = {mapping_df.shape}")

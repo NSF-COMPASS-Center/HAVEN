@@ -1,4 +1,6 @@
-config_type: "data_preprocessor" # options: data_preprocessor, classification, evaluation
+# Input for script src/data_processing/hev_dataset_processor.py
+# Usage python src/data_processing/hev_dataset_processor.py --config <absolute path to this config file>
+
 
 # Input Settings:
   ## initialize base input folder name
