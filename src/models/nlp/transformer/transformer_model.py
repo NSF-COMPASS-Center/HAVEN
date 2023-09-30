@@ -1,6 +1,6 @@
 import torch.nn as nn
 from utils import nn_utils
-from utils.nlp_utils.embedding import EmbeddingLayer
+from models.nlp.embedding.embedding import EmbeddingLayer
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
 

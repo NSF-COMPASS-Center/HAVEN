@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils.nlp_utils.embedding import EmbeddingLayer
+from models.nlp.embedding.embedding import EmbeddingLayer
 from torch.nn import Conv1d
 from utils import nn_utils
 

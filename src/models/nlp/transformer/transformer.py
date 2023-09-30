@@ -1,6 +1,6 @@
 import torch.nn as nn
-from utils.nlp_utils.embedding import EmbeddingLayer, ConvolutionEmbeddingLayer
-from prediction.models.nlp.encoder import EncoderLayer, Encoder
+from models.nlp.embedding.embedding import EmbeddingLayer, ConvolutionEmbeddingLayer
+from models.nlp.transformer.encoder import EncoderLayer, Encoder
 from utils import nn_utils
 
 

@@ -8,10 +8,12 @@ import torch
 import tqdm
 from statistics import mean
 
-from utils import utils, nn_utils, kmer_utils, visualization_utils
-from utils.early_stopping import EarlyStopping
-from prediction.models.nlp import fnn, cnn1d, rnn, lstm, transformer, kmer_fnn, transformer_model
-from prediction.models.cv import cnn2d, cnn2d_pool
+from utils import utils, dataset_utils, nn_utils, kmer_utils
+from training import EarlyStopping
+from models import transformer
+from models.nlp import fnn, rnn, cnn1d, lstm
+from models.nlp.fnn import kmer_fnn
+from models.cv import cnn2d, cnn2d_pool
 
 
 def execute(input_settings, output_settings, classification_settings):
@@ -40,7 +42,7 @@ def execute(input_settings, output_settings, classification_settings):
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
-        df = utils.read_dataset(input_dir, input_file_names,
+        df = dataset_utils.read_dataset(input_dir, input_file_names,
                                 cols=[id_col, sequence_col, label_col])
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
@@ -56,11 +58,11 @@ def execute(input_settings, output_settings, classification_settings):
             sequence_settings["kmer_keys"] = kmer_keys
         # 3. Split dataset
         # full df into training and testing datasets in the ratio configured in the config file
-        train_df, test_df = utils.split_dataset(df, input_split_seeds[iter],
+        train_df, test_df = dataset_utils.split_dataset(df, input_split_seeds[iter],
                                                 classification_settings["train_proportion"], stratify_col=label_col)
         # split testing set into validation and testing datasets in equal proportion
         # so 80:20 will now be 80:10:10
-        val_df, test_df = utils.split_dataset(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
+        val_df, test_df = dataset_utils.split_dataset(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
         train_dataset_loader = nn_utils.get_dataset_loader(train_df, sequence_settings, label_col)
         val_dataset_loader = nn_utils.get_dataset_loader(val_df, sequence_settings, label_col)
         test_dataset_loader = nn_utils.get_dataset_loader(test_df, sequence_settings, label_col)

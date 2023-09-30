@@ -1,5 +1,5 @@
 import torch.nn as nn
-from prediction.models.nlp.normalization import NormalizationLayer
+from models.nlp.transformer.normalization import NormalizationLayer
 
 
 class ResidualConnectionLayer(nn.Module):

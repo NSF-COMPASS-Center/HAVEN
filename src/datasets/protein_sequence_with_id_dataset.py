@@ -1,6 +1,5 @@
-from torch.utils.data import Dataset
-from utils import utils, nn_utils
-from prediction.datasets.protein_sequence_dataset import ProteinSequenceDataset
+from utils import nn_utils
+from datasets.protein_sequence_dataset import ProteinSequenceDataset
 
 import numpy as np
 import torch

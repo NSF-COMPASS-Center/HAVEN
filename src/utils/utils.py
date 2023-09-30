@@ -5,12 +5,13 @@ import numpy as np
 import pandas as pd
 import torch
 from imblearn.over_sampling import RandomOverSampler
-from sklearn.model_selection import train_test_split
 from pathlib import Path
 import os
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 
+
+### functions related to labels, grouping, and label vocabular
 
 def filter_noise(df, label_settings):
     label_col = label_settings["label_col"]
@@ -72,6 +73,47 @@ def get_label_vocabulary(labels):
     return label_idx_map, idx_label_map
 
 
+### functions related to class distributions
+
+def compute_class_distribution(df, label_col, format=False):
+    labels_counts = df[label_col].value_counts()
+    n = labels_counts.sum()
+    labels_counts = labels_counts / n * 100
+    labels_counts = labels_counts.to_dict()
+    if format:
+        labels_counts = {k: f"{k} ({v:.2f}%)" for k, v, in labels_counts.items()}
+    return labels_counts
+
+
+def get_class_weights(datasetloader):
+    labels = datasetloader.dataset.get_labels()
+    class_weights = compute_class_weight(class_weight="balanced",
+                                classes=np.unique(labels),
+                                y=labels)
+    return torch.tensor(class_weights, dtype=torch.float)
+
+
+### functions related to writing outputs
+def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
+    for model_name, dfs in model_dfs.items():
+        output_file_name = f"{output_filename_prefix}_{model_name}_{output_type}.csv"
+        output_file_path = os.path.join(output_dir, output_file_name)
+        # create any missing parent directories
+        Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
+        # 5. Write the classification output
+        print(f"Writing {output_type} of {model_name} to {output_file_path}")
+        pd.concat(dfs).to_csv(output_file_path, index=True)
+
+
+def write_output_model(model, output_dir, output_filename_prefix, model_name):
+    output_file_name = f"{output_filename_prefix}_{model_name}_model.joblib"
+    output_file_path = os.path.join(output_dir, output_file_name)
+    # create any missing parent directories
+    Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
+
+    joblib.dump(model, output_file_path)
+
+
 def get_validation_scores(cv_model):
     k = 5
     params = cv_model["params"]
@@ -97,62 +139,3 @@ def random_oversampling(X, y):
     vals, count = np.unique(y_resampled, return_counts=True)
     print(f"Label counts after resampling = {[*zip(vals, count)]}")
     return X_resampled, y_resampled
-
-
-def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
-    for model_name, dfs in model_dfs.items():
-        output_file_name = f"{output_filename_prefix}_{model_name}_{output_type}.csv"
-        output_file_path = os.path.join(output_dir, output_file_name)
-        # create any missing parent directories
-        Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
-        # 5. Write the classification output
-        print(f"Writing {output_type} of {model_name} to {output_file_path}")
-        pd.concat(dfs).to_csv(output_file_path, index=True)
-
-
-def write_output_model(model, output_dir, output_filename_prefix, model_name):
-    output_file_name = f"{output_filename_prefix}_{model_name}_model.joblib"
-    output_file_path = os.path.join(output_dir, output_file_name)
-    # create any missing parent directories
-    Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
-
-    joblib.dump(model, output_file_path)
-
-
-def compute_class_distribution(df, label_col, format=False):
-    labels_counts = df[label_col].value_counts()
-    n = labels_counts.sum()
-    labels_counts = labels_counts / n * 100
-    labels_counts = labels_counts.to_dict()
-    if format:
-        labels_counts = {k: f"{k} ({v:.2f}%)" for k, v, in labels_counts.items()}
-    return labels_counts
-
-
-def read_dataset(input_dir, input_file_names, cols):
-    datasets = []
-    for input_file_name in input_file_names:
-        input_file_path = os.path.join(input_dir, input_file_name)
-        df = pd.read_csv(input_file_path, usecols=cols)
-        print(f"input file: {input_file_path}, size = {df.shape}")
-        datasets.append(df)
-
-    df = pd.concat(datasets)
-    print(f"Size of input dataset = {df.shape}")
-    return df
-
-
-def split_dataset(df, seed, train_proportion, stratify_col=None):
-    print(f"Splitting dataset with seed={seed}, train_proportion={train_proportion}, stratify_col={stratify_col}")
-    train_df, test_df = train_test_split(df, train_size=train_proportion, random_state=seed, stratify=df[stratify_col])
-    print(f"Size of train_dataset = {train_df.shape}")
-    print(f"Size of test_dataset = {test_df.shape}")
-    return train_df, test_df
-
-
-def get_class_weights(datasetloader):
-    labels = datasetloader.dataset.get_labels()
-    class_weights = compute_class_weight(class_weight="balanced",
-                                classes=np.unique(labels),
-                                y=labels)
-    return torch.tensor(class_weights, dtype=torch.float)

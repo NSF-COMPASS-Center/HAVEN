@@ -1,8 +1,4 @@
-from utils import nn_utils
-import torch
-import torch.nn as nn
-from torch.nn.utils.rnn import pad_sequence
-from utils.nlp_utils.padding import Padding
+from models.nlp.embedding.padding import Padding
 
 
 class PaddingWithID(Padding):
