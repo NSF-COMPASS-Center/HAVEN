@@ -9,8 +9,7 @@ from datasets.protein_sequence_kmer_dataset import ProteinSequenceKmerDataset
 from datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
 from models.nlp.embedding.padding import Padding
 from models.nlp.embedding.padding_with_id import PaddingWithID
-
-from training import FocalLoss
+from training.focal_loss import FocalLoss
 
 
 def create_clones(module, N):

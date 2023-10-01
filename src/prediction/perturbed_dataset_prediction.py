@@ -7,11 +7,10 @@ import torch
 import tqdm
 
 from utils import utils, dataset_utils, nn_utils
-from models import transformer
-from models.nlp import fnn, rnn, cnn1d, lstm
-from models.nlp.fnn import kmer_fnn
+from models.nlp.transformer import transformer
+from models.nlp import cnn1d, rnn, lstm
+from models.nlp.fnn import fnn, kmer_fnn
 from models.cv import cnn2d, cnn2d_pool
-
 
 def execute(input_settings, output_settings, classification_settings):
     # input settings

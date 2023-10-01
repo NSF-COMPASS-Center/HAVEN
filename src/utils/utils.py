@@ -8,8 +8,6 @@ from imblearn.over_sampling import RandomOverSampler
 from pathlib import Path
 import os
 from sklearn.utils.class_weight import compute_class_weight
-import numpy as np
-
 
 ### functions related to labels, grouping, and label vocabular
 

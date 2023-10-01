@@ -9,10 +9,10 @@ import tqdm
 from statistics import mean
 
 from utils import utils, dataset_utils, nn_utils, kmer_utils
-from training import EarlyStopping
-from models import transformer
-from models.nlp import fnn, rnn, cnn1d, lstm
-from models.nlp.fnn import kmer_fnn
+from training.early_stopping import EarlyStopping
+from models.nlp.transformer import transformer
+from models.nlp import cnn1d, rnn, lstm
+from models.nlp.fnn import fnn, kmer_fnn
 from models.cv import cnn2d, cnn2d_pool
 
 

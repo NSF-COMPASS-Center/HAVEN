@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset
-from utils import utils, nn_utils, kmer_utils
+from utils import nn_utils, kmer_utils
 
 import pandas as pd
 import numpy as np
