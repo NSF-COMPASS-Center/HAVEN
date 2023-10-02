@@ -38,7 +38,7 @@ def load_dataset_with_df(df, sequence_settings, label_settings, label_col):
 
 def load_dataset(input_dir, input_file_names, seed, train_proportion, id_col, seq_col, label_col, label_settings, classification_type, k, kmer_keys=None):
     df = read_dataset(input_dir, input_file_names,
-                            cols=[id_col, sequence_col, label_col])
+                            cols=[id_col, seq_col, label_col])
     df, index_label_map = utils.transform_labels(df, label_settings, classification_type=classification_type)
     train_df, test_df = utils.split_dataset(df, seed, train_proportion,
                                             stratify_col=label_col)
