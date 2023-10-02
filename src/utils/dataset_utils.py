@@ -40,7 +40,7 @@ def load_dataset(input_dir, input_file_names, seed, train_proportion, id_col, se
     df = read_dataset(input_dir, input_file_names,
                             cols=[id_col, seq_col, label_col])
     df, index_label_map = utils.transform_labels(df, label_settings, classification_type=classification_type)
-    train_df, test_df = utils.split_dataset(df, seed, train_proportion,
+    train_df, test_df = split_dataset(df, seed, train_proportion,
                                             stratify_col=label_col)
     train_df[split_col] = "train"
     test_df[split_col] = "test"
