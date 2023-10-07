@@ -9,7 +9,7 @@ from pathlib import Path
 import os
 from sklearn.utils.class_weight import compute_class_weight
 
-### functions related to labels, grouping, and label vocabular
+### functions related to labels, grouping, and label vocabulary
 
 def filter_noise(df, label_settings):
     label_col = label_settings["label_col"]

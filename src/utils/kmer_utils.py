@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def compute_kmer_features(df, k, id_col, sequence_col, label_col, kmer_keys=None):
     print(f"Method:compute_kmer_features : df size = {df.shape}")
-    if kmer_keys and len(kmer_keys) > 0:
+    if kmer_keys.any() and len(kmer_keys) > 0:
         print(f"Using provided {len(kmer_keys)} kmer_keys = {kmer_keys}")
     else:
         print("Computing kmer_keys")

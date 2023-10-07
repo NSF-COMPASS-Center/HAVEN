@@ -37,6 +37,7 @@ def load_dataset_with_df(df, sequence_settings, label_settings, label_col):
 
 
 def load_dataset(input_dir, input_file_names, seed, train_proportion, id_col, seq_col, label_col, label_settings, classification_type, k, kmer_keys=None):
+    split_col = "split"
     df = read_dataset(input_dir, input_file_names,
                             cols=[id_col, seq_col, label_col])
     df, index_label_map = utils.transform_labels(df, label_settings, classification_type=classification_type)
@@ -47,7 +48,7 @@ def load_dataset(input_dir, input_file_names, seed, train_proportion, id_col, se
     df = pd.concat([train_df, test_df])
     print(f"Loaded dataset size = {df.shape}")
 
-    kmer_df = kmer_utils.compute_kmer_features(df, k, id_col, sequence_col, label_col, kmer_keys)
+    kmer_df = kmer_utils.compute_kmer_features(df, k, id_col, seq_col, label_col, kmer_keys)
     print(f"kmer_df size = {kmer_df.shape}")
 
     kmer_df = kmer_df.join(df["split"], on=id_col, how="left")

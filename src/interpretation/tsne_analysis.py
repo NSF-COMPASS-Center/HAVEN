@@ -34,12 +34,13 @@ def get_model_specific_embedding(model, model_type):
 
 
 # get tsne embeddings given the emeddings of sequences
-def get_tsne_embeddings(df, label_col):
-    # using only the first 512 columns/ features from the df for computational efficiency
-    X = df[range(512)]
-    tsne_model = TSNE(n_components=2, verbose=1, init="pca", learning_rate="auto").fit(X)
-    X_tsne_emb = pd.DataFrame(tsne_model.fit_transform(X))
-    print(f"Reduced input shape from {df.shape} to {X.shape}")
+def get_tsne_embeddings(df, label_col, n=None):
+    # using only the first n columns/ features from the df for computational efficiency
+    if n:
+        df = df[range(n)]
+        print(f"Reduced input shape from {df.shape} to {X.shape}")
+    tsne_model = TSNE(n_components=2, verbose=1, init="pca", learning_rate="auto").fit(df)
+    X_tsne_emb = pd.DataFrame(tsne_model.fit_transform(df))
     print(f"TSNE embedding shape: {X_tsne_emb.shape}")
-    X_emb[label_col] = df[label_col].values
+    X_tsne_emb[label_col] = df[label_col].values
     return tsne_model, X_tsne_emb
