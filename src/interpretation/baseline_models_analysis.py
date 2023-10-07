@@ -1,4 +1,3 @@
-
 def compute_baseline_model_embedding(baseline_model, df, label_col, id_col, split_col):
     df = df[df[split_col] == "train"]
     features = baseline_model.feature_names_in_
