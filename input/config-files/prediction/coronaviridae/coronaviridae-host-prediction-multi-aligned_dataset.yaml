@@ -36,7 +36,7 @@ classification_settings:
       img_dir: "input/data/coronaviridae/cgr_images"
   training_settings:
     n_epochs: 50
-    max_lr: 1e-4
+    max_lr: 1e-3
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -52,7 +52,7 @@ classification_settings:
       "Chicken": [ "Gallus gallus (Chicken) [TaxID: 9031]" ]
       "Bovine": [ "Bos taurus (Bovine) [TaxID: 9913]" ]
   models:
-    - name: "fnn-l_10-lr1e-4"
+    - name: "fnn-l_10-lr1e-3"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
@@ -74,8 +74,8 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbersgit
 
-    - name: "cnn-l_4-lr1e-4"
-      active: False
+    - name: "cnn-l_4-lr1e-3"
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 4
@@ -88,7 +88,7 @@ classification_settings:
       stride: 1
       manual_seed:  # whole numbers
 
-    - name: "cgr-cnn-l_2-lr1e-4"
+    - name: "cgr-cnn-l_2-lr1e-3"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
@@ -100,7 +100,7 @@ classification_settings:
       stride: 1
       manual_seed:  # whole numbers
 
-    - name: "rnn-l_6-lr1e-4"
+    - name: "rnn-l_6-lr1e-3"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
@@ -111,7 +111,7 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "lstm-l_2-lr1e-4"
+    - name: "lstm-l_2-lr1e-3"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
@@ -123,7 +123,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
