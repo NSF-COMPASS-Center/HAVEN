@@ -6,11 +6,11 @@ from torch.utils.tensorboard import SummaryWriter
 import torch
 import tqdm
 
-from utils import utils, nn_utils, kmer_utils, visualization_utils
-from utils.early_stopping import EarlyStopping
-from prediction.models.nlp import fnn, cnn1d, rnn, lstm, transformer, kmer_fnn, transformer_model
-from prediction.models.cv import cnn2d, cnn2d_pool
-
+from utils import utils, dataset_utils, nn_utils
+from models.nlp.transformer import transformer
+from models.nlp import cnn1d, rnn, lstm
+from models.nlp.fnn import fnn, kmer_fnn
+from models.cv import cnn2d, cnn2d_pool
 
 def execute(input_settings, output_settings, classification_settings):
     # input settings
@@ -100,7 +100,7 @@ def execute(input_settings, output_settings, classification_settings):
             continue
 
         # 1. Read the input data file
-        df = utils.read_dataset(input_dir, [input_file],
+        df = dataset_utils.read_dataset(input_dir, [input_file],
                                 cols=[id_col, sequence_col])
 
         df[label_col] = "Homo sapiens (Human) [TaxID: 9606]"

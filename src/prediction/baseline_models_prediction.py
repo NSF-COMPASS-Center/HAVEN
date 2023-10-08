@@ -4,9 +4,8 @@ import pandas as pd
 from pathlib import Path
 from sklearn.preprocessing import MinMaxScaler
 
-from utils import kmer_utils, utils, visualization_utils
-from prediction.models.baseline import logistic_regression
-from prediction.models.baseline import random_forest
+from utils import utils, dataset_utils, kmer_utils, visualization_utils
+from models.baseline import logistic_regression, random_forest
 
 
 def execute(input_settings, output_settings, classification_settings):
@@ -43,13 +42,13 @@ def execute(input_settings, output_settings, classification_settings):
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
-        df = utils.read_dataset(input_dir, input_file_names,
+        df = dataset_utils.read_dataset(input_dir, input_file_names,
                                 cols=[id_col, sequence_col, label_col])
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                      classification_type=classification_settings["type"])
         # 3. Split dataset
-        train_df, test_df = utils.split_dataset(df, input_split_seeds[iter],
+        train_df, test_df = dataset_utils.split_dataset(df, input_split_seeds[iter],
                                                 classification_settings["train_proportion"], stratify_col=label_col)
 
         train_df["split"] = "train"

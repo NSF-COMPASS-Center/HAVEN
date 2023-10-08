@@ -5,6 +5,8 @@
 *.tsv
 *.gz
 *.aln*
+*.zip
+*.tab
 
 # output files
 output/
