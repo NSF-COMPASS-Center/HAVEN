@@ -112,7 +112,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2-lr1e-3"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
