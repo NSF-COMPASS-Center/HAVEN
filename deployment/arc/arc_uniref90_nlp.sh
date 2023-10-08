@@ -7,7 +7,7 @@
 #SBATCH --mem=128G
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
-#SBATCH -t 120:00:00 # wall-time required (# 120hrs)
+#SBATCH -t 24:00:00 # wall-time required (# 24hrs)
 
 
 # Load modules

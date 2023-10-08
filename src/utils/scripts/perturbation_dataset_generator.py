@@ -10,6 +10,7 @@ NUCLEOTIDE = "nucleotide"
 PROTEIN = "protein"
 ID_COL = "id"
 SEQ_COL = "seq"
+NON_TOKEN = "-"
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Generate perturbed sequences for a given dataset')
@@ -39,8 +40,13 @@ def perturb_sequence(id, sequence, sequence_vocab):
 
     # index: perturbed_position
     for index, orig_token in enumerate(sequence):
-        # by replcaing with every possiblt token in the vocab, we are creating a duplicate of the original sequence
+        # by replacing with every possible token in the vocab, we are creating a duplicate of the original sequence
         # we will remove these duplicate sequences at the end
+
+        # create new sequence only for positions with aligned tokens
+        if orig_token == NON_TOKEN:
+            continue
+
         for new_token in sequence_vocab:
             # format for id = <orig_id>_<orig_token>_<index>_<new_token>
             new_id = f"{id}_{orig_token}_{index}_{new_token}"
