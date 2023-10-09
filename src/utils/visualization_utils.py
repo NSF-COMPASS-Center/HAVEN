@@ -19,7 +19,7 @@ def curve_plot(df, x_col, y_col, color_group_col, style_group_col, output_file_p
     if metadata is not None:
         df = df.replace({color_group_col: metadata})
         hue_order = list(metadata.values())
-    ax = sns.lineplot(data=df, x=x_col, y=y_col, hue=color_group_col, style=style_group_col, hue_order=hue_order, errorbar=None)
+    ax = sns.lineplot(data=df, x=x_col, y=y_col, hue=color_group_col, style=style_group_col, hue_order=hue_order)
     ax.set_ylim(0, 1)
     plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
     view(output_file_path)
@@ -74,10 +74,10 @@ def pre_plot_config(figsize=(10, 10)):
     sns.set_theme()
 
 
-def view(output_filepath):
+def view(output_file_path=None):
     plt.rcParams['figure.autolayout'] = True
     plt.rcParams['xtick.labelsize'] = 10
     plt.rcParams['ytick.labelsize'] = 8
     plt.tight_layout()
-    if output_filepath:
+    if output_file_path:
         plt.savefig(output_file_path)
