@@ -4,7 +4,7 @@ config_type: "prediction" # options: data_preprocessor, prediction, evaluation
   ## initialize base input folder name
   ## provide path to dataset folder
 input_settings:
-  perturbed_dataset_dir: "input/data/coronaviridae/perturbed_dataset/sarscov2_top_7_human_aligned"
+  perturbed_dataset_dir: "input/data/coronaviridae/perturbed_dataset/sarscov2_top_7_hosts_human_aligned"
 
 classification_settings:
   model_type: "perturbed_dataset_prediction"  # options: baseline, nlp, perturbed_dataset_prediction
@@ -62,7 +62,7 @@ classification_settings:
     - name: "cnn-l_4-lr1e-4"
       active: False
       mode: "test" # supported values: train, test
-      model_path: "output/raw/coronaviridae/20230908/host_multi_lr1e-3-e50/cnn-l_4-lr1e-3_itr0.pth"
+      model_path: "output/raw/coronaviridae/20231008/aligned_host_multi_lr1e-3-e50/cnn-l_4-lr1e-3_itr0.pth"
       loss: "FocalLoss"
       depth: 4
       n_tokens: 27
@@ -102,7 +102,7 @@ classification_settings:
     - name: "lstm-l_2-lr1e-4"
       active: False
       mode: "test" # supported values: train, test
-      model_path: "output/raw/coronaviridae/20230908/host_multi_lr1e-3-e50/lstm-l_2-lr1e-3_itr0.pth"
+      model_path: "output/raw/coronaviridae/20231008/aligned_host_multi_lr1e-3-e50/lstm-l_2-lr1e-3_itr0.pth"
       loss: "FocalLoss"
       depth: 2
       n_tokens: 27
