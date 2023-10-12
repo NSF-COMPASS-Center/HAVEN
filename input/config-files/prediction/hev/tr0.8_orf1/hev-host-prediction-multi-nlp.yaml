@@ -53,7 +53,7 @@ classification_settings:
     div_factor: 25.0
     final_div_factor: 10000.0
   models:
-    - name: "fnn-l_10-lr1e-3"
+    - name: "fnn-l_10-lr1e-3-orf1"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
@@ -64,7 +64,7 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "cnn-l_4-lr1e-3"
+    - name: "cnn-l_4-lr1e-3-orf1"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
@@ -77,7 +77,7 @@ classification_settings:
       stride: 1
       manual_seed:  # whole numbers
 
-    - name: "rnn-l_6-lr1e-5"
+    - name: "rnn-l_6-lr1e-5-orf1"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
@@ -88,7 +88,7 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "lstm-l_2-lr1e-3"
+    - name: "lstm-l_2-lr1e-3-orf1"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
@@ -99,7 +99,7 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "transformer-l_6-h_8-lr1e-4"
+    - name: "transformer-l_6-h_8-lr1e-4-orf1"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
