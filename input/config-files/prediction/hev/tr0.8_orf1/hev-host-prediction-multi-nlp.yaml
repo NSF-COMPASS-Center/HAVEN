@@ -48,13 +48,13 @@ classification_settings:
       "Others": [ "*" ] # Leporidae", "Rodent", "Avian", "Ferret", "Camel", "Mongoose", "Bat", "Primate", "Shrew", "Deer", "Hare", "Canine" ]
   training_settings:
     n_epochs: 50
-    max_lr: 1e-4
+    max_lr: 1e-5
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
   models:
     - name: "fnn-l_10-lr1e-3-orf1"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
@@ -65,7 +65,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "cnn-l_4-lr1e-3-orf1"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 4
@@ -78,7 +78,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "rnn-l_6-lr1e-5-orf1"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
@@ -89,7 +89,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2-lr1e-3-orf1"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
