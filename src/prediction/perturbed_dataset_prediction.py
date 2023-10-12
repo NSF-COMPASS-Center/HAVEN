@@ -89,7 +89,7 @@ def execute(input_settings, output_settings, classification_settings):
 
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
     # create any missing parent directories
-    Path(os.path.dirname(output_results_dir)).mkdir(parents=True, exist_ok=True)
+    Path(output_results_dir).mkdir(parents=True, exist_ok=True)
 
     # already present output files
     preexisting_output_files = os.listdir(output_results_dir)

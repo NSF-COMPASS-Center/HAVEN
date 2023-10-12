@@ -1,6 +1,9 @@
 import os
 import re
 from pathlib import Path
+import argparse
+import yaml
+from utils import utils
 
 # Input config file: input/config-files/data-processing/hev-dataset-processor.yaml
 # Usage python src/data_processing/hev_dataset_processor.py --config <absolute path to this config file>
@@ -81,8 +84,8 @@ def process_file(input_file_path, output_file_path, label_names):
 
 
 def main():
-    config = parse_args()
-    execute(config)
+    args = parse_args()
+    execute(utils.parse_config(config_file_path=args.config))
 
 if __name__ == "__main__":
     main()

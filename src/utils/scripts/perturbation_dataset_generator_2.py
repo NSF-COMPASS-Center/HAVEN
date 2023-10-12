@@ -25,17 +25,6 @@ def parse_args():
     return args
 
 
-# Returns a config map for the yaml at the path specified
-def parse_config(config_file_path):
-    config = None
-    try:
-        with open(config_file_path, 'r') as f:
-            config = yaml.load(f, Loader=yaml.SafeLoader)
-    except yaml.YAMLError as err:
-        print(f"Error parsing config file: {err}")
-    return config
-
-
 def process_files(input_file, input_dir, output_dir):
     sarscov2_human_df = pd.read_csv(input_file)
     sarscov2_human_uniprot_ids = sarscov2_human_df["id"].unique()

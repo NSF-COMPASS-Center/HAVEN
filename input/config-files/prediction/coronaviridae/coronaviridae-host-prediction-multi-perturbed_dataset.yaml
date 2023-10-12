@@ -12,7 +12,7 @@ classification_settings:
   sequence_settings:
     batch_size: 32
     id_col: "id"
-    sequence_col: "seq"
+    sequence_col: "seq_aligned"
     max_sequence_length: 2169 # max=2169
     truncate: False
     pad_sequence_val: 0
@@ -60,7 +60,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "cnn-l_4-lr1e-4"
-      active: False
+      active: True
       mode: "test" # supported values: train, test
       model_path: "output/raw/coronaviridae/20231008/aligned_host_multi_lr1e-3-e50/cnn-l_4-lr1e-3_itr0.pth"
       loss: "FocalLoss"
@@ -112,7 +112,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8-lr1e-4"
-      active: True
+      active: False
       mode: "test" # supported values: train, test
       model_path: "output/raw/coronaviridae/20231008/aligned_host_multi_lr1e-3-e50/transformer-l_6-h_8-lr1e-3_itr0.pth"
       loss: "FocalLoss"
@@ -128,5 +128,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae/20231009/perturbed_dataset_prediction/sarscov2-S-human-aligned/transformer-l_6-h_8-lr1e-4"
-  prefix: "tf" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "coronaviridae/20231009/perturbed_dataset_prediction/sarscov2-S-human-aligned/cnn-l_4-lr1e-3"
+  prefix: "cnn" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

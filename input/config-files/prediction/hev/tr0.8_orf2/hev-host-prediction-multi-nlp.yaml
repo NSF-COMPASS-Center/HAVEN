@@ -9,10 +9,12 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "hev_orf1_alignment_ba.fasta_processed.csv",
-                "hev_orf2_alignment_ba.fasta_processed.csv",
-                "hev_orf3_alignment_ba.fasta_processed.csv",
-                "hev_orf4_alignment_ba.fasta_processed.csv" ]
+  file_names: [
+#    "hev_orf1_alignment_ba.fasta_processed.csv",
+    "hev_orf2_alignment_ba.fasta_processed.csv"
+#    "hev_orf3_alignment_ba.fasta_processed.csv",
+#    "hev_orf4_alignment_ba.fasta_processed.csv"
+  ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -28,7 +30,7 @@ classification_settings:
     batch_size: 64
     id_col: "id"
     sequence_col: "sequence"
-    max_sequence_length: 2481
+    max_sequence_length: 794
     truncate: False
     pad_sequence_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
@@ -113,5 +115,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "hev/20231012/host_multi_e50"
+  sub_dir: "hev/20231012/host_multi_e50/orf2"
   prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

@@ -78,17 +78,6 @@ def generate_perturbed_sequences(input_files, output_dir, sequence_type):
         print(f"Processed input file: {input_file}. Perturbed sequences count = {perturbed_sequences_count}")
 
 
-# Returns a config map for the yaml at the path specified
-def parse_config(config_file_path):
-    config = None
-    try:
-        with open(config_file_path, 'r') as f:
-            config = yaml.load(f, Loader=yaml.SafeLoader)
-    except yaml.YAMLError as err:
-        print(f"Error parsing config file: {err}")
-    return config
-
-
 def main():
     config = parse_args()
     input_files = config.input_files.split(",")

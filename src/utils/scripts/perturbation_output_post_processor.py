@@ -37,18 +37,6 @@ def post_process_output(input_dir, output_dir):
         Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
         df.to_csv(output_file_path, index=False)
 
-
-# Returns a config map for the yaml at the path specified
-def parse_config(config_file_path):
-    config = None
-    try:
-        with open(config_file_path, 'r') as f:
-            config = yaml.load(f, Loader=yaml.SafeLoader)
-    except yaml.YAMLError as err:
-        print(f"Error parsing config file: {err}")
-    return config
-
-
 def main():
     config = parse_args()
     input_dir = config.input_dir
