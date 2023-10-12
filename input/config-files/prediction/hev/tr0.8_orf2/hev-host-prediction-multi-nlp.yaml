@@ -59,7 +59,7 @@ classification_settings:
       loss: "FocalLoss"
       depth: 10
       n_tokens: 27
-      n_classes: 9
+      n_classes: 3
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -70,7 +70,7 @@ classification_settings:
       loss: "FocalLoss"
       depth: 4
       n_tokens: 27
-      n_classes: 9
+      n_classes: 3
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       kernel_size: 3
@@ -83,7 +83,7 @@ classification_settings:
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
       n_tokens: 27
-      n_classes: 9
+      n_classes: 3
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -94,7 +94,7 @@ classification_settings:
       loss: "FocalLoss"
       depth: 2
       n_tokens: 27
-      n_classes: 9
+      n_classes: 3
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -107,7 +107,7 @@ classification_settings:
       n_heads: 8
       depth: 6
       n_tokens: 27
-      n_classes: 9
+      n_classes: 3
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
