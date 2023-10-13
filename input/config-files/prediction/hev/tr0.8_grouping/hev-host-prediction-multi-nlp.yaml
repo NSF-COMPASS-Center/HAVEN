@@ -42,8 +42,8 @@ classification_settings:
     exclude_labels: [ "nan" ]
     label_groupings:
       "Human": [ "Human" ]
-        "Boar": [ "Boar" ]
-        "Others": [ "*" ] # Leporidae", "Rodent", "Avian", "Ferret", "Camel", "Mongoose", "Bat", "Primate", "Shrew", "Deer", "Hare", "Canine" ]
+      "Boar": [ "Boar" ]
+      "Others": [ "*" ] # Leporidae", "Rodent", "Avian", "Ferret", "Camel", "Mongoose", "Bat", "Primate", "Shrew", "Deer", "Hare", "Canine" ]
   training_settings:
     n_epochs: 50
     max_lr: 1e-4
@@ -52,23 +52,23 @@ classification_settings:
     final_div_factor: 10000.0
   models:
     - name: "fnn-l_10-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
       n_tokens: 27
-      n_classes: 9
+      n_classes: 3
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
     - name: "cnn-l_4-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 4
       n_tokens: 27
-      n_classes: 9
+      n_classes: 3
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       kernel_size: 3
@@ -81,31 +81,31 @@ classification_settings:
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
       n_tokens: 27
-      n_classes: 9
+      n_classes: 3
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
       n_tokens: 27
-      n_classes: 9
+      n_classes: 3
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8-lr1e-4"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
       n_heads: 8
       depth: 6
       n_tokens: 27
-      n_classes: 9
+      n_classes: 3
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -113,5 +113,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "hev/20231012/host_multi_e50"
+  sub_dir: "hev/20231012/host_multi_e50/orf1234"
   prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
