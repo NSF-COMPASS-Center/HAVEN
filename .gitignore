@@ -7,7 +7,6 @@
 *.aln*
 *.zip
 *.tab
-input/data/*
 
 # output files
 output/
