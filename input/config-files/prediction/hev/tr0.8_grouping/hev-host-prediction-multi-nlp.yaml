@@ -25,7 +25,7 @@ classification_settings:
   train_proportion: 0.8
   type: "multi"
   sequence_settings:
-    batch_size: 64
+    batch_size: 32
     id_col: "id"
     sequence_col: "sequence"
     max_sequence_length: 2481

@@ -76,8 +76,8 @@ def pre_plot_config(figsize=(10, 10)):
 
 def view(output_file_path=None):
     plt.rcParams['figure.autolayout'] = True
-    plt.rcParams['xtick.labelsize'] = 10
-    plt.rcParams['ytick.labelsize'] = 8
+    plt.rcParams['xtick.labelsize'] = 16
+    plt.rcParams['ytick.labelsize'] = 16
     plt.tight_layout()
     if output_file_path:
         plt.savefig(output_file_path)

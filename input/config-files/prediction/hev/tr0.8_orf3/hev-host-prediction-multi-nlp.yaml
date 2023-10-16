@@ -27,7 +27,7 @@ classification_settings:
   train_proportion: 0.8
   type: "multi"
   sequence_settings:
-    batch_size: 64
+    batch_size: 32
     id_col: "id"
     sequence_col: "sequence"
     max_sequence_length: 337
@@ -78,7 +78,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "rnn-l_6-lr1e-5-orf3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
@@ -100,7 +100,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8-lr1e-4-orf3"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False

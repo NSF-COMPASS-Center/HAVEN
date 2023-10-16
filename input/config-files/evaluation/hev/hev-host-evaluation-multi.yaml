@@ -7,14 +7,26 @@ input_settings:
   # Base input directory
   input_dir: "output/raw/hev"
 
-  # Subdirectory of inputs that datasets are placed in
-  dataset_dir: "orf2_orf3_orf4"
+  file_names:
+      # experiment_name (to be used as a key in comparative analysis): file_name
 
-  # TODO: support for multiple files
-  # Name of file(s) in subdirectory to be read and processed.
-  # file_names: ["kmer_k3_lr_host_tr0.8_n2_orf2_orf3_orf4_output.csv"]
-  file_name: "kmer_k3_lr_host_multi_tr0.8_n10_orf2_orf3_orf4_output.csv"
+      "FNN-10L-orf1": "20231012/host_multi_e50/orf1/emb_sincos-d_1024-loss_focalce_fnn-l_10-lr1e-3-orf1_output.csv"
+      # "RNN-6L-orf1": ""
+      "CNN-4L-orf1": "20231012/host_multi_e50/orf1/emb_sincos-d_1024-loss_focalce_cnn-l_4-lr1e-3-orf1_output.csv"
+      "LSTM-2L-orf1": "20231012/host_multi_e50/orf1/emb_sincos-d_1024-loss_focalce_lstm-l_2-lr1e-3-orf1_output.csv"
+      # "TF-orf1": ""
 
+      "FNN-10L-orf2": "20231012/host_multi_e50/orf2/emb_sincos-d_1024-loss_focalce_fnn-l_10-lr1e-3-orf2_output.csv"
+      "RNN-6L-orf2": "20231012/host_multi_e50/orf2/emb_sincos-d_1024-loss_focalce_rnn-l_6-lr1e-5-orf2_output.csv"
+      "CNN-4L-orf2": "20231012/host_multi_e50/orf2/emb_sincos-d_1024-loss_focalce_cnn-l_4-lr1e-3-orf2_output.csv"
+      "LSTM-2L-orf2": "20231012/host_multi_e50/orf2/emb_sincos-d_1024-loss_focalce_lstm-l_2-lr1e-3-orf2_output.csv"
+      "TF-orf2": "20231012/host_multi_e50/orf2/emb_sincos-d_1024-loss_focalce_transformer-l_6-h_8-lr1e-4-orf2_output.csv"
+
+      "FNN-10L-orf3": "20231012/host_multi_e50/orf3/emb_sincos-d_1024-loss_focalce_fnn-l_10-lr1e-3-orf3_output.csv"
+      "RNN-6L-orf3": "20231012/host_multi_e50/orf3/emb_sincos-d_1024-loss_focalce_rnn-l_6-lr1e-5-orf3_output.csv"
+      "CNN-4L-orf3": "20231012/host_multi_e50/orf3/emb_sincos-d_1024-loss_focalce_cnn-l_4-lr1e-3-orf3_output.csv"
+      "LSTM-2L-orf3": "20231012/host_multi_e50/orf3/emb_sincos-d_1024-loss_focalce_lstm-l_2-lr1e-3-orf3_output.csv"
+      "TF-orf3": "20231012/host_multi_e50/orf3/emb_sincos-d_1024-loss_focalce_transformer-l_6-h_8-lr1e-4-orf3_output.csv"
 
 evaluation_settings:
   type: "multi"
@@ -24,11 +36,14 @@ evaluation_settings:
   accuracy: True
   prediction_distribution: True
 
-
+label_mappings:
+  "Human": "Human"
+  "Boar": "Boar"
+  "Others": "Others"
 
 output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "hev/orf2_orf3_orf4"
-  prefix: # default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "hev/20231013/host_multi_val_test_e50"
+  prefix: "orf-123"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
