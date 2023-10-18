@@ -24,18 +24,32 @@ def parse_args():
 
 def post_process_output(input_dir, output_dir):
     input_files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
-    print()
+
+    processing_error = []
     for input_file in input_files:
         print(f"{input_file}")
         df = pd.read_csv(os.path.join(input_dir, input_file), converters={id_col: ast.literal_eval})
         df[id_col] = df[id_col].map(lambda x: x.pop())
-        df[[id_col, orig_token_col, perturb_pos_col, new_token_col]] = df[id_col].str.split("_", expand=True)
+
+        # assuming the id follows the pattern of id_<origtoken>_<perturbpos>_<newtoken>
+        # sequences that do not follow this id pattern will error out in the next line.
+        # tactical fix: record the filename, and continue
+        # TODO: implement a strategical fix
+        try:
+            df[[id_col, orig_token_col, perturb_pos_col, new_token_col]] = df[id_col].str.split("_", expand=True)
+        except:
+            processing_error.append(input_file)
+            continue
 
         output_file_name = os.path.basename(input_file)
         # create any missing parent directories
         output_file_path = os.path.join(output_dir, output_file_name)
         Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
         df.to_csv(output_file_path, index=False)
+
+    print(f"ERROR: Skipped processing following {len(processing_error)} files due to filename not conforming to the expected sequence id pattern:")
+    print("\n".join(processing_error))
+
 
 def main():
     config = parse_args()
