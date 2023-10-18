@@ -25,7 +25,7 @@ classification_settings:
   train_proportion: 0.8
   type: "multi"
   sequence_settings:
-    batch_size: 32
+    batch_size: 4
     id_col: "id"
     sequence_col: "sequence"
     max_sequence_length: 2481
@@ -46,13 +46,13 @@ classification_settings:
       "Others": [ "*" ] # Leporidae", "Rodent", "Avian", "Ferret", "Camel", "Mongoose", "Bat", "Primate", "Shrew", "Deer", "Hare", "Canine" ]
   training_settings:
     n_epochs: 50
-    max_lr: 1e-3
+    max_lr: 1e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
   models:
     - name: "fnn-l_10-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
@@ -63,7 +63,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "cnn-l_4-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 4
@@ -87,7 +87,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
@@ -98,7 +98,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8-lr1e-4"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False

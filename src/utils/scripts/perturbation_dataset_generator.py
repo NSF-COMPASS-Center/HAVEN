@@ -9,7 +9,7 @@ import ast
 NUCLEOTIDE = "nucleotide"
 PROTEIN = "protein"
 ID_COL = "id"
-SEQ_COL = "seq_aligned"
+SEQ_COL = "sequence"
 NON_TOKEN = "-"
 
 def parse_args():
