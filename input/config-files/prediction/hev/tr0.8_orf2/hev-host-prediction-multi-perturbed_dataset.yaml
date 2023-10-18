@@ -4,41 +4,25 @@ config_type: "prediction" # options: data_preprocessor, prediction, evaluation
   ## initialize base input folder name
   ## provide path to dataset folder
 input_settings:
-  # Base input directory
-  input_dir: "input/data/hev/aligned"
-
-  # Name of file(s) in subdirectory to be read and processed.
-  # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [
-    "hev_orf1_alignment_ba.fasta_processed.csv"
-#    "hev_orf2_alignment_ba.fasta_processed.csv",
-#    "hev_orf3_alignment_ba.fasta_processed.csv",
-#    "hev_orf4_alignment_ba.fasta_processed.csv"
-  ]
-  # seeds to split the files into training and testing
-  # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
-
+  perturbed_dataset_dir: "input/data/hev/perturbed_aligned/orf2"
 
 classification_settings:
-  model_type: "nlp"
-  n_iterations: 5
-  split_input: True
-  train_proportion: 0.8
+  model_type: "perturbed_dataset_prediction"  # options: baseline, nlp, perturbed_dataset_prediction
   type: "multi"
   sequence_settings:
     batch_size: 32
     id_col: "id"
     sequence_col: "sequence"
-    max_sequence_length: 2481
+    max_sequence_length: 794 # max=794
     truncate: False
     pad_sequence_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
     kmer_settings:
       k: 3
     cgr_settings:
-      img_size: 32
-      img_dir: ""
+      img_size: 8
+      img_dir: "input/data/coronaviridae/cgr_images"
+
   label_settings:
     label_col: "host"
     exclude_labels: [ "nan" ]
@@ -46,16 +30,11 @@ classification_settings:
       "Human": [ "Human" ]
       "Boar": [ "Boar" ]
       "Others": [ "*" ] # Leporidae", "Rodent", "Avian", "Ferret", "Camel", "Mongoose", "Bat", "Primate", "Shrew", "Deer", "Hare", "Canine" ]
-  training_settings:
-    n_epochs: 50
-    max_lr: 1e-5
-    pct_start: 0.10
-    div_factor: 25.0
-    final_div_factor: 10000.0
   models:
-    - name: "fnn-l_10-lr1e-3-orf1"
+    - name: "fnn-l_10-lr1e-4"
       active: False
-      mode: "train" # supported values: train, test
+      mode: "test" # supported values: train, test
+      model_path: ""
       loss: "FocalLoss"
       depth: 10
       n_tokens: 27
@@ -64,22 +43,25 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "cnn-l_4-lr1e-3-orf1"
+    - name: "cnn-l_4-lr1e-4"
       active: False
-      mode: "train" # supported values: train, test
+      mode: "test" # supported values: train, test
+      model_path: "output/raw/hev/20231012/host_multi_e50/orf2/cnn-l_4-lr1e-3-orf2_itr0.pth"
       loss: "FocalLoss"
       depth: 4
       n_tokens: 27
       n_classes: 3
+      n_epochs: 50
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       kernel_size: 3
       stride: 1
       manual_seed:  # whole numbers
 
-    - name: "rnn-l_6-lr1e-5-orf1"
-      active: True
-      mode: "train" # supported values: train, test
+    - name: "rnn-l_6-lr1e-4"
+      active: False
+      mode: "test" # supported values: train, test
+      model_path: "output/raw/hev/20231012/host_multi_e50/orf2/rnn-l_6-lr1e-5-orf2_itr0.pth"
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
       n_tokens: 27
@@ -88,9 +70,10 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "lstm-l_2-lr1e-3-orf1"
+    - name: "lstm-l_2-lr1e-4"
       active: False
-      mode: "train" # supported values: train, test
+      mode: "test" # supported values: train, test
+      model_path: "output/raw/hev/20231012/host_multi_e50/orf2/lstm-l_2-lr1e-3-orf2_itr0.pth"
       loss: "FocalLoss"
       depth: 2
       n_tokens: 27
@@ -99,9 +82,10 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "transformer-l_6-h_8-lr1e-4-orf1"
-      active: False
-      mode: "train" # supported values: train, test
+    - name: "transformer-l_6-h_8-lr1e-4"
+      active: True
+      mode: "test" # supported values: train, test
+      model_path: "output/raw/hev/20231012/host_multi_e50/orf2/transformer-l_6-h_8-lr1e-4-orf2_itr0.pth"
       loss: "FocalLoss"
       with_convolution: False
       n_heads: 8
@@ -115,5 +99,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "hev/20231012/host_multi_e50/orf1"
-  prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "hev/20231017/perturbed_dataset_prediction/orf2-aligned/transformer-l_6-h_8-lr1e-4"
+  prefix: "tf" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

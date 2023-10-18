@@ -29,17 +29,14 @@ LOGS_DIR=$PROJECT_DIR/output/logs
 echo "Project directory: $PROJECT_DIR"
 
 # Execute python script
-SCRIPT_LOCATION=$PROJECT_DIR/src/zoonosis.py
-CONFIG_FILE=$2
+SCRIPT_LOCATION=$2
+ARGS=$2
 LOG_FILE=$LOGS_DIR/$3.$(date +%Y_%b_%d_%H_%M).log
-echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
-echo "GPU check"
-~/anaconda3/envs/zoonosis/bin/python -c "import torch; print(f'GPU available: {torch.cuda.is_available()}')"
-echo "Zoonosis NLP models START"
+echo "Zoonosis Script START"
 date
 ~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
-echo "Zoonosis NLP models END"
+echo "Zoonosis Script END"
 date
 
 
