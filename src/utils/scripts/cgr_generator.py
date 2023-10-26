@@ -23,17 +23,6 @@ def parse_args():
     return args
 
 
-# Returns a config map for the yaml at the path specified
-def parse_config(config_file_path):
-    config = None
-    try:
-        with open(config_file_path, "r") as f:
-            config = yaml.load(f, Loader=yaml.SafeLoader)
-    except yaml.YAMLError as err:
-        print(f"Error parsing config file: {err}")
-    return config
-
-
 def get_vertex_coordinates(sequence_type):
     center = (0, 0)
     radius = 1

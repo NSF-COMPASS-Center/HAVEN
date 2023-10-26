@@ -77,5 +77,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20230830/host_multi_val_test_e50"
-  prefix: "auprc"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "uniref90/20231022/host_multi_val_test_e50"
+  prefix: "host_multi_all_models"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

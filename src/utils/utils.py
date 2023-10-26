@@ -8,6 +8,7 @@ from imblearn.over_sampling import RandomOverSampler
 from pathlib import Path
 import os
 from sklearn.utils.class_weight import compute_class_weight
+import yaml
 
 ### functions related to labels, grouping, and label vocabulary
 
@@ -137,3 +138,14 @@ def random_oversampling(X, y):
     vals, count = np.unique(y_resampled, return_counts=True)
     print(f"Label counts after resampling = {[*zip(vals, count)]}")
     return X_resampled, y_resampled
+
+
+# Returns a config map for the yaml at the path specified
+def parse_config(config_file_path):
+    config = None
+    try:
+        with open(config_file_path, 'r') as f:
+            config = yaml.load(f, Loader=yaml.SafeLoader)
+    except yaml.YAMLError as err:
+        print(f"Error parsing config file: {err}")
+    return config

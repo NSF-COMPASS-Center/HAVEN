@@ -9,7 +9,8 @@ import ast
 NUCLEOTIDE = "nucleotide"
 PROTEIN = "protein"
 ID_COL = "id"
-SEQ_COL = "seq"
+SEQ_COL = "seq_aligned"
+NON_TOKEN = "-"
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Generate perturbed sequences for a given dataset')
@@ -39,8 +40,13 @@ def perturb_sequence(id, sequence, sequence_vocab):
 
     # index: perturbed_position
     for index, orig_token in enumerate(sequence):
-        # by replcaing with every possiblt token in the vocab, we are creating a duplicate of the original sequence
+        # by replacing with every possible token in the vocab, we are creating a duplicate of the original sequence
         # we will remove these duplicate sequences at the end
+
+        # create new sequence only for positions with aligned tokens
+        if orig_token == NON_TOKEN:
+            continue
+
         for new_token in sequence_vocab:
             # format for id = <orig_id>_<orig_token>_<index>_<new_token>
             new_id = f"{id}_{orig_token}_{index}_{new_token}"
@@ -70,17 +76,6 @@ def generate_perturbed_sequences(input_files, output_dir, sequence_type):
             perturbed_sequences_count += perturbed_df.shape[0]
 
         print(f"Processed input file: {input_file}. Perturbed sequences count = {perturbed_sequences_count}")
-
-
-# Returns a config map for the yaml at the path specified
-def parse_config(config_file_path):
-    config = None
-    try:
-        with open(config_file_path, 'r') as f:
-            config = yaml.load(f, Loader=yaml.SafeLoader)
-    except yaml.YAMLError as err:
-        print(f"Error parsing config file: {err}")
-    return config
 
 
 def main():

@@ -16,7 +16,7 @@ class ProteinSequenceDataset(Dataset):
                                "L": 11, "K": 12, "M": 13, "F": 14, "P": 15,
                                "O": 16, "S": 17, "U": 18, "T": 19, "W": 20,
                                "Y": 21, "V": 22, "B": 23, "Z": 24, "X": 25,
-                               "J": 26}
+                               "J": 26, "-": 0}
         self.data = df
         if truncate:
             self.data = self.truncate_dataset(df)

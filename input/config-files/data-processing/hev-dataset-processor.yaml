@@ -7,13 +7,14 @@
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "data"
+  input_dir: "input/data"
 
   # Subdirectory of inputs that datasets are placed in
-  dataset_dir: "hev"
+  dataset_dir: "hev/aligned"
 
   # Name of file(s) in subdirectory to be read and processed.
-  file_names: ["ORF1.fa","ORF2.fa", "ORF3.fa", "ORF4.fa"]
+  file_names: ["hev_orf1_alignment_ba.fasta", "hev_orf2_alignment_ba.fasta",
+               "hev_orf3_alignment_ba.fasta", "hev_orf4_alignment_ba.fasta"]
 
 
 processor_settings:
@@ -21,8 +22,8 @@ processor_settings:
 
 
 output_settings:
-  output_dir: "input/data"
-  dataset_dir: "hev"
+  output_dir: "input/data/"
+  dataset_dir: "hev/aligned"
   prefix: # default: none; default file name = <file_name>_processed.csv
 
 

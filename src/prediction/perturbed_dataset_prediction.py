@@ -89,7 +89,7 @@ def execute(input_settings, output_settings, classification_settings):
 
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
     # create any missing parent directories
-    Path(os.path.dirname(output_results_dir)).mkdir(parents=True, exist_ok=True)
+    Path(output_results_dir).mkdir(parents=True, exist_ok=True)
 
     # already present output files
     preexisting_output_files = os.listdir(output_results_dir)
@@ -98,7 +98,7 @@ def execute(input_settings, output_settings, classification_settings):
         if is_input_file_processed(input_file, preexisting_output_files):
             print(f"Skipping preprocessed input: {input_file}")
             continue
-
+        print(input_file)
         # 1. Read the input data file
         df = dataset_utils.read_dataset(input_dir, [input_file],
                                 cols=[id_col, sequence_col])

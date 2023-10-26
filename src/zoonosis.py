@@ -5,6 +5,7 @@ import yaml
 from prediction import prediction
 from evaluation import evaluation
 from models.baseline import feature_importance
+from utils import utils
 
 
 def parse_args():
@@ -14,21 +15,9 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-
-# Returns a config map for the yaml at the path specified
-def parse_config(config_file_path):
-    config = None
-    try:
-        with open(config_file_path, 'r') as f:
-            config = yaml.load(f, Loader=yaml.SafeLoader)
-    except yaml.YAMLError as err:
-        print(f"Error parsing config file: {err}")
-    return config
-
-
 def main():
     args = parse_args()
-    config = parse_config(args.config)
+    config = utils.parse_config(args.config)
     config_type = config["config_type"]
     if config_type == "prediction":
         prediction.execute(config)
