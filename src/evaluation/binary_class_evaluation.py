@@ -39,11 +39,11 @@ class BinaryClassEvaluation(EvaluationBase):
     def plot_visualizations(self):
         super()
         if self.evaluation_settings["auroc"]:
-            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auroc", self.visualization_output_file_path + "_auroc_boxplot.png")
-            visualization_utils.curve_plot(df=self.roc_curves_df, x_col="fpr", y_col="tpr", color_group_col=self.experiment_col, style_group_col=self.itr_col, output_file_path=self.visualization_output_file_path + "_roc_curves.png")
+            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auroc", self.visualization_output_file_path + "_auroc_boxplot.pdf")
+            visualization_utils.curve_plot(df=self.roc_curves_df, x_col="fpr", y_col="tpr", color_group_col=self.experiment_col, style_group_col=self.itr_col, output_file_path=self.visualization_output_file_path + "_roc_curves.pdf")
         if self.evaluation_settings["auprc"]:
-            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auprc", self.visualization_output_file_path + "_auprc_boxplot.png")
+            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auprc", self.visualization_output_file_path + "_auprc_boxplot.pdf")
             visualization_utils.curve_plot(df=self.pr_curves_df, x_col="recall", y_col="precision",
                                            color_group_col=self.experiment_col, style_group_col=self.itr_col,
-                                           output_file_path=self.visualization_output_file_path + "_precision_recall_curves.png")
+                                           output_file_path=self.visualization_output_file_path + "_precision_recall_curves.pdf")
         return

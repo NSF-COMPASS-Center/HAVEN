@@ -83,9 +83,9 @@ class EvaluationBase:
 
     def plot_visualizations(self):
         if self.evaluation_settings["accuracy"]:
-            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "accuracy", self.visualization_output_file_path + "_accuracy_boxplot.png")
+            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "accuracy", self.visualization_output_file_path + "_accuracy_boxplot.pdf")
         if self.evaluation_settings["f1"]:
-            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "f1", self.visualization_output_file_path + "_f1_boxplot.png")
+            visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "f1", self.visualization_output_file_path + "_f1_boxplot.pdf")
         if self.evaluation_settings["prediction_distribution"]:
             self.prediction_distribution()
         return
@@ -107,7 +107,7 @@ class EvaluationBase:
         result_df = pd.concat(result)
         result_df.to_csv(self.evaluation_output_file_path + "class_distribution.csv")
         visualization_utils.class_distribution_plot(result_df,
-                                                    self.visualization_output_file_path + "class_distribution.png")
+                                                    self.visualization_output_file_path + "class_distribution.pdf")
 
     def compute_accuracy(self, df_itr) -> float:
         pass

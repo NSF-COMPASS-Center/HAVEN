@@ -98,7 +98,7 @@ def execute(input_settings, output_settings, classification_settings):
         if is_input_file_processed(input_file, preexisting_output_files):
             print(f"Skipping preprocessed input: {input_file}")
             continue
-
+        print(input_file)
         # 1. Read the input data file
         df = dataset_utils.read_dataset(input_dir, [input_file],
                                 cols=[id_col, sequence_col])

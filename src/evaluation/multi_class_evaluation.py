@@ -63,16 +63,16 @@ class MultiClassEvaluation(EvaluationBase):
         itr_selected = sample(list(self.evaluation_metrics_df[self.itr_col].values), 1).pop()
         if self.evaluation_settings["auroc"]:
             visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auroc",
-                                         self.visualization_output_file_path + "_auroc_boxplot.png")
+                                         self.visualization_output_file_path + "_auroc_boxplot.pdf")
 
             visualization_utils.curve_plot(df=self.roc_curves_df[self.roc_curves_df[self.itr_col] == itr_selected], x_col="fpr", y_col="tpr",
                                            color_group_col=self.class_col, style_group_col=self.experiment_col,
-                                           output_file_path=self.visualization_output_file_path + "_roc_curves.png", metadata=self.metadata)
+                                           output_file_path=self.visualization_output_file_path + "_roc_curves.pdf", metadata=self.metadata)
         if self.evaluation_settings["auprc"]:
             visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auprc",
-                                         self.visualization_output_file_path + "_auprc_boxplot.png")
+                                         self.visualization_output_file_path + "_auprc_boxplot.pdf")
             visualization_utils.curve_plot(df=self.pr_curves_df[self.pr_curves_df[self.itr_col] == itr_selected], x_col="recall", y_col="precision",
                                            color_group_col=self.class_col, style_group_col=self.experiment_col,
-                                           output_file_path=self.visualization_output_file_path + "_precision_recall_curves.png", metadata=self.metadata)
+                                           output_file_path=self.visualization_output_file_path + "_precision_recall_curves.pdf", metadata=self.metadata)
         return
 

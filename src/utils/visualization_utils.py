@@ -4,11 +4,16 @@ import seaborn as sns
 
 def box_plot(df, x_col, y_col, output_file_path, baseline=None):
     pre_plot_config()
+    plt.rcParams['figure.autolayout'] = True
+    plt.rcParams['xtick.labelsize'] = 18
+    plt.rcParams['ytick.labelsize'] = 18
     ax = sns.boxplot(data=df, x=x_col, y=y_col)
     # sns.stripplot(data=df, x=x_col, y=y_col, jitter=False, marker="o", color="black", alpha=0.7, linewidth=0.5, ax=ax)
     if baseline is not None:
         ax.axhline(baseline, color="gray", linestyle="--")
     ax.set_ylim(0, 1)
+    ax.set_ylabel("AUPRC", fontsize=20)
+    ax.set_xlabel(" ", fontsize=20)
     plt.xticks(rotation=-90)
     view(output_file_path)
 
@@ -72,12 +77,12 @@ def pre_plot_config(figsize=(10, 10)):
     plt.clf()
     plt.figure(figsize=figsize)
     sns.set_theme()
+    plt.rcParams['figure.autolayout'] = True
+    plt.rcParams['xtick.labelsize'] = 24
+    plt.rcParams['ytick.labelsize'] = 24
 
 
 def view(output_file_path=None):
-    plt.rcParams['figure.autolayout'] = True
-    plt.rcParams['xtick.labelsize'] = 16
-    plt.rcParams['ytick.labelsize'] = 16
     plt.tight_layout()
     if output_file_path:
         plt.savefig(output_file_path)

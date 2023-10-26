@@ -47,8 +47,9 @@ def post_process_output(input_dir, output_dir):
         Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
         df.to_csv(output_file_path, index=False)
 
-    print(f"ERROR: Skipped processing following {len(processing_error)} files due to filename not conforming to the expected sequence id pattern:")
-    print("\n".join(processing_error))
+    if len(processing_error) > 0:
+        print(f"ERROR: Skipped processing following {len(processing_error)} files due to filename not conforming to the expected sequence id pattern:")
+        print("\n".join(processing_error))
 
 
 def main():
