@@ -1,13 +1,40 @@
 import torch.nn as nn
 from models.nlp.embedding.embedding import EmbeddingLayer, ConvolutionEmbeddingLayer
 from models.nlp.transformer.encoder import EncoderLayer, Encoder
+from models.nlp.transformer.decoder import DecoderLayer, Decoder
+from models.nlp.transformer.generator import Generator
 from utils import nn_utils
 
 
 # self implementation
+
+# encoder-decoder architecture
 class Transformer(nn.Module):
     def __init__(self, n_tokens, max_seq_len, n_classes, N=6, input_dim=512, hidden_dim=1024, h=8):
         super(Transformer, self).__init__()
+        self.source_embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
+        self.target_embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
+        self.encoder = Encoder(EncoderLayer(h, input_dim, hidden_dim), N)
+        self.decoder = Decoder(DecoderLayer(h, input_dim, hidden_dim), N)
+        self.generator = Generator(d=hidden_dim, vocab_size=n_tokens)
+
+    def forward(self, source, target, source_mask, target_mask):
+        source_emb = self.source_embedding(source)
+        source_emb = self.encoder(X=source_emb,
+                                  mask=source_mask)
+        decoder_emb = self.decoder(X=target,
+                                   source_emb=source_emb,
+                                   source_mask=source_mask,
+                                   target_mask=target_mask)
+
+        # generate the next token using the decoder_emb
+        y = self.generator(decoder_emb)
+        return y
+
+# only encoder
+class TransformerEncoder(nn.Module):
+    def __init__(self, n_tokens, max_seq_len, n_classes, N=6, input_dim=512, hidden_dim=1024, h=8):
+        super(TransformerEncoder, self).__init__()
         self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
         self.encoder = Encoder(EncoderLayer(h, input_dim, hidden_dim), N)
         self.linear = nn.Linear(input_dim, n_classes)

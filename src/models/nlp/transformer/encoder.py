@@ -13,8 +13,8 @@ class EncoderLayer(nn.Module):
         self.feed_forward = FeedForwardLayer(d, d_ff)
         self.residual_connections = nn_utils.create_clones(ResidualConnectionLayer(), 2)
 
-    def forward(self, X):
-        X = self.residual_connections[0](X, lambda X: self.self_attn(X, X, X))
+    def forward(self, X, mask):
+        X = self.residual_connections[0](X, lambda X: self.self_attn(X, X, X, mask))
         return self.residual_connections[1](X, self.feed_forward)
 
 
@@ -25,9 +25,9 @@ class Encoder(nn.Module):
         self.norm = NormalizationLayer()
         self.encoding = None
 
-    def forward(self, X):
+    def forward(self, X, mask=None):
         # pass through each layer sequentially
         for layer in self.layers:
-            X = layer(X)
+            X = layer(X, mask)
         self.encoding = self.norm(X)
         return self.encoding

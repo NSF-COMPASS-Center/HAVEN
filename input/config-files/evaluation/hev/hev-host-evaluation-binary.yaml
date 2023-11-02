@@ -17,6 +17,7 @@ input_settings:
     "orf1_tr0.8_rf": "20221206/host_binary/orf1/kmer_k3_host_binary_presplit_rf_output.csv"
     "orf2_tr0.8_rf": "20221206/host_binary/orf2/kmer_k3_host_binary_presplit_rf_output.csv"
     "orf3_tr0.8_rf": "20221206/host_binary/orf3/kmer_k3_host_binary_presplit_rf_output.csv"
+    "orf_all_tr0.8_proteinbert": "20230124/host_binary/orf1_orf2_orf3_orf4/proteinbert_host_binary_presplit_output.csv"
 
 evaluation_settings:
   type: "binary"
