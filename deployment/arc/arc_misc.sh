@@ -7,7 +7,7 @@
 #SBATCH --mem=180G
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
-#SBATCH -t 72:00:00 # wall-time required (# 96hrs)
+#SBATCH -t 6:00:00 # wall-time required (# 96hrs)
 
 
 # Load modules
@@ -30,13 +30,16 @@ echo "Project directory: $PROJECT_DIR"
 
 # Execute python script
 SCRIPT_LOCATION=$2
-ARGS=$2
-LOG_FILE=$LOGS_DIR/$3.$(date +%Y_%b_%d_%H_%M).log
+shift # shift all arguments one to the left. So $1 is dropped, $1 is now original $2 and so on and so forth
+shift # shift all arguments one to the left again. So $2 is dropped this time, $1 is now original $3 and so on and so forth
+ARGS="$@" # all the remaining args
+
+LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Log File: $LOG_FILE"
-echo "Zoonosis Script START"
+echo "Zoonosis Miscellaneous Script START"
 date
-~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
-echo "Zoonosis Script END"
+~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION $ARGS > $LOG_FILE >&2
+echo "Zoonosis Miscellaneous Script END"
 date
 
 

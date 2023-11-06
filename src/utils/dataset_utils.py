@@ -1,7 +1,16 @@
 from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader
+
 import pandas as pd
 import os
+
 from utils import utils, nn_utils, kmer_utils
+from datasets.protein_sequence_dataset import ProteinSequenceDataset
+from datasets.protein_sequence_unlabeled_dataset import ProteinSequenceUnlabeledDataset
+from datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWithID
+from datasets.protein_sequence_kmer_dataset import ProteinSequenceKmerDataset
+from datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
+
 
 # read datasets using config properties
 def read_dataset(input_dir, input_file_names, cols):
@@ -54,3 +63,68 @@ def load_dataset(input_dir, input_file_names, seed, train_proportion, id_col, se
     kmer_df = kmer_df.join(df["split"], on=id_col, how="left")
     print(f"kmer_df size after join with split on id = {kmer_df.shape}")
     return index_label_map, kmer_df
+
+def get_dataset_loader(df, sequence_settings, label_col=None, include_id_col=False, exclude_label=False):
+    feature_type = sequence_settings["feature_type"]
+    # supported values: kmer, cgr, token
+    if feature_type == "kmer":
+        return get_kmer_dataset_loader(df, sequence_settings, label_col)
+    elif feature_type == "cgr":
+        return get_cgr_dataset_loader(df, sequence_settings, label_col)
+    elif feature_type == "token":
+        if include_id_col:
+            return get_token_with_id_dataset_loader(df, sequence_settings, label_col)
+        else:
+            return get_token_dataset_loader(df, sequence_settings, label_col, exclude_label)
+    else:
+        print(f"ERROR: Unsupported feature type: {feature_type}")
+
+
+def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
+    seq_col = sequence_settings["sequence_col"]
+    batch_size = sequence_settings["batch_size"]
+    max_seq_len = sequence_settings["max_sequence_length"]
+    pad_sequence_val = sequence_settings["pad_token_val"]
+    truncate = sequence_settings["truncate"]
+
+    dataset = None
+    if exclude_label:
+        dataset = ProteinSequenceUnlabeledDataset(df, seq_col, max_seq_len, truncate)
+    else:
+        dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, label_col)
+
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
+                      collate_fn=Padding(max_seq_len, pad_sequence_val))
+
+
+def get_token_with_id_dataset_loader(df, sequence_settings, label_col):
+    seq_col = sequence_settings["sequence_col"]
+    id_col = sequence_settings["id_col"]
+    batch_size = sequence_settings["batch_size"]
+    max_seq_len = sequence_settings["max_sequence_length"]
+    pad_sequence_val = sequence_settings["pad_token_val"]
+    truncate = sequence_settings["truncate"]
+
+
+    dataset = ProteinSequenceDatasetWithID(df, id_col, seq_col, max_seq_len, truncate, label_col)
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
+                      collate_fn=PaddingWithID(max_seq_len, pad_sequence_val))
+
+
+def get_kmer_dataset_loader(df, sequence_settings, label_col):
+    dataset = ProteinSequenceKmerDataset(df,
+                                         id_col=sequence_settings["id_col"],
+                                         sequence_col=sequence_settings["sequence_col"],
+                                         label_col=label_col,
+                                         k=sequence_settings["kmer_settings"]["k"],
+                                         kmer_keys=sequence_settings["kmer_keys"])
+    return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
+
+
+def get_cgr_dataset_loader(df, sequence_settings, label_col):
+    dataset = ProteinSequenceCGRDataset(df,
+                                        id_col=sequence_settings["id_col"],
+                                        label_col=label_col,
+                                        img_dir=sequence_settings["cgr_settings"]["img_dir"],
+                                        img_size=sequence_settings["cgr_settings"]["img_size"])
+    return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
