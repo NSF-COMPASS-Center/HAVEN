@@ -27,8 +27,9 @@ def scaled_dot_product_attention(Q, K, V, mask=None):
 
     # mask is used while training the decoder
     if mask is not None:
+        mask = mask.unsqueeze(1) # add a dimension for the heads in multihead attention
         # replace all zero entries with negative infinity
-        scores = scores.masked_fill(mask == 0, -1e9)
+        scores = scores.masked_fill(mask, -1e9)
 
     # softmax
     attn = F.softmax(scores, dim=-1)

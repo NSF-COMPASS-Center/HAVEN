@@ -2,8 +2,6 @@ import torch.nn as nn
 import torch
 import copy
 
-from models.nlp.embedding.padding import Padding
-from models.nlp.embedding.padding_with_id import PaddingWithID
 from training.focal_loss import FocalLoss
 
 

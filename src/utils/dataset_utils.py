@@ -5,6 +5,7 @@ import pandas as pd
 import os
 
 from utils import utils, nn_utils, kmer_utils
+from models.nlp.embedding.padding import Padding, PaddingUnlabeled
 from datasets.protein_sequence_dataset import ProteinSequenceDataset
 from datasets.protein_sequence_unlabeled_dataset import ProteinSequenceUnlabeledDataset
 from datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWithID
@@ -25,8 +26,14 @@ def read_dataset(input_dir, input_file_names, cols):
     print(f"Size of input dataset = {df.shape}")
     return df
 
+def split_dataset(df, seed, train_proportion):
+    print(f"Splitting dataset with seed={seed}, train_proportion={train_proportion}")
+    train_df, test_df = train_test_split(df, train_size=train_proportion, random_state=seed)
+    print(f"Size of train_dataset = {train_df.shape}")
+    print(f"Size of test_dataset = {test_df.shape}")
+    return train_df, test_df
 
-def split_dataset(df, seed, train_proportion, stratify_col=None):
+def split_dataset_stratified(df, seed, train_proportion, stratify_col=None):
     print(f"Splitting dataset with seed={seed}, train_proportion={train_proportion}, stratify_col={stratify_col}")
     train_df, test_df = train_test_split(df, train_size=train_proportion, random_state=seed, stratify=df[stratify_col])
     print(f"Size of train_dataset = {train_df.shape}")
@@ -50,8 +57,8 @@ def load_dataset(input_dir, input_file_names, seed, train_proportion, id_col, se
     df = read_dataset(input_dir, input_file_names,
                             cols=[id_col, seq_col, label_col])
     df, index_label_map = utils.transform_labels(df, label_settings, classification_type=classification_type)
-    train_df, test_df = split_dataset(df, seed, train_proportion,
-                                            stratify_col=label_col)
+    train_df, test_df = split_dataset_stratified(df, seed, train_proportion,
+                                                 stratify_col=label_col)
     train_df[split_col] = "train"
     test_df[split_col] = "test"
     df = pd.concat([train_df, test_df])
@@ -88,13 +95,15 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
     truncate = sequence_settings["truncate"]
 
     dataset = None
+    collate_func = None
     if exclude_label:
         dataset = ProteinSequenceUnlabeledDataset(df, seq_col, max_seq_len, truncate)
+        collate_func = PaddingUnlabeled(max_seq_len, pad_sequence_val)
     else:
         dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, label_col)
+        collate_func = Padding(max_seq_len, pad_sequence_val)
 
-    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
-                      collate_fn=Padding(max_seq_len, pad_sequence_val))
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func)
 
 
 def get_token_with_id_dataset_loader(df, sequence_settings, label_col):

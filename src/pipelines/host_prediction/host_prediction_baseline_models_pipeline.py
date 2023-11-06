@@ -48,8 +48,8 @@ def execute(input_settings, output_settings, classification_settings):
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                      classification_type=classification_settings["type"])
         # 3. Split dataset
-        train_df, test_df = dataset_utils.split_dataset(df, input_split_seeds[iter],
-                                                classification_settings["train_proportion"], stratify_col=label_col)
+        train_df, test_df = dataset_utils.split_dataset_stratified(df, input_split_seeds[iter],
+                                                                   classification_settings["train_proportion"], stratify_col=label_col)
 
         train_df["split"] = "train"
         test_df["split"] = "test"

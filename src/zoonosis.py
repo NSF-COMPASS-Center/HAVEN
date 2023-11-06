@@ -21,7 +21,7 @@ def main():
     config_type = config["config_type"]
     # transfer-learning
     if config_type == "transfer_learning":
-        config_sub_type = config_type["config_sub_type"]
+        config_sub_type = config["config_sub_type"]
         # transfer-learning: pre-training
         if config_sub_type == "masked_language_modeling":
             masked_language_modeling_pipleine.execute(config)

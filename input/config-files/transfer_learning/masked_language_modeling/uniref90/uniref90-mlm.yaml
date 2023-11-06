@@ -17,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 64
+    batch_size: 4
     id_col: "uniref90_id"
     sequence_col: "seq"
     max_sequence_length: 1114 # 6630 # 1024 # 1115
@@ -26,15 +26,14 @@ sequence_settings:
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 mlm_settings:
-  mask_token_val: 2
   no_mask_token_vals: [ 0 ]
-  n_tokens: 27
+  n_tokens: 26
   mask_prob: 0.15
   random_mask_prob: 0.1
   no_change_mask_prob: 0.1
 
 encoder_settings:
-  model_name: "transformer_encoder-l_6-h_8-lr1e-4"
+  model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
   n_heads: 8
   depth: 6
   input_dim: 512 # input embedding dimension
