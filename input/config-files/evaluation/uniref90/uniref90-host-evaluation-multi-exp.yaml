@@ -53,7 +53,12 @@ input_settings:
 #    "TF-CNV-k4s4-Focal": "20230705/host_multi_msl1114_baseline_focal/emb_sincos-d_1024-n_2-loss_focalce_transformer-conv-k4s4_output.csv"
 #    "TF-CNV-k3s1-MSL1024-Focal": "20230705/host_multi_msl1114_baseline_focal/msl_1024-emb_sincos-d_1024-n_2-loss_focalce_transformer-conv_output.csv"
 #    "TF-CNV-k4s4-MSL1024-Focal": "20230705/host_multi_msl1114_baseline_focal/msl_1024-emb_sincos-d_1024-n_2-loss_focalce_transformer-conv-k4s4_output.csv"
-
+    "TF-MLM-lr1e-4-e50-FNN-2L-lr1e-3-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_hostpred_ffn_msl1114_host_prediction_output.csv"
+    "TF-MLM-lr1e-4-e50-FNN-2L-lr1e-4-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_host_prediction_fnn_2l_lr1e-4_msl1114_host_prediction_fnn_2l_lr1e-4_output.csv"
+    "TF-MLM-lr1e-4-e50-FNN-2L-lr1e-5-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_host_prediction_fnn_2l_lr1e-5_msl1114_host_prediction_fnn_2l_lr1e-5_output.csv"
+   # "TF-MLM-lr1e-4-e50-FNN-4L-lr1e-3-e50-": "20231105/fine_tuning/host_prediction/mlm_tfencoder_hostpred_ffn_msl1114_host_prediction_output.csv"
+    "TF-MLM-lr1e-4-e50-FNN-4L-lr1e-4-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_host_prediction_fnn_4l_lr1e-4_msl1114_host_prediction_fnn_4l_lr1e-4_output.csv"
+    "TF-MLM-lr1e-4-e50-FNN-4L-lr1e-5-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_host_prediction_fnn_4l_lr1e-5_msl1114_host_prediction_fnn_4l_lr1e-5_output.csv"
 evaluation_settings:
   type: "multi"
   # metrics
@@ -77,5 +82,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20231022/host_multi_val_test_e50"
+  dataset_dir: "uniref90/20231107/host_multi_val_test_e50_transfer_learning"
   prefix: "host_multi_all_models"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

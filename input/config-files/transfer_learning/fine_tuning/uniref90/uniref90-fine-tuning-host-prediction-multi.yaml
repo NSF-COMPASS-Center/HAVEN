@@ -38,13 +38,14 @@ pre_train_settings:
 
 fine_tune_settings:
   n_iterations: 5
+
   split_input: True
   train_proportion: 0.8
   classification_type: "multi"
 
   training_settings:
     n_epochs: 50
-    max_lr: 1e-3
+    max_lr: 1e-5
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -64,12 +65,12 @@ fine_tune_settings:
       "Others": [ "*" ]
 
   task_settings:
-    - name: "host_prediction"
+    - name: "host_prediction_fnn_4l_lr1e-5"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       loss: "FocalLoss"
-      depth: 2
+      depth: 4
       n_classes: 9
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
@@ -78,4 +79,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "uniref90/20231105/fine_tuning/host_prediction"
-  prefix: "mlm_tfencoder_hostpred_ffn_msl1114" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "mlm_tfencoder_msl1114" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
