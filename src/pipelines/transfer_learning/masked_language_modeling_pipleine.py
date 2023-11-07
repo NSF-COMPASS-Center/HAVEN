@@ -147,13 +147,15 @@ def evaluate_model(model, dataset_loader, criterion, tbw, encoder_model_name, ep
         model.eval()
 
         val_loss = []
-        for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
-            input, label = record
+        for _, input in enumerate(pbar := tqdm.tqdm(dataset_loader)):
 
-            output = model(input)  # b x n_classes
-            output = output.to(nn_utils.get_device())
-
+            output, label = model(input)
+            # transpose from b x max_seq_len x n_tokens -> b x n_tokens x max_seq_len
+            # because CrossEntropyLoss expected input to be of the shape b x n_classes x number_dimensions_for_loss
+            # in this case, number_of_dimensions for loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
+            output = output.transpose(1, 2).to(nn_utils.get_device())
             loss = criterion(output, label.long())
+            
             curr_val_loss = loss.item()
             model.test_iter += 1
             if log_loss:
