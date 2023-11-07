@@ -109,7 +109,7 @@ def execute(config):
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = iter
-            results[model_name].append(result_df)
+            results[task_name].append(result_df)
             torch.save(fine_tune_model.state_dict(), fine_tune_model_filepath.format(task_name=task_name, itr=iter))
 
     # write the raw results in csv files
