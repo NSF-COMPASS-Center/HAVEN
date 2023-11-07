@@ -22,12 +22,18 @@ sequence_settings:
     sequence_col: "seq"
     max_sequence_length: 1114 # 6630 # 1024 # 1115
     truncate: False
-    pad_sequence_val: 0
+    pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 pre_train_settings:
-  model_name: "masked_language_model"
+  model_name: "masked_language_modeling"
   model_path: ""
+  encoder_settings:
+    model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
+    n_heads: 8
+    depth: 6
+    input_dim: 512 # input embedding dimension
+    hidden_dim: 1024
 
 fine_tune_settings:
   n_iterations: 5
@@ -63,7 +69,7 @@ fine_tune_settings:
       fine_tuned_model_path: ""
       loss: "FocalLoss"
       depth: 2
-      n_tokens: 27
+      n_tokens: 26
       n_classes: 9
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024

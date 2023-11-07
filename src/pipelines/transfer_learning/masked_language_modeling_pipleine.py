@@ -137,7 +137,7 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
             f"{encoder_model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
 
     # Validation
-    _, val_loss = evaluate_model(model, val_dataset_loader, criterion, tbw, encoder_model_name, epoch, log_loss=True)
+    val_loss = evaluate_model(model, val_dataset_loader, criterion, tbw, encoder_model_name, epoch, log_loss=True)
     early_stopper(val_loss)
     return model
 
@@ -155,7 +155,7 @@ def evaluate_model(model, dataset_loader, criterion, tbw, encoder_model_name, ep
             # in this case, number_of_dimensions for loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
             output = output.transpose(1, 2).to(nn_utils.get_device())
             loss = criterion(output, label.long())
-            
+
             curr_val_loss = loss.item()
             model.test_iter += 1
             if log_loss:

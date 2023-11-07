@@ -30,10 +30,11 @@ def execute(config):
 
     sequence_settings = config["sequence_settings"]
     pre_train_settings = config["pre_train_settings"]
-
+    pre_train_encoder_settings = config[""]
     fine_tune_settings = config["fine_tune_settings"]
     label_settings = fine_tune_settings["label_settings"]
     training_settings = fine_tune_settings["training_settings"]
+
     n_iters = fine_tune_settings["n_iterations"]
 
     tasks = config["task_settings"]
