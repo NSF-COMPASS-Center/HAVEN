@@ -49,6 +49,11 @@ def execute(config):
     pad_token_val = sequence_settings["pad_token_val"]
     results = {}
 
+    # Path to store the pre-trained encoder model
+    encoder_model_name = encoder_settings["model_name"]
+    encoder_model_filepath = os.path.join(output_dir, results_dir, sub_dir, encoder_model_name + "_itr{itr}.pth")
+    Path(os.path.dirname(encoder_model_filepath)).mkdir(parents=True, exist_ok=True)
+
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
@@ -69,16 +74,13 @@ def execute(config):
 
         # 3. instantiate the encoder model
         encoder_model = transformer.get_transformer_encoder(encoder_settings)
-        encoder_model_name = encoder_settings["model_name"]
-        encoder_model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{encoder_model_name}_itr{itr}.pth")
-        Path(os.path.dirname(encoder_model_filepath)).mkdir(parents=True, exist_ok=True)
 
         # 4. instantiate the mlm model
         mlm_model = pre_training_masked_language_modeling.get_mlm_model(encoder_model=encoder_model,
                                                                         mlm_model=mlm_settings)
         mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
                         training_settings, encoder_model_name, pad_token_val)
-        torch.save(mlm_model.encoder_model.state_dict(), model_filepath.format(encoder_model_name=encoder_model_name, itr=iter))
+        torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
 
 def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, training_settings, encoder_model_name, pad_token_val):
     tbw = SummaryWriter()

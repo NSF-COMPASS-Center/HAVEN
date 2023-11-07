@@ -11,6 +11,7 @@ from statistics import mean
 from utils import utils, dataset_utils, nn_utils
 from training.early_stopping import EarlyStopping
 from training.fine_tuning import host_prediction
+from models.nlp.transformer import transformer
 
 
 def execute(config):
@@ -30,15 +31,16 @@ def execute(config):
 
     sequence_settings = config["sequence_settings"]
     pre_train_settings = config["pre_train_settings"]
-    pre_train_encoder_settings = config[""]
+
     fine_tune_settings = config["fine_tune_settings"]
     label_settings = fine_tune_settings["label_settings"]
     training_settings = fine_tune_settings["training_settings"]
 
+    pre_train_encoder_settings = pre_train_settings["encoder_settings"]
+    pre_train_encoder_settings["n_tokens"] += 2  # (accounting for pad_token_val and mask_token_val)
     n_iters = fine_tune_settings["n_iterations"]
 
-    tasks = config["task_settings"]
-
+    tasks = fine_tune_settings["task_settings"]
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
     label_col = label_settings["label_col"]
@@ -64,13 +66,11 @@ def execute(config):
         val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
         test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
 
-        # load pre-trained model
-        pre_trained_model = None
-        if "masked_language_model" in pre_train_settings["model_name"]:
-            pre_trained_model.load_state_dict(torch.load(pre_train_settings["model_path"]))
+        # load pre-trained encoder model
+        pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
+        pre_trained_model.load_state_dict(torch.load(pre_train_settings["model_path"]))
 
         fine_tune_model = None
-
         # model store filepath
         fine_tune_model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{task_name}_itr{itr}.pth")
         Path(os.path.dirname(model_filepath)).mkdir(parents=True, exist_ok=True)
@@ -79,7 +79,7 @@ def execute(config):
             task_name = task["name"]
             mode = model["mode"]
             # Set the pre_trained model within the task config
-            task["pre_trained_model"] = pre_trained_model
+            task["pre_trained_model"] = pre_trained_encoder_model
 
             if task["active"] is False:
                 print(f"Skipping {task_name} ...")
@@ -105,7 +105,7 @@ def execute(config):
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = iter
             results[model_name].append(result_df)
-            torch.save(nlp_model.state_dict(), model_filepath.format(model_name=model_name, itr=iter))
+            torch.save(fine_tune_model.state_dict(), fine_tune_model_filepath.format(task_name=task_name, itr=iter))
 
     # write the raw results in csv files
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
@@ -140,7 +140,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
                 print("Breaking off training loop due to early stop")
                 break
 
-    result_df, _ = evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch=None, log_loss=False)
+    result_df, _ = evaluate_model(model, test_dataset_loader, criterion, tbw, task_name, epoch=None, log_loss=False)
     return result_df, model
 
 
@@ -168,7 +168,7 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         tbw.add_scalar(f"{task_name}/learning-rate", float(curr_lr), model.train_iter)
         tbw.add_scalar(f"{task_name}/training-loss", float(train_loss), model.train_iter)
         pbar.set_description(
-            f"{model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
+            f"{task_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
 
     # Validation
     _, val_loss = evaluate_model(model, val_dataset_loader, criterion, tbw, task_name, epoch, log_loss=True)

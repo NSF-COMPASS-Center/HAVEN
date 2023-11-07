@@ -34,6 +34,7 @@ pre_train_settings:
     depth: 6
     input_dim: 512 # input embedding dimension
     hidden_dim: 1024
+    n_tokens: 26
 
 fine_tune_settings:
   n_iterations: 5
@@ -69,7 +70,6 @@ fine_tune_settings:
       fine_tuned_model_path: ""
       loss: "FocalLoss"
       depth: 2
-      n_tokens: 26
       n_classes: 9
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
