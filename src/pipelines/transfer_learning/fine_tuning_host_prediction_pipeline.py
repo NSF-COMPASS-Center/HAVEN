@@ -38,6 +38,8 @@ def execute(config):
 
     pre_train_encoder_settings = pre_train_settings["encoder_settings"]
     pre_train_encoder_settings["n_tokens"] += 2  # (accounting for pad_token_val and mask_token_val)
+    # add max_sequence_length to pre_train_encoder_settings
+    pre_train_encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"]
     n_iters = fine_tune_settings["n_iterations"]
 
     tasks = fine_tune_settings["task_settings"]
@@ -45,6 +47,10 @@ def execute(config):
     sequence_col = sequence_settings["sequence_col"]
     label_col = label_settings["label_col"]
     results = {}
+
+    # fine_tune_model store filepath
+    fine_tune_model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{task_name}_itr{itr}.pth")
+    Path(os.path.dirname(fine_tune_model_filepath)).mkdir(parents=True, exist_ok=True)
 
     for iter in range(n_iters):
         print(f"Iteration {iter}")
@@ -62,22 +68,21 @@ def execute(config):
         # split testing set into validation and testing datasets in equal proportion
         # so 80:20 will now be 80:10:10
         val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
+        train_df = train_df[:500]
+        val_df = val_df[:50]
+        test_df = test_df[:50]
         train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col)
         val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
         test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
 
         # load pre-trained encoder model
         pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
-        pre_trained_model.load_state_dict(torch.load(pre_train_settings["model_path"]))
+        pre_trained_encoder_model.load_state_dict(torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
 
         fine_tune_model = None
-        # model store filepath
-        fine_tune_model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{task_name}_itr{itr}.pth")
-        Path(os.path.dirname(model_filepath)).mkdir(parents=True, exist_ok=True)
-
         for task in tasks:
             task_name = task["name"]
-            mode = model["mode"]
+            mode = task["mode"]
             # Set the pre_trained model within the task config
             task["pre_trained_model"] = pre_trained_encoder_model
 

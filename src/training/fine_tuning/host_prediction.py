@@ -1,6 +1,8 @@
 from torch import nn
 import torch.nn.functional as F
 
+from utils import nn_utils
+
 
 class HostPrediction(nn.Module):
     def __init__(self, pre_trained_model, input_dim, hidden_dim, depth, n_classes):
@@ -18,7 +20,7 @@ class HostPrediction(nn.Module):
 
 
     def forward(self, X):
-        X = self.pre_trained_model(X)
+        X = self.pre_trained_model(X, mask=None)
         # pool the pre_trained_model embeddings of all tokens in the input sequence using mean
         X = X.mean(dim=1)
         # input linear layer
@@ -26,7 +28,7 @@ class HostPrediction(nn.Module):
         # hidden
         for linear_layer in self.linear_hidden_n:
             X = F.relu(linear_layer(X))
-        y = self.linear_op(self.fnn_emb)
+        y = self.linear_op(X)
         return y
 
 def get_host_prediction_model(task):

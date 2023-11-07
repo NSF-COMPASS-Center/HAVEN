@@ -17,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 64
+    batch_size: 4
     id_col: "uniref90_id"
     sequence_col: "seq"
     max_sequence_length: 1114 # 6630 # 1024 # 1115
@@ -27,7 +27,7 @@ sequence_settings:
 
 pre_train_settings:
   model_name: "masked_language_modeling"
-  model_path: ""
+  model_path: "output\\raw\\uniref90\\20231105\\pre_training\\mlm\\transformer_encoder-l_6-h_8-lr1e-4-mlm_itre_0.pth"
   encoder_settings:
     model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
     n_heads: 8
