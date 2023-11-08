@@ -43,16 +43,16 @@ def split_dataset_stratified(df, seed, train_proportion, stratify_col=None):
 
 def load_dataset(input_dir, input_file_names, sequence_settings, cols, label_settings, label_col, classification_type):
     df = read_dataset(input_dir, input_file_names, cols=cols)
-    return load_dataset_with_df(df[cols], sequence_settings, cols, label_settings, label_col, classification_type)
+    return load_dataset_with_df(df[cols], sequence_settings, label_settings, label_col, classification_type)
 
 
-def load_dataset_with_df(df, sequence_settings, label_settings, label_col):
+def load_dataset_with_df(df, sequence_settings, label_settings, label_col, classification_type):
     df, index_label_map = utils.transform_labels(df, label_settings, classification_type=classification_type)
-    dataset_loader = nn_utils.get_dataset_loader(df, sequence_settings, label_col)
+    dataset_loader = get_dataset_loader(df, sequence_settings, label_col)
     return index_label_map, dataset_loader
 
 
-def load_dataset(input_dir, input_file_names, seed, train_proportion, id_col, seq_col, label_col, label_settings, classification_type, k, kmer_keys=None):
+def load_kmer_dataset(input_dir, input_file_names, seed, train_proportion, id_col, seq_col, label_col, label_settings, classification_type, k, kmer_keys=None):
     split_col = "split"
     df = read_dataset(input_dir, input_file_names,
                             cols=[id_col, seq_col, label_col])
