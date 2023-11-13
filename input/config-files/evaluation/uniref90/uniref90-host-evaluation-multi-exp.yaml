@@ -54,7 +54,7 @@ input_settings:
 #    "TF-CNV-k3s1-MSL1024-Focal": "20230705/host_multi_msl1114_baseline_focal/msl_1024-emb_sincos-d_1024-n_2-loss_focalce_transformer-conv_output.csv"
 #    "TF-CNV-k4s4-MSL1024-Focal": "20230705/host_multi_msl1114_baseline_focal/msl_1024-emb_sincos-d_1024-n_2-loss_focalce_transformer-conv-k4s4_output.csv"
     "TF-MLM-lr1e-4-e50-FNN-2L-lr1e-3-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_msl1114_host_prediction_fnn_2l_lr1e-3_output.csv"
-    # "TF-MLM-lr1e-4-e50-FNN-2L-lr1e-4-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_msl1114_host_prediction_fnn_2l_lr1e-4_output.csv"
+    "TF-MLM-lr1e-4-e50-FNN-2L-lr1e-4-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_msl1114_host_prediction_fnn_2l_lr1e-4_output.csv"
     "TF-MLM-lr1e-4-e50-FNN-2L-lr1e-5-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_msl1114_host_prediction_fnn_2l_lr1e-5_output.csv"
     "TF-MLM-lr1e-4-e50-FNN-4L-lr1e-3-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_msl1114_host_prediction_fnn_4l_lr1e-3_output.csv"
     "TF-MLM-lr1e-4-e50-FNN-4L-lr1e-4-e50": "20231105/fine_tuning/host_prediction/mlm_tfencoder_msl1114_host_prediction_fnn_4l_lr1e-4_output.csv"
