@@ -21,7 +21,7 @@ sequence_settings:
     id_col: "uniref90_id"
     sequence_col: "seq"
     max_sequence_length: 1366 # 6630 # 1024 # 1115
-    truncate: False
+    truncate: True
     pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 

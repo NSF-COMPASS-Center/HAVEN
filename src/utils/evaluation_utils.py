@@ -18,7 +18,7 @@ def get_f1_score(y_true, y_pred, select_non_zero=False):
     y_pred = y_pred.transpose(1, 2)
 
     # compute softmax over the predictions
-    y_pred = torch.nn.functional.log_softmax(y_pred, dim=2)
+    y_pred = torch.nn.functional.softmax(y_pred, dim=-1)
 
     # select the class index with the highest prediction as the class prediction for that sequence
     y_pred_vals, y_pred_index = torch.max(y_pred, dim=2)
@@ -29,6 +29,8 @@ def get_f1_score(y_true, y_pred, select_non_zero=False):
         y_true = y_true[non_zero_indices]
         y_pred = y_pred[non_zero_indices]
 
+    y_true = y_true.cpu().detach().numpy()
+    y_pred = y_pred.cpu().detach().numpy()
     f1_micro = f1_score(y_true, y_pred, average="micro")
     f1_macro = f1_score(y_true, y_pred, average="macro")
     return f1_micro, f1_macro
