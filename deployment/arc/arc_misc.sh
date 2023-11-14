@@ -38,7 +38,7 @@ LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Log File: $LOG_FILE"
 echo "Zoonosis Miscellaneous Script START"
 date
-~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION $ARGS > $LOG_FILE >&2
+~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION $ARGS > $LOG_FILE 2>&1
 echo "Zoonosis Miscellaneous Script END"
 date
 

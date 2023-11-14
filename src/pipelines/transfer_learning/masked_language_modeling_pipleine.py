@@ -9,7 +9,7 @@ import torch
 import tqdm
 from statistics import mean
 
-from utils import utils, dataset_utils, nn_utils
+from utils import utils, dataset_utils, nn_utils, evaluation_utils
 from training.early_stopping import EarlyStopping
 from models.nlp.transformer import transformer
 from training import pre_training_masked_language_modeling
@@ -125,6 +125,7 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         # in this case, number_of_dimensions for loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
         output = output.transpose(1, 2).to(nn_utils.get_device())
         loss = criterion(output, label.long())
+        f1_micro, f1_macro = evaluation_utils.get_f1_score(y_true=label, y_pred=output, select_non_zero=True)
         loss.backward()
 
         optimizer.step()
@@ -161,7 +162,10 @@ def evaluate_model(model, dataset_loader, criterion, tbw, encoder_model_name, ep
             curr_val_loss = loss.item()
             model.test_iter += 1
             if log_loss:
+                f1_micro, f1_macro = evaluation_utils.get_f1_score(y_true=label, y_pred=output, select_non_zero=True)
                 tbw.add_scalar(f"{encoder_model_name}/validation-loss", float(curr_val_loss), model.test_iter)
+                tbw.add_scalar(f"{encoder_model_name}/f1_micro", f1_micro, model.test_iter)
+                tbw.add_scalar(f"{encoder_model_name}/f1_macro", f1_macro, model.test_iter)
                 pbar.set_description(
                     f"{encoder_model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.test_iter}, epoch={epoch + 1}")
             val_loss.append(curr_val_loss)
