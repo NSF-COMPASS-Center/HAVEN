@@ -87,7 +87,7 @@ def execute(config):
 
         mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
                         training_settings, encoder_model_name, pad_token_val,
-                        encoder_model_checkpoint_filepath.format(itr=iter))
+                        encoder_model_checkpoint_filepath.format(itr=iter, checkpt="{checkpt}")) # checkpt="{checkpt}" is a hack to avoid KeyError for 'checkpt'
         torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
 
 def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
