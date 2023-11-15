@@ -80,6 +80,11 @@ def execute(config):
         # 4. instantiate the mlm model
         mlm_model = pre_training_masked_language_modeling.get_mlm_model(encoder_model=encoder_model,
                                                                         mlm_model=mlm_settings)
+
+        # If resuming from a previously stored checkpoint
+        if encoder_settings["model_checkpoint_path"]:
+            mlm_model.load_state_dict(torch.load(training_settings["model_checkpoint_path"]))
+
         mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
                         training_settings, encoder_model_name, pad_token_val,
                         encoder_model_checkpoint_filepath.format(itr=iter))
@@ -113,7 +118,7 @@ def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
             break
 
         # store checkpoints
-        torch.save(model.encoder_model.state_dict(), encoder_model_checkpoint_filepath.format(checkpt=e))
+        torch.save(model.state_dict(), encoder_model_checkpoint_filepath.format(checkpt=e))
 
     evaluate_model(model, test_dataset_loader, criterion, tbw, encoder_model_name, epoch=None, log_loss=False)
     return model

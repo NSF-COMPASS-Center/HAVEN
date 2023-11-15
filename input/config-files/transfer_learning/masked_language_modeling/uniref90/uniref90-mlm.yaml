@@ -34,6 +34,7 @@ mlm_settings:
 
 encoder_settings:
   model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
+  model_checkpoint_path:
   n_heads: 8
   depth: 6
   input_dim: 512 # input embedding dimension
