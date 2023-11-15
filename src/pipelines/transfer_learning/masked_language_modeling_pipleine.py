@@ -52,7 +52,9 @@ def execute(config):
     # Path to store the pre-trained encoder model
     encoder_model_name = encoder_settings["model_name"]
     encoder_model_filepath = os.path.join(output_dir, results_dir, sub_dir, encoder_model_name + "_itr{itr}.pth")
-    Path(os.path.dirname(encoder_model_filepath)).mkdir(parents=True, exist_ok=True)
+    encoder_model_checkpoint_filepath = os.path.join(output_dir, results_dir, sub_dir, "checkpoints", encoder_model_name + "_itr{itr}_checkpt{checkpt}.pth")
+    # the encoder_model_checkpoint_filepath ensures that all directories for encoder_model_filepath are also created.
+    Path(os.path.dirname(encoder_model_checkpoint_filepath)).mkdir(parents=True, exist_ok=True)
 
     for iter in range(n_iters):
         print(f"Iteration {iter}")
@@ -79,10 +81,12 @@ def execute(config):
         mlm_model = pre_training_masked_language_modeling.get_mlm_model(encoder_model=encoder_model,
                                                                         mlm_model=mlm_settings)
         mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
-                        training_settings, encoder_model_name, pad_token_val)
+                        training_settings, encoder_model_name, pad_token_val,
+                        encoder_model_checkpoint_filepath.format(itr=iter))
         torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
 
-def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, training_settings, encoder_model_name, pad_token_val):
+def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
+        training_settings, encoder_model_name, pad_token_val, encoder_model_checkpoint_filepath):
     tbw = SummaryWriter()
     criterion = nn.CrossEntropyLoss(ignore_index=pad_token_val)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -108,6 +112,9 @@ def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, tr
             print("Breaking off training loop due to early stop")
             break
 
+        # store checkpoints
+        torch.save(model.encoder_model.state_dict(), encoder_model_checkpoint_filepath.format(checkpt=e))
+
     evaluate_model(model, test_dataset_loader, criterion, tbw, encoder_model_name, epoch=None, log_loss=False)
     return model
 
@@ -125,7 +132,6 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         # in this case, number_of_dimensions for loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
         output = output.transpose(1, 2).to(nn_utils.get_device())
         loss = criterion(output, label.long())
-        f1_micro, f1_macro = evaluation_utils.get_f1_score(y_true=label, y_pred=output, select_non_zero=True)
         loss.backward()
 
         optimizer.step()
