@@ -52,9 +52,9 @@ def execute(config):
     # Path to store the pre-trained encoder model
     encoder_model_name = encoder_settings["model_name"]
     encoder_model_filepath = os.path.join(output_dir, results_dir, sub_dir, encoder_model_name + "_itr{itr}.pth")
-    encoder_model_checkpoint_filepath = os.path.join(output_dir, results_dir, sub_dir, "checkpoints", encoder_model_name + "_itr{itr}_checkpt{checkpt}.pth")
-    # the encoder_model_checkpoint_filepath ensures that all directories for encoder_model_filepath are also created.
-    Path(os.path.dirname(encoder_model_checkpoint_filepath)).mkdir(parents=True, exist_ok=True)
+    mlm_checkpoint_filepath = os.path.join(output_dir, results_dir, sub_dir, "checkpoints", encoder_model_name + "_itr{itr}_checkpt{checkpt}.pth")
+    # the mlm_checkpoint_filepath ensures that all parent directories for encoder_model_filepath are also created.
+    Path(os.path.dirname(mlm_checkpoint_filepath)).mkdir(parents=True, exist_ok=True)
 
     for iter in range(n_iters):
         print(f"Iteration {iter}")
@@ -81,17 +81,13 @@ def execute(config):
         mlm_model = pre_training_masked_language_modeling.get_mlm_model(encoder_model=encoder_model,
                                                                         mlm_model=mlm_settings)
 
-        # If resuming from a previously stored checkpoint
-        if encoder_settings["model_checkpoint_path"]:
-            mlm_model.load_state_dict(torch.load(training_settings["model_checkpoint_path"]))
-
         mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
                         training_settings, encoder_model_name, pad_token_val,
-                        encoder_model_checkpoint_filepath.format(itr=iter, checkpt="{checkpt}")) # checkpt="{checkpt}" is a hack to avoid KeyError for 'checkpt'
+                        mlm_checkpoint_filepath.format(itr=iter, checkpt="{checkpt}")) # checkpt="{checkpt}" is a hack to avoid KeyError for 'checkpt'
         torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
 
 def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
-        training_settings, encoder_model_name, pad_token_val, encoder_model_checkpoint_filepath):
+        training_settings, encoder_model_name, pad_token_val, mlm_checkpoint_filepath):
     tbw = SummaryWriter()
     criterion = nn.CrossEntropyLoss(ignore_index=pad_token_val)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -106,6 +102,11 @@ def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
         div_factor=training_settings["div_factor"],
         final_div_factor=training_settings["final_div_factor"])
     early_stopper = EarlyStopping(patience=10, min_delta=0)
+
+    # check and resume from checkpoint, if available
+    if training_settings["checkpoint_path"]:
+        model, optimizer, lr_scheduler = nn_utils.load_checkpoint(model, optimizer, lr_scheduler,
+                                                                  training_settings["checkpoint_path"])
     model.train_iter = 0
     model.test_iter = 0
 
@@ -117,8 +118,11 @@ def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
             print("Breaking off training loop due to early stop")
             break
 
-        # store checkpoints
-        torch.save(model.state_dict(), encoder_model_checkpoint_filepath.format(checkpt=e))
+        # save checkpoint
+        nn_utils.save_checkpoint(model.state_dict(),
+                                 optimizer.state_dict(),
+                                 lr_scheduler.state_dict(),
+                                 e, mlm_checkpoint_filepath)
 
     evaluate_model(model, test_dataset_loader, criterion, tbw, encoder_model_name, epoch=None, log_loss=False)
     return model

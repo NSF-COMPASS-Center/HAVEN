@@ -67,3 +67,22 @@ def init_weights(module: nn.Module, initialization_type: str, bias_init_value=0)
         # ignore layers which do not have the weight and/or bias attributes
         print(f"WARNING: {ae}")
         pass
+
+
+def save_checkpoint(model, optimizer, lr_scheduler, epoch, file_path):
+    checkpoint = {
+        "model_state_dict": model,
+        "optimizer_state_dict": optimizer,
+        "lr_scheduler_state_dict": lr_scheduler,
+        "epoch": epoch
+    }
+    torch.save(checkpoint, file_path.format(checkpt=epoch))
+
+
+def load_checkpoint(model, optimizer, lr_scheduler, file_path):
+    checkpoint = torch.load(file_path)
+    model.load_state_dict(checkpoint["model_state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    lr_scheduler.load_state_dict(checkpoint["lr_scheduler_state_dict"])
+
+    return model, optimizer, lr_scheduler
