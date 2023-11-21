@@ -104,13 +104,14 @@ def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
     early_stopper = EarlyStopping(patience=10, min_delta=0)
 
     # check and resume from checkpoint, if available
+    last_epoch = -1
     if training_settings["checkpoint_path"]:
-        model, optimizer, lr_scheduler = nn_utils.load_checkpoint(model, optimizer, lr_scheduler,
+        model, optimizer, lr_scheduler, last_epoch = nn_utils.load_checkpoint(model, optimizer, lr_scheduler,
                                                                   training_settings["checkpoint_path"])
     model.train_iter = 0
     model.test_iter = 0
 
-    for e in range(n_epochs):
+    for e in range(last_epoch+1, n_epochs):
         model = run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
                           lr_scheduler, early_stopper, tbw, encoder_model_name, e)
         # check if early stopping condition was satisfied and stop accordingly

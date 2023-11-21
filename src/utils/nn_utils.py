@@ -80,9 +80,12 @@ def save_checkpoint(model, optimizer, lr_scheduler, epoch, file_path):
 
 
 def load_checkpoint(model, optimizer, lr_scheduler, file_path):
-    checkpoint = torch.load(file_path)
+    checkpoint = torch.load(file_path, map_location=get_device())
+    last_epoch = checkpoint["epoch"]
+
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     lr_scheduler.load_state_dict(checkpoint["lr_scheduler_state_dict"])
+    lr_scheduler.last_epoch = last_epoch
 
-    return model, optimizer, lr_scheduler
+    return model, optimizer, lr_scheduler, last_epoch
