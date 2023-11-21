@@ -48,7 +48,7 @@ training_settings:
   pct_start: 0.10
   div_factor: 25.0
   final_div_factor: 10000.0
-  checkpoint_path: "C:\\Dev\\git\\zoonosis\\output\\raw\\uniref90\\20231115\\pre_training\\mlm\\checkpoints\\transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0_checkpt26.pth"
+  checkpoint_path: "output/raw/uniref90/20231115/pre_training/mlm/checkpoints/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0_checkpt26.pth"
 
 output_settings:
   output_dir: "output"
