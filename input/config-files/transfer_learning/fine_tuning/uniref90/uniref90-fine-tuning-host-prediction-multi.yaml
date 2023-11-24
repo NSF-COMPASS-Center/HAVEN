@@ -10,8 +10,8 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_final_msl1114.csv" ]
-  # file_names: [ "uniref90_final.csv" ]
+  # file_names: [ "uniref90_final_msl1114.csv" ]
+  file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -20,14 +20,14 @@ sequence_settings:
     batch_size: 64
     id_col: "uniref90_id"
     sequence_col: "seq"
-    max_sequence_length: 1114 # 6630 # 1024 # 1115
-    truncate: False
+    max_sequence_length: 1366 # 6630 # 1024 # 1115
+    truncate: True
     pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 pre_train_settings:
   model_name: "masked_language_modeling"
-  model_path: "output/raw/uniref90/20231105/pre_training/mlm/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0.pth"
+  model_path: "output/raw/uniref90/20231115/pre_training/mlm/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0.pth"
   encoder_settings:
     model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
     n_heads: 8
@@ -78,5 +78,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90/20231105/fine_tuning/host_prediction"
-  prefix: "mlm_tfencoder_msl1114" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20231115/fine_tuning/host_prediction"
+  prefix: "mlm_transformer_encoder-l_6-h_8-lr1e-4_uniref90viridae_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
