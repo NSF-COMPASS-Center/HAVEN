@@ -28,6 +28,8 @@ class HostPrediction(nn.Module):
         # hidden
         for linear_layer in self.linear_hidden_n:
             X = F.relu(linear_layer(X))
+        # embedding to be used for interpretability of the fine-tuned model
+        self.fine_tuned_embedding = X
         y = self.linear_op(X)
         return y
 
