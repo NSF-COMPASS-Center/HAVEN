@@ -13,7 +13,7 @@ class MaskedLanguageModel(nn.Module):
         self.pad_token_val = pad_token_val
         self.mask_token_val = n_tokens + 1
         self.no_mask_token_vals = no_mask_token_vals
-        self.n_tokens = n_tokens + 2 # # (accounting for pad_token_val and mask_token_val)
+        self.n_tokens = n_tokens + 2 # accounting for pad_token_val and mask_token_val
         self.mask_prob = mask_prob
         self.random_mask_prob = random_mask_prob
         self.no_change_mask_prob = no_change_mask_prob

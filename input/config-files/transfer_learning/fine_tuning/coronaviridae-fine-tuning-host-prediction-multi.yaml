@@ -6,21 +6,21 @@ config_sub_type: "host_prediction"
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/coronaviridae/sarscov2"
+  input_dir: "input/data/coronaviridae"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   # file_names: [ "uniref90_final_msl1114.csv" ]
-  file_names: [ "sarscov2_top_7_hosts_human.csv" ]
+  file_names: [ "coronaviridae_top_7_hosts.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 64
-    id_col: "uniref90_id"
+    batch_size: 8
+    id_col: "id"
     sequence_col: "seq"
-    max_sequence_length: 1453
+    max_sequence_length: 1366 # has to be equal to the configuration used for MLM pretraining
     truncate: True
     pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
@@ -51,7 +51,7 @@ fine_tune_settings:
     final_div_factor: 10000.0
 
   label_settings:
-    label_col: "virus_host_name"
+    label_col: "virus_host"
     exclude_labels: [ "nan" ]
     label_groupings:
       "Pig": [ "Sus scrofa (Pig) [TaxID: 9823]" ]
