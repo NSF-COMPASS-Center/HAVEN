@@ -11,19 +11,23 @@ from models.nlp.transformer import transformer
 from models.nlp import cnn1d, rnn, lstm
 from models.nlp.fnn import fnn, kmer_fnn
 from models.cv import cnn2d, cnn2d_pool
+from training.fine_tuning import host_prediction
 
-def execute(input_settings, output_settings, classification_settings):
+def execute(config):
     # input settings
+    input_settings = config["input_settings"]
     input_dir = input_settings["perturbed_dataset_dir"]
     input_files = os.listdir(input_dir)
 
     # output settings
+    output_settings = config["output_settings"]
     output_dir = output_settings["output_dir"]
     results_dir = output_settings["results_dir"]
     sub_dir = output_settings["sub_dir"]
     output_prefix = output_settings["prefix"]
     output_prefix = output_prefix if output_prefix is not None else ""
 
+    classification_settings = config["classification_settings"]
     models = classification_settings["models"]
     label_settings = classification_settings["label_settings"]
     sequence_settings = classification_settings["sequence_settings"]
@@ -32,7 +36,7 @@ def execute(input_settings, output_settings, classification_settings):
     sequence_col = sequence_settings["sequence_col"]
     label_col = label_settings["label_col"]
 
-    nlp_model = None
+    prediction_model = None
 
     for model in models:
         model_name = model["name"]
@@ -44,47 +48,59 @@ def execute(input_settings, output_settings, classification_settings):
             print(f"Skipping {model_name} ...")
             continue
 
-        if "kmer-fnn" in model_name:
+        if "transfer_learning" in model_name:
+            print(f"Executing Transfer Learning (Pre-trained and fine tuned model) in {mode} mode")
+            pre_train_encoder_settings = model["pre_train_settings"]
+            pre_train_encoder_settings["n_tokens"] += 2
+            # add max_sequence_length to pre_train_encoder_settings
+            pre_train_encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"]
+            # load pre-trained encoder model
+            pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
+            # Set the pre_trained model within the task config
+            model["pre_trained_model"] = pre_trained_encoder_model
+            prediction_model = host_prediction.get_host_prediction_model(model)
+
+        elif "kmer-fnn" in model_name:
             print(f"Executing K-mer-FNN in {mode} mode")
             model["input_dim"] = train_dataset_loader.dataset.get_kmer_keys_count()
-            nlp_model = kmer_fnn.get_fnn_model(model)
+            prediction_model = kmer_fnn.get_fnn_model(model)
 
         elif "fnn" in model_name:
             print(f"Executing FNN in {mode} mode")
-            nlp_model = fnn.get_fnn_model(model)
+            prediction_model = fnn.get_fnn_model(model)
 
         elif "cgr-cnn-pool" in model_name:
             print(f"Executing CGR-CNN-Pool in {mode} mode")
             model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
-            nlp_model = cnn2d_pool.get_cnn_model(model)
+            prediction_model = cnn2d_pool.get_cnn_model(model)
 
         elif "cgr-cnn" in model_name:
             print(f"Executing CGR-CNN in {mode} mode")
             model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
-            nlp_model = cnn2d.get_cnn_model(model)
+            prediction_model = cnn2d.get_cnn_model(model)
 
         elif "cnn" in model_name:
             print(f"Executing CNN in {mode} mode")
-            nlp_model = cnn1d.get_cnn_model(model)
+            prediction_model = cnn1d.get_cnn_model(model)
 
         elif "rnn" in model_name:
             print(f"Executing RNN in {mode} mode")
-            nlp_model = rnn.get_rnn_model(model)
+            prediction_model = rnn.get_rnn_model(model)
 
         elif "lstm" in model_name:
             print(f"Executing LSTM in {mode} mode")
-            nlp_model = lstm.get_lstm_model(model)
+            prediction_model = lstm.get_lstm_model(model)
 
         elif "transformer" in model_name:
             print(f"Executing Transformer in {mode} mode")
-            nlp_model = transformer.get_transformer_model(model)
+            prediction_model = transformer.get_transformer_model(model)
 
         else:
-            continue
+                continue
 
         # Execute the NLP model
         if mode == "test":
-            nlp_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
+            prediction_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
 
 
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
@@ -113,7 +129,7 @@ def execute(input_settings, output_settings, classification_settings):
         test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col, include_id_col=True)
 
         # 4. Generate predictions
-        result_df = evaluate_model(nlp_model, test_dataset_loader, id_col)
+        result_df = evaluate_model(prediction_model, test_dataset_loader, id_col)
 
         # 5. Create the result dataframe and remap the class indices to original input labels
         result_df.rename(columns=index_label_map, inplace=True)

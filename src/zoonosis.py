@@ -3,6 +3,7 @@ import argparse
 
 from pipelines.host_prediction import host_prediction_pipeline
 from pipelines.transfer_learning import masked_language_modeling_pipleine, fine_tuning_host_prediction_pipeline
+from pipelines.interpretability import host_prediction_perturbation_analysis_prediction
 from evaluation import evaluation
 from models.baseline import feature_importance
 from utils import utils
@@ -37,6 +38,10 @@ def main():
     # evaluation
     elif config_type == "evaluation":
         evaluation.execute(config)
+    # evaluation
+    elif config_type == "host_prediction_perturbation":
+        host_prediction_perturbation_analysis_prediction.execute(config)
+
     # feature_importance for baseline models
     # TODO: >>>> DEPRECATED <<<< (Remove all corresponding code)
     elif config_type == "feature_importance":

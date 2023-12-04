@@ -6,6 +6,7 @@ import os
 
 from utils import utils, nn_utils, kmer_utils
 from models.nlp.embedding.padding import Padding, PaddingUnlabeled
+from models.nlp.embedding.padding_with_id import PaddingWithID
 from datasets.protein_sequence_dataset import ProteinSequenceDataset
 from datasets.protein_sequence_unlabeled_dataset import ProteinSequenceUnlabeledDataset
 from datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWithID
