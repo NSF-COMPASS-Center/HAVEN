@@ -69,6 +69,5 @@ Change Log
 [2018/12/16] added description of fasta header.
 [2019/05/30] added lists of viruses having segmented and non-segmented genome.
 [2021/10/05] added virushostdb_comment.daily.tsv
-
 ==================================================================
 Last update: 2021/10/05

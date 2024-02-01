@@ -35,26 +35,27 @@ def execute(config):
     encoder_settings = config["encoder_settings"]
     sequence_settings = config["sequence_settings"]
 
-    # add n_tokens, max_sequence_length to encoder_settings
-    encoder_settings["n_tokens"] = mlm_settings["n_tokens"] + 2 # (accounting for pad_token_val and mask_token_val)
-    encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"]
-
-    # add pad_token_val, encoder_dim (which is defined in input_dim of encoder_settings) to mlm_settings
-    mlm_settings["pad_token_val"] = sequence_settings["pad_token_val"]
-    mlm_settings["encoder_dim"] = encoder_settings["input_dim"]
-
     n_iters = training_settings["n_iterations"]
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
     pad_token_val = sequence_settings["pad_token_val"]
-    results = {}
+
+    # add n_tokens, max_sequence_length to encoder_settings
+    encoder_settings["n_tokens"] = mlm_settings["n_tokens"] + 2  # (accounting for pad_token_val and mask_token_val)
+    encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"]
+
+    # add pad_token_val, encoder_dim (which is defined in input_dim of encoder_settings) to mlm_settings
+    mlm_settings["pad_token_val"] = pad_token_val
+    mlm_settings["encoder_dim"] = encoder_settings["input_dim"]
 
     # Path to store the pre-trained encoder model
     encoder_model_name = encoder_settings["model_name"]
     encoder_model_filepath = os.path.join(output_dir, results_dir, sub_dir, encoder_model_name + "_itr{itr}.pth")
     mlm_checkpoint_filepath = os.path.join(output_dir, results_dir, sub_dir, "checkpoints", encoder_model_name + "_itr{itr}_checkpt{checkpt}.pth")
-    # the mlm_checkpoint_filepath ensures that all parent directories for encoder_model_filepath are also created.
+    # creating parent directories for mlm_checkpoint_filepath ensures that all parent directories for encoder_model_filepath are also created.
     Path(os.path.dirname(mlm_checkpoint_filepath)).mkdir(parents=True, exist_ok=True)
+
+    results = {}
 
     for iter in range(n_iters):
         print(f"Iteration {iter}")
@@ -83,7 +84,7 @@ def execute(config):
 
         mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
                         training_settings, encoder_model_name, pad_token_val,
-                        mlm_checkpoint_filepath.format(itr=iter, checkpt="{checkpt}")) # checkpt="{checkpt}" is a hack to avoid KeyError for 'checkpt'
+                        mlm_checkpoint_filepath.format_map(itr=iter)) # format_map method is used to avoid missing KeyError for 'checkpt'
         torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
 
 def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
@@ -139,7 +140,7 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         output, label = model(input)
         # transpose from b x max_seq_len x n_tokens -> b x n_tokens x max_seq_len
         # because CrossEntropyLoss expected input to be of the shape b x n_classes x number_dimensions_for_loss
-        # in this case, number_of_dimensions for loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
+        # in this case, number_of_dimensions_for_loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
         output = output.transpose(1, 2).to(nn_utils.get_device())
         loss = criterion(output, label.long())
         loss.backward()
@@ -171,7 +172,7 @@ def evaluate_model(model, dataset_loader, criterion, tbw, encoder_model_name, ep
             output, label = model(input)
             # transpose from b x max_seq_len x n_tokens -> b x n_tokens x max_seq_len
             # because CrossEntropyLoss expected input to be of the shape b x n_classes x number_dimensions_for_loss
-            # in this case, number_of_dimensions for loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
+            # in this case, number_dimensions_for_loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
             output = output.transpose(1, 2).to(nn_utils.get_device())
             loss = criterion(output, label.long())
 
