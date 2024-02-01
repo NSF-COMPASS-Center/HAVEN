@@ -15,7 +15,6 @@ from itertools import repeat
 # Usage: python src/data_processing/uniref_dataset_processor.py -if <absolute path to input fasta file> -od <absolute path output directory>
 
 # Filenames
-UNIREF90_DATA_CSV_FILENAME = "uniref90_parsed.csv"
 # UNIREF90_DATA_CSV_FILENAME = "uniref90_viridae_20231113_parsed.csv"
 # UNIREF90_DATA_W_HOSTS_FILENAME = "uniref90_w_hosts.csv"
 UNIREF90_DATA_W_HOSTS_FILENAME = "uniref90_w_hosts_virushostdb.csv"
@@ -49,27 +48,16 @@ UNIPROT_REST_PROTS = "https://rest.uniprot.org/uniprotkb/search"
 UNIPROT_REST_UNIREF90_QUERY_PARAM = "uniref_cluster_90:%s"
 N_CPU = 6
 
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Parse and create UniRef Dataset")
-    parser.add_argument("-if", "--input_file", required=True,
-                        help="Absolute path to the input file in fasta format\n")
-    parser.add_argument("-od", "--output_dir", required=True,
-                        help="Absolute path to output directory to create intermediate file.\n")
-    args = parser.parse_args()
-    return args
-
-
 # Parse fasta file
 # input fasta file
 # output: csv file with columns ["uniref90_id", "tax_id", "seq"]
-def parse_fasta_file(fasta_file_path, output_directory):
+def parse_fasta_file(input_file_path, output_file_path):
     sequences = []
     i = 0
     no_id_count = 0
     print("START: Parsing fasta file")
     # parse fasta file to extract uniref90_id, tax_id of virus/organism, and protein sequence
-    with open(fasta_file_path) as f:
+    with open(input_file_path) as f:
         for record in SeqIO.parse(f, "fasta"):
             i += 1
             print(i)
@@ -86,15 +74,16 @@ def parse_fasta_file(fasta_file_path, output_directory):
     df = pd.DataFrame(sequences)
 
     # write the parsed dataframe to a csv file
-    print(f"Writing to file {UNIREF90_DATA_CSV_FILENAME}")
-    df.to_csv(os.path.join(output_directory, UNIREF90_DATA_CSV_FILENAME), index=False)
+    print(f"Writing to file {output_file_path}")
+    df.to_csv(output_file_path, index=False)
 
 
 # Get hosts of virus from virus_host db using virus tax id
 # input: parsed csv file of all sequences
 # output: csv file with hosts of virus. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
 # The sequences will be joined back and compiled into one dataset at a later stage
-def get_virus_hosts_from_virushostdb(output_directory):
+def get_virus_hosts_from_virushostdb(input_file_path, output_file_path, virushostdb_mapping_file):
+    print("START: Get virus hosts from Virus Host DB")
     # read the parsed uniref90_data csv file
     virushostdb_file = os.path.join(output_directory, "../utils", "virushostdb", "mapping_files", "virushostdb_human_animals.csv")
 
@@ -125,6 +114,7 @@ def get_virus_hosts_from_virushostdb(output_directory):
     # print(f"Mapped dataset size after aggregating hosts =  {mapped_df_agg.shape}")
     # mapped_df_agg.to_csv(os.path.join(output_directory, UNIREF90_DATA_W_HOSTS_FILENAME), index=False)
     mapped_df.to_csv(os.path.join(output_directory, UNIREF90_DATA_W_HOSTS_FILENAME), index=False)
+    print("END: Get virus hosts from Virus Host DB")
     return mapped_df
 
 
@@ -134,17 +124,16 @@ def get_virus_hosts_from_virushostdb(output_directory):
 # Use multiprocessing to speed up the process
 # Note: this method drops the sequence information to save memory.
 # The sequences will be joined back and compiled into one dataset at a later stage
-def get_virus_hosts(output_directory):
+def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
+    print("START: Get virus hosts from UniProt")
     # read the parsed uniref90_data csv file
-    df = pd.read_csv(os.path.join(output_directory, UNIREF90_DATA_CSV_FILENAME))
-    print(f"Uniref90 dataset size = {df.shape}")
+    df = pd.read_csv(input_file_path)
+    print(f"Read Uniref90 dataset size = {df.shape}")
 
     # retain only uniref90_ids to save memory
     df = df[[UNIREF90_ID, TAX_ID]]
 
     # read the existing output file to pick up from where the previous execution left.
-    output_file_path = str(os.path.join(output_directory, UNIREF90_DATA_W_HOSTS_FILENAME))
-
     df_host = pd.read_csv(output_file_path, on_bad_lines=None, converters={2: literal_eval},
                           names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
     df_host = df_host[[TAX_ID, UNIREF90_ID]]
@@ -162,20 +151,17 @@ def get_virus_hosts(output_directory):
     # split into sub dfs for parallel processing
     dfs = np.array_split(df, N_CPU)
     print(f"Number of sub dfs = {len(dfs)}")
-    print(f"Size of dfs[0] = {dfs[0].shape}")
-    print(f"Size of dfs[1] = {dfs[1].shape}")
-    print(f"Size of dfs[2] = {dfs[2].shape}")
-    print(f"Size of dfs[3] = {dfs[3].shape}")
-    print(f"Size of dfs[4] = {dfs[4].shape}")
-    print(f"Size of dfs[5] = {dfs[5].shape}")
+    for i in range(N_CPU):
+        print(f"Size of dfs[{i}] = {dfs[i].shape}")
+
     # multiprocessing for parallelization
     cpu_pool = Pool(N_CPU)
     cpu_pool.starmap(get_virus_host, zip(dfs, repeat(output_file_path)))
 
     cpu_pool.close()
     cpu_pool.join()
-    print(f"Written to file {UNIREF90_DATA_W_HOSTS_FILENAME}")
-
+    print(f"Written to file {output_file_path}")
+    print("END: Get virus hosts from UniProt")
 
 # call another method which will query UniProt to get hosts of the virus
 # write the retrieved host ids to the output file
@@ -389,8 +375,7 @@ def main():
     input_file_path = config.input_file
     output_dir = config.output_dir
 
-    # 1. Parse the Fasta file
-    parse_fasta_file(input_file_path, output_dir)
+
     # 2. Get hosts of the virus from which the protein sequences were sampled
     # get_virus_hosts(output_dir)
     df = get_virus_hosts_from_virushostdb(output_dir)
@@ -415,7 +400,3 @@ def main():
     # 8. Write the filtered dataset to a file
     print(f"Writing to file {UNIREF90_DATA_WO_SINGLE_HOST}")
     df.to_csv(os.path.join(output_dir, UNIREF90_DATA_WO_SINGLE_HOST))
-
-
-if __name__ == "__main__":
-    main()

@@ -30,7 +30,7 @@ def main():
         elif config_sub_type == "host_prediction":
             fine_tuning_host_prediction_pipeline.execute(config)
         else:
-            print("ERROR: Unsupported configuration for config_type. Supported values=masked_langage_modeling",
+            print(f"ERROR: Unsupported config_sub_type '{config_sub_type}' for config_type '{config_type}'.\nSupported values=masked_langage_modeling",
                   "host_prediction")
     # classification: host-prediction
     elif config_type == "host_prediction":
