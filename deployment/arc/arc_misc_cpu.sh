@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH -J zoonosis-nlp
-# SBATCH --account=seqevol
+#SBATCH --account=seqevol
 #SBATCH --partition=normal_q
 
 #SBATCH --mem=128G
