@@ -9,23 +9,29 @@ from ast import literal_eval
 from Bio import SeqIO
 from multiprocessing import Pool
 from itertools import repeat
-
+from pathlib import Path
 
 # Script to parse and create uniref90 dataset
 # Usage: python src/data_processing/uniref_dataset_processor.py -if <absolute path to input fasta file> -od <absolute path output directory>
 
 # Filenames
-# UNIREF90_DATA_CSV_FILENAME = "uniref90_viridae_20231113_parsed.csv"
-# UNIREF90_DATA_W_HOSTS_FILENAME = "uniref90_w_hosts.csv"
-UNIREF90_DATA_W_HOSTS_FILENAME = "uniref90_w_hosts_virushostdb.csv"
 UNIREF90_DATA_W_METADATA = "uniref90_w_metadata.csv"
 UNIREF90_DATA_MAMMALS_AVES = "uniref90_mammals_aves_virus.csv"
 UNIREF90_DATA_W_SINGLE_HOST = "uniref90_mammals_aves_w_singlehost.csv"
 # UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_mammals_aves_wo_singlehost.csv"
 UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_wo_singlehost_virushostdb.csv"
 
+# UniProt keywords
+
+# Virus Host DB keywords
+VIRUS_HOST_DB_VIRUS_TAX_ID = "virus tax id"
+VIRUS_HOST_DB_VIRUS_NAME = "virus name"
+VIRUS_HOST_DB_HOST_TAX_ID = "host tax id"
+VIRUS_HOST_DB_HOST_NAME = "host name"
+
 # Column names at various stages of dataset curation
 UNIREF90_ID = "uniref90_id"
+
 TAX_ID = "tax_id"
 SEQUENCE = "seq"
 HOST_TAX_IDS = "host_tax_ids"
@@ -84,22 +90,25 @@ def parse_fasta_file(input_file_path, output_file_path):
 # The sequences will be joined back and compiled into one dataset at a later stage
 def get_virus_hosts_from_virushostdb(input_file_path, output_file_path, virushostdb_mapping_file):
     print("START: Get virus hosts from Virus Host DB")
-    # read the parsed uniref90_data csv file
-    virushostdb_file = os.path.join(output_directory, "../utils", "virushostdb", "mapping_files", "virushostdb_human_animals.csv")
+    # read the mapping data
+    mapping_df = pd.read_csv(virushostdb_mapping_file, sep="\t")
+    print(f"Virus Host DB mapping dataset size = {mapping_df.shape}")
 
-    mapping_df = pd.read_csv(virushostdb_file)
-    print(f"Mapping dataset size = {mapping_df.shape}")
-    df = pd.read_csv(os.path.join(output_directory, UNIREF90_DATA_CSV_FILENAME))
+    # read the parsed uniref90_data csv file
+    df = pd.read_csv(input_file_path)
     print(f"Uniref90 dataset size = {df.shape}")
 
     # retain only uniref90_ids to save memory
     df = df[[UNIREF90_ID, TAX_ID]]
+
     # join the two dfs on the virus tax id
-    mapped_df = df.merge(mapping_df, how="left", left_on=TAX_ID, right_on="virus tax id")
+    mapped_df = df.merge(mapping_df, how="left", left_on=TAX_ID, right_on=VIRUS_HOST_DB_VIRUS_TAX_ID)
     print(f"Mapped dataset size = {mapped_df.shape}")
 
     # rename "host tax id" to HOST_TAX_IDS
-    mapped_df.rename(columns={"host tax id": HOST_TAX_IDS, "virus name": VIRUS_NAME, "host name": VIRUS_HOST_NAME}, inplace=True)
+    mapped_df.rename(columns={VIRUS_HOST_DB_VIRUS_NAME: VIRUS_NAME,
+                              VIRUS_HOST_DB_HOST_TAX_ID: HOST_TAX_IDS,
+                              VIRUS_HOST_DB_HOST_NAME: VIRUS_HOST_NAME}, inplace=True)
 
     # retain only [UNIREF90_ID, TAX_ID, HOST_TAX_IDS]
     mapped_df = mapped_df[[UNIREF90_ID, TAX_ID, VIRUS_NAME, HOST_TAX_IDS, VIRUS_HOST_NAME]]
@@ -109,13 +118,13 @@ def get_virus_hosts_from_virushostdb(input_file_path, output_file_path, virushos
     print(f"Mapped dataset size after removing sequences with no hosts =  {mapped_df.shape}")
 
     # aggregate the sequences with multiple hosts to one record with a list of host tax ids
-    # mapped_df_agg = mapped_df.groupby([UNIREF90_ID, TAX_ID]).agg({HOST_TAX_IDS: lambda x: list(x)})
-    # mapped_df_agg.reset_index(inplace=True)
-    # print(f"Mapped dataset size after aggregating hosts =  {mapped_df_agg.shape}")
-    # mapped_df_agg.to_csv(os.path.join(output_directory, UNIREF90_DATA_W_HOSTS_FILENAME), index=False)
-    mapped_df.to_csv(os.path.join(output_directory, UNIREF90_DATA_W_HOSTS_FILENAME), index=False)
+    mapped_df_agg = mapped_df.groupby([UNIREF90_ID, TAX_ID]).agg({HOST_TAX_IDS: lambda x: list(x)})
+    mapped_df_agg.reset_index(inplace=True)
+    print(f"Mapped dataset size after aggregating hosts =  {mapped_df_agg.shape}")
+
+    mapped_df_agg.to_csv(output_file_path, index=False)
+    print(f"Written to file {output_file_path}")
     print("END: Get virus hosts from Virus Host DB")
-    return mapped_df
 
 
 # Get hosts of virus from UniPROT using uniref90_id of protein sequences
@@ -133,17 +142,17 @@ def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
     # retain only uniref90_ids to save memory
     df = df[[UNIREF90_ID, TAX_ID]]
 
-    # read the existing output file to pick up from where the previous execution left.
-    df_host = pd.read_csv(output_file_path, on_bad_lines=None, converters={2: literal_eval},
+    # read the existing output file, if it exists, to pick up from where the previous execution left.
+    if Path(output_file_path).is_file():
+        df_host = pd.read_csv(output_file_path, on_bad_lines=None, converters={2: literal_eval},
                           names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
-    df_host = df_host[[TAX_ID, UNIREF90_ID]]
-    print(f"Number of records already processed = {df_host.shape[0]}")
+        df_host = df_host[[TAX_ID, UNIREF90_ID]]
+        print(f"Number of records already processed = {df_host.shape[0]}")
 
-    # remove the uniref_ids which have already been processed in the previous executions.
-    # no straightforward way to implement this filter
-    # hack: 1. left join with indicator=True creates an additional column named "_merge" with values "both" or "left_only"
-    #       2. retain only the rows with "_merge" column value == "left_only"
-    if df_host.shape[0] != 0:
+        # remove the uniref_ids which have already been processed in the previous executions.
+        # no straightforward way to implement this filter
+        # hack: 1. left join with indicator=True creates an additional column named "_merge" with values "both" or "left_only"
+        #       2. retain only the rows with "_merge" column value == "left_only"
         df = pd.merge(df, df_host, how="left", on=[UNIREF90_ID], indicator=True)
         df = df[df["_merge"] == "left_only"][[UNIREF90_ID, TAX_ID]]
     print(f"Number of records TO BE processed = {df.shape[0]}")
@@ -370,33 +379,33 @@ def remove_duplicate_sequences(df):
     return df
 
 
-def main():
-    config = parse_args()
-    input_file_path = config.input_file
-    output_dir = config.output_dir
-
-
-    # 2. Get hosts of the virus from which the protein sequences were sampled
-    # get_virus_hosts(output_dir)
-    df = get_virus_hosts_from_virushostdb(output_dir)
-    # 3. Filter the dataset: Remove sequences with no hosts of the virus
-    # df = remove_sequences_w_no_hosts(output_dir)
-    # # 4. Explode the host column: Create multiple entries (duplicate the sequence) one for each host of the virus of the sequence
-    # df = explode_virus_hosts(df)
-    # # 5. Get metadata for each record: taxonomy name and rank of the virus and virus_hosts of the sequences
-    # df = get_virus_metadata(df)
-    # # Note: Data in steps 2, 3, 4, 5 do not contain the protein sequence. We dropped the sequence column in step 2 to save memory
-    # # 6. Rejoin the sequence data using the parsed fasta file output from step 1 and write to an intermediary dataset file
-    join_metadata_with_sequences_data(df, output_dir)
-    # # 7. Filters
-    # # 7.1 Retain sequences with virus AND virus host with rank = "Species
-    # df = get_sequences_at_species_level(output_dir)
-    # # 7.2 Retain sequences with viruses hosts belonging to the class of Mammals OR Aves (birds)
-    # df = get_sequences_from_mammals_aves_hosts(df)
-    # # 7.3 Remove viruses with only one unique virus host
-    df = remove_sequences_of_virus_with_one_host(df)
-    # # 7.4 Remove duplicate sequences (same uniref90_id and sequence, but multiple hosts)
-    df = remove_duplicate_sequences(df)
-    # 8. Write the filtered dataset to a file
-    print(f"Writing to file {UNIREF90_DATA_WO_SINGLE_HOST}")
-    df.to_csv(os.path.join(output_dir, UNIREF90_DATA_WO_SINGLE_HOST))
+# def main():
+#     config = parse_args()
+#     input_file_path = config.input_file
+#     output_dir = config.output_dir
+#
+#
+#     # 2. Get hosts of the virus from which the protein sequences were sampled
+#     # get_virus_hosts(output_dir)
+#     df = get_virus_hosts_from_virushostdb(output_dir)
+#     # 3. Filter the dataset: Remove sequences with no hosts of the virus
+#     # df = remove_sequences_w_no_hosts(output_dir)
+#     # # 4. Explode the host column: Create multiple entries (duplicate the sequence) one for each host of the virus of the sequence
+#     # df = explode_virus_hosts(df)
+#     # # 5. Get metadata for each record: taxonomy name and rank of the virus and virus_hosts of the sequences
+#     # df = get_virus_metadata(df)
+#     # # Note: Data in steps 2, 3, 4, 5 do not contain the protein sequence. We dropped the sequence column in step 2 to save memory
+#     # # 6. Rejoin the sequence data using the parsed fasta file output from step 1 and write to an intermediary dataset file
+#     join_metadata_with_sequences_data(df, output_dir)
+#     # # 7. Filters
+#     # # 7.1 Retain sequences with virus AND virus host with rank = "Species
+#     # df = get_sequences_at_species_level(output_dir)
+#     # # 7.2 Retain sequences with viruses hosts belonging to the class of Mammals OR Aves (birds)
+#     # df = get_sequences_from_mammals_aves_hosts(df)
+#     # # 7.3 Remove viruses with only one unique virus host
+#     df = remove_sequences_of_virus_with_one_host(df)
+#     # # 7.4 Remove duplicate sequences (same uniref90_id and sequence, but multiple hosts)
+#     df = remove_duplicate_sequences(df)
+#     # 8. Write the filtered dataset to a file
+#     print(f"Writing to file {UNIREF90_DATA_WO_SINGLE_HOST}")
+#     df.to_csv(os.path.join(output_dir, UNIREF90_DATA_WO_SINGLE_HOST))

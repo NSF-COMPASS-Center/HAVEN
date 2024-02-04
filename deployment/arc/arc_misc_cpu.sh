@@ -22,6 +22,7 @@ conda info
 # Setup project and result directories
 PROJECT_DIR=$1
 LOGS_DIR=$PROJECT_DIR/output/logs
+export PYTHONPATH="$PROJECT_DIR/src"
 echo "Project directory: $PROJECT_DIR"
 
 # Execute python script
