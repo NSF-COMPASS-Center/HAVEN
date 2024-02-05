@@ -4,7 +4,7 @@ import requests
 import numpy as np
 import argparse
 import re
-# import pytaxonkit
+import pytaxonkit
 from ast import literal_eval
 from Bio import SeqIO
 from multiprocessing import Pool
@@ -21,7 +21,10 @@ UNIREF90_DATA_W_SINGLE_HOST = "uniref90_mammals_aves_w_singlehost.csv"
 # UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_mammals_aves_wo_singlehost.csv"
 UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_wo_singlehost_virushostdb.csv"
 
-# UniProt keywords
+# UniProt keywords/contsant values
+UNIPROT_REST_PROTS = "https://rest.uniprot.org/uniprotkb/search"
+UNIPROT_REST_UNIREF90_QUERY_PARAM = "uniref_cluster_90:%s"
+N_CPU = 6
 
 # Virus Host DB keywords
 VIRUS_HOST_DB_VIRUS_TAX_ID = "virus tax id"
@@ -29,9 +32,14 @@ VIRUS_HOST_DB_VIRUS_NAME = "virus name"
 VIRUS_HOST_DB_HOST_TAX_ID = "host tax id"
 VIRUS_HOST_DB_HOST_NAME = "host name"
 
+## NCBI Taxonomy keywords
+NAME = "Name"
+RANK = "Rank"
+NCBI_TAX_ID = "TaxID"
+TAXONKIT_DIR = "~/dev/taxonkit"
+
 # Column names at various stages of dataset curation
 UNIREF90_ID = "uniref90_id"
-
 TAX_ID = "tax_id"
 SEQUENCE = "seq"
 HOST_TAX_IDS = "host_tax_ids"
@@ -40,19 +48,6 @@ VIRUS_NAME = "virus_name"
 VIRUS_TAXON_RANK = "virus_taxon_rank"
 VIRUS_HOST_NAME = "virus_host_name"
 VIRUS_HOST_TAXON_RANK = "virus_host_taxon_rank"
-
-## Taxonomy columns
-NAME = "Name"
-RANK = "Rank"
-NCBI_TAX_ID = "TaxID"
-
-
-TAXONKIT_DIR = "~/dev/taxonkit"
-
-# uniprot related constants
-UNIPROT_REST_PROTS = "https://rest.uniprot.org/uniprotkb/search"
-UNIPROT_REST_UNIREF90_QUERY_PARAM = "uniref_cluster_90:%s"
-N_CPU = 6
 
 # Parse fasta file
 # input fasta file
@@ -210,11 +205,12 @@ def query_uniprot(uniref90_id):
 # remove sequences with no hosts of the virus from which the sequences were sampled
 # input: Dataset in csv file containing sequences with host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
 # output: Dataframe with sequences containing atleast one host_tax_is. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
-def remove_sequences_w_no_hosts(output_directory):
-    print("\nRemoving Sequences with no hosts")
-    # df = pd.read_csv(os.path.join(output_directory, UNIREF90_DATA_W_HOSTS_FILENAME), on_bad_lines=None, converters={2: literal_eval},
-    #                       names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
-    df = pd.read_csv(os.path.join(output_directory, UNIREF90_DATA_W_HOSTS_FILENAME), names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
+## Used only for mapping with UniProt.
+## In case of VirusHost DB, the dataset is already pruned to remove sequences without hosts during the mapping stage itself.
+def remove_sequences_w_no_hosts(input_file_path, output_file_path):
+    print("START: Remove sequences with no hosts")
+    df = pd.read_csv(input_file_path, on_bad_lines=None, converters={2: literal_eval},
+                     names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
 
     # count the number of hosts for each sequence
     df[HOST_COUNT] = df.apply(lambda x: len(x[HOST_TAX_IDS]), axis=1)
@@ -225,7 +221,10 @@ def remove_sequences_w_no_hosts(output_directory):
     print(f"Dataset after excluding proteins with no virus host = {df.shape[0]}")
     # drop the host_count column
     df.drop(columns=[HOST_COUNT], inplace=True)
-    return df
+    df.to_csv(output_file_path, index=False)
+    print(f"Written to file {output_file_path}")
+    print("END: Remove sequences with no hosts")
+    return
 
 
 # Explode the host_tax_ids columns
@@ -238,22 +237,34 @@ def explode_virus_hosts(df):
     df = df.explode(HOST_TAX_IDS)
     print(f"Dataset size after exploding {HOST_TAX_IDS} column = {df.shape[0]}")
     print(f"Number of unique protein sequences = {len(df[UNIREF90_ID].unique())}")
-    print(f"Number of unique hosts  = {len(df[HOST_TAX_IDS].unique())}")
     return df
 
 
 # Get taxonomy name and rank of the virus and its host for each sequence record.
 # Input: Dataframe with exploded host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
 # Output: Dataset with metadata. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
-def get_virus_metadata(df):
-    print("\nRetrieving virus metadata")
+def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_path):
+    print("START: Retrieving virus and virus host metadata using pytaxonkit")
+    # Set TAXONKIT_DB environment variable
+    os.environ["TAXONKIT_DB"] = taxon_metadata_dir_path
+
+    # Read input dataset
+    df = pd.read_csv(input_file_path, on_bad_lines=None, converters={2: literal_eval},
+                     names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
+    print(f"Read dataset size = {df.shape[0]}")
+
+    # Explode the hosts column
+    df = df.explode(HOST_TAX_IDS)
+    print(f"Dataset size after exploding {HOST_TAX_IDS} column = {df.shape[0]}")
+    print(f"Number of unique viral protein sequences = {len(df[UNIREF90_ID].unique())}")
+
     # Retrieve name and rank of all unique viruses in the dataset
     virus_tax_ids = df[TAX_ID].unique()
     print(f"Number of unique virus tax ids = {len(virus_tax_ids)}")
     virus_metadata_df = get_taxonomy_name_rank(virus_tax_ids)
     print(f"Size of virus metadata dataset = {virus_metadata_df.shape[0]}")
 
-    # Retrieve name and rank of all unique viruses in the dataset
+    # Retrieve name and rank of all unique virus_hosts in the dataset
     virus_host_tax_ids = df[HOST_TAX_IDS].unique()
     print(f"Number of unique virus host tax ids = {len(virus_host_tax_ids)}")
     virus_host_metadata_df = get_taxonomy_name_rank(virus_host_tax_ids)
@@ -265,11 +276,14 @@ def get_virus_metadata(df):
     df_w_metadata.rename(columns={NAME: VIRUS_NAME, RANK: VIRUS_TAXON_RANK}, inplace=True)
     print(f"Dataset size after merge with virus metadata = {df_w_metadata.shape}")
 
+    # Merge df with virus_metadata_df to map metadata of virus hosts
     df_w_metadata = pd.merge(df_w_metadata, virus_host_metadata_df, left_on=HOST_TAX_IDS, right_on=NCBI_TAX_ID, how="left")
     df_w_metadata.drop(columns=[NCBI_TAX_ID], inplace=True)
     df_w_metadata.rename(columns={NAME: VIRUS_HOST_NAME, RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
     print(f"Dataset size after merge with virus host metadata = {df_w_metadata.shape}")
-    return df_w_metadata
+    df_w_metadata.to_csv(output_file_path, index=False)
+    print(f"Written to file {output_file_path}")
+    print("END: Retrieving virus and virus host metadata using pytaxonkit")
 
 
 # Get taxonomy names and ranks from ncbi using pytaxonkit for given list of tax_ids
