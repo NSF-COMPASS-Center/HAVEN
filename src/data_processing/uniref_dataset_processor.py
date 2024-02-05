@@ -10,6 +10,7 @@ from Bio import SeqIO
 from multiprocessing import Pool
 from itertools import repeat
 from pathlib import Path
+import ast
 
 # Script to parse and create uniref90 dataset
 # Usage: python src/data_processing/uniref_dataset_processor.py -if <absolute path to input fasta file> -od <absolute path output directory>
@@ -24,6 +25,8 @@ UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_wo_singlehost_virushostdb.csv"
 # UniProt keywords/contsant values
 UNIPROT_REST_PROTS = "https://rest.uniprot.org/uniprotkb/search"
 UNIPROT_REST_UNIREF90_QUERY_PARAM = "uniref_cluster_90:%s"
+ORGANISM_HOSTS = "organismHosts"
+TAXON_ID="taxonId"
 N_CPU = 6
 
 # Virus Host DB keywords
@@ -36,7 +39,10 @@ VIRUS_HOST_DB_HOST_NAME = "host name"
 NAME = "Name"
 RANK = "Rank"
 NCBI_TAX_ID = "TaxID"
-TAXONKIT_DIR = "~/dev/taxonkit"
+TAXONKIT_DB = "TAXONKIT_DB"
+SPECIES = "species"
+MAMMALIA = "Mammalia"
+AVES = "Aves"
 
 # Column names at various stages of dataset curation
 UNIREF90_ID = "uniref90_id"
@@ -190,13 +196,13 @@ def get_virus_host(df, output_file_path):
 # output: list of host(s) of the virus
 def query_uniprot(uniref90_id):
     response = requests.get(url=UNIPROT_REST_PROTS,
-                            params={"query": UNIPROT_REST_UNIREF90_QUERY_PARAM % uniref90_id, "fields": "virus_hosts"})
+                            params={"query": UNIPROT_REST_UNIREF90_QUERY_PARAM % uniref90_id, "fields": VIRUS_HOSTS})
     host_tax_ids = []
     try:
         data = response.json()["results"][0]
-        org_hosts = data["organismHosts"]
+        org_hosts = data[ORGANISM_HOSTS]
         for org_host in org_hosts:
-            host_tax_ids.append(org_host["taxonId"])
+            host_tax_ids.append(org_host[TAXON_ID])
     except (KeyError, IndexError):
         pass
     return host_tax_ids
@@ -227,34 +233,24 @@ def remove_sequences_w_no_hosts(input_file_path, output_file_path):
     return
 
 
-# Explode the host_tax_ids columns
-# Create multiple entries (duplicate the uniref90id) for each virus host associated with a sequence uniref90_id
-# input: Dataframe with sequence ids containing atleast one host_tax_is. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
-# output: Dataframe with exploded host_tax_ids (one host_id per record in the host_tax_ids column). Columns = ["uniref90_id", "tax_id", "host_tax_ids]
-def explode_virus_hosts(df):
-    print("\nExploding virus hosts")
-    print(f"Dataset size = {df.shape[0]}")
-    df = df.explode(HOST_TAX_IDS)
-    print(f"Dataset size after exploding {HOST_TAX_IDS} column = {df.shape[0]}")
-    print(f"Number of unique protein sequences = {len(df[UNIREF90_ID].unique())}")
-    return df
-
-
 # Get taxonomy name and rank of the virus and its host for each sequence record.
 # Input: Dataframe with exploded host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
 # Output: Dataset with metadata. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_path):
     print("START: Retrieving virus and virus host metadata using pytaxonkit")
     # Set TAXONKIT_DB environment variable
-    os.environ["TAXONKIT_DB"] = taxon_metadata_dir_path
+    os.environ[TAXONKIT_DB] = taxon_metadata_dir_path
 
     # Read input dataset
-    df = pd.read_csv(input_file_path, on_bad_lines=None, converters={2: literal_eval},
-                     names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
+    df = pd.read_csv(input_file_path)
     print(f"Read dataset size = {df.shape[0]}")
 
+    # convert HOST_TAX_IDS column to list type
+    df[HOST_TAX_IDS] = df[HOST_TAX_IDS].apply(ast.literal_eval)
     # Explode the hosts column
     df = df.explode(HOST_TAX_IDS)
+    # convert the HOST_TAX_IDS column to int64 for merge with the taxonomy metadata df
+    df[HOST_TAX_IDS] = df[HOST_TAX_IDS].astype("int64")
     print(f"Dataset size after exploding {HOST_TAX_IDS} column = {df.shape[0]}")
     print(f"Number of unique viral protein sequences = {len(df[UNIREF90_ID].unique())}")
 
@@ -318,38 +314,52 @@ def join_metadata_with_sequences_data(df, output_directory):
 
 
 # Filter for records with virus_name and virus_host_name at "Species" level
-# Input: Dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
-# Output: Filtered dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
-def get_sequences_at_species_level(output_directory):
-    df = pd.read_csv(os.path.join(output_directory, UNIREF90_DATA_W_METADATA))
-    print(f"Dataset size before filter: {df.shape}")
+# Input: Dataset with metadata. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
+# Output: Filtered dataset with metadata. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
+def get_sequences_at_species_level(input_file_path, output_file_path):
+    print("START: Filter records with virus and virus hosts at 'species' level taxonomy.")
+    df = pd.read_csv(input_file_path)
+    print(f"Dataset size before filter: {df.shape[0]}")
 
     # Filter for virus rank == Species
-    df = df[df[VIRUS_TAXON_RANK] == "species"]
-    print(f"Dataframe size after virus at species level filter: {df.shape}")
+    df = df[df[VIRUS_TAXON_RANK] == SPECIES]
+    print(f"Dataset size after virus at species level filter: {df.shape[0]}")
 
     # Filter for virus_host rank == Species
-    df = df[df[VIRUS_HOST_TAXON_RANK] == "species"]
-    print(f"Dataframe size after virus_host at species level filter: {df.shape}")
+    df = df[df[VIRUS_HOST_TAXON_RANK] == SPECIES]
+    print(f"Dataset size after virus_host at species level filter: {df.shape[0]}")
 
-    return df
+    df.to_csv(output_file_path, index=False)
+    print(f"Writing to file {output_file_path}")
+    print("END: Filter records with virus and virus hosts at 'species' level taxonomy.")
 
 
 # Filter for sequences with virus hosts belonging to the class of Mammals OR Aves (birds)
-# Input: Dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
-# Output: Filtered dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
-def get_sequences_from_mammals_aves_hosts(df):
+# Input: Dataset with metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
+# Output: Filtered dataset with metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
+def get_sequences_from_mammals_aves_hosts(input_file_path, taxon_metadata_dir_path, output_file_path):
+    print("START: Filter records with virus hosts belonging to 'mammals' OR 'aves' family.")
+    # Set TAXONKIT_DB environment variable
+    os.environ["TAXONKIT_DB"] = taxon_metadata_dir_path
+
+    # Read input file
+    df = pd.read_csv(input_file_path)
+
     # Get all unique host tax ids
     host_tax_ids = df[HOST_TAX_IDS].unique()
     print(f"Number of unique host tax ids = {len(host_tax_ids)}")
 
     # Get taxids belonging to the class of mammals and aves
     mammals_aves_tax_ids = get_mammals_aves_tax_ids(host_tax_ids)
+    print(f"Number of unique mammalia or aves tax ids = {len(mammals_aves_tax_ids)}")
     # Filter
     print(f"Dataset size before filtering for mammals and aves: {df.shape}")
     df = df[df[HOST_TAX_IDS].isin(mammals_aves_tax_ids)]
     print(f"Dataset size after filtering for mammals and aves: {df.shape}")
-    return df
+
+    df.to_csv(output_file_path, index=False)
+    print(f"Writing to file {output_file_path}")
+    print("END: Filter records with virus hosts belonging to 'mammals' OR 'aves' family.")
 
 
 # Get taxids belonging to the class of mammals and aves
@@ -360,7 +370,7 @@ def get_mammals_aves_tax_ids(tax_ids):
     for i, tax_id in enumerate(tax_ids):
         tax_class = pytaxonkit.lineage([tax_id], formatstr="{c}")["Lineage"].iloc[0]
         print(f"{i}: {tax_id} = {tax_class}")
-        if tax_class == "Mammalia" or tax_class == "Aves":
+        if tax_class == MAMMALIA or tax_class == AVES:
             mammals_aves_tax_ids.append(tax_id)
     return mammals_aves_tax_ids
 

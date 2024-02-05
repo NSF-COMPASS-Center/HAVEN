@@ -6,9 +6,7 @@ from data_processing import uniref_dataset_processor
 # names of all intermediary files to be created
 UNIREF90_DATA_CSV_FILENAME = "uniref90_viridae.csv"
 UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME = "uniref90_viridae_uniprot_hosts.csv"
-UNIREF90_DATA_HOST_UNIPROT_MAPPING_PRUNED_FILENAME = "uniref90_viridae_uniprot_hosts_pruned.csv"
 UNIREF90_DATA_HOST_VIRUSHOSTDB_MAPPING_FILENAME = "uniref90_viridae_virushostdb_hosts.csv"
-UNIREF90_DATA_HOST_VIRUSHOSTDB_MAPPING_PRUNED_FILENAME = "uniref90_viridae_virushostdb_hosts_pruned.csv"
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Preprocess the UniRef90 protein sequences dataset.\nOnly one of the below options can be selected at runtime.')
@@ -24,6 +22,15 @@ def parse_args():
                         help="Get hosts of virus from VirusHostDB mapping using the absolute path to the mapping file.\n")
     parser.add_argument("--prune_dataset", action="store_true",
                         help="Remove sequences without hosts of virus from the input csv dataset file.\n")
+    parser.add_argument("--taxon_dir",
+                        help="Absolute path to the NCBI taxon directory.")
+    parser.add_argument("--taxon_metadata", action="store_true",
+                        help="Get taxonomy metadata using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+    parser.add_argument("--filter_species", action="store_true",
+                        help="Filter for virus and virus hosts with rank of species.")
+    parser.add_argument("--filter_mammals_aves", action="store_true",
+                        help="Filter for virus hosts belonging to mammalia OR aves family using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+
     args = parser.parse_args()
     return args
 
@@ -58,12 +65,27 @@ def pre_process_uniref90(config):
                                                              output_file_path=pruned_dataset_file_path)
 
     # 4. Get taxonomy metadata (rank of virus and virus hosts) from NCBI
-    if config.taxon_metadata is not None:
+    if config.taxon_metadata:
         input_file_path = config.input_file
         metadata_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_metadata.csv")
-        uniref_dataset_processor.remove_sequences_w_no_hosts(input_file_path=input_file_path,
-                                                             taxon_metadata_dir_path=config.taxon_metadata,
+        uniref_dataset_processor.get_virus_metadata(input_file_path=input_file_path,
+                                                             taxon_metadata_dir_path=config.taxon_dir,
                                                              output_file_path=metadata_dataset_file_path)
+
+    # 5. Filter for virus and virus_hosts at species level
+    if config.filter_species:
+        input_file_path = config.input_file
+        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species.csv")
+        get_sequences_at_species_level(input_file_path=input_file_path,
+                                       output_file_path=filtered_dataset_file_path)
+
+    # 5. Filter for virus_hosts belonging to mammals OR aves
+    if config.filter_mammals_aves:
+        input_file_path = config.input_file
+        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_mammals_or_aves.csv")
+        get_sequences_from_mammals_aves_hosts(input_file_path=input_file_path,
+                                              taxon_metadata_dir_path=config.taxon_dir,
+                                       output_file_path=filtered_dataset_file_path)
 
 def main():
     config = parse_args()
