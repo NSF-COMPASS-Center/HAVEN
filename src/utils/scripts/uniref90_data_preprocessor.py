@@ -69,23 +69,23 @@ def pre_process_uniref90(config):
         input_file_path = config.input_file
         metadata_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_metadata.csv")
         uniref_dataset_processor.get_virus_metadata(input_file_path=input_file_path,
-                                                             taxon_metadata_dir_path=config.taxon_dir,
-                                                             output_file_path=metadata_dataset_file_path)
+                                                    taxon_metadata_dir_path=config.taxon_dir,
+                                                    output_file_path=metadata_dataset_file_path)
 
     # 5. Filter for virus and virus_hosts at species level
     if config.filter_species:
         input_file_path = config.input_file
         filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species.csv")
-        get_sequences_at_species_level(input_file_path=input_file_path,
-                                       output_file_path=filtered_dataset_file_path)
+        uniref_dataset_processor.get_sequences_at_species_level(input_file_path=input_file_path,
+                                                                output_file_path=filtered_dataset_file_path)
 
     # 5. Filter for virus_hosts belonging to mammals OR aves
     if config.filter_mammals_aves:
         input_file_path = config.input_file
         filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_mammals_or_aves.csv")
-        get_sequences_from_mammals_aves_hosts(input_file_path=input_file_path,
-                                              taxon_metadata_dir_path=config.taxon_dir,
-                                       output_file_path=filtered_dataset_file_path)
+        uniref_dataset_processor.get_sequences_from_mammals_aves_hosts(input_file_path=input_file_path,
+                                                                       taxon_metadata_dir_path=config.taxon_dir,
+                                                                       output_file_path=filtered_dataset_file_path)
 
 def main():
     config = parse_args()
