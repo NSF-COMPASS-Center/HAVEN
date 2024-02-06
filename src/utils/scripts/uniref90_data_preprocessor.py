@@ -30,43 +30,43 @@ def parse_args():
                         help="Filter for virus and virus hosts with rank of species.")
     parser.add_argument("--filter_mammals_aves", action="store_true",
                         help="Filter for virus hosts belonging to mammalia OR aves family using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+    parser.add_argument("--merge_sequence_data",
+                        help="Join the metadata from the input_file with the sequence data from the provided absolute file path.")
 
     args = parser.parse_args()
     return args
 
 
 def pre_process_uniref90(config):
+    input_file_path = config.input_file
     output_dir = config.output_dir
 
     # 1. Parse the Fasta file
-    ## config.input_file_path points
     if config.fasta_to_csv:
-        uniref_dataset_processor.parse_fasta_file(input_file_path=config.input_file,
+        uniref_dataset_processor.parse_fasta_file(input_file_path=input_file_path,
                                               output_file_path=os.path.join(output_dir, UNIREF90_DATA_CSV_FILENAME))
 
     # 2. Get hosts of the virus from which the protein sequences were sampled using either uniprot or virushostdb
     #    depending on the input.
     # 2A. Host mapping from UniProt
     if config.host_map_uniprot:
-        uniref_dataset_processor.get_virus_hosts_from_uniprot(input_file_path=config.input_file,
+        uniref_dataset_processor.get_virus_hosts_from_uniprot(input_file_path=input_file_path,
                                                               output_file_path=os.path.join(output_dir,
                                                                                             UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME))
 
     # 2B. Host mapping from VirusHostDB
     if config.host_map_virushostdb is not None:
-        uniref_dataset_processor.get_virus_hosts_from_virushostdb(input_file_path=config.input_file,
+        uniref_dataset_processor.get_virus_hosts_from_virushostdb(input_file_path=input_file_path,
                                                                   output_file_path=os.path.join(output_dir, UNIREF90_DATA_HOST_VIRUSHOSTDB_MAPPING_FILENAME),
                                                                   virushostdb_mapping_file=config.host_map_virushostdb)
     # 3. Remove sequences with no hosts
     if config.prune_dataset:
-        input_file_path = config.input_file
         pruned_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_pruned.csv")
         uniref_dataset_processor.remove_sequences_w_no_hosts(input_file_path=input_file_path,
                                                              output_file_path=pruned_dataset_file_path)
 
     # 4. Get taxonomy metadata (rank of virus and virus hosts) from NCBI
     if config.taxon_metadata:
-        input_file_path = config.input_file
         metadata_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_metadata.csv")
         uniref_dataset_processor.get_virus_metadata(input_file_path=input_file_path,
                                                     taxon_metadata_dir_path=config.taxon_dir,
@@ -74,18 +74,23 @@ def pre_process_uniref90(config):
 
     # 5. Filter for virus and virus_hosts at species level
     if config.filter_species:
-        input_file_path = config.input_file
         filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species.csv")
         uniref_dataset_processor.get_sequences_at_species_level(input_file_path=input_file_path,
                                                                 output_file_path=filtered_dataset_file_path)
 
     # 5. Filter for virus_hosts belonging to mammals OR aves
     if config.filter_mammals_aves:
-        input_file_path = config.input_file
         filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_mammals_or_aves.csv")
         uniref_dataset_processor.get_sequences_from_mammals_aves_hosts(input_file_path=input_file_path,
                                                                        taxon_metadata_dir_path=config.taxon_dir,
                                                                        output_file_path=filtered_dataset_file_path)
+    # 6. Merge the metadata with the sequence data
+    if config.merge_sequence_data:
+        sequence_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_w_seq.csv")
+        uniref_dataset_processor.join_metadata_with_sequences_data(input_file_path=input_file_path,
+                                                                   sequence_data_file_path=config.merge_sequence_data,
+                                                                   output_file_path=sequence_dataset_file_path)
+
 
 def main():
     config = parse_args()

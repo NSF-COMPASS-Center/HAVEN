@@ -299,20 +299,6 @@ def get_taxonomy_name_rank(tax_ids):
     return df_w_rank
 
 
-# Join metadata dataset with sequence data using data from the parsed fasta file
-# Input: Metadata dataset. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
-# Output: Dataset written to csv file. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
-def join_metadata_with_sequences_data(df, output_directory):
-    print(f"Metadata dataset size = {df.shape}")
-    sequence_data_df = pd.read_csv(os.path.join(output_directory, UNIREF90_DATA_CSV_FILENAME))
-    print(f"Sequence dataset size = {sequence_data_df.shape}")
-    uniref90_df = pd.merge(df, sequence_data_df[[UNIREF90_ID, SEQUENCE]], how="left", on=UNIREF90_ID)
-    print(uniref90_df.head())
-    print(f"Size of dataset after merge of metadata with sequence data = {uniref90_df.shape}")
-    print(f"Writing to file {UNIREF90_DATA_W_METADATA}")
-    uniref90_df.to_csv(os.path.join(output_directory, UNIREF90_DATA_W_METADATA), index=False)
-
-
 # Filter for records with virus_name and virus_host_name at "Species" level
 # Input: Dataset with metadata. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 # Output: Filtered dataset with metadata. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
@@ -373,6 +359,24 @@ def get_mammals_aves_tax_ids(tax_ids):
         if tax_class == MAMMALIA or tax_class == AVES:
             mammals_aves_tax_ids.append(tax_id)
     return mammals_aves_tax_ids
+
+
+# Join metadata dataset with sequence data from the parsed fasta file
+# Input: Metadata dataset. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
+# Output: Dataset written to csv file. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
+def join_metadata_with_sequences_data(input_file_path, sequence_data_file_path, output_file_path):
+    print("START: Joining metadata with sequences data.")
+    metadata_df = pd.read_csv(input_file_path)
+    print(f"Metadata dataset size = {metadata_df.shape[0]}")
+
+    sequence_data_df = pd.read_csv(sequence_data_file_path)
+    print(f"Sequence dataset size = {sequence_data_df.shape[0]}")
+
+    merged_df = pd.merge(metadata_df, sequence_data_df[[UNIREF90_ID, SEQUENCE]], how="left", on=UNIREF90_ID)
+    print(f"Size of dataset after merge of metadata with sequence data = {merged_df.shape[0]}")
+    merged_df.to_csv(output_file_path, index=False)
+    print(f"Written to file {output_file_path}")
+    print("END: Joining metadata with sequences data.")
 
 
 # Remove sequences of virus with only one host
