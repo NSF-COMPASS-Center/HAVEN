@@ -90,7 +90,7 @@ def pre_process_uniref90(config):
                                                                        taxon_metadata_dir_path=config.taxon_dir,
                                                                        output_file_path=filtered_dataset_file_path)
     # 6B. Filter for virus_hosts belonging to Vertebrata clade
-    if config.filter_vertibrates:
+    if config.filter_vertebrates:
         filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_vertebrates.csv")
         uniref_dataset_processor.get_sequences_from_vertebrata_hosts(input_file_path=input_file_path,
                                                                      taxon_metadata_dir_path=config.taxon_dir,
