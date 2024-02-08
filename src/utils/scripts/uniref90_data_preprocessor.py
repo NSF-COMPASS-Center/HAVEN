@@ -32,6 +32,8 @@ def parse_args():
                         help="Filter for virus and virus hosts with rank of species.")
     parser.add_argument("--filter_mammals_aves", action="store_true",
                         help="Filter for virus hosts belonging to mammalia OR aves family using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+    parser.add_argument("--filter_vertebrates", action="store_true",
+                        help="Filter for virus hosts belonging to Vertebrata clade using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
     parser.add_argument("--merge_sequence_data",
                         help="Join the metadata from the input_file with the sequence data from the provided absolute file path.")
 
