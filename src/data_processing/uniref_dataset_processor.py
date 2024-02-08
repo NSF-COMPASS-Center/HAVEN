@@ -4,7 +4,7 @@ import requests
 import numpy as np
 import argparse
 import re
-import pytaxonkit
+# import pytaxonkit
 from ast import literal_eval
 from Bio import SeqIO
 from multiprocessing import Pool

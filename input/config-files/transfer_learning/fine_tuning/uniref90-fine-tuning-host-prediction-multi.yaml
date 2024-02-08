@@ -6,12 +6,12 @@ config_sub_type: "host_prediction"
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/uniref90"
+  input_dir: "input/data/uniref90/20240131"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   # file_names: [ "uniref90_final_msl1114.csv" ]
-  file_names: [ "uniref90_final.csv" ]
+  file_names: [ "uniref90_viridae_virushostdb_hosts_pruned_metadata_species_vertebrates_w_seq_t0.005_c5.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -38,7 +38,6 @@ pre_train_settings:
 
 fine_tune_settings:
   n_iterations: 5
-
   split_input: True
   train_proportion: 0.8
   classification_type: "multi"
@@ -55,14 +54,10 @@ fine_tune_settings:
     exclude_labels: [ "nan" ]
     label_groupings:
       "Human": [ "Homo sapiens" ]
-      "Desert warthog": [ "Phacochoerus aethiopicus" ]
-      "Lesser bandicoot rat": [ "Bandicota bengalensis" ]
-      "Horse": [ "Equus caballus" ]
-      "Goat": [ "Capra hircus" ]
-      "Red junglefowl": [ "Gallus gallus" ]
-      "Wood mouse": [ "Apodemus sylvaticus" ]
+      "Chimpanzee": [ "Pan troglodytes" ]
       "Cattle": [ "Bos taurus" ]
-      "Others": [ "*" ]
+      "Grivet": [ "Chlorocebus aethiops" ]
+      "Pig": [ "Sus scrofa" ]
 
   task_settings:
     - name: "host_prediction_fnn_2l_lr1e-4"
@@ -71,12 +66,12 @@ fine_tune_settings:
       fine_tuned_model_path: ""
       loss: "FocalLoss"
       depth: 2
-      n_classes: 9
+      n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90/20231115/fine_tuning/host_prediction"
-  prefix: "mlm_transformer_encoder-l_6-h_8-lr1e-4_uniref90viridae_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90_vertebrates_t0.005_c5/20240207/fine_tuning/host_prediction"
+  prefix: "mlm_transformer_encoder-l6-h8-lr1e-4_uniref90viridae_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
