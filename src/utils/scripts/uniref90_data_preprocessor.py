@@ -8,8 +8,10 @@ UNIREF90_DATA_CSV_FILENAME = "uniref90_viridae.csv"
 UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME = "uniref90_viridae_uniprot_hosts.csv"
 UNIREF90_DATA_HOST_VIRUSHOSTDB_MAPPING_FILENAME = "uniref90_viridae_virushostdb_hosts.csv"
 
+
 def parse_args():
-    parser = argparse.ArgumentParser(description='Preprocess the UniRef90 protein sequences dataset.\nOnly one of the below options can be selected at runtime.')
+    parser = argparse.ArgumentParser(
+        description='Preprocess the UniRef90 protein sequences dataset.\nOnly one of the below options can be selected at runtime.')
     parser.add_argument("-if", "--input_file", required=True,
                         help="Absolute path to input file depending on the option(s) selected.\n")
     parser.add_argument("-od", "--output_dir", required=True,
@@ -44,7 +46,7 @@ def pre_process_uniref90(config):
     # 1. Parse the Fasta file
     if config.fasta_to_csv:
         uniref_dataset_processor.parse_fasta_file(input_file_path=input_file_path,
-                                              output_file_path=os.path.join(output_dir, UNIREF90_DATA_CSV_FILENAME))
+                                                  output_file_path=os.path.join(output_dir, UNIREF90_DATA_CSV_FILENAME))
 
     # 2. Get hosts of the virus from which the protein sequences were sampled using either uniprot or virushostdb
     #    depending on the input.
@@ -57,7 +59,8 @@ def pre_process_uniref90(config):
     # 2B. Host mapping from VirusHostDB
     if config.host_map_virushostdb is not None:
         uniref_dataset_processor.get_virus_hosts_from_virushostdb(input_file_path=input_file_path,
-                                                                  output_file_path=os.path.join(output_dir, UNIREF90_DATA_HOST_VIRUSHOSTDB_MAPPING_FILENAME),
+                                                                  output_file_path=os.path.join(output_dir,
+                                                                                                UNIREF90_DATA_HOST_VIRUSHOSTDB_MAPPING_FILENAME),
                                                                   virushostdb_mapping_file=config.host_map_virushostdb)
     # 3. Remove sequences with no hosts
     if config.prune_dataset:
@@ -78,13 +81,20 @@ def pre_process_uniref90(config):
         uniref_dataset_processor.get_sequences_at_species_level(input_file_path=input_file_path,
                                                                 output_file_path=filtered_dataset_file_path)
 
-    # 5. Filter for virus_hosts belonging to mammals OR aves
+    # 6A. Filter for virus_hosts belonging to family of mammals OR aves
     if config.filter_mammals_aves:
         filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_mammals_or_aves.csv")
         uniref_dataset_processor.get_sequences_from_mammals_aves_hosts(input_file_path=input_file_path,
                                                                        taxon_metadata_dir_path=config.taxon_dir,
                                                                        output_file_path=filtered_dataset_file_path)
-    # 6. Merge the metadata with the sequence data
+    # 6B. Filter for virus_hosts belonging to Vertebrata clade
+    if config.filter_vertibrates:
+        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_vertebrates.csv")
+        uniref_dataset_processor.get_sequences_from_vertebrata_hosts(input_file_path=input_file_path,
+                                                                     taxon_metadata_dir_path=config.taxon_dir,
+                                                                     output_file_path=filtered_dataset_file_path)
+
+    # 7. Merge the metadata with the sequence data
     if config.merge_sequence_data:
         sequence_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_w_seq.csv")
         uniref_dataset_processor.join_metadata_with_sequences_data(input_file_path=input_file_path,

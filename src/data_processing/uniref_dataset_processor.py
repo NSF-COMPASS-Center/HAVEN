@@ -43,6 +43,7 @@ TAXONKIT_DB = "TAXONKIT_DB"
 SPECIES = "species"
 MAMMALIA = "Mammalia"
 AVES = "Aves"
+VERTEBRATA_TAX_ID = "7742"
 
 # Column names at various stages of dataset curation
 UNIREF90_ID = "uniref90_id"
@@ -348,6 +349,34 @@ def get_sequences_from_mammals_aves_hosts(input_file_path, taxon_metadata_dir_pa
     print("END: Filter records with virus hosts belonging to 'mammals' OR 'aves' family.")
 
 
+# Filter for sequences with virus hosts belonging to the clade of vertebrata
+# Input: Dataset with metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
+# Output: Filtered dataset with metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
+def get_sequences_from_vertebrata_hosts(input_file_path, taxon_metadata_dir_path, output_file_path):
+    print("START: Filter records with virus hosts belonging to 'vertebrata' clade.")
+    # Set TAXONKIT_DB environment variable
+    os.environ["TAXONKIT_DB"] = taxon_metadata_dir_path
+
+    # Read input file
+    df = pd.read_csv(input_file_path)
+
+    # Get all unique host tax ids
+    host_tax_ids = df[HOST_TAX_IDS].unique()
+    print(f"Number of unique host tax ids = {len(host_tax_ids)}")
+
+    # Get taxids belonging to the clade of vertebrata
+    vertebrata_tax_ids = get_vertebrata_tax_ids(host_tax_ids)
+    print(f"Number of unique vertebrata tax ids = {len(vertebrata_tax_ids)}")
+    # Filter
+    print(f"Dataset size before filtering for vertebrata: {df.shape}")
+    df = df[df[HOST_TAX_IDS].isin(vertebrata_tax_ids)]
+    print(f"Dataset size after filtering for vertebrata: {df.shape}")
+
+    df.to_csv(output_file_path, index=False)
+    print(f"Writing to file {output_file_path}")
+    print("END: Filter records with virus hosts belonging to vertebrata' clade.")
+
+
 # Get taxids belonging to the class of mammals and aves
 # Input: list of tax_ids
 # Output: list of tax_ids belonging to mammals and aves class
@@ -359,6 +388,23 @@ def get_mammals_aves_tax_ids(tax_ids):
         if tax_class == MAMMALIA or tax_class == AVES:
             mammals_aves_tax_ids.append(tax_id)
     return mammals_aves_tax_ids
+
+
+# Get taxids belonging to the clade = Vertebrata
+# Input: list of tax_ids
+# Output: list of tax_ids belonging to Vertebrata clade
+def get_vertebrata_tax_ids(tax_ids):
+    vertebrata_tax_ids = []
+    for i, tax_id in enumerate(tax_ids):
+        # Issue: No placeholder formatter for rank=clade. Hence cannot use formatstr as for class {c}
+        # Workaround: Get full lineage and filter for vertebrata Tax ID
+        # example output from pytaxonkit.lineage([]):
+        # '131567;2759;33154;33208;6072;33213;33511;7711;89593;7742;7776;117570;117571;8287;1338369;32523;32524;40674;32525;9347;1437010;314146;9443;376913;314293;9526;314295;9604;207598;9605;9606'
+        # hence split by ";"
+        full_lineage_tax_ids = pytaxonkit.lineage([tax_id])["FullLineageTaxIDs"].iloc[0].split(";")
+        if VERTEBRATA_TAX_ID in full_lineage_tax_ids:
+            vertebrata_tax_ids.append(tax_id)
+    return vertebrata_tax_ids
 
 
 # Join metadata dataset with sequence data from the parsed fasta file
