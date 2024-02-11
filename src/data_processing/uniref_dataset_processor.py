@@ -4,6 +4,8 @@ import requests
 import numpy as np
 import argparse
 import re
+#
+#
 # import pytaxonkit
 from ast import literal_eval
 from Bio import SeqIO
@@ -428,8 +430,12 @@ def join_metadata_with_sequences_data(input_file_path, sequence_data_file_path, 
 # Remove sequences of virus with only one host
 # Input: Dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 # Output: Filtered dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
-def remove_sequences_of_virus_with_one_host(df):
-    print("\nRemoving sequences with one host.")
+def remove_sequences_of_virus_with_one_host(input_file_path, output_file_path):
+    print("START: Remove sequences with one host.")
+
+    # Read input file
+    df = pd.read_csv(input_file_path)
+
     # group by virus name and count the number of unique hosts for each virus
     agg_df = df.groupby([VIRUS_NAME])[VIRUS_HOST_NAME].nunique()
     # list of viruses with only one unique host
@@ -439,7 +445,9 @@ def remove_sequences_of_virus_with_one_host(df):
     print(f"Dataset size before filtering for viruses with more than one hosts: {df.shape}")
     df = df[~df[VIRUS_NAME].isin(viruses_with_one_host)]
     print(f"Dataset size after filtering for viruses with more than one hosts: {df.shape}")
-    return df
+    df.to_csv(output_file_path, index=False)
+    print(f"Written to file {output_file_path}")
+    print("END: Remove sequences with one host.")
 
 
 # Remove duplicate sequences

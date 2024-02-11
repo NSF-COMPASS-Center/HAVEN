@@ -36,6 +36,8 @@ def parse_args():
                         help="Filter for virus hosts belonging to Vertebrata clade using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
     parser.add_argument("--merge_sequence_data",
                         help="Join the metadata from the input_file with the sequence data from the provided absolute file path.")
+    parser.add_argument("--remove_single_host_viruses", action="store_true",
+                        help="Remove viruses with only one host.")
 
     args = parser.parse_args()
     return args
@@ -102,6 +104,11 @@ def pre_process_uniref90(config):
         uniref_dataset_processor.join_metadata_with_sequences_data(input_file_path=input_file_path,
                                                                    sequence_data_file_path=config.merge_sequence_data,
                                                                    output_file_path=sequence_dataset_file_path)
+
+    # 8. Remove viruses with only one host
+    if config.remove_single_host_viruses:
+        uniref_dataset_processor.remove_sequences_of_virus_with_one_host(input_file_path=input_file_path,
+                                                                         output_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_wo_single_host_virus.csv"))
 
 
 def main():
