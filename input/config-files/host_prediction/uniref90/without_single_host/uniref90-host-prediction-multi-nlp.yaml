@@ -9,7 +9,7 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_viridae_virushostdb_hosts_pruned_metadata_species_vertebrates_w_seq_t0.005_c5.csv" ]
+  file_names: [ "uniref90_viridae_virushostdb_hosts_pruned_metadata_species_vertebrates_w_seq_wo_single_host_virus_t0.01_c16.csv" ]
   # file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
@@ -28,7 +28,7 @@ classification_settings:
     sequence_col: "seq"
     max_sequence_length: 1366 # 6630 # 1024 # 1115
     truncate: True
-    pad_sequence_val: 0
+    pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
     kmer_settings:
       k: 3
@@ -41,23 +41,34 @@ classification_settings:
     label_groupings:
       "Human": [ "Homo sapiens" ]
       "Chimpanzee": [ "Pan troglodytes" ]
-      "Cattle": [ "Bos taurus" ]
       "Grivet": [ "Chlorocebus aethiops" ]
+      "Cattle": [ "Bos taurus" ]
       "Pig": [ "Sus scrofa" ]
+      "House mouse": [ "Mus musculus" ]
+      "Indochinese rhesus macaque": [ "Macaca mulatta" ]
+      "Red junglefowl": [ "Gallus gallus" ]
+      "Vervet monkey": [ "Chlorocebus pygerythrus" ]
+      "Brown rat": [ "Rattus norvegicus" ]
+      "Horse": [ "Equus caballus" ]
+      "Common warthog": [ "Phacochoerus africanus" ]
+      "Hamlyn monkey": [ "Cercopithecus hamlyni" ]
+      "Cat": [ "Felis catus" ]
+      "Goat": [ "Capra hircus" ]
+      "Sheep": [ "Ovis aries" ]
   training_settings:
     n_epochs: 50
-    max_lr: 1e-3
+    max_lr: 1e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
   models:
     - name: "fnn-l_10-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
       n_tokens: 27
-      n_classes: 5
+      n_classes: 16
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -68,17 +79,17 @@ classification_settings:
       loss: "FocalLoss"
       depth: 10
       n_tokens: 27
-      n_classes: 5
+      n_classes: 16
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
     - name: "cnn-l_4-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 4
       n_tokens: 27
-      n_classes: 5
+      n_classes: 16
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       kernel_size: 3
@@ -91,7 +102,7 @@ classification_settings:
       loss: "FocalLoss"
       depth: 2
       n_tokens: 27
-      n_classes: 9
+      n_classes: 16
       n_filters: 3
       kernel_size: 3
       stride: 1
@@ -103,7 +114,7 @@ classification_settings:
       loss: "FocalLoss"
       depth: 2
       n_tokens: 27
-      n_classes: 9
+      n_classes: 16
       n_filters: 16
       kernel_size: 3
       stride: 1
@@ -115,31 +126,31 @@ classification_settings:
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
       n_tokens: 27
-      n_classes: 9
+      n_classes: 16
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
       n_tokens: 27
-      n_classes: 9
+      n_classes: 16
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8-lr1e-4"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
       n_heads: 8
       depth: 6
       n_tokens: 27
-      n_classes: 9
+      n_classes: 16
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
@@ -156,12 +167,12 @@ classification_settings:
       n_heads: 8
       depth: 6
       n_tokens: 27
-      n_classes: 9
+      n_classes: 16
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed: 0 # whole numbers
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90-vertebrates/20240207/host_multi"
+  sub_dir: "uniref90_vertebrates_wo_single_host_virus_t0.01_c16/20240211/host_multi"
   prefix: "emb_sincos-d1024-lossfocalce_e50_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
