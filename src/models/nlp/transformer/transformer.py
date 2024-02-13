@@ -27,6 +27,7 @@ class Transformer(nn.Module):
 
         return decoder_emb
 
+
 # only encoder
 class TransformerEncoder(nn.Module):
     def __init__(self, n_tokens, max_seq_len, N=6, input_dim=512, hidden_dim=1024, h=8):
