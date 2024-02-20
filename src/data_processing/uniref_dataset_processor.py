@@ -25,7 +25,7 @@ UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_wo_singlehost_virushostdb.csv"
 UNIPROT_REST_PROTS = "https://rest.uniprot.org/uniprotkb/search"
 UNIPROT_REST_UNIREF90_QUERY_PARAM = "uniref_cluster_90:%s"
 ORGANISM_HOSTS = "organismHosts"
-TAXON_ID="taxonId"
+TAXON_ID = "taxonId"
 N_CPU = 6
 VIRUS_HOSTS = "virus_hosts"
 
@@ -55,6 +55,7 @@ VIRUS_NAME = "virus_name"
 VIRUS_TAXON_RANK = "virus_taxon_rank"
 VIRUS_HOST_NAME = "virus_host_name"
 VIRUS_HOST_TAXON_RANK = "virus_host_taxon_rank"
+
 
 # Parse fasta file
 # input fasta file
@@ -147,7 +148,7 @@ def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
     # read the existing output file, if it exists, to pick up from where the previous execution left.
     if Path(output_file_path).is_file():
         df_host = pd.read_csv(output_file_path, on_bad_lines=None, converters={2: literal_eval},
-                          names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
+                              names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
         df_host = df_host[[TAX_ID, UNIREF90_ID]]
         print(f"Number of records already processed = {df_host.shape[0]}")
 
@@ -177,6 +178,7 @@ def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
     print(f"Written to file {output_file_path}")
     print("END: Get virus hosts from UniProt")
 
+
 # call another method which will query UniProt to get hosts of the virus
 # write the retrieved host ids to the output file
 def get_virus_host(df, output_file_path):
@@ -187,7 +189,7 @@ def get_virus_host(df, output_file_path):
         uniref90_id = row[UNIREF90_ID]
         tax_id = row[TAX_ID]
         host_tax_ids = query_uniprot(uniref90_id)
-        print(f"{uniref90_id}: {len(host_tax_ids)}")
+        print(f"{uniref90_id}: {len(host_tax_ids) if host_tax_ids is not None else None}")
 
         # write output to file
         f = open(output_file_path, mode="a")
@@ -217,7 +219,7 @@ def query_uniprot(uniref90_id):
 
 # remove sequences with no hosts of the virus from which the sequences were sampled
 # input: Dataset in csv file containing sequences with host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
-# output: Dataframe with sequences containing atleast one host_tax_is. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
+# output: Dataframe with sequences containing atleast one host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
 ## Used only for mapping with UniProt.
 ## In case of VirusHost DB, the dataset is already pruned to remove sequences without hosts during the mapping stage itself.
 def remove_sequences_w_no_hosts(input_file_path, output_file_path):
@@ -280,7 +282,8 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     print(f"Dataset size after merge with virus metadata = {df_w_metadata.shape}")
 
     # Merge df with virus_metadata_df to map metadata of virus hosts
-    df_w_metadata = pd.merge(df_w_metadata, virus_host_metadata_df, left_on=HOST_TAX_IDS, right_on=NCBI_TAX_ID, how="left")
+    df_w_metadata = pd.merge(df_w_metadata, virus_host_metadata_df, left_on=HOST_TAX_IDS, right_on=NCBI_TAX_ID,
+                             how="left")
     df_w_metadata.drop(columns=[NCBI_TAX_ID], inplace=True)
     df_w_metadata.rename(columns={NAME: VIRUS_HOST_NAME, RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
     print(f"Dataset size after merge with virus host metadata = {df_w_metadata.shape}")
@@ -458,12 +461,11 @@ def remove_sequences_of_virus_with_one_host(input_file_path, output_file_path):
 # Input: Dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 # Output: Filtered dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 def remove_duplicate_sequences(df):
-    df= df.set_index(UNIREF90_ID)
+    df = df.set_index(UNIREF90_ID)
     print(f"Dataset size before removing duplicates: {df.shape}")
     df = df[~df.index.duplicated()]
     print(f"Dataset size after removing duplicates: {df.shape}")
     return df
-
 
 # def main():
 #     config = parse_args()
