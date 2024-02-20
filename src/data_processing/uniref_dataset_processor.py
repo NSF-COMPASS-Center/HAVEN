@@ -3,7 +3,7 @@ import os
 import requests
 import numpy as np
 import re
-import pytaxonkit
+# import pytaxonkit
 from ast import literal_eval
 from Bio import SeqIO
 from multiprocessing import Pool
@@ -154,8 +154,11 @@ def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
         # remove the uniref_ids which have already been processed in the previous executions.
         # no straightforward way to implement this filter
         # hack: 1. left join with indicator=True creates an additional column named "_merge" with values "both" or "left_only"
-        #       2. retain only the rows with "_merge" column value == "left_only"
+        #       2. columns are : uniref90_id, tax_id_x, tax_id_y, and _merge
+        #       3. drop column 'tax_id_y' and rename 'tax_id_x' to 'tax_id'
+        #       4. retain only the rows with "_merge" column value == "left_only"
         df = pd.merge(df, df_host, how="left", on=[UNIREF90_ID], indicator=True)
+        df = df.drop(columns=TAX_ID + "_y").rename(columns={TAX_ID + "_x": TAX_ID})
         df = df[df["_merge"] == "left_only"][[UNIREF90_ID, TAX_ID]]
     print(f"Number of records TO BE processed = {df.shape[0]}")
 
@@ -208,6 +211,7 @@ def query_uniprot(uniref90_id):
         # to differentiate between the absence of mapping for a given sequence and
         # a sequence with mapping but zero hosts
         host_tax_ids = None
+        pass
     return host_tax_ids
 
 
