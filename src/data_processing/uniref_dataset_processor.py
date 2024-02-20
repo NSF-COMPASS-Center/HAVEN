@@ -2,11 +2,8 @@ import pandas as pd
 import os
 import requests
 import numpy as np
-import argparse
 import re
-#
-#
-# import pytaxonkit
+import pytaxonkit
 from ast import literal_eval
 from Bio import SeqIO
 from multiprocessing import Pool
@@ -30,6 +27,7 @@ UNIPROT_REST_UNIREF90_QUERY_PARAM = "uniref_cluster_90:%s"
 ORGANISM_HOSTS = "organismHosts"
 TAXON_ID="taxonId"
 N_CPU = 6
+VIRUS_HOSTS = "virus_hosts"
 
 # Virus Host DB keywords
 VIRUS_HOST_DB_VIRUS_TAX_ID = "virus tax id"
