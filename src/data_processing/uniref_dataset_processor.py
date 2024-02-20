@@ -207,7 +207,9 @@ def query_uniprot(uniref90_id):
         for org_host in org_hosts:
             host_tax_ids.append(org_host[TAXON_ID])
     except (KeyError, IndexError):
-        pass
+        # to differentiate between the absence of mapping for a given sequence and
+        # a sequence with mapping but zero hosts
+        host_tax_ids = None
     return host_tax_ids
 
 
