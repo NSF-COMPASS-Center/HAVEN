@@ -460,12 +460,20 @@ def remove_sequences_of_virus_with_one_host(input_file_path, output_file_path):
 # Remove duplicate sequences
 # Input: Dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 # Output: Filtered dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
-def remove_duplicate_sequences(df):
+def remove_duplicate_sequences(input_file_path, output_file_path):
+    print("START: Remove sequences with multiple hosts.")
+
+    # Read input file
+    df = pd.read_csv(input_file_path)
+
     df = df.set_index(UNIREF90_ID)
     print(f"Dataset size before removing duplicates: {df.shape}")
     df = df[~df.index.duplicated()]
     print(f"Dataset size after removing duplicates: {df.shape}")
-    return df
+
+    df.reset_index().to_csv(output_file_path, index=False)
+    print(f"Written to file {output_file_path}")
+    print("END: Remove sequences with multiple hosts.")
 
 # def main():
 #     config = parse_args()
