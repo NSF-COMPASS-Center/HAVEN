@@ -449,10 +449,11 @@ def remove_sequences_of_virus_with_one_host(input_file_path, output_file_path, f
     viruses_with_one_host = agg_df[agg_df == 1].index.tolist()
 
     print(f"Number of viruses with one host = {len(viruses_with_one_host)}")
+    filtered_df = df[df[VIRUS_NAME].isin(viruses_with_one_host)]
+
     print(f"Dataset size before filtering for viruses with more than one hosts: {df.shape}")
     df = df[~df[VIRUS_NAME].isin(viruses_with_one_host)]
     print(f"Dataset size after filtering for viruses with more than one hosts: {df.shape}")
-    filtered_df = df[df[VIRUS_NAME].isin(viruses_with_one_host)]
 
     df.to_csv(output_file_path, index=False)
     print(f"Output written to file {output_file_path}")
@@ -473,9 +474,9 @@ def remove_duplicate_sequences(input_file_path, output_file_path, filtered_file_
     df = pd.read_csv(input_file_path)
 
     df = df.set_index(UNIREF90_ID)
+    filtered_df = df[df.index.duplicated()]
     print(f"Dataset size before removing duplicates: {df.shape}")
     df = df[~df.index.duplicated()]
-    filtered_df = df[df.index.duplicated()]
     print(f"Dataset size after removing duplicates: {df.shape}")
 
     df.reset_index().to_csv(output_file_path, index=False)
