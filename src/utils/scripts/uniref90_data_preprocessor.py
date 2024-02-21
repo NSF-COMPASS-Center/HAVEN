@@ -110,12 +110,14 @@ def pre_process_uniref90(config):
     # 8. Remove sequences with more than one host
     if config.remove_multi_host_sequences:
         uniref_dataset_processor.remove_duplicate_sequences(input_file_path=input_file_path,
-                                                            output_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_seq_wo_multi_host.csv"))
+                                                            output_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_wo_multi_host_seq.csv"),
+                                                            filtered_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_multi_host_seq.csv"))
 
     # 9. Remove viruses with only one host
     if config.remove_single_host_viruses:
         uniref_dataset_processor.remove_sequences_of_virus_with_one_host(input_file_path=input_file_path,
-                                                                         output_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_wo_single_host_virus.csv"))
+                                                                         output_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_wo_single_host_virus.csv"),
+                                                                         filtered_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_single_host_virus.csv"))
 
 
 def main():
