@@ -438,7 +438,7 @@ def join_metadata_with_sequences_data(input_file_path, sequence_data_file_path, 
 # Input: Dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 # Output: Filtered dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
 def remove_sequences_of_virus_with_one_host(input_file_path, output_file_path, filtered_file_path):
-    print("START: Remove sequences with one host.")
+    print("START: Remove sequences of viruses with one host.")
 
     # Read input file
     df = pd.read_csv(input_file_path)
@@ -461,7 +461,7 @@ def remove_sequences_of_virus_with_one_host(input_file_path, output_file_path, f
     filtered_df.to_csv(filtered_file_path, index=False)
     print(f"Filtered sequences written to file {filtered_file_path}")
 
-    print("END: Remove sequences with one host.")
+    print("END: Remove sequences of viruses with one host.")
 
 
 # Remove duplicate sequences
@@ -474,9 +474,9 @@ def remove_duplicate_sequences(input_file_path, output_file_path, filtered_file_
     df = pd.read_csv(input_file_path)
 
     df = df.set_index(UNIREF90_ID)
-    filtered_df = df[df.index.duplicated()]
+    filtered_df = df[df.index.duplicated(keep=False)]
     print(f"Dataset size before removing duplicates: {df.shape}")
-    df = df[~df.index.duplicated()]
+    df = df[~df.index.duplicated(keep=False)]
     print(f"Dataset size after removing duplicates: {df.shape}")
 
     df.reset_index().to_csv(output_file_path, index=False)
