@@ -24,10 +24,23 @@ UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_wo_singlehost_virushostdb.csv"
 # UniProt keywords/contsant values
 UNIPROT_REST_PROTS = "https://rest.uniprot.org/uniprotkb/search"
 UNIPROT_REST_UNIREF90_QUERY_PARAM = "uniref_cluster_90:%s"
+
+VIRUS_HOSTS = "virus_hosts"
+EMBL_CROSS_REF = "xref_embl"
 ORGANISM_HOSTS = "organismHosts"
 TAXON_ID = "taxonId"
-N_CPU = 6
-VIRUS_HOSTS = "virus_hosts"
+
+UNIPROT_RESULTS = "results"
+UNIPROT_PRIMARY_ACCESSION = "primaryAccession"
+UNIREF90_PREFIX="UniRef90_"
+UNIPROTKB_CROSS_REF = "uniProtKBCrossReferences"
+UNIPROT_DATABASE = "database"
+UNIPROT_EMBL = "EMBL"
+UNIPROT_KEY = "key"
+UNIPROT_VALUE = "value"
+EMBL_PROTEIN_ID = "ProteinId"
+
+N_CPU = 10
 
 # Virus Host DB keywords
 VIRUS_HOST_DB_VIRUS_TAX_ID = "virus tax id"
@@ -50,6 +63,7 @@ UNIREF90_ID = "uniref90_id"
 TAX_ID = "tax_id"
 SEQUENCE = "seq"
 HOST_TAX_IDS = "host_tax_ids"
+EMBL_REF_ID = "embl_ref_id"
 HOST_COUNT = "host_count"
 VIRUS_NAME = "virus_name"
 VIRUS_TAXON_RANK = "virus_taxon_rank"
@@ -148,7 +162,7 @@ def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
     # read the existing output file, if it exists, to pick up from where the previous execution left.
     if Path(output_file_path).is_file():
         df_host = pd.read_csv(output_file_path, on_bad_lines=None, converters={2: literal_eval},
-                              names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
+                              names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS, EMBL_REF_ID])
         df_host = df_host[[TAX_ID, UNIREF90_ID]]
         print(f"Number of records already processed = {df_host.shape[0]}")
 
@@ -188,12 +202,12 @@ def get_virus_host(df, output_file_path):
         # query uniprot
         uniref90_id = row[UNIREF90_ID]
         tax_id = row[TAX_ID]
-        host_tax_ids = query_uniprot(uniref90_id)
-        print(f"{uniref90_id}: {len(host_tax_ids) if host_tax_ids is not None else None}")
+        host_tax_ids, embl_entry_id = query_uniprot(uniref90_id)
+        print(f"{uniref90_id}: {len(host_tax_ids) if host_tax_ids is not None else None}, {embl_entry_id}")
 
         # write output to file
         f = open(output_file_path, mode="a")
-        f.write(",".join([str(uniref90_id), str(tax_id), "\"" + str(host_tax_ids) + "\""]) + "\n")
+        f.write(",".join([str(uniref90_id), str(tax_id), "\"" + str(host_tax_ids) + "\"", str(embl_entry_id)]) + "\n")
         f.close()
 
 
@@ -201,20 +215,34 @@ def get_virus_host(df, output_file_path):
 # input: uniref90_id
 # output: list of host(s) of the virus
 def query_uniprot(uniref90_id):
+    # split UniRef90_A0A023GZ41 and capture A0A023GZ41
+    uniprot_id = uniref90_id.split("_")[1]
     response = requests.get(url=UNIPROT_REST_PROTS,
-                            params={"query": UNIPROT_REST_UNIREF90_QUERY_PARAM % uniref90_id, "fields": VIRUS_HOSTS})
+                            params={"query": UNIPROT_REST_UNIREF90_QUERY_PARAM % uniref90_id,
+                                    "fields": ",".join([VIRUS_HOSTS, EMBL_CROSS_REF])})
     host_tax_ids = []
+    embl_entry_id = None
     try:
-        data = response.json()["results"][0]
+        results = response.json()["results"]
+        # ideally there should be only one matching primaryAccession entry for the seed uniprot_id
+        data = [result for result in results if result[UNIPROT_PRIMARY_ACCESSION] == uniprot_id][0]
+
+        # embl cross reference entry id
+        cross_refs = data[UNIPROTKB_CROSS_REF]
+        embl_cross_ref_properties = [cross_ref for cross_ref in cross_refs if cross_ref[UNIPROT_DATABASE] == UNIPROT_EMBL][0]["properties"]
+        embl_entry_id = [property for property in embl_cross_ref_properties if property[UNIPROT_KEY] == EMBL_PROTEIN_ID][0][UNIPROT_VALUE]
+
+        # organism hosts from uniprot
         org_hosts = data[ORGANISM_HOSTS]
         for org_host in org_hosts:
             host_tax_ids.append(org_host[TAXON_ID])
+
     except (KeyError, IndexError):
         # to differentiate between the absence of mapping for a given sequence and
         # a sequence with mapping but zero hosts
         host_tax_ids = None
         pass
-    return host_tax_ids
+    return host_tax_ids, embl_entry_id
 
 
 # remove sequences with no hosts of the virus from which the sequences were sampled
