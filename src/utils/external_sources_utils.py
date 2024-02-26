@@ -135,8 +135,11 @@ def query_embl(embl_ref_ids, temp_dir):
                 break
 
         host = None
-        if source_feature and source_feature.qualifiers["host"]:
-            host = source_feature.qualifiers["host"]
+        try:
+            if source_feature and source_feature.qualifiers["host"]:
+                host = source_feature.qualifiers["host"]
+        except KeyError:
+            pass
         embl_host_mapping[record.id] = host
     # delete the temporary file
     os.remove(temp_output_file_path)
