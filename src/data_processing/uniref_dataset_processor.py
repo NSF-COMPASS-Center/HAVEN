@@ -200,7 +200,7 @@ def get_virus_hosts_from_embl(input_file_path, embl_mapping_filepath, output_fil
     print(f"Number of unique EMBL reference ids TO BE processed = {len(embl_ref_ids)}")
 
     # split into sub dfs for parallel processing
-    embl_ref_ids_sublists = np.array_split(np.array(embl_ref_ids), len(embl_ref_ids) / EMBL_QUERY_PAYLOAD_SIZE)
+    embl_ref_ids_sublists = np.array_split(np.array(embl_ref_ids), len(embl_ref_ids) / EMBL_QUERY_PAYLOAD_SIZE + 1)
     print(f"Number of sub lists = {len(embl_ref_ids_sublists)}")
     # for i in range(N_CPU):
     #      print(f"Size of embl_ref_ids_sublists[{i}] = {embl_ref_ids_sublists[i].shape}")
