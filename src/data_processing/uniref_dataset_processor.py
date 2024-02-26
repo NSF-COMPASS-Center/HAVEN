@@ -1,46 +1,17 @@
 import pandas as pd
 import os
-import requests
 import numpy as np
 import re
-# import pytaxonkit
 from ast import literal_eval
 from Bio import SeqIO
 from multiprocessing import Pool
 from itertools import repeat
 from pathlib import Path
 import ast
+from utils import external_sources_utils
 
-# Script to parse and create uniref90 dataset
-# Usage: python src/data_processing/uniref_dataset_processor.py -if <absolute path to input fasta file> -od <absolute path output directory>
-
-# Filenames
-UNIREF90_DATA_W_METADATA = "uniref90_w_metadata.csv"
-UNIREF90_DATA_MAMMALS_AVES = "uniref90_mammals_aves_virus.csv"
-UNIREF90_DATA_W_SINGLE_HOST = "uniref90_mammals_aves_w_singlehost.csv"
-# UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_mammals_aves_wo_singlehost.csv"
-UNIREF90_DATA_WO_SINGLE_HOST = "uniref90_wo_singlehost_virushostdb.csv"
-
-# UniProt keywords/contsant values
-UNIPROT_REST_PROTS = "https://rest.uniprot.org/uniprotkb/search"
-UNIPROT_REST_UNIREF90_QUERY_PARAM = "uniref_cluster_90:%s"
-
-VIRUS_HOSTS = "virus_hosts"
-EMBL_CROSS_REF = "xref_embl"
-ORGANISM_HOSTS = "organismHosts"
-TAXON_ID = "taxonId"
-
-UNIPROT_RESULTS = "results"
-UNIPROT_PRIMARY_ACCESSION = "primaryAccession"
-UNIREF90_PREFIX="UniRef90_"
-UNIPROTKB_CROSS_REF = "uniProtKBCrossReferences"
-UNIPROT_DATABASE = "database"
-UNIPROT_EMBL = "EMBL"
-UNIPROT_KEY = "key"
-UNIPROT_VALUE = "value"
-EMBL_PROTEIN_ID = "ProteinId"
-
-N_CPU = 10
+N_CPU = 2
+EMBL_QUERY_PAYLOAD_SIZE = 200
 
 # Virus Host DB keywords
 VIRUS_HOST_DB_VIRUS_TAX_ID = "virus tax id"
@@ -54,16 +25,15 @@ RANK = "Rank"
 NCBI_TAX_ID = "TaxID"
 TAXONKIT_DB = "TAXONKIT_DB"
 SPECIES = "species"
-MAMMALIA = "Mammalia"
-AVES = "Aves"
-VERTEBRATA_TAX_ID = "7742"
 
 # Column names at various stages of dataset curation
 UNIREF90_ID = "uniref90_id"
 TAX_ID = "tax_id"
 SEQUENCE = "seq"
 HOST_TAX_IDS = "host_tax_ids"
+UNIPROT_HOST_TAX_IDS ="uniprot_host_tax_ids"
 EMBL_REF_ID = "embl_ref_id"
+EMBL_HOST_NAME ="embl_host_name"
 HOST_COUNT = "host_count"
 VIRUS_NAME = "virus_name"
 VIRUS_TAXON_RANK = "virus_taxon_rank"
@@ -167,14 +137,8 @@ def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
         print(f"Number of records already processed = {df_host.shape[0]}")
 
         # remove the uniref_ids which have already been processed in the previous executions.
-        # no straightforward way to implement this filter
-        # hack: 1. left join with indicator=True creates an additional column named "_merge" with values "both" or "left_only"
-        #       2. columns are : uniref90_id, tax_id_x, tax_id_y, and _merge
-        #       3. drop column 'tax_id_y' and rename 'tax_id_x' to 'tax_id'
-        #       4. retain only the rows with "_merge" column value == "left_only"
-        df = pd.merge(df, df_host, how="left", on=[UNIREF90_ID], indicator=True)
-        df = df.drop(columns=TAX_ID + "_y").rename(columns={TAX_ID + "_x": TAX_ID})
-        df = df[df["_merge"] == "left_only"][[UNIREF90_ID, TAX_ID]]
+        processed_hosts = list(df_host[UNIREF90_ID].unique())
+        df = df[~df[UNIREF90_ID].isin(processed_hosts)]
     print(f"Number of records TO BE processed = {df.shape[0]}")
 
     # split into sub dfs for parallel processing
@@ -185,7 +149,7 @@ def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
 
     # multiprocessing for parallelization
     cpu_pool = Pool(N_CPU)
-    cpu_pool.starmap(get_virus_host, zip(dfs, repeat(output_file_path)))
+    cpu_pool.starmap(get_uniprot_virus_hosts, zip(dfs, repeat(output_file_path)))
 
     cpu_pool.close()
     cpu_pool.join()
@@ -195,14 +159,14 @@ def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
 
 # call another method which will query UniProt to get hosts of the virus
 # write the retrieved host ids to the output file
-def get_virus_host(df, output_file_path):
+def get_uniprot_virus_hosts(df, output_file_path):
     # get virus hosts
     for row in df.iterrows():
         row = row[1]
         # query uniprot
         uniref90_id = row[UNIREF90_ID]
         tax_id = row[TAX_ID]
-        host_tax_ids, embl_entry_id = query_uniprot(uniref90_id)
+        host_tax_ids, embl_entry_id = external_sources_utils.query_uniprot(uniref90_id)
         print(f"{uniref90_id}: {len(host_tax_ids) if host_tax_ids is not None else None}, {embl_entry_id}")
 
         # write output to file
@@ -211,45 +175,72 @@ def get_virus_host(df, output_file_path):
         f.close()
 
 
-# query UniProt for to get the host of the virus of the protein sequence
-# input: uniref90_id
-# output: list of host(s) of the virus
-def query_uniprot(uniref90_id):
-    # split UniRef90_A0A023GZ41 and capture A0A023GZ41
-    uniprot_id = uniref90_id.split("_")[1]
-    response = requests.get(url=UNIPROT_REST_PROTS,
-                            params={"query": UNIPROT_REST_UNIREF90_QUERY_PARAM % uniref90_id,
-                                    "fields": ",".join([VIRUS_HOSTS, EMBL_CROSS_REF])})
-    host_tax_ids = []
-    embl_entry_id = None
-    try:
-        results = response.json()["results"]
-        # ideally there should be only one matching primaryAccession entry for the seed uniprot_id
-        data = [result for result in results if result[UNIPROT_PRIMARY_ACCESSION] == uniprot_id][0]
+# Get hosts of virus from EMBL using embl_id of protein sequences
+# input: csv file with embl ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "embl_id"]
+# output: csv file with hosts of virus. Columns = ["uniref90_id", "tax_id", "uniprot_host_tax_ids", "embl_id", "embl_host_names"]
+# Use multiprocessing to speed up the process
+def get_virus_hosts_from_embl(input_file_path, embl_mapping_filepath, output_file_path):
+    print("START: Get virus hosts from EMBL")
+    # read the input file
+    df = pd.read_csv(input_file_path, on_bad_lines=None, converters={2: literal_eval},
+                     names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS, EMBL_REF_ID])
+    print(f"Read Uniref90 dataset size = {df.shape}")
 
-        # embl cross reference entry id
-        cross_refs = data[UNIPROTKB_CROSS_REF]
-        embl_cross_ref_properties = [cross_ref for cross_ref in cross_refs if cross_ref[UNIPROT_DATABASE] == UNIPROT_EMBL][0]["properties"]
-        embl_entry_id = [property for property in embl_cross_ref_properties if property[UNIPROT_KEY] == EMBL_PROTEIN_ID][0][UNIPROT_VALUE]
+    embl_ref_ids = list(df[EMBL_REF_ID].unique())
+    print(f"Number of unique EMBL reference ids = {len(embl_ref_ids)}")
 
-        # organism hosts from uniprot
-        org_hosts = data[ORGANISM_HOSTS]
-        for org_host in org_hosts:
-            host_tax_ids.append(org_host[TAXON_ID])
+    # read the existing output file, if it exists, to pick up from where the previous execution left.
+    if Path(embl_mapping_filepath).is_file():
+        embl_mapping_df = pd.read_csv(embl_mapping_filepath, names=[EMBL_REF_ID, EMBL_HOST_NAME])
+        processed_embl_ref_ids = set(embl_mapping_df[EMBL_REF_ID].unique())
+        print(f"Number of EMBL reference ids already processed = {len(processed_embl_ref_ids)}")
 
-    except (KeyError, IndexError):
-        # to differentiate between the absence of mapping for a given sequence and
-        # a sequence with mapping but zero hosts
-        host_tax_ids = None
-        pass
-    return host_tax_ids, embl_entry_id
+        # remove the embl_reference_ids which have already been processed in the previous executions.
+        embl_ref_ids = list(set(embl_ref_ids) - processed_embl_ref_ids)
+    print(f"Number of unique EMBL reference ids TO BE processed = {len(embl_ref_ids)}")
+
+    # split into sub dfs for parallel processing
+    embl_ref_ids_sublists = np.array_split(np.array(embl_ref_ids), len(embl_ref_ids) / EMBL_QUERY_PAYLOAD_SIZE)
+    print(f"Number of sub lists = {len(embl_ref_ids_sublists)}")
+    # for i in range(N_CPU):
+    #      print(f"Size of embl_ref_ids_sublists[{i}] = {embl_ref_ids_sublists[i].shape}")
+
+    # multiprocessing for parallelization
+    cpu_pool = Pool(N_CPU)
+    cpu_pool.starmap(get_embl_virus_host, zip(embl_ref_ids_sublists, repeat(embl_mapping_filepath)))
+
+    cpu_pool.close()
+    cpu_pool.join()
+    print(f"EMBL host mapping written to file {embl_mapping_filepath}")
+
+    # Map the embl_reference_ids in the dataset to the respective hosts from embl based on the embl_reference_ids
+    embl_mapping_df = pd.read_csv(embl_mapping_filepath, names=[EMBL_REF_ID, EMBL_HOST_NAME])
+    # join the two dfs on the embl_reference_id
+    mapped_df = df.merge(embl_mapping_df, how="left", on=EMBL_REF_ID)
+    print(f"Mapped dataset size = {mapped_df.shape}")
+    mapped_df.to_csv(output_file_path, index=False)
+    print(f"Written to file {output_file_path}")
+    print("END: Get virus hosts from EMBL")
+
+
+# call another method which will query EMBL to get hosts of the virus
+# write the retrieved host names to the output mapping file
+def get_embl_virus_host(embl_ref_ids, output_file_path):
+    # get virus hosts from EMBL
+    embl_mapping = external_sources_utils.query_embl(embl_ref_ids, temp_dir=os.path.dirname(output_file_path))
+    # write output to file
+    embl_mapping_dict = {
+        EMBL_REF_ID: list(embl_mapping.keys()),
+        EMBL_HOST_NAME: list(embl_mapping.values())
+    }
+    pd.DataFrame.from_dict(embl_mapping_dict).to_csv(output_file_path, mode="a", index=False, header=False)
 
 
 # remove sequences with no hosts of the virus from which the sequences were sampled
 # input: Dataset in csv file containing sequences with host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
 # output: Dataframe with sequences containing atleast one host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
-## Used only for mapping with UniProt.
-## In case of VirusHost DB, the dataset is already pruned to remove sequences without hosts during the mapping stage itself.
+# Used only for mapping with UniProt.
+# In case of VirusHost DB, the dataset is already pruned to remove sequences without hosts during the mapping stage itself.
 def remove_sequences_w_no_hosts(input_file_path, output_file_path):
     print("START: Remove sequences with no hosts")
     df = pd.read_csv(input_file_path, on_bad_lines=None, converters={2: literal_eval},
@@ -294,13 +285,13 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     # Retrieve name and rank of all unique viruses in the dataset
     virus_tax_ids = df[TAX_ID].unique()
     print(f"Number of unique virus tax ids = {len(virus_tax_ids)}")
-    virus_metadata_df = get_taxonomy_name_rank(virus_tax_ids)
+    virus_metadata_df = external_sources_utils.get_taxonomy_name_rank(virus_tax_ids)
     print(f"Size of virus metadata dataset = {virus_metadata_df.shape[0]}")
 
     # Retrieve name and rank of all unique virus_hosts in the dataset
     virus_host_tax_ids = df[HOST_TAX_IDS].unique()
     print(f"Number of unique virus host tax ids = {len(virus_host_tax_ids)}")
-    virus_host_metadata_df = get_taxonomy_name_rank(virus_host_tax_ids)
+    virus_host_metadata_df = external_sources_utils.get_taxonomy_name_rank(virus_host_tax_ids)
     print(f"Size of virus host metadata dataset = {virus_host_metadata_df.shape[0]}")
 
     # Merge df with virus_metadata_df to map metadata of viruses
@@ -318,23 +309,6 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     df_w_metadata.to_csv(output_file_path, index=False)
     print(f"Written to file {output_file_path}")
     print("END: Retrieving virus and virus host metadata using pytaxonkit")
-
-
-# Get taxonomy names and ranks from ncbi using pytaxonkit for given list of tax_ids
-# Input: list of tax_ids
-# Output: Dataframe with columns: ["TaxID", "Name", "Rank"]
-def get_taxonomy_name_rank(tax_ids):
-    # There is no method with input parameter: taxid and output: scientific name and rank.
-    # However, there is a method that takes in name and returns the taxid and rank
-    # Hack:
-    # 1. Get names of the tax_ids using name()
-    # 2. Get ranks using the names from previous step using name2taxid()
-    df = pytaxonkit.name(tax_ids)
-    df_w_rank = pytaxonkit.name2taxid(df[NAME].values)
-    # default datatype of TaxID column = int32
-    # convert it to int64 for convenience in downstream analysis
-    df_w_rank[NCBI_TAX_ID] = pd.to_numeric(df_w_rank[NCBI_TAX_ID], errors="coerce").fillna(0).astype("int64")
-    return df_w_rank
 
 
 # Filter for records with virus_name and virus_host_name at "Species" level
@@ -374,7 +348,7 @@ def get_sequences_from_mammals_aves_hosts(input_file_path, taxon_metadata_dir_pa
     print(f"Number of unique host tax ids = {len(host_tax_ids)}")
 
     # Get taxids belonging to the class of mammals and aves
-    mammals_aves_tax_ids = get_mammals_aves_tax_ids(host_tax_ids)
+    mammals_aves_tax_ids = external_sources_utils.get_mammals_aves_tax_ids(host_tax_ids)
     print(f"Number of unique mammalia or aves tax ids = {len(mammals_aves_tax_ids)}")
     # Filter
     print(f"Dataset size before filtering for mammals and aves: {df.shape}")
@@ -402,7 +376,7 @@ def get_sequences_from_vertebrata_hosts(input_file_path, taxon_metadata_dir_path
     print(f"Number of unique host tax ids = {len(host_tax_ids)}")
 
     # Get taxids belonging to the clade of vertebrata
-    vertebrata_tax_ids = get_vertebrata_tax_ids(host_tax_ids)
+    vertebrata_tax_ids = external_sources_utils.get_vertebrata_tax_ids(host_tax_ids)
     print(f"Number of unique vertebrata tax ids = {len(vertebrata_tax_ids)}")
     # Filter
     print(f"Dataset size before filtering for vertebrata: {df.shape}")
@@ -412,36 +386,6 @@ def get_sequences_from_vertebrata_hosts(input_file_path, taxon_metadata_dir_path
     df.to_csv(output_file_path, index=False)
     print(f"Writing to file {output_file_path}")
     print("END: Filter records with virus hosts belonging to vertebrata' clade.")
-
-
-# Get taxids belonging to the class of mammals and aves
-# Input: list of tax_ids
-# Output: list of tax_ids belonging to mammals and aves class
-def get_mammals_aves_tax_ids(tax_ids):
-    mammals_aves_tax_ids = []
-    for i, tax_id in enumerate(tax_ids):
-        tax_class = pytaxonkit.lineage([tax_id], formatstr="{c}")["Lineage"].iloc[0]
-        print(f"{i}: {tax_id} = {tax_class}")
-        if tax_class == MAMMALIA or tax_class == AVES:
-            mammals_aves_tax_ids.append(tax_id)
-    return mammals_aves_tax_ids
-
-
-# Get taxids belonging to the clade = Vertebrata
-# Input: list of tax_ids
-# Output: list of tax_ids belonging to Vertebrata clade
-def get_vertebrata_tax_ids(tax_ids):
-    vertebrata_tax_ids = []
-    for i, tax_id in enumerate(tax_ids):
-        # Issue: No placeholder formatter for rank=clade. Hence cannot use formatstr as for class {c}
-        # Workaround: Get full lineage and filter for vertebrata Tax ID
-        # example output from pytaxonkit.lineage([]):
-        # '131567;2759;33154;33208;6072;33213;33511;7711;89593;7742;7776;117570;117571;8287;1338369;32523;32524;40674;32525;9347;1437010;314146;9443;376913;314293;9526;314295;9604;207598;9605;9606'
-        # hence split by ";"
-        full_lineage_tax_ids = pytaxonkit.lineage([tax_id])["FullLineageTaxIDs"].iloc[0].split(";")
-        if VERTEBRATA_TAX_ID in full_lineage_tax_ids:
-            vertebrata_tax_ids.append(tax_id)
-    return vertebrata_tax_ids
 
 
 # Join metadata dataset with sequence data from the parsed fasta file

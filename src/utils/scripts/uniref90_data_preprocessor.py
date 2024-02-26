@@ -6,6 +6,8 @@ from data_processing import uniref_dataset_processor
 # names of all intermediary files to be created
 UNIREF90_DATA_CSV_FILENAME = "uniref90_viridae.csv"
 UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME = "uniref90_viridae_uniprot_hosts.csv"
+EMBL_HOST_MAPPING_FILENAME = "embl_hosts.csv"
+UNIREF90_DATA_HOST_EMBL_MAPPING_FILENAME = "uniref90_viridae_embl_hosts.csv"
 UNIREF90_DATA_HOST_VIRUSHOSTDB_MAPPING_FILENAME = "uniref90_viridae_virushostdb_hosts.csv"
 
 
@@ -20,6 +22,8 @@ def parse_args():
                         help="Convert the input fasta file to csv format.\n")
     parser.add_argument("--host_map_uniprot", action="store_true",
                         help="Get hosts of virus from UniProt.\n")
+    parser.add_argument("--host_map_embl", action="store_true",
+                        help="Get hosts of virus from EMBL.\n")
     parser.add_argument("--host_map_virushostdb",
                         help="Get hosts of virus from VirusHostDB mapping using the absolute path to the mapping file.\n")
     parser.add_argument("--prune_dataset", action="store_true",
@@ -61,8 +65,12 @@ def pre_process_uniref90(config):
         uniref_dataset_processor.get_virus_hosts_from_uniprot(input_file_path=input_file_path,
                                                               output_file_path=os.path.join(output_dir,
                                                                                             UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME))
-
-    # 2B. Host mapping from VirusHostDB
+    # 2B. Host mapping from EMBL
+    if config.host_map_embl:
+        uniref_dataset_processor.get_virus_hosts_from_embl(input_file_path=input_file_path,
+                                                           embl_mapping_filepath=os.path.join(output_dir, EMBL_HOST_MAPPING_FILENAME),
+                                                           output_file_path=os.path.join(output_dir, UNIREF90_DATA_HOST_EMBL_MAPPING_FILENAME))
+    # 2C. Host mapping from VirusHostDB
     if config.host_map_virushostdb is not None:
         uniref_dataset_processor.get_virus_hosts_from_virushostdb(input_file_path=input_file_path,
                                                                   output_file_path=os.path.join(output_dir,
@@ -110,14 +118,19 @@ def pre_process_uniref90(config):
     # 8. Remove sequences with more than one host
     if config.remove_multi_host_sequences:
         uniref_dataset_processor.remove_duplicate_sequences(input_file_path=input_file_path,
-                                                            output_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_wo_multi_host_seq.csv"),
-                                                            filtered_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_multi_host_seq.csv"))
+                                                            output_file_path=os.path.join(output_dir, Path(
+                                                                input_file_path).stem + "_wo_multi_host_seq.csv"),
+                                                            filtered_file_path=os.path.join(output_dir, Path(
+                                                                input_file_path).stem + "_multi_host_seq.csv"))
 
     # 9. Remove viruses with only one host
     if config.remove_single_host_viruses:
         uniref_dataset_processor.remove_sequences_of_virus_with_one_host(input_file_path=input_file_path,
-                                                                         output_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_wo_single_host_virus.csv"),
-                                                                         filtered_file_path=os.path.join(output_dir, Path(input_file_path).stem + "_single_host_virus.csv"))
+                                                                         output_file_path=os.path.join(output_dir, Path(
+                                                                             input_file_path).stem + "_wo_single_host_virus.csv"),
+                                                                         filtered_file_path=os.path.join(output_dir,
+                                                                                                         Path(
+                                                                                                             input_file_path).stem + "_single_host_virus.csv"))
 
 
 def main():
