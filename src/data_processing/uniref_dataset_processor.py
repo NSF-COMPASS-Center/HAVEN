@@ -37,6 +37,7 @@ EMBL_HOST_NAME ="embl_host_name"
 HOST_COUNT = "host_count"
 VIRUS_NAME = "virus_name"
 VIRUS_TAXON_RANK = "virus_taxon_rank"
+VIRUS_HOST_TAX_ID = "virus_host_tax_id"
 VIRUS_HOST_NAME = "virus_host_name"
 VIRUS_HOST_TAXON_RANK = "virus_host_taxon_rank"
 
@@ -389,7 +390,7 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     df_w_metadata = pd.merge(df_w_metadata, virus_host_metadata_df, left_on=VIRUS_HOST_NAME, right_on=NAME,
                              how="left")
     df_w_metadata.drop(columns=[NAME], inplace=True)
-    df_w_metadata.rename(columns={RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
+    df_w_metadata.rename(columns={NCBI_TAX_ID: VIRUS_HOST_TAX_ID, RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
     print(f"Dataset size after merge with virus host metadata = {df_w_metadata.shape}")
     df_w_metadata.to_csv(output_file_path, index=False)
     print(f"Written to file {output_file_path}")
