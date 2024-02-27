@@ -8,18 +8,28 @@ from random import sample
 
 class MultiClassEvaluation(EvaluationBase):
     def __init__(self, df, evaluation_settings, evaluation_output_file_base_path, visualization_output_file_base_path,
-                 output_file_name):
+                 output_file_name, label_mappings):
         super().__init__(df, evaluation_settings, evaluation_output_file_base_path, visualization_output_file_base_path,
                          output_file_name)
-        self.y_pred_columns = self.get_y_pred_columns()
+        self.df = self.get_selected_df(label_mappings)
+        self.y_pred_columns = self.df[self.y_true_col].unique()
         self.class_col = "class"
 
-    def get_y_pred_columns(self):
-        y_pred_columns = list(self.df.columns.values)
-        y_pred_columns.remove(self.itr_col)
-        y_pred_columns.remove(self.y_true_col)
-        y_pred_columns.remove(self.experiment_col)
-        return y_pred_columns
+    # def get_y_pred_columns(self):
+    #     y_pred_columns = list(self.df.columns.values)
+    #     y_pred_columns.remove(self.itr_col)
+    #     y_pred_columns.remove(self.y_true_col)
+    #     y_pred_columns.remove(self.experiment_col)
+    #     return y_pred_columns
+
+    def get_selected_df(self, label_mappings):
+        selected_labels = list(label_mappings.values())
+        print(f"Size of results dataset = {self.df.shape[0]}")
+        print(f"Selected labels = {selected_labels}")
+        print(f"Number of selected labels = {len(selected_labels)}")
+        selected_df = self.df[self.df[self.y_true_col].isin(selected_labels)]
+        print(f"Size of selected results dataset = {selected_df.shape[0]}")
+        return selected_df
 
     def compute_accuracy(self, df_itr):
         y_pred = self.convert_probability_to_prediction(df_itr)
@@ -71,8 +81,8 @@ class MultiClassEvaluation(EvaluationBase):
         if self.evaluation_settings["auprc"]:
             visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auprc",
                                          self.visualization_output_file_path + "_auprc_boxplot.pdf")
-            visualization_utils.curve_plot(df=self.pr_curves_df[self.pr_curves_df[self.itr_col] == itr_selected], x_col="recall", y_col="precision",
-                                           color_group_col=self.class_col, style_group_col=self.experiment_col,
-                                           output_file_path=self.visualization_output_file_path + "_precision_recall_curves.pdf", metadata=self.metadata)
+            # visualization_utils.curve_plot(df=self.pr_curves_df[self.pr_curves_df[self.itr_col] == itr_selected], x_col="recall", y_col="precision",
+            #                                color_group_col=self.class_col, style_group_col=self.experiment_col,
+            #                                output_file_path=self.visualization_output_file_path + "_precision_recall_curves.pdf", metadata=self.metadata)
         return
 

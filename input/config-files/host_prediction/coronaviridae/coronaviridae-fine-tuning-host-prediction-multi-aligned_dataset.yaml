@@ -1,0 +1,72 @@
+config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation
+config_sub_type: "host_prediction"
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "input/data/coronaviridae"
+
+  # Name of file(s) in subdirectory to be read and processed.
+  # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
+  file_names: ["coronaviridae_top_7_host_aligned.csv"]
+  # seeds to split the files into training and testing
+  # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
+  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
+
+sequence_settings:
+    batch_size: 32
+    id_col: "id"
+    sequence_col: "seq"
+    max_sequence_length: 2169 # max=2169 (after alignment)
+    truncate: False
+    pad_sequence_val: 0
+    feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
+
+pre_train_settings:
+  model_name: "masked_language_model"
+  model_path: ""
+
+fine_tune_settings:
+  n_iterations: 5
+  split_input: True
+  train_proportion: 0.8
+  classification_type: "multi"
+
+  training_settings:
+    n_epochs: 50
+    max_lr: 1e-3
+    pct_start: 0.10
+    div_factor: 25.0
+    final_div_factor: 10000.0
+
+  label_settings:
+    label_col: "virus_host"
+    exclude_labels: [ "nan"]
+    label_groupings:
+      "Pig": [ "Sus scrofa (Pig) [TaxID: 9823]" ]
+      "Human": [ "Homo sapiens (Human) [TaxID: 9606]" ]
+      "Wild turkey": [ "Meleagris gallopavo (Wild turkey) [TaxID: 9103]" ]
+      "Japanese pipistrelle": [ "Pipistrellus abramus (Japanese pipistrelle) (Pipistrellus javanicus abramus) [TaxID: 105295]" ]
+      "Lesser bamboo bat": [ "Tylonycteris pachypus (Lesser bamboo bat) (Vespertilio pachypus) [TaxID: 258959]" ]
+      "Chicken": [ "Gallus gallus (Chicken) [TaxID: 9031]" ]
+      "Bovine": [ "Bos taurus (Bovine) [TaxID: 9913]" ]
+
+  task_settings:
+    - name: "host_prediction"
+      active: True
+      mode: "train" # supported values: train, test
+      fine_tuned_model_path: ""
+      loss: "FocalLoss"
+      depth: 2
+      n_tokens: 27
+      n_classes: 7
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+
+output_settings:
+  output_dir: "output"
+  results_dir: "raw"
+  sub_dir: "coronaviridae/20231008/aligned_host_multi_lr1e-3-e50"
+  prefix: "emb_sincos-d_1024-loss_focalce" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

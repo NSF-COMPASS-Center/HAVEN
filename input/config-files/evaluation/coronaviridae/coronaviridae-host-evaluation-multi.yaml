@@ -15,7 +15,10 @@ input_settings:
     # "RNN-6L-Focal": "20230709/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_rnn-l_6_output.csv"
     # "LSTM-2L-Focal": "20230813/host_multi_baseline_focal/emb_sincos-d_1024-loss_focalce_lstm-l_2_output.csv"
     "LSTM-2L": "20231008/aligned_host_multi_lr1e-3-e50/emb_sincos-d_1024-loss_focalce_lstm-l_2-lr1e-3_output.csv"
-    "Transformer": "20231008/aligned_host_multi_lr1e-3-e50/emb_sincos-d_1024-loss_focalce_transformer-l_6-h_8-lr1e-3_output.csv"
+    "TransformerEncoder": "20231008/aligned_host_multi_lr1e-3-e50/emb_sincos-d_1024-loss_focalce_transformer-l_6-h_8-lr1e-3_output.csv"
+    #"TranferLearning_lr1e-3": "20231127/fine_tuning/host_prediction/mlm_transformer_encoder-l_6-h_8-lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_lr1e-3_output.csv"
+    #"TranferLearning_lr1e-4": "20231127/fine_tuning/host_prediction/mlm_transformer_encoder-l_6-h_8-lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_lr1e-4_output.csv"
+    "TranferLearning_lr1e-5": "20231127/fine_tuning/host_prediction/mlm_transformer_encoder-l_6-h_8-lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_lr1e-5_output.csv"
 
 
 label_mappings:
@@ -41,5 +44,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "coronaviridae/20231022/host_multi"
-  prefix: "aligned-seq-input"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "coronaviridae/20231205/host_multi"
+  prefix: "transfer-learning"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

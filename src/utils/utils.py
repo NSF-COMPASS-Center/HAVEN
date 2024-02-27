@@ -149,3 +149,15 @@ def parse_config(config_file_path):
     except yaml.YAMLError as err:
         print(f"Error parsing config file: {err}")
     return config
+
+# returns a histogram for a given input distribution and the number of bins
+def get_histogram(values, n_bins=12):
+    n = len(values)
+    freq, bins = np.histogram(values, bins=n_bins)
+    hist_map = []
+    for i in range(n_bins):
+        hist_map.append({"start": bins[i], "end":bins[i+1], "count": freq[i], "percentage": freq[i]/n*100})
+
+
+    hist_df = pd.DataFrame(hist_map)
+    return hist_df

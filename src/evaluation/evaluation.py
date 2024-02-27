@@ -28,7 +28,7 @@ def execute(config):
     if evaluation_type == "binary":
         evaluation_executor = BinaryClassEvaluation(df, evaluation_settings, evaluation_output_file_base_path, visualization_output_file_base_path, output_file_name)
     elif evaluation_type == "multi":
-        evaluation_executor = MultiClassEvaluation(df, evaluation_settings, evaluation_output_file_base_path, visualization_output_file_base_path, output_file_name)
+        evaluation_executor = MultiClassEvaluation(df, evaluation_settings, evaluation_output_file_base_path, visualization_output_file_base_path, output_file_name, label_mappings)
     else:
         print(f"ERROR: Unsupported type of evaluation: evaluation_settings.type = {evaluation_type}")
 
