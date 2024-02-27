@@ -10,7 +10,7 @@ from pathlib import Path
 import ast
 from utils import external_sources_utils
 
-N_CPU = 2
+N_CPU = 12
 EMBL_QUERY_PAYLOAD_SIZE = 200
 
 # Virus Host DB keywords
@@ -236,34 +236,115 @@ def get_embl_virus_host(embl_ref_ids, output_file_path):
     pd.DataFrame.from_dict(embl_mapping_dict).to_csv(output_file_path, mode="a", index=False, header=False)
 
 
-# remove sequences with no hosts of the virus from which the sequences were sampled
-# input: Dataset in csv file containing sequences with host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
-# output: Dataframe with sequences containing atleast one host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
-# Used only for mapping with UniProt.
+# # remove sequences with no hosts of the virus from which the sequences were sampled
+# # input: Dataset in csv file containing sequences with host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
+# # output: Dataframe with sequences containing atleast one host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
+# # Used only for mapping with UniProt.
+# # In case of VirusHost DB, the dataset is already pruned to remove sequences without hosts during the mapping stage itself.
+# def remove_sequences_w_no_hosts(input_file_path, output_file_path):
+#     print("START: Remove sequences with no hosts")
+#     df = pd.read_csv(input_file_path, on_bad_lines=None, converters={2: literal_eval},
+#                      names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
+#
+#     # count the number of hosts for each sequence
+#     df[HOST_COUNT] = df.apply(lambda x: len(x[HOST_TAX_IDS]), axis=1)
+#     print(f"Dataset size = {df.shape}")
+#
+#     # Filter for sequences with atleast one host
+#     df = df[df[HOST_COUNT] > 0]
+#     print(f"Dataset after excluding proteins with no virus host = {df.shape[0]}")
+#     # drop the host_count column
+#     df.drop(columns=[HOST_COUNT], inplace=True)
+#     df.to_csv(output_file_path, index=False)
+#     print(f"Written to file {output_file_path}")
+#     print("END: Remove sequences with no hosts")
+#     return
+
+
+# remove sequences with no EMBL hosts of the virus from which the sequences were sampled
+# input: Dataset in csv file containing sequences with embl_host_name. Columns = [uniref90_id, tax_id, host_tax_ids, embl_ref_id, embl_host_name]
+# output: Dataframe with sequences containing embl_host_name. Columns = [uniref90_id, tax_id, uniprot_host_tax_ids, embl_ref_id, embl_host_name]
+# Used only for mapping with UniProt and EMBL.
 # In case of VirusHost DB, the dataset is already pruned to remove sequences without hosts during the mapping stage itself.
 def remove_sequences_w_no_hosts(input_file_path, output_file_path):
     print("START: Remove sequences with no hosts")
-    df = pd.read_csv(input_file_path, on_bad_lines=None, converters={2: literal_eval},
-                     names=[UNIREF90_ID, TAX_ID, HOST_TAX_IDS])
-
-    # count the number of hosts for each sequence
-    df[HOST_COUNT] = df.apply(lambda x: len(x[HOST_TAX_IDS]), axis=1)
+    df = pd.read_csv(input_file_path)
     print(f"Dataset size = {df.shape}")
 
-    # Filter for sequences with atleast one host
-    df = df[df[HOST_COUNT] > 0]
-    print(f"Dataset after excluding proteins with no virus host = {df.shape[0]}")
-    # drop the host_count column
-    df.drop(columns=[HOST_COUNT], inplace=True)
+    # renaming host_tax_ids to uniprot_host_tax_ids
+    df.rename(columns={HOST_TAX_IDS: UNIPROT_HOST_TAX_IDS}, inplace=True)
+
+    df = df[~df[EMBL_HOST_NAME].isna()]
+    print(f"Dataset after excluding proteins with no virus host name from EMBL = {df.shape[0]}")
+
+    # Additional pruning:
+    # Remove sequences with duplicate EMBL reference ids
+    embl_ref_id_counts = df[EMBL_REF_ID].value_counts()
+    non_unique_embl_ref_ids = embl_ref_id_counts[embl_ref_id_counts > 1]
+    print(f"Number of non-unique EMBL reference ids = {non_unique_embl_ref_ids.shape}")
+    print(f"Non-unique EMBL reference ids = {non_unique_embl_ref_ids}")
+    df = df[~df[EMBL_REF_ID].isin(non_unique_embl_ref_ids.index)]
+
+    print(f"Dataset after excluding non-unique EMBL reference ids = {df.shape[0]}")
     df.to_csv(output_file_path, index=False)
     print(f"Written to file {output_file_path}")
     print("END: Remove sequences with no hosts")
     return
 
 
+# # Get taxonomy name and rank of the virus and its host for each sequence record.
+# # Input: Dataframe with exploded host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
+# # Output: Dataset with metadata. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
+# def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_path):
+#     print("START: Retrieving virus and virus host metadata using pytaxonkit")
+#     # Set TAXONKIT_DB environment variable
+#     os.environ[TAXONKIT_DB] = taxon_metadata_dir_path
+#
+#     # Read input dataset
+#     df = pd.read_csv(input_file_path)
+#     print(f"Read dataset size = {df.shape[0]}")
+#
+#     # convert HOST_TAX_IDS column to list type
+#     df[HOST_TAX_IDS] = df[HOST_TAX_IDS].apply(ast.literal_eval)
+#     # Explode the hosts column
+#     df = df.explode(HOST_TAX_IDS)
+#     # convert the HOST_TAX_IDS column to int64 for merge with the taxonomy metadata df
+#     df[HOST_TAX_IDS] = df[HOST_TAX_IDS].astype("int64")
+#     print(f"Dataset size after exploding {HOST_TAX_IDS} column = {df.shape[0]}")
+#     print(f"Number of unique viral protein sequences = {len(df[UNIREF90_ID].unique())}")
+#
+#     # Retrieve name and rank of all unique viruses in the dataset
+#     virus_tax_ids = df[TAX_ID].unique()
+#     print(f"Number of unique virus tax ids = {len(virus_tax_ids)}")
+#     virus_metadata_df = external_sources_utils.get_taxonomy_name_rank(virus_tax_ids)
+#     print(f"Size of virus metadata dataset = {virus_metadata_df.shape[0]}")
+#
+#     # Retrieve name and rank of all unique virus_hosts in the dataset
+#     virus_host_tax_ids = df[HOST_TAX_IDS].unique()
+#     print(f"Number of unique virus host tax ids = {len(virus_host_tax_ids)}")
+#     virus_host_metadata_df = external_sources_utils.get_taxonomy_name_rank(virus_host_tax_ids)
+#     print(f"Size of virus host metadata dataset = {virus_host_metadata_df.shape[0]}")
+#
+#     # Merge df with virus_metadata_df to map metadata of viruses
+#     df_w_metadata = pd.merge(df, virus_metadata_df, left_on=TAX_ID, right_on=NCBI_TAX_ID, how="left")
+#     df_w_metadata.drop(columns=[NCBI_TAX_ID], inplace=True)
+#     df_w_metadata.rename(columns={NAME: VIRUS_NAME, RANK: VIRUS_TAXON_RANK}, inplace=True)
+#     print(f"Dataset size after merge with virus metadata = {df_w_metadata.shape}")
+#
+#     # Merge df with virus_metadata_df to map metadata of virus hosts
+#     df_w_metadata = pd.merge(df_w_metadata, virus_host_metadata_df, left_on=HOST_TAX_IDS, right_on=NCBI_TAX_ID,
+#                              how="left")
+#     df_w_metadata.drop(columns=[NCBI_TAX_ID], inplace=True)
+#     df_w_metadata.rename(columns={NAME: VIRUS_HOST_NAME, RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
+#     print(f"Dataset size after merge with virus host metadata = {df_w_metadata.shape}")
+#     df_w_metadata.to_csv(output_file_path, index=False)
+#     print(f"Written to file {output_file_path}")
+#     print("END: Retrieving virus and virus host metadata using pytaxonkit")
+
+
 # Get taxonomy name and rank of the virus and its host for each sequence record.
-# Input: Dataframe with exploded host_tax_ids. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
-# Output: Dataset with metadata. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
+# Input: Dataframe with exploded host_tax_ids. Columns = [uniref90_id, tax_id, uniprot_host_tax_ids, embl_ref_id, embl_host_name]
+# Output: Dataset with metadata. Columns = [uniref90_id, tax_id, embl_ref_id, embl_host_name, virus_name, virus_taxon_rank, virus_host_name, virus_host_taxon_rank]
 def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_path):
     print("START: Retrieving virus and virus host metadata using pytaxonkit")
     # Set TAXONKIT_DB environment variable
@@ -273,25 +354,26 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     df = pd.read_csv(input_file_path)
     print(f"Read dataset size = {df.shape[0]}")
 
-    # convert HOST_TAX_IDS column to list type
-    df[HOST_TAX_IDS] = df[HOST_TAX_IDS].apply(ast.literal_eval)
-    # Explode the hosts column
-    df = df.explode(HOST_TAX_IDS)
-    # convert the HOST_TAX_IDS column to int64 for merge with the taxonomy metadata df
-    df[HOST_TAX_IDS] = df[HOST_TAX_IDS].astype("int64")
-    print(f"Dataset size after exploding {HOST_TAX_IDS} column = {df.shape[0]}")
+    # drop UNIPROT_HOST_TAX_IDS
+    df.drop(columns=UNIPROT_HOST_TAX_IDS, inplace=True)
+
+    # Create a new virus_host_name column by extracting the host name from the embl_host_name column
+    # 1. Take the first element (assuming there is only one element in the list (TODO: double check) e.g. ['Homo sapiens']
+    # 2. Split by ';' and take the first element in case of noisy host names e.g. ['Homo sapiens; sex: M; age: 7 months']
+    df[VIRUS_HOST_NAME] = df[EMBL_HOST_NAME].apply(lambda x: x[0].split(";")[0])
+
     print(f"Number of unique viral protein sequences = {len(df[UNIREF90_ID].unique())}")
 
     # Retrieve name and rank of all unique viruses in the dataset
     virus_tax_ids = df[TAX_ID].unique()
     print(f"Number of unique virus tax ids = {len(virus_tax_ids)}")
-    virus_metadata_df = external_sources_utils.get_taxonomy_name_rank(virus_tax_ids)
+    virus_metadata_df = external_sources_utils.get_taxonomy_name_rank_from_id(virus_tax_ids)
     print(f"Size of virus metadata dataset = {virus_metadata_df.shape[0]}")
 
     # Retrieve name and rank of all unique virus_hosts in the dataset
-    virus_host_tax_ids = df[HOST_TAX_IDS].unique()
-    print(f"Number of unique virus host tax ids = {len(virus_host_tax_ids)}")
-    virus_host_metadata_df = external_sources_utils.get_taxonomy_name_rank(virus_host_tax_ids)
+    embl_virus_host_names = df[VIRUS_HOST_NAME].unique()
+    print(f"Number of unique embl_virus_host_names = {len(embl_virus_host_names)}")
+    virus_host_metadata_df = external_sources_utils.get_taxonomy_name_rank_from_name(embl_virus_host_names)
     print(f"Size of virus host metadata dataset = {virus_host_metadata_df.shape[0]}")
 
     # Merge df with virus_metadata_df to map metadata of viruses
@@ -301,10 +383,10 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     print(f"Dataset size after merge with virus metadata = {df_w_metadata.shape}")
 
     # Merge df with virus_metadata_df to map metadata of virus hosts
-    df_w_metadata = pd.merge(df_w_metadata, virus_host_metadata_df, left_on=HOST_TAX_IDS, right_on=NCBI_TAX_ID,
+    df_w_metadata = pd.merge(df_w_metadata, virus_host_metadata_df, left_on=VIRUS_HOST_NAME, right_on=NAME,
                              how="left")
-    df_w_metadata.drop(columns=[NCBI_TAX_ID], inplace=True)
-    df_w_metadata.rename(columns={NAME: VIRUS_HOST_NAME, RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
+    df_w_metadata.drop(columns=[NAME], inplace=True)
+    df_w_metadata.rename(columns={RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
     print(f"Dataset size after merge with virus host metadata = {df_w_metadata.shape}")
     df_w_metadata.to_csv(output_file_path, index=False)
     print(f"Written to file {output_file_path}")

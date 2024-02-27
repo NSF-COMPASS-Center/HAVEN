@@ -67,7 +67,7 @@ def query_uniprot(uniref90_id):
 # Get taxonomy names and ranks from ncbi using pytaxonkit for given list of tax_ids
 # Input: list of tax_ids
 # Output: Dataframe with columns: ["TaxID", "Name", "Rank"]
-def get_taxonomy_name_rank(tax_ids):
+def get_taxonomy_name_rank_from_id(tax_ids):
     # There is no method with input parameter: taxid and output: scientific name and rank.
     # However, there is a method that takes in name and returns the taxid and rank
     # Hack:
@@ -75,6 +75,17 @@ def get_taxonomy_name_rank(tax_ids):
     # 2. Get ranks using the names from previous step using name2taxid()
     df = pytaxonkit.name(tax_ids)
     df_w_rank = pytaxonkit.name2taxid(df[NAME].values)
+    # default datatype of TaxID column = int32
+    # convert it to int64 for convenience in downstream analysis
+    df_w_rank[NCBI_TAX_ID] = pd.to_numeric(df_w_rank[NCBI_TAX_ID], errors="coerce").fillna(0).astype("int64")
+    return df_w_rank
+
+
+# Get taxonomy names and ranks from ncbi using pytaxonkit for given list of tax_names
+# Input: list of names
+# Output: Dataframe with columns: ["TaxID", "Name", "Rank"]
+def get_taxonomy_name_rank_from_name(tax_names):
+    df_w_rank = pytaxonkit.name2taxid(tax_names)
     # default datatype of TaxID column = int32
     # convert it to int64 for convenience in downstream analysis
     df_w_rank[NCBI_TAX_ID] = pd.to_numeric(df_w_rank[NCBI_TAX_ID], errors="coerce").fillna(0).astype("int64")
