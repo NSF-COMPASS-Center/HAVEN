@@ -7,6 +7,7 @@ import torch.nn.functional as F
 import torch
 import tqdm
 from statistics import mean
+import wandb
 
 from utils import utils, dataset_utils, nn_utils, kmer_utils
 from training.early_stopping import EarlyStopping
@@ -39,6 +40,13 @@ def execute(input_settings, output_settings, classification_settings):
     sequence_col = sequence_settings["sequence_col"]
     label_col = label_settings["label_col"]
     results = {}
+
+    wandb_config = {
+        "n_epochs": training_settings["n_epochs"],
+        "lr": training_settings["max_lr"],
+        "max_sequence_length": sequence_settings["max_sequence_length"]
+    }
+
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
@@ -77,6 +85,13 @@ def execute(input_settings, output_settings, classification_settings):
             # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
             model["max_seq_len"] = sequence_settings["max_sequence_length"]
             mode = model["mode"]
+
+            # Initialize Weights & Biases for each run
+            wandb_config["iter"] = iter
+            wandb.init(project="zoonosis-host-prediction",
+                       config=wandb_config,
+                       group=model_name,
+                       job_type=iter)
 
             if model["active"] is False:
                 print(f"Skipping {model_name} ...")
@@ -136,6 +151,7 @@ def execute(input_settings, output_settings, classification_settings):
             results[model_name].append(result_df)
             torch.save(nlp_model.state_dict(), model_filepath.format(model_name=model_name, itr=iter))
 
+            wandb.finish()
     # write the raw results in csv files
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
     utils.write_output(results, output_results_dir, output_prefix, "output")
@@ -194,6 +210,10 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         model.train_iter += 1
         curr_lr = lr_scheduler.get_last_lr()[0]
         train_loss = loss.item()
+        wandb.log({
+            "learning-rate": float(curr_lr),
+            "training-loss": float(train_loss)
+        })
         tbw.add_scalar(f"{model_name}/learning-rate", float(curr_lr), model.train_iter)
         tbw.add_scalar(f"{model_name}/training-loss", float(train_loss), model.train_iter)
         pbar.set_description(
@@ -221,6 +241,9 @@ def evaluate_model(model, dataset_loader, criterion, tbw, model_name, epoch, log
             curr_val_loss = loss.item()
             model.test_iter += 1
             if log_loss:
+                wandb.log({
+                    "validation-loss": float(curr_val_loss)
+                })
                 tbw.add_scalar(f"{model_name}/validation-loss", float(curr_val_loss), model.test_iter)
                 pbar.set_description(
                     f"{model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.test_iter}, epoch={epoch + 1}")
