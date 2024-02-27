@@ -357,6 +357,9 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     # drop UNIPROT_HOST_TAX_IDS
     df.drop(columns=UNIPROT_HOST_TAX_IDS, inplace=True)
 
+    # convert EMBL_HOST_NAME column to list type
+    df[EMBL_HOST_NAME] = df[EMBL_HOST_NAME].apply(ast.literal_eval)
+
     # Create a new virus_host_name column by extracting the host name from the embl_host_name column
     # 1. Take the first element (assuming there is only one element in the list (TODO: double check) e.g. ['Homo sapiens']
     # 2. Split by ';' and take the first element in case of noisy host names e.g. ['Homo sapiens; sex: M; age: 7 months']
