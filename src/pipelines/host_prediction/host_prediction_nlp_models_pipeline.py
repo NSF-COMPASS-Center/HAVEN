@@ -44,7 +44,8 @@ def execute(input_settings, output_settings, classification_settings):
     wandb_config = {
         "n_epochs": training_settings["n_epochs"],
         "lr": training_settings["max_lr"],
-        "max_sequence_length": sequence_settings["max_sequence_length"]
+        "max_sequence_length": sequence_settings["max_sequence_length"],
+        "dataset": input_file_names[0]
     }
 
     for iter in range(n_iters):
