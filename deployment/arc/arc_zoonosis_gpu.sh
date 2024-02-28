@@ -19,7 +19,7 @@ module load Anaconda3
 module load cuda11.2/toolkit
 
 # Load conda environment
-source activate ~/anaconda3/envs/zoonosis
+source activate ~/.conda/envs/zoonosis
 echo "Conda information:"
 conda info
 
