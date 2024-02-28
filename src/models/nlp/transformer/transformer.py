@@ -65,9 +65,14 @@ class TransformerEncoderClassifier(nn.Module):
     def forward(self, X, mask):
         X = self.embedding(X)
         X = self.encoder(X, mask)
+
+        # pool the model embeddings of all tokens in the input sequence using mean
+        X = X.mean(dim=1)
+        
         # embedding to be used for interpretability
-        self.embedding = X
-        y = self.linear_op(X)
+        self.tf_enc_embedding = X
+
+        y = self.linear_output(X)
         return y
 
 
