@@ -62,7 +62,7 @@ class TransformerEncoderClassifier(nn.Module):
         # last linear layer: input_dim--> n_classes
         self.linear_output = nn.Linear(input_dim, n_classes)
 
-    def forward(self, X, mask):
+    def forward(self, X, mask=None):
         X = self.embedding(X)
         X = self.encoder(X, mask)
 

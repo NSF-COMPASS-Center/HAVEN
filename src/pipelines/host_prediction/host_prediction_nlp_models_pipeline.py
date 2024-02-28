@@ -200,7 +200,7 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
 
         optimizer.zero_grad()
 
-        output = model(input, mask=None)
+        output = model(input)
         output = output.to(nn_utils.get_device())
 
         loss = criterion(output, label.long())
