@@ -88,11 +88,12 @@ def execute(input_settings, output_settings, classification_settings):
             mode = model["mode"]
 
             # Initialize Weights & Biases for each run
-            wandb_config["iter"] = iter
+            wandb_config["hidden_dim"]: model["hidden_dim"]
             wandb.init(project="zoonosis-host-prediction",
                        config=wandb_config,
-                       group=model_name,
-                       job_type=iter)
+                       group=classification_settings["experiment"],
+                       job_type=model_name,
+                       name=iter)
 
             if model["active"] is False:
                 print(f"Skipping {model_name} ...")
