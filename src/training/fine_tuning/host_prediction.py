@@ -18,7 +18,6 @@ class HostPrediction(nn.Module):
         # last linear layer: hidden_dim--> n_classes
         self.linear_op = nn.Linear(hidden_dim, n_classes)
 
-
     def forward(self, X):
         X = self.pre_trained_model(X, mask=None)
         # pool the pre_trained_model embeddings of all tokens in the input sequence using mean
@@ -32,6 +31,7 @@ class HostPrediction(nn.Module):
         self.fine_tuned_embedding = X
         y = self.linear_op(X)
         return y
+
 
 def get_host_prediction_model(task):
     host_prediction_model = HostPrediction(pre_trained_model=task["pre_trained_model"],

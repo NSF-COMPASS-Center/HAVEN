@@ -93,7 +93,7 @@ def execute(input_settings, output_settings, classification_settings):
                        config=wandb_config,
                        group=classification_settings["experiment"],
                        job_type=model_name,
-                       name=iter)
+                       name=f"iter_{iter}")
 
             if model["active"] is False:
                 print(f"Skipping {model_name} ...")
@@ -136,7 +136,7 @@ def execute(input_settings, output_settings, classification_settings):
 
             elif "transformer" in model_name:
                 print(f"Executing Transformer in {mode} mode")
-                nlp_model = transformer.get_transformer_encoder(model)
+                nlp_model = transformer.get_transformer_encoder_classifier(model)
 
             else:
                 continue
