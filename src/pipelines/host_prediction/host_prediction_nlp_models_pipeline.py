@@ -87,14 +87,6 @@ def execute(input_settings, output_settings, classification_settings):
             model["max_seq_len"] = sequence_settings["max_sequence_length"]
             mode = model["mode"]
 
-            # Initialize Weights & Biases for each run
-            wandb_config["hidden_dim"]: model["hidden_dim"]
-            wandb.init(project="zoonosis-host-prediction",
-                       config=wandb_config,
-                       group=classification_settings["experiment"],
-                       job_type=model_name,
-                       name=f"iter_{iter}")
-
             if model["active"] is False:
                 print(f"Skipping {model_name} ...")
                 continue
@@ -141,6 +133,14 @@ def execute(input_settings, output_settings, classification_settings):
             else:
                 continue
 
+            # Initialize Weights & Biases for each run
+            wandb_config["hidden_dim"]: model["hidden_dim"]
+            wandb.init(project="zoonosis-host-prediction",
+                       config=wandb_config,
+                       group=classification_settings["experiment"],
+                       job_type=model_name,
+                       name=f"iter_{iter}")
+            
             # Execute the NLP model
             if mode == "test":
                 nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
