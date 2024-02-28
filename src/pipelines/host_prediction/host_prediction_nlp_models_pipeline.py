@@ -134,7 +134,7 @@ def execute(input_settings, output_settings, classification_settings):
                 continue
 
             # Initialize Weights & Biases for each run
-            wandb_config["hidden_dim"]: model["hidden_dim"]
+            wandb_config["hidden_dim"] = model["hidden_dim"]
             wandb.init(project="zoonosis-host-prediction",
                        config=wandb_config,
                        group=classification_settings["experiment"],
