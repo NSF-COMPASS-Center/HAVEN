@@ -45,14 +45,14 @@ classification_settings:
       "Capybara": [ "Hydrochoerus hydrochaeris" ]
       "Himalayan marmot": [ "Marmota himalayana" ]
       "Red junglefowl": [ "Gallus gallus" ]
-      "Common carp": [ "Cyprinus carpio" ]
-      "South Island robin": [ "Petroica australis" ]
-      "Cat": [ "Felis catus" ]
-      "Sonoran Desert tortoise": [ "Gopherus morafkai" ]
-      "Brush mouse": [ "Peromyscus boylii" ]
-      "Yellow-bellied marmot": [ "Marmota flaviventris" ]
-      "Cattle": [ "Bos taurus" ]
-      "Big brown bat": [ "Eptesicus fuscus" ]
+#      "Common carp": [ "Cyprinus carpio" ]
+#      "South Island robin": [ "Petroica australis" ]
+#      "Cat": [ "Felis catus" ]
+#      "Sonoran Desert tortoise": [ "Gopherus morafkai" ]
+#      "Brush mouse": [ "Peromyscus boylii" ]
+#      "Yellow-bellied marmot": [ "Marmota flaviventris" ]
+#      "Cattle": [ "Bos taurus" ]
+#      "Big brown bat": [ "Eptesicus fuscus" ]
   training_settings:
     n_epochs: 50
     max_lr: 1e-4

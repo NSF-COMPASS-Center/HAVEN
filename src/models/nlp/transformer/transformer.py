@@ -68,7 +68,7 @@ class TransformerEncoderClassifier(nn.Module):
 
         # pool the model embeddings of all tokens in the input sequence using mean
         X = X.mean(dim=1)
-        
+
         # embedding to be used for interpretability
         self.tf_enc_embedding = X
 
