@@ -122,7 +122,7 @@ classification_settings:
       n_tokens: 27
       n_classes: 5
       input_dim: 512 # input embedding dimension
-      hidden_dim: 1024
+      hidden_dim: 2048
       manual_seed:  # whole numbers
 
 output_settings:
