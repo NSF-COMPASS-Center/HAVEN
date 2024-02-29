@@ -14,7 +14,7 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None, figure_config=DE
     ax = sns.boxplot(data=df, x=x_col, y=y_col)
     if baseline is not None:
         ax.axhline(baseline, color="gray", linestyle="--")
-    ax.set_ylim(0, 1)
+    ax.set_ylim(0.5, 1)
     ax.set_xlabel("Model", size=14)
     ax.set_ylabel("AUPRC", size=14)
     plt.xticks(rotation=-90)
