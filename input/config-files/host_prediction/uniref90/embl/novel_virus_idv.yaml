@@ -10,6 +10,7 @@ input_settings:
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv_c5.csv" ]
+  pre_training_file_name: "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5.csv"
   # file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
