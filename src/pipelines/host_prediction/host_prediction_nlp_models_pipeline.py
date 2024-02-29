@@ -76,6 +76,10 @@ def execute(input_settings, output_settings, classification_settings):
         val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
         test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
 
+        if not classification_settings["split_input"]:
+            test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col)
+            train_dataset_loader = val_dataset_loader = test_dataset_loader
+            
         nlp_model = None
         # model store filepath
         model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
