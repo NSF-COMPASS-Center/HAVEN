@@ -11,7 +11,7 @@ input_settings:
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   # file_names: [ "uniref90_final_msl1114.csv" ]
-  file_names: [ "uniref90_viridae_virushostdb_hosts_pruned_metadata_species_vertebrates_w_seq_wo_single_host_virus_t0.01_c16.csv" ]
+  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -37,6 +37,7 @@ pre_train_settings:
     n_tokens: 26
 
 fine_tune_settings:
+  experiment: "fine_tune_model_arch_hyperparam_search"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
@@ -54,35 +55,32 @@ fine_tune_settings:
     exclude_labels: [ "nan" ]
     label_groupings:
       "Human": [ "Homo sapiens" ]
-      "Chimpanzee": [ "Pan troglodytes" ]
-      "Grivet": [ "Chlorocebus aethiops" ]
-      "Cattle": [ "Bos taurus" ]
       "Pig": [ "Sus scrofa" ]
-      "House mouse": ["Mus musculus"]
-      "Indochinese rhesus macaque": ["Macaca mulatta"]
-      "Red junglefowl": ["Gallus gallus"]
-      "Vervet monkey": ["Chlorocebus pygerythrus"]
-      "Brown rat": ["Rattus norvegicus"]
-      "Horse": ["Equus caballus"]
-      "Common warthog": ["Phacochoerus africanus"]
-      "Hamlyn monkey": ["Cercopithecus hamlyni"]
-      "Cat": ["Felis catus"]
-      "Goat": ["Capra hircus"]
-      "Sheep": ["Ovis aries"]
+      "Capybara": [ "Hydrochoerus hydrochaeris" ]
+      "Himalayan marmot": [ "Marmota himalayana" ]
+      "Red junglefowl": [ "Gallus gallus" ]
+#      "Common carp": [ "Cyprinus carpio" ]
+#      "South Island robin": [ "Petroica australis" ]
+#      "Cat": [ "Felis catus" ]
+#      "Sonoran Desert tortoise": [ "Gopherus morafkai" ]
+#      "Brush mouse": [ "Peromyscus boylii" ]
+#      "Yellow-bellied marmot": [ "Marmota flaviventris" ]
+#      "Cattle": [ "Bos taurus" ]
+#      "Big brown bat": [ "Eptesicus fuscus" ]
 
   task_settings:
-    - name: "host_prediction_fnn_2l_lr1e-5-95k"
+    - name: "host_prediction_fnn_8l_d1024_lr1e-5"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       loss: "FocalLoss"
-      depth: 2
-      n_classes: 16
+      depth: 8
+      n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_vertebrates_wo_single_host_virus_t0.01_c16/20240211/fine_tuning/host_prediction"
-  prefix: "mlm_transformer_encoder-l6-h8-lr1e-4_uniref90viridae_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240228/host_multi/fine_tuning"
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

@@ -1,3 +1,5 @@
+import itertools
+
 import pandas as pd
 import os
 import numpy as np
@@ -462,11 +464,22 @@ def get_sequences_from_vertebrata_hosts(input_file_path, taxon_metadata_dir_path
     print(f"Number of unique host tax ids = {len(host_tax_ids)}")
 
     # Get taxids belonging to the clade of vertebrata
-    vertebrata_tax_ids = external_sources_utils.get_vertebrata_tax_ids(host_tax_ids)
+    # split into sublists for parallel processing
+    host_tax_ids_sublists = np.array_split(np.array(host_tax_ids), N_CPU)
+    for i in range(N_CPU):
+         print(f"Size of host_tax_ids_sublists[{i}] = {host_tax_ids_sublists[i].shape}")
+
+    # multiprocessing for parallelization
+    cpu_pool = Pool(N_CPU)
+    vertebrata_tax_ids_sublists = cpu_pool.map(external_sources_utils.get_vertebrata_tax_ids, host_tax_ids_sublists)
+    # flatten the list of sub_lists into one list
+    vertebrata_tax_ids = list(itertools.chain.from_iterable(vertebrata_tax_ids_sublists))
+    cpu_pool.close()
+    cpu_pool.join()
     print(f"Number of unique vertebrata tax ids = {len(vertebrata_tax_ids)}")
     # Filter
     print(f"Dataset size before filtering for vertebrata: {df.shape}")
-    df = df[df[HOST_TAX_IDS].isin(vertebrata_tax_ids)]
+    df = df[df[VIRUS_HOST_TAX_ID].isin(vertebrata_tax_ids)]
     print(f"Dataset size after filtering for vertebrata: {df.shape}")
 
     df.to_csv(output_file_path, index=False)

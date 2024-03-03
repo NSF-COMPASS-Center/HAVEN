@@ -2,7 +2,7 @@
 
 #SBATCH -J zoonosis-nlp
 #SBATCH --account=seqevol
-#SBATCH --partition=dgx_normal_q
+#SBATCH --partition=a100_normal_q
 
 #SBATCH --mem=180G
 #SBATCH --nodes=1
@@ -19,7 +19,7 @@ module load Anaconda3
 module load cuda11.2/toolkit
 
 # Load conda environment
-source activate ~/anaconda3/envs/zoonosis
+source activate ~/.conda/envs/zoonosis
 echo "Conda information:"
 conda info
 

@@ -1,0 +1,50 @@
+config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw/uniref90_embl_vertebrates_idv_c5/20240229/host_multi"
+
+  file_names:
+    "fnn-l_10-d_1024-lr1e-3": "idv_nv_msl1036_fnn-l_10-d_1024-lr1e-3_output.csv"
+    "cnn-l_4-d_1024-k3s1-lr1e-3": "idv_nv_msl1036_cnn-l_4-d_1024-k3s1-lr1e-3_output.csv"
+    "rnn-l_6-d_1024-lr1e-5": "idv_nv_msl1036_rnn-l_6-d_1024-lr1e-5_output.csv"
+    "lstm-l_2-d_1024-lr1e-3": "idv_nv_msl1036_lstm-l_2-d_1024-lr1e-3_output.csv"
+    "TF-ENC-msl1036-d1024-lr1e-4": "idv_nv_msl1036_transformer-l_6-h_8-d_1024-lr1e-4_output.csv"
+    # "TF-FNN2l-d1024-lr1e-5": "20240228/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-5_output.csv"
+
+evaluation_settings:
+  type: "multi"
+  # metrics
+  auroc: False
+  auprc: True
+  f1: False
+  accuracy: True
+  prediction_distribution: False
+
+label_mappings:
+  "Homo sapiens": "Human"
+  "Sus scrofa": "Pig"
+  "Hydrochoerus hydrochaeris": "Capybara"
+  "Marmota himalayana": "Himalayan marmot"
+  "Gallus gallus": "Red junglefowl"
+#  "Mus musculus": "House mouse"
+#  "Macaca mulatta": "Indochinese rhesus macaque"
+#  "Gallus gallus": "Red junglefowl"
+#  "Chlorocebus pygerythrus": "Vervet monkey"
+#  "Rattus norvegicus": "Brown rat"
+#  "Equus caballus": "Horse"
+#  "Phacochoerus africanus": "Common warthog"
+#  "Cercopithecus hamlyni": "Hamlyn monkey"
+#  "Felis catus": "Cat"
+#  "Capra hircus": "Goat"
+#  "Ovis aries": "Sheep"
+
+output_settings:
+  output_dir: "output"
+  evaluation_dir: "evaluation"
+  visualization_dir: "visualization"
+  dataset_dir: "uniref90/20240228/host_multi_nv_idv_all_models"
+  prefix: "nv_idv"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

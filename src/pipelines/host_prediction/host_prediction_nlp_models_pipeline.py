@@ -7,6 +7,7 @@ import torch.nn.functional as F
 import torch
 import tqdm
 from statistics import mean
+import wandb
 
 from utils import utils, dataset_utils, nn_utils, kmer_utils
 from training.early_stopping import EarlyStopping
@@ -39,14 +40,22 @@ def execute(input_settings, output_settings, classification_settings):
     sequence_col = sequence_settings["sequence_col"]
     label_col = label_settings["label_col"]
     results = {}
+
+    wandb_config = {
+        "n_epochs": training_settings["n_epochs"],
+        "lr": training_settings["max_lr"],
+        "max_sequence_length": sequence_settings["max_sequence_length"],
+        "dataset": input_file_names[0]
+    }
+
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
         df = dataset_utils.read_dataset(input_dir, input_file_names,
-                                cols=[id_col, sequence_col, label_col])
+                                        cols=[id_col, sequence_col, label_col])
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
-                                                           classification_type=classification_settings["type"])
+                                                     classification_type=classification_settings["type"])
 
         # only if the feature type is kmer, computer the kmer features over the entire datatset
         # TODO: can this be moved to nn_utils and computer kmer features only over the training dataset? will that affect the performance? how will we compute features for the testing dataset
@@ -59,13 +68,27 @@ def execute(input_settings, output_settings, classification_settings):
         # 3. Split dataset
         # full df into training and testing datasets in the ratio configured in the config file
         train_df, test_df = dataset_utils.split_dataset_stratified(df, input_split_seeds[iter],
-                                                                   classification_settings["train_proportion"], stratify_col=label_col)
+                                                                   classification_settings["train_proportion"],
+                                                                   stratify_col=label_col)
         # split testing set into validation and testing datasets in equal proportion
         # so 80:20 will now be 80:10:10
-        val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
+        val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5,
+                                                                 stratify_col=label_col)
         train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col)
         val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
         test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
+
+        if not classification_settings["split_input"]:
+            # for evaluation of pre-trained models, the class weights are computed using the dataset (full) that was used to train the model
+            # since the evaluation dataset may or may not contain all the labels
+            pre_train_df = dataset_utils.read_dataset(input_dir, input_settings["pre_training_file_name"],
+                                                      cols=[id_col, sequence_col, label_col])
+            pre_train_df, _ = utils.transform_labels(pre_train_df, label_settings,
+                                                     classification_type=classification_settings["type"])
+            train_dataset_loader = dataset_utils.get_dataset_loader(pre_train_df, sequence_settings, label_col)
+
+            test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col)
+            val_dataset_loader = test_dataset_loader
 
         nlp_model = None
         # model store filepath
@@ -119,10 +142,18 @@ def execute(input_settings, output_settings, classification_settings):
 
             elif "transformer" in model_name:
                 print(f"Executing Transformer in {mode} mode")
-                nlp_model = transformer.get_transformer_encoder(model)
+                nlp_model = transformer.get_transformer_encoder_classifier(model)
 
             else:
                 continue
+
+            # Initialize Weights & Biases for each run
+            wandb_config["hidden_dim"] = model["hidden_dim"]
+            wandb.init(project="zoonosis-host-prediction",
+                       config=wandb_config,
+                       group=classification_settings["experiment"],
+                       job_type=model_name,
+                       name=f"iter_{iter}")
 
             # Execute the NLP model
             if mode == "test":
@@ -136,12 +167,14 @@ def execute(input_settings, output_settings, classification_settings):
             results[model_name].append(result_df)
             torch.save(nlp_model.state_dict(), model_filepath.format(model_name=model_name, itr=iter))
 
+            wandb.finish()
     # write the raw results in csv files
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
     utils.write_output(results, output_results_dir, output_prefix, "output")
 
 
-def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, model_name, mode):
+def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, model_name,
+              mode):
     tbw = SummaryWriter()
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
@@ -173,7 +206,8 @@ def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_load
     return result_df, model
 
 
-def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw, model_name,
+def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw,
+              model_name,
               epoch):
     # Training
     model.train()
@@ -182,7 +216,7 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
 
         optimizer.zero_grad()
 
-        output = model(input, mask=None)
+        output = model(input)
         output = output.to(nn_utils.get_device())
 
         loss = criterion(output, label.long())
@@ -194,6 +228,10 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         model.train_iter += 1
         curr_lr = lr_scheduler.get_last_lr()[0]
         train_loss = loss.item()
+        wandb.log({
+            "learning-rate": float(curr_lr),
+            "training-loss": float(train_loss)
+        })
         tbw.add_scalar(f"{model_name}/learning-rate", float(curr_lr), model.train_iter)
         tbw.add_scalar(f"{model_name}/training-loss", float(train_loss), model.train_iter)
         pbar.set_description(
@@ -221,6 +259,9 @@ def evaluate_model(model, dataset_loader, criterion, tbw, model_name, epoch, log
             curr_val_loss = loss.item()
             model.test_iter += 1
             if log_loss:
+                wandb.log({
+                    "validation-loss": float(curr_val_loss)
+                })
                 tbw.add_scalar(f"{model_name}/validation-loss", float(curr_val_loss), model.test_iter)
                 pbar.set_description(
                     f"{model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.test_iter}, epoch={epoch + 1}")

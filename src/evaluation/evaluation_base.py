@@ -66,7 +66,8 @@ class EvaluationBase:
                     if self.evaluation_settings["prediction_distribution"]:
                         self.prediction_distribution()
                     result.append(result_itr)
-                except:
+                except Exception as e:
+                    print(e)
                     pass
         self.evaluation_metrics_df = pd.DataFrame(result)
         self.evaluation_metrics_df.to_csv(self.evaluation_output_file_path + "_evaluation_metrics.csv")
@@ -74,7 +75,7 @@ class EvaluationBase:
         if len(roc_curves) > 0:
             self.roc_curves_df = pd.concat(roc_curves, ignore_index=True)
             self.roc_curves_df.to_csv(self.evaluation_output_file_path + "_roc_curves.csv")
-        if len(roc_curves) > 0:
+        if len(pr_curves) > 0:
             self.pr_curves_df = pd.concat(pr_curves, ignore_index=True)
             self.pr_curves_df.to_csv(self.evaluation_output_file_path + "_pr_curves.csv")
 

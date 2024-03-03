@@ -37,3 +37,6 @@ output/
 
 # ARC logs
 **/arc-logs*/**
+
+# Weights and Biases files
+**/wandb/**
