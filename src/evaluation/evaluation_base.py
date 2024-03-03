@@ -66,7 +66,8 @@ class EvaluationBase:
                     if self.evaluation_settings["prediction_distribution"]:
                         self.prediction_distribution()
                     result.append(result_itr)
-                except:
+                except Exception as e:
+                    print(e)
                     pass
         self.evaluation_metrics_df = pd.DataFrame(result)
         self.evaluation_metrics_df.to_csv(self.evaluation_output_file_path + "_evaluation_metrics.csv")
