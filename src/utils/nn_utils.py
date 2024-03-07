@@ -89,3 +89,9 @@ def load_checkpoint(model, optimizer, lr_scheduler, file_path):
     lr_scheduler.last_epoch = last_epoch
 
     return model, optimizer, lr_scheduler, last_epoch
+
+
+def set_model_grad(model, grad_value):
+    for param in model.parameters():
+        param.requires_grad = grad_value
+    return model

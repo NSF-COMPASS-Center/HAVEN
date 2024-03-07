@@ -30,3 +30,8 @@ class EarlyStopping:
             if self.patience_counter >= self.patience:
                 print("Early STOP: Early stopping threshold reached.")
                 self.early_stop = True
+
+    def reset(self):
+        self.early_stop = False
+        self.patience_counter = 0
+        self.current_best_loss = math.inf

@@ -137,11 +137,12 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
-    n_epochs = training_settings["n_epochs"]
+    n_epochs_freeze = training_settings["n_epochs_freeze"]
+    n_epochs_unfreeze = training_settings["n_epochs_unfreeze"]
     lr_scheduler = OneCycleLR(
         optimizer=optimizer,
         max_lr=float(training_settings["max_lr"]),
-        epochs=n_epochs,
+        epochs=n_epochs_freeze + n_epochs_unfreeze,
         steps_per_epoch=len(train_dataset_loader),
         pct_start=training_settings["pct_start"],
         anneal_strategy='cos',
@@ -152,12 +153,30 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     model.test_iter = 0
     if mode == "train":
         # train the model only if set to train mode
-        for e in range(n_epochs):
+        # freeze the pretrained model for the first n_epochs_freeze
+        nn_utils.set_model_grad(model.pre_trained_model, grad_value=False)
+
+        # train for n_epochs_freeze
+        for e in range(n_epochs_freeze):
             model = run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
                               lr_scheduler, early_stopper, tbw, task_name, e)
             # check if early stopping condition was satisfied and stop accordingly
             if early_stopper.early_stop:
-                print("Breaking off training loop due to early stop")
+                print("Breaking off frozen training loop due to early stop")
+                break
+
+        # unfreeze the pretrained model for the next n_epochs_unfreeze
+        nn_utils.set_model_grad(model.pre_trained_model, grad_value=True)
+
+        # Reset early stopper
+        early_stopper.reset()
+
+        for e in range(n_epochs_unfreeze):
+            model = run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+                              lr_scheduler, early_stopper, tbw, task_name, e)
+            # check if early stopping condition was satisfied and stop accordingly
+            if early_stopper.early_stop:
+                print("Breaking off unfrozen training loop due to early stop")
                 break
 
     result_df, _ = evaluate_model(model, test_dataset_loader, criterion, tbw, task_name, epoch=None, log_loss=False)
