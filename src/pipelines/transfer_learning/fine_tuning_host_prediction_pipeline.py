@@ -50,7 +50,8 @@ def execute(config):
     results = {}
 
     wandb_config = {
-        "n_epochs": training_settings["n_epochs"],
+        "n_epochs_freeze": training_settings["n_epochs_freeze"],
+        "n_epochs_unfreeze": training_settings["n_epochs_unfreeze"],
         "lr": training_settings["max_lr"],
         "max_sequence_length": sequence_settings["max_sequence_length"],
         "dataset": input_file_names[0]
