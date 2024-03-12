@@ -32,7 +32,7 @@ class MaskedLanguageModel(nn.Module):
             no_mask = sequence_batch != no_mask_token_val # positions WITHOUT the <no_mask_token_val>
             init_mask = init_mask & no_mask # only positions WITHOUT the the <no_mask_token_val> will be retained for final masking
 
-        # TODO: Revisit the lgic of selecting 10% for random replacement and no replacement from sequence_batch and not init_mask
+        # TODO: Revisit thgic of selecting 10% for random replacement and no replacement from sequence_batch and not init_mask
         # mask for positions to be left unchanged (i.e., replace with the original tokens)
         unchanged_token_mask = torch.rand(sequence_batch.shape, device=nn_utils.get_device()) < self.no_change_mask_prob
         unchanged_token_mask = init_mask & unchanged_token_mask

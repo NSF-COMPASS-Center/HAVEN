@@ -37,16 +37,16 @@ pre_train_settings:
     n_tokens: 26
 
 fine_tune_settings:
-  experiment: "fine_tune_model_w_freezing"
+  experiment: "fine_tune_model"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
   classification_type: "multi"
 
   training_settings:
-    n_epochs_freeze: 20
-    n_epochs_unfreeze: 30
-    max_lr: 1e-5
+    n_epochs_freeze: 0
+    n_epochs_unfreeze: 50
+    max_lr: 1e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -70,7 +70,7 @@ fine_tune_settings:
 #      "Big brown bat": [ "Eptesicus fuscus" ]
 
   task_settings:
-    - name: "host_prediction_fnn_2l_d1024_lr1e-5"
+    - name: "host_prediction_fnn_2l_d1024_lr1e-4"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
@@ -83,5 +83,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240306/host_multi/fine_tuning"
+  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240307/host_multi/fine_tuning"
   prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
