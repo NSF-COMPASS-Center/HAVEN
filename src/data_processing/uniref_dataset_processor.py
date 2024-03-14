@@ -12,7 +12,7 @@ from pathlib import Path
 import ast
 from utils import external_sources_utils
 
-N_CPU = 12
+N_CPU = 2
 EMBL_QUERY_PAYLOAD_SIZE = 200
 
 # Virus Host DB keywords

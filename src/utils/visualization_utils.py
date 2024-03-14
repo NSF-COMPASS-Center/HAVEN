@@ -3,7 +3,7 @@ import seaborn as sns
 import textwrap
 
 DEFAULT_FIGURE_CONFIG = {
-    "figsize": (10, 10),
+    "figsize": (9, 7),
     "xtick.labelsize": 18,
     "ytick.labelsize": 18
 }
@@ -15,7 +15,7 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None, figure_config=DE
     if baseline is not None:
         ax.axhline(baseline, color="gray", linestyle="--")
     ax.set_ylim(0.5, 1)
-    # ax.set_xlabel("Model", size=20, labelpad=2)
+    ax.set_xlabel("", size=20, labelpad=5)
     ax.set_ylabel("AUPRC", size=20)
     # plt.xticks(rotation=45)
     wrap_xticklabels(ax)

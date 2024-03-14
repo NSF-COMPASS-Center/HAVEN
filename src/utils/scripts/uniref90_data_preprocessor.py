@@ -4,10 +4,17 @@ from pathlib import Path
 from data_processing import uniref_dataset_processor
 
 # names of all intermediary files to be created
-UNIREF90_DATA_CSV_FILENAME = "uniref90_viridae.csv"
-UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME = "uniref90_viridae_uniprot_hosts.csv"
-EMBL_HOST_MAPPING_FILENAME = "embl_hosts.csv"
-UNIREF90_DATA_HOST_EMBL_MAPPING_FILENAME = "uniref90_viridae_embl_hosts.csv"
+# UNIREF90_DATA_CSV_FILENAME = "uniref90_viridae.csv"
+# UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME = "uniref90_viridae_uniprot_hosts.csv"
+# EMBL_HOST_MAPPING_FILENAME = "embl_hosts.csv"
+# UNIREF90_DATA_HOST_EMBL_MAPPING_FILENAME = "uniref90_viridae_embl_hosts.csv"
+# UNIREF90_DATA_HOST_VIRUSHOSTDB_MAPPING_FILENAME = "uniref90_viridae_virushostdb_hosts.csv"
+
+# names of all intermediary files to be created
+UNIREF90_DATA_CSV_FILENAME = "coronaviridae_s_uniref90.csv"
+UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME = "coronaviridae_s_uniref90_uniprot_hosts.csv"
+EMBL_HOST_MAPPING_FILENAME = "coronaviridae_s_uniref90_embl_host_mapping.csv"
+UNIREF90_DATA_HOST_EMBL_MAPPING_FILENAME = "coronaviridae_s_uniref90_embl_hosts.csv"
 UNIREF90_DATA_HOST_VIRUSHOSTDB_MAPPING_FILENAME = "uniref90_viridae_virushostdb_hosts.csv"
 
 
