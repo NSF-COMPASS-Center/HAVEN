@@ -117,14 +117,14 @@ def get_virus_hosts_from_virushostdb(input_file_path, output_file_path, virushos
     print("END: Get virus hosts from Virus Host DB")
 
 
-# Get hosts of virus from UniPROT using uniref90_id of protein sequences
+# Getm etadata (virus hosts and embl reference id) from UniPROT using uniref90_id of protein sequences
 # input: parsed csv file of all sequences
-# output: csv file with hosts of virus. Columns = ["uniref90_id", "tax_id", "host_tax_ids]
+# output: csv file with hosts of virus. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "embl_ref_id"]
 # Use multiprocessing to speed up the process
 # Note: this method drops the sequence information to save memory.
 # The sequences will be joined back and compiled into one dataset at a later stage
-def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
-    print("START: Get virus hosts from UniProt")
+def get_metadata_from_uniprot(input_file_path, output_file_path):
+    print("START: Get metadata (virus hosts and embl reference id) from UniProt")
     # read the parsed uniref90_data csv file
     df = pd.read_csv(input_file_path)
     print(f"Read Uniref90 dataset size = {df.shape}")
@@ -157,11 +157,13 @@ def get_virus_hosts_from_uniprot(input_file_path, output_file_path):
     cpu_pool.close()
     cpu_pool.join()
     print(f"Written to file {output_file_path}")
-    print("END: Get virus hosts from UniProt")
+    print("END: Get metadata (virus hosts and embl reference id) from UniProt")
 
 
-# call another method which will query UniProt to get hosts of the virus
-# write the retrieved host ids to the output file
+# call another method which will query UniProt to get metadata (virus hosts and embl reference id) of virus
+# write the retrieved host ids and embl ref id
+#
+# to the output file
 def get_uniprot_virus_hosts(df, output_file_path):
     # get virus hosts
     for row in df.iterrows():
@@ -358,7 +360,7 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     print(f"Read dataset size = {df.shape[0]}")
 
     # drop UNIPROT_HOST_TAX_IDS
-    df.drop(columns=UNIPROT_HOST_TAX_IDS, inplace=True)
+    # df.drop(columns=UNIPROT_HOST_TAX_IDS, inplace=True)
 
     # convert EMBL_HOST_NAME column to list type
     df[EMBL_HOST_NAME] = df[EMBL_HOST_NAME].apply(ast.literal_eval)
@@ -406,6 +408,20 @@ def get_sequences_at_species_level(input_file_path, output_file_path):
     print("START: Filter records with virus and virus hosts at 'species' level taxonomy.")
     df = pd.read_csv(input_file_path)
     print(f"Dataset size before filter: {df.shape[0]}")
+
+    # If rank of virus < species, then get the species rank
+    species_tax_id_map, species_tax_name_map = external_sources_utils.get_taxonomy_species_data(list(df[~df[VIRUS_TAXON_RANK] == SPECIES].unique()))
+    df.replace({TAX_ID: species_tax_id_map, VIRUS_NAME: species_tax_name_map}, inplace=True)
+    species_tax_id_map_keys = list(species_tax_id_map.keys())
+    # update the taxonomy rank to species to vapid being filtered out in the next step
+    df[VIRUS_TAXON_RANK] = df.apply(lambda x: SPECIES if x[TAX_ID] in species_tax_id_map_keys else x[VIRUS_TAXON_RANK])
+
+    # If rank of virus host < species, then get the species rank
+    species_tax_id_map, species_tax_name_map = external_sources_utils.get_taxonomy_species_data(
+        list(df[~df[VIRUS_HOST_TAXON_RANK] == SPECIES].unique()))
+    df.replace({VIRUS_HOST_TAX_ID: species_tax_id_map, VIRUS_HOST_NAME: species_tax_name_map}, inplace=True)
+    # update the taxonomy rank to species to vapid being filtered out in the next step
+    df[VIRUS_HOST_TAXON_RANK] = df.apply(lambda x: SPECIES if x[VIRUS_HOST_TAX_ID] in species_tax_id_map_keys else x[VIRUS_HOST_TAXON_RANK])
 
     # Filter for virus rank == Species
     df = df[df[VIRUS_TAXON_RANK] == SPECIES]

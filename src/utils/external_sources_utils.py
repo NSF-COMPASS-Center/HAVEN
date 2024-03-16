@@ -5,7 +5,7 @@
 import random
 
 import requests
-# import pytaxonkit
+import pytaxonkit
 import pandas as pd
 import os
 from Bio import SeqIO
@@ -21,6 +21,7 @@ EMBL_REST_API = "https://www.ebi.ac.uk/Tools/dbfetch"
 NAME = "Name"
 RANK = "Rank"
 NCBI_TAX_ID = "TaxID"
+NCBI_Lineage = "Lineage"
 TAXONKIT_DB = "TAXONKIT_DB"
 MAMMALIA = "Mammalia"
 AVES = "Aves"
@@ -97,7 +98,7 @@ def get_taxonomy_name_rank_from_name(tax_names):
 # Output: list of tax_ids belonging to Vertebrata clade
 def get_vertebrata_tax_ids(tax_ids):
     vertebrata_tax_ids = []
-    for i, tax_id in enumerate(tax_ids):
+    for tax_id in tax_ids:
         # Issue: No placeholder formatter for rank=clade. Hence cannot use formatstr as for class {c}
         # Workaround: Get full lineage and filter for vertebrata Tax ID
         # example output from pytaxonkit.lineage([]):
@@ -109,13 +110,25 @@ def get_vertebrata_tax_ids(tax_ids):
     return vertebrata_tax_ids
 
 
+# For given tax_ids at rank lower than species, get the species equivalent ranks
+# Input: tax ids at ranks lower than species
+# Output: Taxonomy rank at species level
+def get_taxonomy_species_data(tax_ids):
+    lower_than_species_tax_ids = pytaxonkit.filter(tax_ids)
+    df_w_species_data = pytaxonkit.lineage(lower_than_species_tax_ids, formatstr="{s}")
+    df_w_species_data = df_w_species_data[[NCBI_TAX_ID, NAME, "LineageTaxIDs", NCBI_Lineage]]
+    species_tax_id_map = df_w_species_data.set_index(NAME)["LineageTaxIDs"].to_dict()
+    species_tax_name_map = df_w_species_data.set_index(NAME)[NCBI_Lineage].to_dict()
+    return species_tax_id_map, species_tax_name_map
+
+
 # Get taxids belonging to the class of mammals and aves
 # Input: list of tax_ids
 # Output: list of tax_ids belonging to mammals and aves class
 def get_mammals_aves_tax_ids(tax_ids):
     mammals_aves_tax_ids = []
     for i, tax_id in enumerate(tax_ids):
-        tax_class = pytaxonkit.lineage([tax_id], formatstr="{c}")["Lineage"].iloc[0]
+        tax_class = pytaxonkit.lineage([tax_id], formatstr="{c}")[NCBI_Lineage].iloc[0]
         print(f"{i}: {tax_id} = {tax_class}")
         if tax_class == MAMMALIA or tax_class == AVES:
             mammals_aves_tax_ids.append(tax_id)
@@ -155,3 +168,5 @@ def query_embl(embl_ref_ids, temp_dir):
     # delete the temporary file
     os.remove(temp_output_file_path)
     return embl_host_mapping
+
+
