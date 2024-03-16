@@ -396,9 +396,32 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     df_w_metadata.drop(columns=[NAME], inplace=True)
     df_w_metadata.rename(columns={NCBI_TAX_ID: VIRUS_HOST_TAX_ID, RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
     print(f"Dataset size after merge with virus host metadata = {df_w_metadata.shape}")
+
+    df_w_metadata = replace_lower_than_species_data(df_w_metadata)
     df_w_metadata.to_csv(output_file_path, index=False)
     print(f"Written to file {output_file_path}")
     print("END: Retrieving virus and virus host metadata using pytaxonkit")
+
+
+def replace_lower_than_species_data(df):
+    # If rank of virus < species, then get the species rank
+    species_tax_id_map, species_tax_name_map = external_sources_utils.get_taxonomy_species_data(
+        list(df[~df[VIRUS_TAXON_RANK] == SPECIES].unique()))
+    print(f"Replacing virus with ranks lower than {SPECIES}: {species_tax_name_map}")
+    df.replace({TAX_ID: species_tax_id_map, VIRUS_NAME: species_tax_name_map}, inplace=True)
+    species_tax_id_map_keys = list(species_tax_id_map.keys())
+    # update the taxonomy rank to species to vapid being filtered out in the next step
+    df[VIRUS_TAXON_RANK] = df.apply(lambda x: SPECIES if x[TAX_ID] in species_tax_id_map_keys else x[VIRUS_TAXON_RANK])
+
+    # If rank of virus host < species, then get the species rank
+    species_tax_id_map, species_tax_name_map = external_sources_utils.get_taxonomy_species_data(
+        list(df[~df[VIRUS_HOST_TAXON_RANK] == SPECIES].unique()))
+    print(f"Replacing viru hosts with ranks lower than {SPECIES}: {species_tax_name_map}")
+    df.replace({VIRUS_HOST_TAX_ID: species_tax_id_map, VIRUS_HOST_NAME: species_tax_name_map}, inplace=True)
+    # update the taxonomy rank to species to vapid being filtered out in the next step
+    df[VIRUS_HOST_TAXON_RANK] = df.apply(
+        lambda x: SPECIES if x[VIRUS_HOST_TAX_ID] in species_tax_id_map_keys else x[VIRUS_HOST_TAXON_RANK])
+    return df
 
 
 # Filter for records with virus_name and virus_host_name at "Species" level
@@ -408,20 +431,6 @@ def get_sequences_at_species_level(input_file_path, output_file_path):
     print("START: Filter records with virus and virus hosts at 'species' level taxonomy.")
     df = pd.read_csv(input_file_path)
     print(f"Dataset size before filter: {df.shape[0]}")
-
-    # If rank of virus < species, then get the species rank
-    species_tax_id_map, species_tax_name_map = external_sources_utils.get_taxonomy_species_data(list(df[~df[VIRUS_TAXON_RANK] == SPECIES].unique()))
-    df.replace({TAX_ID: species_tax_id_map, VIRUS_NAME: species_tax_name_map}, inplace=True)
-    species_tax_id_map_keys = list(species_tax_id_map.keys())
-    # update the taxonomy rank to species to vapid being filtered out in the next step
-    df[VIRUS_TAXON_RANK] = df.apply(lambda x: SPECIES if x[TAX_ID] in species_tax_id_map_keys else x[VIRUS_TAXON_RANK])
-
-    # If rank of virus host < species, then get the species rank
-    species_tax_id_map, species_tax_name_map = external_sources_utils.get_taxonomy_species_data(
-        list(df[~df[VIRUS_HOST_TAXON_RANK] == SPECIES].unique()))
-    df.replace({VIRUS_HOST_TAX_ID: species_tax_id_map, VIRUS_HOST_NAME: species_tax_name_map}, inplace=True)
-    # update the taxonomy rank to species to vapid being filtered out in the next step
-    df[VIRUS_HOST_TAXON_RANK] = df.apply(lambda x: SPECIES if x[VIRUS_HOST_TAX_ID] in species_tax_id_map_keys else x[VIRUS_HOST_TAXON_RANK])
 
     # Filter for virus rank == Species
     df = df[df[VIRUS_TAXON_RANK] == SPECIES]
