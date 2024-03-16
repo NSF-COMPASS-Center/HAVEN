@@ -115,9 +115,12 @@ def get_vertebrata_tax_ids(tax_ids):
 # Output: Taxonomy rank at species level
 def get_taxonomy_species_data(tax_ids):
     lower_than_species_tax_ids = pytaxonkit.filter(tax_ids)
+    print(f"Tax ids with ranks less than species = {lower_than_species_tax_ids}")
     df_w_species_data = pytaxonkit.lineage(lower_than_species_tax_ids, formatstr="{s}")
+    if df_w_species_data is None:
+        return None, None
     df_w_species_data = df_w_species_data[[NCBI_TAX_ID, NAME, "LineageTaxIDs", NCBI_Lineage]]
-    species_tax_id_map = df_w_species_data.set_index(NAME)["LineageTaxIDs"].to_dict()
+    species_tax_id_map = df_w_species_data.set_index(NCBI_TAX_ID)["LineageTaxIDs"].to_dict()
     species_tax_name_map = df_w_species_data.set_index(NAME)[NCBI_Lineage].to_dict()
     return species_tax_id_map, species_tax_name_map
 

@@ -403,24 +403,29 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     print("END: Retrieving virus and virus host metadata using pytaxonkit")
 
 
+# For viruses and virus hosts rank lower than species, get the species equivalent ranks
 def replace_lower_than_species_data(df):
     # If rank of virus < species, then get the species rank
-    species_tax_id_map, species_tax_name_map = external_sources_utils.get_taxonomy_species_data(
-        list(df[~df[VIRUS_TAXON_RANK] == SPECIES].unique()))
-    print(f"Replacing virus with ranks lower than {SPECIES}: {species_tax_name_map}")
-    df.replace({TAX_ID: species_tax_id_map, VIRUS_NAME: species_tax_name_map}, inplace=True)
-    species_tax_id_map_keys = list(species_tax_id_map.keys())
-    # update the taxonomy rank to species to vapid being filtered out in the next step
-    df[VIRUS_TAXON_RANK] = df.apply(lambda x: SPECIES if x[TAX_ID] in species_tax_id_map_keys else x[VIRUS_TAXON_RANK])
+    # species_tax_id_map, species_tax_name_map = external_sources_utils.get_taxonomy_species_data(
+    #     list(df[df[VIRUS_TAXON_RANK] != SPECIES][TAX_ID].unique()))
+    # if species_tax_id_map and species_tax_name_map:
+    #     print(f"Replacing virus with ranks lower than {SPECIES}: {species_tax_name_map}")
+    #     df.replace({TAX_ID: species_tax_id_map, VIRUS_NAME: species_tax_name_map}, inplace=True)
+    #     species_tax_id_map_keys = list(species_tax_id_map.keys())
+    #     # update the taxonomy rank to species to vapid being filtered out in the next step
+    #     df[VIRUS_TAXON_RANK] = df.apply(lambda x: SPECIES if x[TAX_ID] in species_tax_id_map_keys else x[VIRUS_TAXON_RANK])
 
     # If rank of virus host < species, then get the species rank
     species_tax_id_map, species_tax_name_map = external_sources_utils.get_taxonomy_species_data(
-        list(df[~df[VIRUS_HOST_TAXON_RANK] == SPECIES].unique()))
-    print(f"Replacing viru hosts with ranks lower than {SPECIES}: {species_tax_name_map}")
-    df.replace({VIRUS_HOST_TAX_ID: species_tax_id_map, VIRUS_HOST_NAME: species_tax_name_map}, inplace=True)
-    # update the taxonomy rank to species to vapid being filtered out in the next step
-    df[VIRUS_HOST_TAXON_RANK] = df.apply(
-        lambda x: SPECIES if x[VIRUS_HOST_TAX_ID] in species_tax_id_map_keys else x[VIRUS_HOST_TAXON_RANK])
+        list(df[df[VIRUS_HOST_TAXON_RANK] != SPECIES][VIRUS_HOST_TAX_ID].unique()))
+    if species_tax_id_map and species_tax_name_map:
+        # update the taxonomy rank to species to avoid being filtered out in the next step
+        species_tax_id_map_keys = list(species_tax_id_map.keys())
+        df[VIRUS_HOST_TAXON_RANK] = df.apply(
+            lambda x: SPECIES if x[VIRUS_HOST_TAX_ID] in species_tax_id_map_keys else x[VIRUS_HOST_TAXON_RANK], axis=1)
+
+        print(f"Replacing virus hosts with ranks lower than {SPECIES}: {species_tax_name_map}")
+        df.replace({VIRUS_HOST_TAX_ID: species_tax_id_map, VIRUS_HOST_NAME: species_tax_name_map}, inplace=True)
     return df
 
 
