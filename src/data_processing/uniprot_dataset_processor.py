@@ -1,15 +1,18 @@
-import pandas as pd
 import re
+
+import pandas as pd
 from Bio import SeqIO
 
-UNIREF90_ID = "uniref90_id"
+# Column names at various stages of dataset curation
+UNIPROT_ID = "uniprot_id"
 TAX_ID = "tax_id"
 SEQUENCE = "seq"
 
-# Parse uniref90 fasta file
+
+# Parse uniprot fasta file
 # input fasta file
 # output: csv file with columns ["uniref90_id", "tax_id", "seq"]
-def parse_uniref_fasta_file(input_file_path, output_file_path):
+def parse_uniprot_fasta_file(input_file_path, output_file_path):
     sequences = []
     i = 0
     no_id_count = 0
@@ -18,13 +21,14 @@ def parse_uniref_fasta_file(input_file_path, output_file_path):
     with open(input_file_path) as f:
         for record in SeqIO.parse(f, "fasta"):
             i += 1
-            print(i)
             try:
-                match = re.search(r".+TaxID=(\d+).+", record.description)
-                tax_id = match.group(1).strip()
-                sequences.append({UNIREF90_ID: record.id, TAX_ID: tax_id, SEQUENCE: str(record.seq)})
+                match = re.search(r"..\|(\S+)\|.+OX=(\d+).+", record.description)
+                uniprot_id = match.group(1).strip()
+                tax_id = match.group(2).strip()
+                sequences.append({UNIPROT_ID: uniprot_id, TAX_ID: tax_id, SEQUENCE: str(record.seq)})
             except AttributeError:
                 no_id_count += 1
+                print(record.description)
     print("END: Parsing fasta file")
     print(len(sequences))
     print(f"Number of records parsed = {i}")

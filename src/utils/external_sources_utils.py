@@ -5,7 +5,7 @@
 import random
 
 import requests
-# import pytaxonkit
+import pytaxonkit
 import pandas as pd
 import os
 from Bio import SeqIO
@@ -28,21 +28,35 @@ AVES = "Aves"
 VERTEBRATA_TAX_ID = "7742"
 
 
-# query UniProt for to get the host of the virus of the protein sequence
+# query UniRef for to get the host of the virus of the protein sequence
 # input: uniref90_id
 # output: list of host(s) of the virus
-def query_uniprot(uniref90_id):
+def query_uniref(uniref90_id):
     # split UniRef90_A0A023GZ41 and capture A0A023GZ41
-    uniprot_id = uniref90_id.split("_")[1]
+    uniref90_id = uniref90_id.split("_")[1]
     response = requests.get(url=UNIPROT_REST_API,
                             params={"query": UNIREF90_QUERY_PARAM % uniref90_id,
                                     "fields": ",".join(["virus_hosts", "xref_embl"])})
+    return parse_uniprot_response(response, uniref90_id)
+
+
+# query Uniprot for to get the host of the virus of the protein sequence
+# input: uniprot_id
+# output: list of host(s) of the virus
+def query_uniprot(uniprot_id):
+    response = requests.get(url=UNIPROT_REST_API,
+                            params={"query": uniprot_id,
+                                    "fields": ",".join(["virus_hosts", "xref_embl"])})
+    return parse_uniprot_response(response, uniprot_id)
+
+
+def parse_uniprot_response(response, id):
     host_tax_ids = []
     embl_entry_id = None
     try:
         results = response.json()["results"]
         # ideally there should be only one matching primaryAccession entry for the seed uniprot_id
-        data = [result for result in results if result["primaryAccession"] == uniprot_id][0]
+        data = [result for result in results if result["primaryAccession"] == id][0]
 
         # embl cross reference entry id
         cross_refs = data["uniProtKBCrossReferences"]
@@ -171,5 +185,3 @@ def query_embl(embl_ref_ids, temp_dir):
     # delete the temporary file
     os.remove(temp_output_file_path)
     return embl_host_mapping
-
-
