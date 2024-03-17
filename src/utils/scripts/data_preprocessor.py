@@ -12,6 +12,7 @@ from data_processing import uniref_dataset_processor
 
 # names of all intermediary files to be created
 UNIREF90_DATA_CSV_FILENAME = "coronaviridae_s_uniref90.csv"
+UNIPROT_DATA_CSV_FILENAME = "coronaviridae_s_uniprot.csv"
 UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME = "coronaviridae_s_uniref90_uniprot_hosts.csv"
 EMBL_HOST_MAPPING_FILENAME = "coronaviridae_s_uniref90_embl_host_mapping.csv"
 UNIREF90_DATA_HOST_EMBL_MAPPING_FILENAME = "coronaviridae_s_uniref90_embl_hosts.csv"
@@ -25,10 +26,10 @@ def parse_args():
                         help="Absolute path to input file depending on the option(s) selected.\n")
     parser.add_argument("-od", "--output_dir", required=True,
                         help="Absolute path to output directory where the generated file will be saved.\n")
-    parser.add_argument("--fasta_to_csv", action="store_true",
+    parser.add_argument("--fasta_to_csv",
                         help="Convert the input fasta file to csv format.\n")
-    parser.add_argument("--host_map_uniprot", action="store_true",
-                        help="Get hosts of virus from UniProt.\n")
+    parser.add_argument("--uniprot_metadata", action="store_true",
+                        help="Get metadata (hosts and embl reference id) of virus from UniProt.\n")
     parser.add_argument("--host_map_embl", action="store_true",
                         help="Get hosts of virus from EMBL.\n")
     parser.add_argument("--host_map_virushostdb",
@@ -61,15 +62,20 @@ def pre_process_uniref90(config):
     output_dir = config.output_dir
 
     # 1. Parse the Fasta file
-    if config.fasta_to_csv:
-        uniref_dataset_processor.parse_fasta_file(input_file_path=input_file_path,
+    if config.fasta_to_csv is not None:
+        if config.fasta_to_csv == "uniref":
+            uniref_dataset_processor.parse_uniref_fasta_file(input_file_path=input_file_path,
                                                   output_file_path=os.path.join(output_dir, UNIREF90_DATA_CSV_FILENAME))
+        elif config.fasta_to_csv == "uniprot":
+            uniref_dataset_processor.parse_uniprot_fasta_file(input_file_path=input_file_path,
+                                                             output_file_path=os.path.join(output_dir,
+                                                                                           UNIPROT_DATA_CSV_FILENAME))
 
     # 2. Get hosts of the virus from which the protein sequences were sampled using either uniprot or virushostdb
     #    depending on the input.
-    # 2A. Host mapping from UniProt
-    if config.host_map_uniprot:
-        uniref_dataset_processor.get_virus_hosts_from_uniprot(input_file_path=input_file_path,
+    # 2A. Metadata (host, embl ref id) from UniProt
+    if config.uniprot_metadata:
+        uniref_dataset_processor.get_metadata_from_uniprot(input_file_path=input_file_path,
                                                               output_file_path=os.path.join(output_dir,
                                                                                             UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME))
     # 2B. Host mapping from EMBL
