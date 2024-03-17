@@ -32,9 +32,9 @@ SPECIES = "species"
 TAX_ID = "tax_id"
 SEQUENCE = "seq"
 HOST_TAX_IDS = "host_tax_ids"
-UNIPROT_HOST_TAX_IDS ="uniprot_host_tax_ids"
+UNIPROT_HOST_TAX_IDS = "uniprot_host_tax_ids"
 EMBL_REF_ID = "embl_ref_id"
-EMBL_HOST_NAME ="embl_host_name"
+EMBL_HOST_NAME = "embl_host_name"
 HOST_COUNT = "host_count"
 VIRUS_NAME = "virus_name"
 VIRUS_TAXON_RANK = "virus_taxon_rank"
@@ -465,7 +465,7 @@ def get_sequences_from_vertebrata_hosts(input_file_path, taxon_metadata_dir_path
     # split into sublists for parallel processing
     host_tax_ids_sublists = np.array_split(np.array(host_tax_ids), N_CPU)
     for i in range(N_CPU):
-         print(f"Size of host_tax_ids_sublists[{i}] = {host_tax_ids_sublists[i].shape}")
+        print(f"Size of host_tax_ids_sublists[{i}] = {host_tax_ids_sublists[i].shape}")
 
     # multiprocessing for parallelization
     cpu_pool = Pool(N_CPU)
@@ -501,7 +501,6 @@ def join_metadata_with_sequences_data(input_file_path, sequence_data_file_path, 
     merged_df.to_csv(output_file_path, index=False)
     print(f"Written to file {output_file_path}")
     print("END: Joining metadata with sequences data.")
-
 
 # Remove sequences of virus with only one host
 # Input: Dataset with sequence and metadata. Columns = ["uniref90_id", "seq", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]

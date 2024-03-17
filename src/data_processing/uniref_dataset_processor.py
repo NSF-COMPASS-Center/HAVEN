@@ -6,6 +6,7 @@ UNIREF90_ID = "uniref90_id"
 TAX_ID = "tax_id"
 SEQUENCE = "seq"
 
+
 # Parse uniref90 fasta file
 # input fasta file
 # output: csv file with columns ["uniref90_id", "tax_id", "seq"]

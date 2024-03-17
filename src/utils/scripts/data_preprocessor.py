@@ -5,13 +5,7 @@ from data_processing import base_dataset_processor, uniref_dataset_processor, un
 from utils import external_sources_utils
 
 # names of all intermediary files to be created
-# UNIREF90_DATA_CSV_FILENAME = "uniref90_viridae.csv"
-# UNIREF90_DATA_HOST_UNIPROT_MAPPING_FILENAME = "uniref90_viridae_uniprot_hosts.csv"
-# EMBL_HOST_MAPPING_FILENAME = "embl_hosts.csv"
-# UNIREF90_DATA_HOST_EMBL_MAPPING_FILENAME = "uniref90_viridae_embl_hosts.csv"
-# UNIREF90_DATA_HOST_VIRUSHOSTDB_MAPPING_FILENAME = "uniref90_viridae_virushostdb_hosts.csv"
-
-# names of all intermediary files to be created
+# Uniref90 filenames
 UNIREF = "uniref"
 UNIREF90_ID = "uniref90_id"
 UNIREF90_DATA_CSV_FILENAME = "coronaviridae_s_uniref90.csv"
@@ -20,7 +14,6 @@ UNIREF90_DATA_CSV_FILENAME = "coronaviridae_s_uniref90.csv"
 UNIPROT = "uniprot"
 UNIPROT_ID = "uniprot_id"
 UNIPROT_DATA_CSV_FILENAME = "coronaviridae_s_uniprot.csv"
-
 
 
 def parse_args():
@@ -112,45 +105,50 @@ def pre_process(config, id):
 
 
 def pre_process_uniref90(config):
+    print("START: Preprocess Uniref90 dataset")
     input_file_path = config.input_file
     output_dir = config.output_dir
 
     # 1. Parse the Fasta file
-    if config.fasta_to_csv is not None:
+    if config.fasta_to_csv:
         uniref_dataset_processor.parse_uniref_fasta_file(input_file_path=input_file_path,
                                                          output_file_path=os.path.join(output_dir,
                                                                                        UNIREF90_DATA_CSV_FILENAME))
 
     # 2A. Metadata (host, embl ref id) from UniProt
     if config.uniprot_metadata:
-        uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "uniprot_metadata.csv")
+        uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
         base_dataset_processor.get_metadata_from_uniprot(input_file_path=input_file_path,
                                                            output_file_path=os.path.join(output_dir,
                                                                                          uniprot_metadata_file_path),
                                                          id=UNIREF90_ID,
                                                          query_uniprot=external_sources_utils.query_uniref)
     pre_process(config, UNIREF90_ID)
+    print("START: Preprocess Uniref90 dataset")
 
 
 def pre_process_uniprot(config):
+    print("START: Preprocess Uniprot dataset")
     input_file_path = config.input_file
     output_dir = config.output_dir
 
     # 1. Parse the Fasta file
-    if config.fasta_to_csv is not None:
+    if config.fasta_to_csv:
         uniprot_dataset_processor.parse_uniprot_fasta_file(input_file_path=input_file_path,
                                                           output_file_path=os.path.join(output_dir,
                                                                                         UNIPROT_DATA_CSV_FILENAME))
 
         # 2A. Metadata (host, embl ref id) from UniProt
     if config.uniprot_metadata:
-        uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "uniprot_metadata.csv")
+        uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
         base_dataset_processor.get_metadata_from_uniprot(input_file_path=input_file_path,
                                                          output_file_path=os.path.join(output_dir,
                                                                                        uniprot_metadata_file_path),
                                                          id=UNIPROT_ID,
-                                                         query_uniprot=)
+                                                         query_uniprot=external_sources_utils.query_uniprot)
     pre_process(config, UNIPROT_ID)
+    print("END: Preprocess Uniprot dataset")
+
 
 def main():
     config = parse_args()
