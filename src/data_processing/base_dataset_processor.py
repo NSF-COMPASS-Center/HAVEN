@@ -397,25 +397,35 @@ def replace_lower_than_species_data(df):
     return df
 
 
+# Filter for records with virus_name at "Species" level
+# Input: Dataset with metadata containing columns = [virus_taxon_rank]
+# Output: Filtered dataset with metadata with the same columns as in the input dataset
+def get_virus_at_species_level(input_file_path, output_file_path):
+    return get_sequences_at_species_level(input_file_path, output_file_path, VIRUS_TAXON_RANK)
+
+
+# Filter for records with virus_name at "Species" level
+# Input: Dataset with metadata containing columns = [virus_host_taxon_rank]
+# Output: Filtered dataset with metadata with the same columns as in the input dataset
+def get_virus_host_at_species_level(input_file_path, output_file_path):
+    return get_sequences_at_species_level(input_file_path, output_file_path, VIRUS_HOST_TAXON_RANK)
+
+
 # Filter for records with virus_name and virus_host_name at "Species" level
 # Input: Dataset with metadata containing columns = [virus_taxon_rank, virus_host_taxon_rank]
 # Output: Filtered dataset with metadata with the same columns as in the input dataset
-def get_sequences_at_species_level(input_file_path, output_file_path):
-    print("START: Filter records with virus and virus hosts at 'species' level taxonomy.")
+def get_sequences_at_species_level(input_file_path, output_file_path, column):
+    print(f"START: Filter records with {column} at 'species' level taxonomy.")
     df = pd.read_csv(input_file_path)
     print(f"Dataset size before filter: {df.shape[0]}")
 
     # Filter for virus rank == Species
-    df = df[df[VIRUS_TAXON_RANK] == SPECIES]
-    print(f"Dataset size after virus at species level filter: {df.shape[0]}")
-
-    # Filter for virus_host rank == Species
-    df = df[df[VIRUS_HOST_TAXON_RANK] == SPECIES]
-    print(f"Dataset size after virus_host at species level filter: {df.shape[0]}")
+    df = df[df[column] == SPECIES]
+    print(f"Dataset size after {column} at species level filter: {df.shape[0]}")
 
     df.to_csv(output_file_path, index=False)
     print(f"Writing to file {output_file_path}")
-    print("END: Filter records with virus and virus hosts at 'species' level taxonomy.")
+    print(f"END: Filter records with {column} at 'species' level taxonomy.")
 
 
 # # Filter for sequences with virus hosts belonging to the class of Mammals OR Aves (birds)

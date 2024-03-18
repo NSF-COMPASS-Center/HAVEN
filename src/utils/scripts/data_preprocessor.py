@@ -39,8 +39,11 @@ def parse_args():
                         help="Absolute path to the NCBI taxon directory.")
     parser.add_argument("--taxon_metadata", action="store_true",
                         help="Get taxonomy metadata using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
-    parser.add_argument("--filter_species", action="store_true",
-                        help="Filter for virus and virus hosts with rank of species.")
+    parser.add_argument("--filter_species_virus", action="store_true",
+                        help="Filter for virus with rank of species.")
+    parser.add_argument("--filter_species_virus_host", action="store_true",
+                        help="Filter for virus hosts with rank of species.")
+
     # parser.add_argument("--filter_mammals_aves", action="store_true",
     #                     help="Filter for virus hosts belonging to mammalia OR aves family using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
     parser.add_argument("--filter_vertebrates", action="store_true",
@@ -85,19 +88,25 @@ def pre_process(config, id):
                                                   id=id)
 
     # 5. Filter for virus and virus_hosts at species level
-    if config.filter_species:
-        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species.csv")
-        base_dataset_processor.get_sequences_at_species_level(input_file_path=input_file_path,
-                                                              output_file_path=filtered_dataset_file_path)
+    if config.filter_species_virus:
+        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species_virus.csv")
+        base_dataset_processor.get_virus_at_species_level(input_file_path=input_file_path,
+                                                          output_file_path=filtered_dataset_file_path)
 
-    # 6. Filter for virus_hosts belonging to Vertebrata clade
+    # 6. Filter for virus and virus_hosts at species level
+    if config.filter_species_virus_host:
+        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species_virus_host.csv")
+        base_dataset_processor.get_virus_host_at_species_level(input_file_path=input_file_path,
+                                                               output_file_path=filtered_dataset_file_path)
+
+    # 7. Filter for virus_hosts belonging to Vertebrata clade
     if config.filter_vertebrates:
         filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_vertebrates.csv")
         base_dataset_processor.get_sequences_from_vertebrata_hosts(input_file_path=input_file_path,
                                                                    taxon_metadata_dir_path=config.taxon_dir,
                                                                    output_file_path=filtered_dataset_file_path)
 
-    # 7. Merge the metadata with the sequence data
+    # 8. Merge the metadata with the sequence data
     if config.merge_sequence_data:
         sequence_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_w_seq.csv")
         base_dataset_processor.join_metadata_with_sequences_data(input_file_path=input_file_path,
