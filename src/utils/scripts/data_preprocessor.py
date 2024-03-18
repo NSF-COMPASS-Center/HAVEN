@@ -39,6 +39,8 @@ def parse_args():
                         help="Absolute path to the NCBI taxon directory.")
     parser.add_argument("--taxon_metadata", action="store_true",
                         help="Get taxonomy metadata using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+    parser.add_argument("--uprank_host_genus", action="store_true",
+                        help="Uprank the taxonomy of virus hosts to 'genus' level.")
     parser.add_argument("--filter_species_virus", action="store_true",
                         help="Filter for virus with rank of species.")
     parser.add_argument("--filter_species_virus_host", action="store_true",
@@ -86,6 +88,11 @@ def pre_process(config, id):
                                                   taxon_metadata_dir_path=config.taxon_dir,
                                                   output_file_path=metadata_dataset_file_path,
                                                   id=id)
+
+    if config.uprank_host_genus:
+        upranked_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_virus_host_genus.csv")
+        base_dataset_processor.uprank_virus_host_genus(input_file_path=input_file_path,
+                                                       output_file_path=upranked_dataset_file_path)
 
     # 5. Filter for virus and virus_hosts at species level
     if config.filter_species_virus:
@@ -135,7 +142,7 @@ def pre_process_uniref90(config):
                                                          id=UNIREF90_ID,
                                                          query_uniprot=external_sources_utils.query_uniref)
     pre_process(config, UNIREF90_ID)
-    print("START: Preprocess Uniref90 dataset")
+    print("END: Preprocess Uniref90 dataset")
 
 
 def pre_process_uniprot(config):

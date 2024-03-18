@@ -27,6 +27,7 @@ RANK = "Rank"
 NCBI_TAX_ID = "TaxID"
 TAXONKIT_DB = "TAXONKIT_DB"
 SPECIES = "species"
+GENUS = "genus"
 
 # Column names at various stages of dataset curation
 TAX_ID = "tax_id"
@@ -395,6 +396,31 @@ def replace_lower_than_species_data(df):
         print(f"Replacing virus hosts with ranks lower than {SPECIES}: {species_tax_name_map}")
         df.replace({VIRUS_HOST_TAX_ID: species_tax_id_map, VIRUS_HOST_NAME: species_tax_name_map}, inplace=True)
     return df
+
+
+# If virus hosts rank is available and lower than genus, get the genus equivalent ranks
+def uprank_virus_host_genus(input_file_path, taxon_metadata_dir_path, output_file_path):
+    print(f"START: Uprank virus host to 'genus' level taxonomy.")
+    # Set TAXONKIT_DB environment variable
+    os.environ[TAXONKIT_DB] = taxon_metadata_dir_path
+
+    df = pd.read_csv(input_file_path)
+    print(f"Dataset size: {df.shape[0]}")
+
+    # If rank of virus host < species, then get the species rank
+    genus_tax_id_map, genus_tax_name_map = external_sources_utils.get_taxonomy_genus_data(
+        list(df[VIRUS_HOST_TAX_ID].unique()))
+    if genus_tax_id_map and genus_tax_name_map:
+        # update the taxonomy rank to species to avoid being filtered out in the next step
+        genus_tax_id_map_keys = list(genus_tax_id_map.keys())
+        df[VIRUS_HOST_TAXON_RANK] = df.apply(
+            lambda x: GENUS if x[VIRUS_HOST_TAX_ID] in genus_tax_id_map_keys else x[VIRUS_HOST_TAXON_RANK], axis=1)
+
+        # print(f"Replacing virus hosts with ranks lower than {GENUS}: {species_tax_name_map}")
+        df.replace({VIRUS_HOST_TAX_ID: genus_tax_id_map, VIRUS_HOST_NAME: genus_tax_name_map}, inplace=True)
+    df.to_csv(output_file_path, index=False)
+    print(f"Written to file {output_file_path}")
+    print(f"END: Uprank virus host to 'genus' level taxonomy.")
 
 
 # Filter for records with virus_name at "Species" level

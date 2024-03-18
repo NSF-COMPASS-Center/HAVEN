@@ -5,7 +5,7 @@
 import random
 
 import requests
-# import pytaxonkit
+import pytaxonkit
 import pandas as pd
 import os
 from Bio import SeqIO
@@ -128,7 +128,7 @@ def get_vertebrata_tax_ids(tax_ids):
 # Input: tax ids at ranks lower than species
 # Output: Taxonomy rank at species level
 def get_taxonomy_species_data(tax_ids):
-    lower_than_species_tax_ids = pytaxonkit.filter(tax_ids)
+    lower_than_species_tax_ids = pytaxonkit.filter(tax_ids, lower_than="species")
     print(f"Tax ids with ranks less than species = {lower_than_species_tax_ids}")
     df_w_species_data = pytaxonkit.lineage(lower_than_species_tax_ids, formatstr="{s}")
     if df_w_species_data is None:
@@ -137,6 +137,22 @@ def get_taxonomy_species_data(tax_ids):
     species_tax_id_map = df_w_species_data.set_index(NCBI_TAX_ID)["LineageTaxIDs"].to_dict()
     species_tax_name_map = df_w_species_data.set_index(NAME)[NCBI_Lineage].to_dict()
     return species_tax_id_map, species_tax_name_map
+
+
+# For given tax_ids at rank lower than genus, get the genus equivalent ranks
+# Input: tax ids at ranks lower than genus
+# Output: Taxonomy rank at genus level
+def get_taxonomy_genus_data(tax_ids):
+    lower_than_genus_tax_ids = pytaxonkit.filter(tax_ids, lower_than="genus")
+    print(f"Number of tax ids with ranks less than genus = {len(lower_than_genus_tax_ids)}")
+    df_w_genus_data = pytaxonkit.lineage(lower_than_genus_tax_ids, formatstr="{g}")
+    if df_w_genus_data is None:
+        return None, None
+    df_w_genus_data = df_w_genus_data[[NCBI_TAX_ID, NAME, "LineageTaxIDs", NCBI_Lineage]]
+    genus_tax_id_map = df_w_genus_data.set_index(NCBI_TAX_ID)["LineageTaxIDs"].to_dict()
+    genus_tax_name_map = df_w_genus_data.set_index(NAME)[NCBI_Lineage].to_dict()
+    return genus_tax_id_map, genus_tax_name_map
+
 
 
 # Get taxids belonging to the class of mammals and aves
