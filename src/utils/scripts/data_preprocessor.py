@@ -65,42 +65,44 @@ def pre_process(config, id):
         embl_host_mapping_filepath = os.path.join(output_dir, Path(input_file_path).stem + "_embl_host_mapping.csv")
         dataset_embl_hosts_mapping_filepath = os.path.join(output_dir, Path(input_file_path).stem + "_embl_hosts.csv")
         base_dataset_processor.get_virus_hosts_from_embl(input_file_path=input_file_path,
-                                                           embl_mapping_filepath=os.path.join(output_dir, embl_host_mapping_filepath),
-                                                           output_file_path=os.path.join(output_dir, dataset_embl_hosts_mapping_filepath),
+                                                         embl_mapping_filepath=os.path.join(output_dir,
+                                                                                            embl_host_mapping_filepath),
+                                                         output_file_path=os.path.join(output_dir,
+                                                                                       dataset_embl_hosts_mapping_filepath),
                                                          id=id)
     # 3. Remove sequences with no hosts
     if config.prune_dataset:
         pruned_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_pruned.csv")
         base_dataset_processor.remove_sequences_w_no_hosts(input_file_path=input_file_path,
-                                                             output_file_path=pruned_dataset_file_path)
+                                                           output_file_path=pruned_dataset_file_path)
 
     # 4. Get taxonomy metadata (rank of virus and virus hosts) from NCBI
     if config.taxon_metadata:
         metadata_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_metadata.csv")
         base_dataset_processor.get_virus_metadata(input_file_path=input_file_path,
-                                                    taxon_metadata_dir_path=config.taxon_dir,
-                                                    output_file_path=metadata_dataset_file_path,
+                                                  taxon_metadata_dir_path=config.taxon_dir,
+                                                  output_file_path=metadata_dataset_file_path,
                                                   id=id)
 
     # 5. Filter for virus and virus_hosts at species level
     if config.filter_species:
         filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species.csv")
         base_dataset_processor.get_sequences_at_species_level(input_file_path=input_file_path,
-                                                                output_file_path=filtered_dataset_file_path)
+                                                              output_file_path=filtered_dataset_file_path)
 
     # 6. Filter for virus_hosts belonging to Vertebrata clade
     if config.filter_vertebrates:
         filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_vertebrates.csv")
         base_dataset_processor.get_sequences_from_vertebrata_hosts(input_file_path=input_file_path,
-                                                                     taxon_metadata_dir_path=config.taxon_dir,
-                                                                     output_file_path=filtered_dataset_file_path)
+                                                                   taxon_metadata_dir_path=config.taxon_dir,
+                                                                   output_file_path=filtered_dataset_file_path)
 
     # 7. Merge the metadata with the sequence data
     if config.merge_sequence_data:
         sequence_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_w_seq.csv")
         base_dataset_processor.join_metadata_with_sequences_data(input_file_path=input_file_path,
-                                                                   sequence_data_file_path=config.merge_sequence_data,
-                                                                   output_file_path=sequence_dataset_file_path,
+                                                                 sequence_data_file_path=config.merge_sequence_data,
+                                                                 output_file_path=sequence_dataset_file_path,
                                                                  id=id)
 
 
@@ -118,9 +120,9 @@ def pre_process_uniref90(config):
     # 2A. Metadata (host, embl ref id) from UniProt
     if config.uniprot_metadata:
         uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
+        print(f"uniprot_metadata_file_path ={uniprot_metadata_file_path}")
         base_dataset_processor.get_metadata_from_uniprot(input_file_path=input_file_path,
-                                                           output_file_path=os.path.join(output_dir,
-                                                                                         uniprot_metadata_file_path),
+                                                         output_file_path=uniprot_metadata_file_path,
                                                          id=UNIREF90_ID,
                                                          query_uniprot=external_sources_utils.query_uniref)
     pre_process(config, UNIREF90_ID)
@@ -135,15 +137,14 @@ def pre_process_uniprot(config):
     # 1. Parse the Fasta file
     if config.fasta_to_csv:
         uniprot_dataset_processor.parse_uniprot_fasta_file(input_file_path=input_file_path,
-                                                          output_file_path=os.path.join(output_dir,
-                                                                                        UNIPROT_DATA_CSV_FILENAME))
+                                                           output_file_path=os.path.join(output_dir,
+                                                                                         UNIPROT_DATA_CSV_FILENAME))
 
         # 2A. Metadata (host, embl ref id) from UniProt
     if config.uniprot_metadata:
         uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
         base_dataset_processor.get_metadata_from_uniprot(input_file_path=input_file_path,
-                                                         output_file_path=os.path.join(output_dir,
-                                                                                       uniprot_metadata_file_path),
+                                                         output_file_path=uniprot_metadata_file_path,
                                                          id=UNIPROT_ID,
                                                          query_uniprot=external_sources_utils.query_uniprot)
     pre_process(config, UNIPROT_ID)
