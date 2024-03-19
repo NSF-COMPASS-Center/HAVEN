@@ -368,8 +368,8 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
 
     df_w_metadata = replace_lower_than_species_data(df_w_metadata)
     df_w_metadata.to_csv(output_file_path, index=False)
-    print(f"Number of unique viruses = {len(df[TAX_ID].unique())}")
-    print(f"Number of unique virus hosts = {len(df[VIRUS_HOST_TAX_ID].unique())}")
+    print(f"Number of unique viruses = {len(df_w_metadata[TAX_ID].unique())}")
+    print(f"Number of unique virus hosts = {len(df_w_metadata[VIRUS_HOST_TAX_ID].unique())}")
     print(f"Written to file {output_file_path}")
     print("END: Retrieving virus and virus host metadata using pytaxonkit")
 
@@ -392,7 +392,7 @@ def replace_lower_than_species_data(df):
     if species_tax_name_map:
         print(f"Replacing virus hosts with ranks lower than {SPECIES}: {species_tax_name_map}")
         df.replace({VIRUS_HOST_NAME: species_tax_name_map}, inplace=True)
-    
+
     # drop VIRUS_HOST_TAX_ID, and VIRUS_HOST_TAXON_RANK as it will be created again after retrieving the metadata again
     df.drop(columns=[VIRUS_HOST_TAX_ID, VIRUS_HOST_TAXON_RANK], inplace=True)
 

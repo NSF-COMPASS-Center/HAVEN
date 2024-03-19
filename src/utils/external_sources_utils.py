@@ -5,7 +5,7 @@
 import random
 
 import requests
-import pytaxonkit
+# import pytaxonkit
 import pandas as pd
 import os
 from Bio import SeqIO
@@ -118,9 +118,12 @@ def get_vertebrata_tax_ids(tax_ids):
         # example output from pytaxonkit.lineage([]):
         # '131567;2759;33154;33208;6072;33213;33511;7711;89593;7742;7776;117570;117571;8287;1338369;32523;32524;40674;32525;9347;1437010;314146;9443;376913;314293;9526;314295;9604;207598;9605;9606'
         # hence split by ";"
-        full_lineage_tax_ids = pytaxonkit.lineage([tax_id])["FullLineageTaxIDs"].iloc[0].split(";")
-        if VERTEBRATA_TAX_ID in full_lineage_tax_ids:
-            vertebrata_tax_ids.append(tax_id)
+        try:
+            full_lineage_tax_ids = pytaxonkit.lineage([tax_id])["FullLineageTaxIDs"].iloc[0].split(";")
+            if VERTEBRATA_TAX_ID in full_lineage_tax_ids:
+                vertebrata_tax_ids.append(tax_id)
+        except:
+            print(f"ERROR in lineage for tax_id = {tax_id}")
     return vertebrata_tax_ids
 
 
@@ -133,10 +136,9 @@ def get_taxonomy_species_data(tax_ids):
     df_w_species_data = pytaxonkit.lineage(lower_than_species_tax_ids, formatstr="{s}")
     if df_w_species_data is None:
         return None, None
-    df_w_species_data = df_w_species_data[[NCBI_TAX_ID, NAME, "LineageTaxIDs", NCBI_Lineage]]
-    species_tax_id_map = df_w_species_data.set_index(NCBI_TAX_ID)["LineageTaxIDs"].to_dict()
+    df_w_species_data = df_w_species_data[[NCBI_TAX_ID, NAME, NCBI_Lineage]]
     species_tax_name_map = df_w_species_data.set_index(NAME)[NCBI_Lineage].to_dict()
-    return species_tax_id_map, species_tax_name_map
+    return species_tax_name_map
 
 
 # For given tax_ids at rank lower than genus, get the genus equivalent ranks
