@@ -368,6 +368,8 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
 
     df_w_metadata = replace_lower_than_species_data(df_w_metadata)
     df_w_metadata.to_csv(output_file_path, index=False)
+    print(f"Number of unique viruses = {len(df[TAX_ID].unique())}")
+    print(f"Number of unique virus hosts = {len(df[VIRUS_HOST_TAX_ID].unique())}")
     print(f"Written to file {output_file_path}")
     print("END: Retrieving virus and virus host metadata using pytaxonkit")
 
@@ -408,8 +410,8 @@ def uprank_virus_host_genus(input_file_path, taxon_metadata_dir_path, output_fil
     print(f"Dataset size: {df.shape[0]}")
 
     # If rank of virus host < species, then get the species rank
-    genus_tax_id_map, genus_tax_name_map = external_sources_utils.get_taxonomy_genus_data(
-        list(df[VIRUS_HOST_TAX_ID].unique()))
+    tax_ids = [int(x) for x in list(df[~df[VIRUS_HOST_TAX_ID].isna()][VIRUS_HOST_TAX_ID].unique())]
+    genus_tax_id_map, genus_tax_name_map = external_sources_utils.get_taxonomy_genus_data(tax_ids)
     if genus_tax_id_map and genus_tax_name_map:
         # update the taxonomy rank to species to avoid being filtered out in the next step
         genus_tax_id_map_keys = list(genus_tax_id_map.keys())

@@ -92,6 +92,7 @@ def pre_process(config, id):
     if config.uprank_host_genus:
         upranked_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_virus_host_genus.csv")
         base_dataset_processor.uprank_virus_host_genus(input_file_path=input_file_path,
+                                                       taxon_metadata_dir_path=config.taxon_dir,
                                                        output_file_path=upranked_dataset_file_path)
 
     # 5. Filter for virus and virus_hosts at species level
