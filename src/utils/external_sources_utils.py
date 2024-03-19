@@ -149,12 +149,11 @@ def get_taxonomy_genus_data(tax_ids):
     df_w_genus_data = pytaxonkit.lineage(lower_than_genus_tax_ids, formatstr="{g}")
     if df_w_genus_data is None:
         return None, None
-    df_w_genus_data = df_w_genus_data[[NCBI_TAX_ID, NAME, "LineageTaxIDs", NCBI_Lineage]]
-    genus_tax_id_map = df_w_genus_data.set_index(NCBI_TAX_ID)["LineageTaxIDs"].to_dict()
+    df_w_genus_data = df_w_genus_data[[NCBI_TAX_ID, NAME, NCBI_Lineage]]
     genus_tax_name_map = df_w_genus_data.set_index(NAME)[NCBI_Lineage].to_dict()
     print(f"Number of tax ids with genus equivalents = {len(genus_tax_name_map)}")
     print(genus_tax_name_map)
-    return genus_tax_id_map, genus_tax_name_map
+    return genus_tax_name_map
 
 
 

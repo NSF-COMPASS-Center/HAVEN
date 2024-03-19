@@ -359,7 +359,7 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     df_w_metadata.rename(columns={NAME: VIRUS_NAME, RANK: VIRUS_TAXON_RANK}, inplace=True)
     print(f"Dataset size after merge with virus metadata = {df_w_metadata.shape}")
 
-    # Merge df with virus_metadata_df to map metadata of virus hosts
+    # Merge df with virus_hosts_metadata_df to map metadata of virus hosts
     df_w_metadata = pd.merge(df_w_metadata, virus_host_metadata_df, left_on=VIRUS_HOST_NAME, right_on=NAME,
                              how="left")
     df_w_metadata.drop(columns=[NAME], inplace=True)
@@ -411,15 +411,27 @@ def uprank_virus_host_genus(input_file_path, taxon_metadata_dir_path, output_fil
 
     # If rank of virus host < species, then get the species rank
     tax_ids = [int(x) for x in list(df[~df[VIRUS_HOST_TAX_ID].isna()][VIRUS_HOST_TAX_ID].unique())]
-    genus_tax_id_map, genus_tax_name_map = external_sources_utils.get_taxonomy_genus_data(tax_ids)
-    if genus_tax_id_map and genus_tax_name_map:
-        # update the taxonomy rank to species to avoid being filtered out in the next step
-        genus_tax_id_map_keys = list(genus_tax_id_map.keys())
-        df[VIRUS_HOST_TAXON_RANK] = df.apply(
-            lambda x: GENUS if x[VIRUS_HOST_TAX_ID] in genus_tax_id_map_keys else x[VIRUS_HOST_TAXON_RANK], axis=1)
-
+    genus_tax_name_map = external_sources_utils.get_taxonomy_genus_data(tax_ids)
+    if genus_tax_name_map:
         # print(f"Replacing virus hosts with ranks lower than {GENUS}: {species_tax_name_map}")
-        df.replace({VIRUS_HOST_TAX_ID: genus_tax_id_map, VIRUS_HOST_NAME: genus_tax_name_map}, inplace=True)
+        df.replace({VIRUS_HOST_NAME: genus_tax_name_map}, inplace=True)
+
+    # drop VIRUS_HOST_TAX_ID, and VIRUS_HOST_TAXON_RANK as it will be created again after retrieving the metadata again
+    df.drop(columns=[VIRUS_HOST_TAX_ID, VIRUS_HOST_TAXON_RANK], inplace=True)
+
+    # Retrieve name and rank of all unique virus_hosts in the dataset
+    virus_host_names = df[VIRUS_HOST_NAME].unique()
+    print(f"Number of unique virus_host_names = {len(virus_host_names)}")
+    virus_host_metadata_df = external_sources_utils.get_taxonomy_name_rank_from_name(virus_host_names)
+    print(f"Size of virus host metadata dataset = {virus_host_metadata_df.shape[0]}")
+
+    # Merge df with virus_hosts_metadata_df to map metadata of virus hosts
+    df = pd.merge(df, virus_host_metadata_df, left_on=VIRUS_HOST_NAME, right_on=NAME,
+                             how="left")
+    df.drop(columns=[NAME], inplace=True)
+    df.rename(columns={NCBI_TAX_ID: VIRUS_HOST_TAX_ID, RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
+    print(f"Dataset size after merge with virus host metadata = {df.shape}")
+
     df.to_csv(output_file_path, index=False)
     print(f"Written to file {output_file_path}")
     print(f"END: Uprank virus host to 'genus' level taxonomy.")
