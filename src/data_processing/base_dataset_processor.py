@@ -387,16 +387,27 @@ def replace_lower_than_species_data(df):
     #     df[VIRUS_TAXON_RANK] = df.apply(lambda x: SPECIES if x[TAX_ID] in species_tax_id_map_keys else x[VIRUS_TAXON_RANK])
 
     # If rank of virus host < species, then get the species rank
-    species_tax_id_map, species_tax_name_map = external_sources_utils.get_taxonomy_species_data(
+    species_tax_name_map = external_sources_utils.get_taxonomy_species_data(
         list(df[df[VIRUS_HOST_TAXON_RANK] != SPECIES][VIRUS_HOST_TAX_ID].unique()))
-    if species_tax_id_map and species_tax_name_map:
-        # update the taxonomy rank to species to avoid being filtered out in the next step
-        species_tax_id_map_keys = list(species_tax_id_map.keys())
-        df[VIRUS_HOST_TAXON_RANK] = df.apply(
-            lambda x: SPECIES if x[VIRUS_HOST_TAX_ID] in species_tax_id_map_keys else x[VIRUS_HOST_TAXON_RANK], axis=1)
-
+    if species_tax_name_map:
         print(f"Replacing virus hosts with ranks lower than {SPECIES}: {species_tax_name_map}")
-        df.replace({VIRUS_HOST_TAX_ID: species_tax_id_map, VIRUS_HOST_NAME: species_tax_name_map}, inplace=True)
+        df.replace({VIRUS_HOST_NAME: species_tax_name_map}, inplace=True)
+    
+    # drop VIRUS_HOST_TAX_ID, and VIRUS_HOST_TAXON_RANK as it will be created again after retrieving the metadata again
+    df.drop(columns=[VIRUS_HOST_TAX_ID, VIRUS_HOST_TAXON_RANK], inplace=True)
+
+    # Retrieve name and rank of all unique virus_hosts in the dataset
+    virus_host_names = df[VIRUS_HOST_NAME].unique()
+    print(f"Number of unique virus_host_names = {len(virus_host_names)}")
+    virus_host_metadata_df = external_sources_utils.get_taxonomy_name_rank_from_name(virus_host_names)
+    print(f"Size of virus host metadata dataset = {virus_host_metadata_df.shape[0]}")
+
+    # Merge df with virus_hosts_metadata_df to map metadata of virus hosts
+    df = pd.merge(df, virus_host_metadata_df, left_on=VIRUS_HOST_NAME, right_on=NAME,
+                             how="left")
+    df.drop(columns=[NAME], inplace=True)
+    df.rename(columns={NCBI_TAX_ID: VIRUS_HOST_TAX_ID, RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
+    print(f"Dataset size after merge with virus host metadata = {df.shape}")
     return df
 
 
