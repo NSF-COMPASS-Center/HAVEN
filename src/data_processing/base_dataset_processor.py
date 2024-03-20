@@ -389,7 +389,7 @@ def replace_lower_than_species_data(df):
         list(df[df[VIRUS_HOST_TAXON_RANK] != SPECIES][VIRUS_HOST_TAX_ID].unique()))
     if tax_id_species_name_map:
         print(f"Replacing virus hosts with ranks lower than {SPECIES}: {tax_id_species_name_map}")
-        df[VIRUS_HOST_NAME] = df.apply(lambda x: tax_id_species_name_map[x[VIRUS_HOST_TAX_ID]] if x[VIRUS_HOST_TAX_ID] in tax_id_species_name_map else x[VIRUS_HOST_NAME])
+        df[VIRUS_HOST_NAME] = df.apply(lambda x: tax_id_species_name_map[x[VIRUS_HOST_TAX_ID]] if x[VIRUS_HOST_TAX_ID] in tax_id_species_name_map else x[VIRUS_HOST_NAME], axis=1)
 
     # drop VIRUS_HOST_TAX_ID, and VIRUS_HOST_TAXON_RANK as it will be created again after retrieving the metadata again
     df.drop(columns=[VIRUS_HOST_TAX_ID, VIRUS_HOST_TAXON_RANK], inplace=True)
@@ -405,6 +405,7 @@ def replace_lower_than_species_data(df):
                              how="left")
     df.drop(columns=[NAME], inplace=True)
     df.rename(columns={NCBI_TAX_ID: VIRUS_HOST_TAX_ID, RANK: VIRUS_HOST_TAXON_RANK}, inplace=True)
+    df[VIRUS_HOST_NAME] = df[VIRUS_HOST_NAME].str.lower()
     print(f"Dataset size after merge with virus host metadata = {df.shape}")
     return df
 
