@@ -5,7 +5,7 @@
 import random
 
 import requests
-# import pytaxonkit
+import pytaxonkit
 import pandas as pd
 import os
 from Bio import SeqIO
@@ -135,10 +135,10 @@ def get_taxonomy_species_data(tax_ids):
     print(f"Tax ids with ranks less than species = {lower_than_species_tax_ids}")
     df_w_species_data = pytaxonkit.lineage(lower_than_species_tax_ids, formatstr="{s}")
     if df_w_species_data is None:
-        return None, None
+        return None
     df_w_species_data = df_w_species_data[[NCBI_TAX_ID, NAME, NCBI_Lineage]]
-    species_tax_name_map = df_w_species_data.set_index(NAME)[NCBI_Lineage].to_dict()
-    return species_tax_name_map
+    tax_id_species_name_map = df_w_species_data.set_index(NCBI_TAX_ID)[NCBI_Lineage].to_dict()
+    return tax_id_species_name_map
 
 
 # For given tax_ids at rank lower than genus, get the genus equivalent ranks
