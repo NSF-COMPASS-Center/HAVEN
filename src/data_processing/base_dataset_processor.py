@@ -338,7 +338,7 @@ def get_virus_metadata(input_file_path, taxon_metadata_dir_path, output_file_pat
     # 1. Take the first element (assuming there is only one element in the list (TODO: double check) e.g. ['Homo sapiens']
     # 2. Split by ';' and take the first element in case of noisy host names e.g. ['Homo sapiens; sex: M; age: 7 months']
     df[VIRUS_HOST_NAME] = df[EMBL_HOST_NAME].apply(lambda x: x[0].split(";")[0])
-
+    df[VIRUS_HOST_NAME] = df[VIRUS_HOST_NAME].str.lower()
     print(f"Number of unique viral protein sequences = {len(df[id].unique())}")
 
     # Retrieve name and rank of all unique viruses in the dataset
