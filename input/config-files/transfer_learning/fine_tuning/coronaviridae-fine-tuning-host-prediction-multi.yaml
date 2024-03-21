@@ -6,12 +6,12 @@ config_sub_type: "host_prediction"
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/coronaviridae/20240313"
+  input_dir: "input/data/coronaviridae/20240313/uniref/aligned"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   # file_names: [ "uniref90_final_msl1114.csv" ]
-  file_names: [ "coronaviridae_s_uniref90_embl_hosts_pruned_metadata_corrected_species_virus_host_vertebrates_w_seq_t0.01_c8.csv" ]
+  file_names: [ "coronaviridae_s_uniref90_embl_hosts_pruned_metadata_corrected_species_virus_host_vertebrates_w_seq_t0.01_c8_aligned.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -37,7 +37,7 @@ pre_train_settings:
     n_tokens: 26
 
 fine_tune_settings:
-  experiment: "fine_tune_model_coronaviridae_s_prot_binary"
+  experiment: "fine_tune_model_coronaviridae_s_prot_aligned_binary"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
@@ -82,4 +82,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "coronaviridae_s_prot_embl_vertebrates_t0.01_c8/20240320/fine_tuning/host_prediction/binary"
-  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_aligned_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
