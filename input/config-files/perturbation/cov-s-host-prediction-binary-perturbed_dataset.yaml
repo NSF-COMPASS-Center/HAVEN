@@ -4,13 +4,13 @@ config_type: "host_prediction_perturbation" # options: data_preprocessor, host_p
   ## initialize base input folder name
   ## provide path to dataset folder
 input_settings:
-  perturbed_dataset_dir: "input/data/coronaviridae/perturbed_dataset/sarscov2-S-WIV04"
+  perturbed_dataset_dir: "input/data/coronaviridae/20240313/wiv04/perturbed_dataset"
 
 classification_settings:
   model_type: "perturbed_dataset_prediction"  # options: baseline, nlp, perturbed_dataset_prediction
   type: "multi"
   sequence_settings:
-    batch_size: 32
+    batch_size: 16
     id_col: "id"
     sequence_col: "seq"
     max_sequence_length: 1366 # max=2169
@@ -35,7 +35,7 @@ classification_settings:
       mode: "test"
       model_path: "output/raw/coronaviridae_s_prot_embl_vertebrates_t0.01_c8/20240320/fine_tuning/host_prediction/binary/host_prediction_fnn_2l_d1024_lr1e-4_itr0.pth"
       depth: 2
-      n_classes: 7
+      n_classes: 2
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       pre_train_settings:

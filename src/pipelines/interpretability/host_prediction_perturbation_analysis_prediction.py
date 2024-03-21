@@ -117,7 +117,7 @@ def execute(config):
         print(input_file)
         # 1. Read the input data file
         df = dataset_utils.read_dataset(input_dir, [input_file],
-                                cols=[id_col, sequence_col])
+                                cols=[id_col, sequence_col, label_col])
 
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
