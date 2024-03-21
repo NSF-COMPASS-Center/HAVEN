@@ -37,7 +37,7 @@ pre_train_settings:
     n_tokens: 26
 
 fine_tune_settings:
-  experiment: "fine_tune_model_coronaviridae_s_prot"
+  experiment: "fine_tune_model_coronaviridae_s_prot_binary"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
@@ -52,7 +52,7 @@ fine_tune_settings:
     final_div_factor: 10000.0
 
   label_settings:
-    label_col: "virus_host_name"
+    label_col: "human_binary_label"
     exclude_labels: [ "nan" ]
     label_groupings:
       "Human": [ "homo sapiens" ]

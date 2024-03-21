@@ -91,9 +91,9 @@ def execute(config):
             print(f"Executing LSTM in {mode} mode")
             prediction_model = lstm.get_lstm_model(model)
 
-        elif "transformer" in model_name:
-            print(f"Executing Transformer in {mode} mode")
-            prediction_model = transformer.get_transformer_model(model)
+        elif "host_prediction" in model_name:
+            print(f"Executing Host Prediction fine tuning in {mode} mode")
+            prediction_model = host_prediction.get_host_prediction_model(model)
 
         else:
                 continue
@@ -118,8 +118,6 @@ def execute(config):
         # 1. Read the input data file
         df = dataset_utils.read_dataset(input_dir, [input_file],
                                 cols=[id_col, sequence_col])
-
-        df[label_col] = "Homo sapiens (Human) [TaxID: 9606]"
 
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
