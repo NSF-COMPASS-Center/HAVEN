@@ -8,10 +8,10 @@ input_settings:
   input_dir: "output/raw/coronaviridae_s_prot_embl_vertebrates_t0.01_c8/20240320/fine_tuning/host_prediction"
 
   file_names:
-    #"Binary-Aligned": "binary/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_aligned_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
-    #"Binary": "binary/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    "Binary-Aligned": "binary/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_aligned_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    "Binary": "binary/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
     "Multi-Aligned": "multi/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_aligned_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
-    "Multi": "multi/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_aligned_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    "Multi": "multi/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
 
 evaluation_settings:
   type: "multi"
@@ -23,16 +23,17 @@ evaluation_settings:
   prediction_distribution: False
 
 label_mappings:
-  "homo sapiens" : "Human"
+#  "homo sapiens" : "Human"
+#  "NOT homo sapiens" : "Non-Human"
 
-#      "Chicken": [ "gallus gallus" ]
-#      "Human": [ "homo sapiens" ]
-#      "Cat": [ "felis catus" ]
-#      "Pig": [ "sus scrofa" ]
-#      "Gray wolf": [ "canis lupus" ]
-#      "Horshoe bat": ["rhinolophus sp."]
-#      "Ferret": ["mustela putorius"]
-#      "Chinese rufous horseshoe bat": ["rhinolophus sinicus"]
+  "gallus gallus": "Chicken"
+  "homo sapiens": "Human"
+  "felis catus": "Cat"
+  "sus scrofa": "Pig"
+  "canis lupus": "Gray wolf"
+  "rhinolophus sp.": "Horshoe bat"
+  "mustela putorius": "Ferret"
+  "rhinolophus sinicus": "Chinese rufous horseshoe bat"
 
 #  "Mus musculus": "House mouse"
 #  "Macaca mulatta": "Indochinese rhesus macaque"

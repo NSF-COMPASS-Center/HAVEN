@@ -125,7 +125,11 @@ def execute(config):
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = iter
             results[task_name].append(result_df)
-            torch.save(fine_tune_model.state_dict(), fine_tune_model_filepath.format(task_name=task_name, itr=iter))
+
+            # save the model
+            model_filepath = fine_tune_model_filepath.format(task_name=task_name, itr=iter)
+            torch.save(fine_tune_model.state_dict(), model_filepath)
+            print(f"Model output written to {model_filepath}")
 
             wandb.finish()
     # write the raw results in csv files
