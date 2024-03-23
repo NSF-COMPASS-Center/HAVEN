@@ -33,7 +33,7 @@ classification_settings:
     - name: "transfer_learning_mlm_fnn_2l_lr1e-4"
       active: True
       mode: "test"
-      model_path: "output/raw/coronaviridae_s_prot_embl_vertebrates_t0.01_c8/20240320/fine_tuning/host_prediction/binary/host_prediction_fnn_2l_d1024_lr1e-4_itr0.pth"
+      model_path: "output/raw/coronaviridae_s_prot_embl_vertebrates_t0.01_c8/20240320/fine_tuning/host_prediction/binary/host_prediction_fnn_2l_d1024_lr1e-4_itr4.pth"
       depth: 2
       n_classes: 2
       input_dim: 512 # input embedding dimension
