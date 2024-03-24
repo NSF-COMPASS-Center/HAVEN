@@ -9,7 +9,7 @@ import ast
 NUCLEOTIDE = "nucleotide"
 PROTEIN = "protein"
 ID_COL = "uniref90_id"
-SEQ_COL = "seq"
+SEQ_COL = "aligned_seq"
 LABEL_COL = "virus_host_name"
 NON_TOKEN = "-"
 
