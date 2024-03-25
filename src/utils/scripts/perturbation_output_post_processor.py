@@ -6,11 +6,14 @@ import yaml
 import os
 import pandas as pd
 from pathlib import Path
+import re
 
 perturb_pos_col = "perturb_pos"
 orig_token_col = "orig_token"
 new_token_col = "new_token"
+temp_col = "temp_col"
 id_col = "uniref90_id"
+id_parser_regex_pattern = re.compile("(.+)_([A-Z])_(\d+)_([A-Z])")
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Post process the output of perturbated dataset prediction')
@@ -20,6 +23,17 @@ def parse_args():
                         help="Absolute path to output directory.\n")
     args = parser.parse_args()
     return args
+
+# parse id columns of the format <id>_<orig token>_<perturb pos>_<new token>
+# eg: UniRef90_A0A7T6Y5W2_X_283_V, WIV04_E_323_A
+# returns id, orig_token, perturb_pos, new_token
+def parse_id(id_val):
+    match_result = id_parser_regex_pattern.match(id_val)
+    if match_result:
+        id, orig_token, perturb_pos, new_token = match_result.group(1, 2, 3, 4)
+        return id, orig_token, perturb_pos, new_token
+    else:
+        return None
 
 
 def post_process_output(input_dir, output_dir):
@@ -31,12 +45,10 @@ def post_process_output(input_dir, output_dir):
         df = pd.read_csv(os.path.join(input_dir, input_file), converters={id_col: ast.literal_eval})
         df[id_col] = df[id_col].map(lambda x: x.pop())
 
-        # assuming the id follows the pattern of id_<origtoken>_<perturbpos>_<newtoken>
+        # assuming the id follows the pattern of uniref90_<alphanumeric id>_<orig token>_<perturb pos>_<new token>
         # sequences that do not follow this id pattern will error out in the next line.
-        # tactical fix: record the filename, and continue
-        # TODO: implement a strategical fix
         try:
-            df[[id_col, orig_token_col, perturb_pos_col, new_token_col]] = df[id_col].str.split("_", expand=True)
+            df[[id_col, orig_token_col, perturb_pos_col, new_token_col]] = df.apply(lambda x: parse_id(x[id_col]), axis=1, result_type="expand")
         except:
             processing_error.append(input_file)
             continue
