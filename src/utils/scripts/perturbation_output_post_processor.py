@@ -12,7 +12,7 @@ perturb_pos_col = "perturb_pos"
 orig_token_col = "orig_token"
 new_token_col = "new_token"
 temp_col = "temp_col"
-id_col = "uniref90_id"
+id_col = "uniprot_id"
 id_parser_regex_pattern = re.compile("(.+)_([A-Z])_(\d+)_([A-Z])")
 
 def parse_args():
@@ -45,7 +45,7 @@ def post_process_output(input_dir, output_dir):
         df = pd.read_csv(os.path.join(input_dir, input_file), converters={id_col: ast.literal_eval})
         df[id_col] = df[id_col].map(lambda x: x.pop())
 
-        # assuming the id follows the pattern of uniref90_<alphanumeric id>_<orig token>_<perturb pos>_<new token>
+        # assuming the id follows the pattern of <alphanumeric id>_<orig token>_<perturb pos>_<new token>
         # sequences that do not follow this id pattern will error out in the next line.
         try:
             df[[id_col, orig_token_col, perturb_pos_col, new_token_col]] = df.apply(lambda x: parse_id(x[id_col]), axis=1, result_type="expand")
