@@ -18,7 +18,7 @@ input_settings:
 
 
 classification_settings:
-  experiment: "host_prediction"
+  experiment: "host_prediction_idv"
   model_type: "nlp"
   n_iterations: 5
   split_input: False
