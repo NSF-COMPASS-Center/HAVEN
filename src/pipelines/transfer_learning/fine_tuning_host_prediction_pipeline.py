@@ -81,6 +81,18 @@ def execute(config):
         val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
         test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
 
+        if not fine_tune_settings["split_input"]:
+            # for zero-shot evaluation, the class weights are computed using the dataset (full) that was used to train the model
+            # since the evaluation dataset may or may not contain all the labels
+            pre_train_df = dataset_utils.read_dataset(input_dir, input_settings["pre_training_file_name"],
+                                                      cols=[id_col, sequence_col, label_col])
+            pre_train_df, _ = utils.transform_labels(pre_train_df, label_settings,
+                                                     classification_type=fine_tune_settings["classification_type"])
+            train_dataset_loader = dataset_utils.get_dataset_loader(pre_train_df, sequence_settings, label_col)
+
+            test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col)
+            val_dataset_loader = test_dataset_loader
+
         # load pre-trained encoder model
         pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
         pre_trained_encoder_model.load_state_dict(torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))

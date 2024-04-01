@@ -22,7 +22,7 @@ classification_settings:
   model_type: "nlp"
   n_iterations: 5
   split_input: False
-  train_proportion: 0.8
+  train_proportion: 0.01
   type: "multi"
   sequence_settings:
     batch_size: 64
