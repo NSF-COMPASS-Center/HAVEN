@@ -4,8 +4,8 @@ import textwrap
 
 DEFAULT_FIGURE_CONFIG = {
     "figsize": (9, 7),
-    "xtick.labelsize": 18,
-    "ytick.labelsize": 18
+    "xtick.labelsize": 12,
+    "ytick.labelsize": 12
 }
 
 
@@ -14,7 +14,7 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None, figure_config=DE
     ax = sns.boxplot(data=df, x=x_col, y=y_col)
     if baseline is not None:
         ax.axhline(baseline, color="gray", linestyle="--")
-    ax.set_ylim(0.5, 1)
+    ax.set_ylim(0.0, 1)
     ax.set_xlabel("", size=20, labelpad=5)
     ax.set_ylabel("AUPRC", size=20)
     # plt.xticks(rotation=45)
