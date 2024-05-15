@@ -4,8 +4,8 @@ import textwrap
 
 DEFAULT_FIGURE_CONFIG = {
     "figsize": (9, 7),
-    "xtick.labelsize": 12,
-    "ytick.labelsize": 12
+    "xtick.labelsize": 20,
+    "ytick.labelsize": 20
 }
 
 
