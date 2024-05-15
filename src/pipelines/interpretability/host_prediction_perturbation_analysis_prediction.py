@@ -91,9 +91,9 @@ def execute(config):
             print(f"Executing LSTM in {mode} mode")
             prediction_model = lstm.get_lstm_model(model)
 
-        elif "transformer" in model_name:
-            print(f"Executing Transformer in {mode} mode")
-            prediction_model = transformer.get_transformer_model(model)
+        elif "host_prediction" in model_name:
+            print(f"Executing Host Prediction fine tuning in {mode} mode")
+            prediction_model = host_prediction.get_host_prediction_model(model)
 
         else:
                 continue
@@ -102,13 +102,14 @@ def execute(config):
         if mode == "test":
             prediction_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
 
-
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
     # create any missing parent directories
     Path(output_results_dir).mkdir(parents=True, exist_ok=True)
 
     # already present output files
     preexisting_output_files = os.listdir(output_results_dir)
+
+    print(f"Number of input files = {len(input_files)}")
     for input_file in input_files:
         # check if the input file has already been processed
         if is_input_file_processed(input_file, preexisting_output_files):
@@ -117,9 +118,7 @@ def execute(config):
         print(input_file)
         # 1. Read the input data file
         df = dataset_utils.read_dataset(input_dir, [input_file],
-                                cols=[id_col, sequence_col])
-
-        df[label_col] = "Homo sapiens (Human) [TaxID: 9606]"
+                                cols=[id_col, sequence_col, label_col])
 
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,

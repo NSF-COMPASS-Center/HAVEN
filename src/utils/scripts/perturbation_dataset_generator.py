@@ -8,8 +8,9 @@ import ast
 
 NUCLEOTIDE = "nucleotide"
 PROTEIN = "protein"
-ID_COL = "id"
-SEQ_COL = "seq"
+ID_COL = "uniprot_id"
+SEQ_COL = "aligned_seq"
+LABEL_COL = "virus_host_name"
 NON_TOKEN = "-"
 
 def parse_args():
@@ -33,8 +34,8 @@ def get_sequence_vocabulary(sequence_type):
         print(f"ERROR: Unsupported sequence type '{sequence_type}'. Supported values: {NUCLEOTIDE}, {PROTEIN}.")
         exit(1)
 
-def perturb_sequence(id, sequence, sequence_vocab):
-    df = pd.DataFrame(columns=[ID_COL, SEQ_COL])
+def perturb_sequence(id, label, sequence, sequence_vocab):
+    df = pd.DataFrame(columns=[ID_COL, SEQ_COL, LABEL_COL])
 
     sequences = []
 
@@ -51,7 +52,7 @@ def perturb_sequence(id, sequence, sequence_vocab):
             # format for id = <orig_id>_<orig_token>_<index>_<new_token>
             new_id = f"{id}_{orig_token}_{index}_{new_token}"
             new_seq = sequence[:index] + new_token + sequence[index + 1:]
-            sequences.append({ID_COL: new_id, SEQ_COL: new_seq})
+            sequences.append({ID_COL: new_id, SEQ_COL: new_seq, LABEL_COL: label})
 
     # create a dataframe
     df = pd.DataFrame(sequences)
@@ -69,7 +70,8 @@ def generate_perturbed_sequences(input_files, output_dir, sequence_type):
         perturbed_sequences_count = 0
         for _, row in df.iterrows():
             id = row[ID_COL]
-            perturbed_df = perturb_sequence(id, row[SEQ_COL], sequence_vocab)
+            label = row[LABEL_COL]
+            perturbed_df = perturb_sequence(id, label, row[SEQ_COL], sequence_vocab)
             output_filepath = os.path.join(output_dir, f"{input_file_name}_{id}.csv")
             perturbed_df.to_csv(output_filepath, index=False)
             print(f"Processed {id}: {perturbed_df.shape} --> {output_filepath}")

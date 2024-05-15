@@ -79,7 +79,7 @@ def execute(input_settings, output_settings, classification_settings):
         test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
 
         if not classification_settings["split_input"]:
-            # for evaluation of pre-trained models, the class weights are computed using the dataset (full) that was used to train the model
+            # for zero-shot evaluation, the class weights are computed using the dataset (full) that was used to train the model
             # since the evaluation dataset may or may not contain all the labels
             pre_train_df = dataset_utils.read_dataset(input_dir, input_settings["pre_training_file_name"],
                                                       cols=[id_col, sequence_col, label_col])

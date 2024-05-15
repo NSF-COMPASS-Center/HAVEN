@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import textwrap
 
 DEFAULT_FIGURE_CONFIG = {
-    "figsize": (10, 10),
-    "xtick.labelsize": 18,
-    "ytick.labelsize": 18    
+    "figsize": (9, 7),
+    "xtick.labelsize": 20,
+    "ytick.labelsize": 20
 }
 
 
@@ -14,10 +14,11 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None, figure_config=DE
     ax = sns.boxplot(data=df, x=x_col, y=y_col)
     if baseline is not None:
         ax.axhline(baseline, color="gray", linestyle="--")
-    ax.set_ylim(0.5, 1)
-    ax.set_xlabel("Model", size=14)
-    ax.set_ylabel("AUPRC", size=14)
-    plt.xticks(rotation=-90)
+    ax.set_ylim(0.0, 1)
+    ax.set_xlabel("", size=20, labelpad=5)
+    ax.set_ylabel("AUPRC", size=20)
+    # plt.xticks(rotation=45)
+    wrap_xticklabels(ax)
     view(output_file_path)
 
 
@@ -38,6 +39,7 @@ def heat_map(df, output_file_path=None, figure_config=DEFAULT_FIGURE_CONFIG):
     pre_plot_config(figure_config)
     sns.heatmap(df)
     view(output_file_path)
+
 
 def class_distribution_plot(df, output_file_path, figure_config=DEFAULT_FIGURE_CONFIG):
     pre_plot_config(figure_config)
@@ -81,6 +83,8 @@ def pre_plot_config(figure_config=DEFAULT_FIGURE_CONFIG):
     plt.clf()
     plt.figure(figsize=figure_config["figsize"])
     sns.set_theme()
+    sns.set_style("whitegrid")
+    sns.color_palette("colorblind", as_cmap=True)
     plt.rcParams["figure.autolayout"] = True
     plt.rcParams["xtick.labelsize"] = figure_config["xtick.labelsize"]
     plt.rcParams["ytick.labelsize"] = figure_config["ytick.labelsize"]
@@ -90,3 +94,11 @@ def view(output_file_path=None):
     plt.tight_layout()
     if output_file_path:
         plt.savefig(output_file_path)
+
+
+def wrap_xticklabels(ax, label_width=10, break_long_words=False):
+    wrapped_labels = []
+    for label in ax.get_xticklabels():
+        label_text = label.get_text()
+        wrapped_labels.append(textwrap.fill(text=label_text, width=label_width, break_long_words=break_long_words))
+    ax.set_xticklabels(wrapped_labels, rotation=0)

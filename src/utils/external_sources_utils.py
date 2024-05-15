@@ -5,7 +5,7 @@
 import random
 
 import requests
-# import pytaxonkit
+import pytaxonkit
 import pandas as pd
 import os
 from Bio import SeqIO
@@ -21,27 +21,42 @@ EMBL_REST_API = "https://www.ebi.ac.uk/Tools/dbfetch"
 NAME = "Name"
 RANK = "Rank"
 NCBI_TAX_ID = "TaxID"
+NCBI_Lineage = "Lineage"
 TAXONKIT_DB = "TAXONKIT_DB"
 MAMMALIA = "Mammalia"
 AVES = "Aves"
 VERTEBRATA_TAX_ID = "7742"
 
 
-# query UniProt for to get the host of the virus of the protein sequence
+# query UniRef for to get the host of the virus of the protein sequence
 # input: uniref90_id
 # output: list of host(s) of the virus
-def query_uniprot(uniref90_id):
+def query_uniref(uniref90_id):
     # split UniRef90_A0A023GZ41 and capture A0A023GZ41
-    uniprot_id = uniref90_id.split("_")[1]
+    uniref90_id = uniref90_id.split("_")[1]
     response = requests.get(url=UNIPROT_REST_API,
                             params={"query": UNIREF90_QUERY_PARAM % uniref90_id,
                                     "fields": ",".join(["virus_hosts", "xref_embl"])})
+    return parse_uniprot_response(response, uniref90_id)
+
+
+# query Uniprot for to get the host of the virus of the protein sequence
+# input: uniprot_id
+# output: list of host(s) of the virus
+def query_uniprot(uniprot_id):
+    response = requests.get(url=UNIPROT_REST_API,
+                            params={"query": uniprot_id,
+                                    "fields": ",".join(["virus_hosts", "xref_embl"])})
+    return parse_uniprot_response(response, uniprot_id)
+
+
+def parse_uniprot_response(response, id):
     host_tax_ids = []
     embl_entry_id = None
     try:
         results = response.json()["results"]
         # ideally there should be only one matching primaryAccession entry for the seed uniprot_id
-        data = [result for result in results if result["primaryAccession"] == uniprot_id][0]
+        data = [result for result in results if result["primaryAccession"] == id][0]
 
         # embl cross reference entry id
         cross_refs = data["uniProtKBCrossReferences"]
@@ -97,16 +112,51 @@ def get_taxonomy_name_rank_from_name(tax_names):
 # Output: list of tax_ids belonging to Vertebrata clade
 def get_vertebrata_tax_ids(tax_ids):
     vertebrata_tax_ids = []
-    for i, tax_id in enumerate(tax_ids):
+    for tax_id in tax_ids:
         # Issue: No placeholder formatter for rank=clade. Hence cannot use formatstr as for class {c}
         # Workaround: Get full lineage and filter for vertebrata Tax ID
         # example output from pytaxonkit.lineage([]):
         # '131567;2759;33154;33208;6072;33213;33511;7711;89593;7742;7776;117570;117571;8287;1338369;32523;32524;40674;32525;9347;1437010;314146;9443;376913;314293;9526;314295;9604;207598;9605;9606'
         # hence split by ";"
-        full_lineage_tax_ids = pytaxonkit.lineage([tax_id])["FullLineageTaxIDs"].iloc[0].split(";")
-        if VERTEBRATA_TAX_ID in full_lineage_tax_ids:
-            vertebrata_tax_ids.append(tax_id)
+        try:
+            full_lineage_tax_ids = pytaxonkit.lineage([tax_id])["FullLineageTaxIDs"].iloc[0].split(";")
+            if VERTEBRATA_TAX_ID in full_lineage_tax_ids:
+                vertebrata_tax_ids.append(tax_id)
+        except:
+            print(f"ERROR in lineage for tax_id = {tax_id}")
     return vertebrata_tax_ids
+
+
+# For given tax_ids at rank lower than species, get the species equivalent ranks
+# Input: tax ids at ranks lower than species
+# Output: Taxonomy rank at species level
+def get_taxonomy_species_data(tax_ids):
+    lower_than_species_tax_ids = pytaxonkit.filter(tax_ids, lower_than="species")
+    print(f"Tax ids with ranks less than species = {lower_than_species_tax_ids}")
+    df_w_species_data = pytaxonkit.lineage(lower_than_species_tax_ids, formatstr="{s}")
+    if df_w_species_data is None:
+        return None
+    df_w_species_data = df_w_species_data[[NCBI_TAX_ID, NAME, NCBI_Lineage]]
+    tax_id_species_name_map = df_w_species_data.set_index(NCBI_TAX_ID)[NCBI_Lineage].to_dict()
+    return tax_id_species_name_map
+
+
+# For given tax_ids at rank lower than genus, get the genus equivalent ranks
+# Input: tax ids at ranks lower than genus
+# Output: Taxonomy rank at genus level
+def get_taxonomy_genus_data(tax_ids):
+    lower_than_genus_tax_ids = tax_ids
+    # lower_than_genus_tax_ids = pytaxonkit.filter(tax_ids, lower_than="genus")
+    print(f"Number of tax ids with ranks less than genus = {len(lower_than_genus_tax_ids)}")
+    df_w_genus_data = pytaxonkit.lineage(lower_than_genus_tax_ids, formatstr="{g}")
+    if df_w_genus_data is None:
+        return None, None
+    df_w_genus_data = df_w_genus_data[[NCBI_TAX_ID, NAME, NCBI_Lineage]]
+    genus_tax_name_map = df_w_genus_data.set_index(NAME)[NCBI_Lineage].to_dict()
+    print(f"Number of tax ids with genus equivalents = {len(genus_tax_name_map)}")
+    print(genus_tax_name_map)
+    return genus_tax_name_map
+
 
 
 # Get taxids belonging to the class of mammals and aves
@@ -115,7 +165,7 @@ def get_vertebrata_tax_ids(tax_ids):
 def get_mammals_aves_tax_ids(tax_ids):
     mammals_aves_tax_ids = []
     for i, tax_id in enumerate(tax_ids):
-        tax_class = pytaxonkit.lineage([tax_id], formatstr="{c}")["Lineage"].iloc[0]
+        tax_class = pytaxonkit.lineage([tax_id], formatstr="{c}")[NCBI_Lineage].iloc[0]
         print(f"{i}: {tax_id} = {tax_class}")
         if tax_class == MAMMALIA or tax_class == AVES:
             mammals_aves_tax_ids.append(tax_id)

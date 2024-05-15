@@ -9,7 +9,7 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv_c5.csv" ]
+  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv.csv" ]
   pre_training_file_name: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5.csv" ]
   # file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
@@ -18,11 +18,11 @@ input_settings:
 
 
 classification_settings:
-  experiment: "host_prediction"
+  experiment: "host_prediction_idv"
   model_type: "nlp"
   n_iterations: 5
   split_input: False
-  train_proportion: 0.8
+  train_proportion: 0.01
   type: "multi"
   sequence_settings:
     batch_size: 64
@@ -56,7 +56,7 @@ classification_settings:
 #      "Big brown bat": [ "Eptesicus fuscus" ]
   training_settings:
     n_epochs: 50
-    max_lr: 1e-3
+    max_lr: 1e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -128,5 +128,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_idv_c5/20240229/host_multi"
+  sub_dir: "uniref90_embl_vertebrates_idv/20240401/host_multi"
   prefix: "idv_nv_msl1036" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

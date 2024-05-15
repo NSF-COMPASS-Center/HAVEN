@@ -1,0 +1,55 @@
+config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw/coronaviridae_s_prot_embl_vertebrates_t0.01_c8/20240320/fine_tuning/host_prediction"
+
+  file_names:
+    "Binary-Aligned": "binary/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_aligned_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    "Binary": "binary/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    "Multi-Aligned": "multi/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_aligned_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    "Multi": "multi/mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+
+evaluation_settings:
+  type: "multi"
+  # metrics
+  auroc: False
+  auprc: True
+  f1: False
+  accuracy: False
+  prediction_distribution: False
+
+label_mappings:
+#  "homo sapiens" : "Human"
+#  "NOT homo sapiens" : "Non-Human"
+
+  "gallus gallus": "Chicken"
+  "homo sapiens": "Human"
+  "felis catus": "Cat"
+  "sus scrofa": "Pig"
+  "canis lupus": "Gray wolf"
+  "rhinolophus sp.": "Horshoe bat"
+  "mustela putorius": "Ferret"
+  "rhinolophus sinicus": "Chinese rufous horseshoe bat"
+
+#  "Mus musculus": "House mouse"
+#  "Macaca mulatta": "Indochinese rhesus macaque"
+#  "Gallus gallus": "Red junglefowl"
+#  "Chlorocebus pygerythrus": "Vervet monkey"
+#  "Rattus norvegicus": "Brown rat"
+#  "Equus caballus": "Horse"
+#  "Phacochoerus africanus": "Common warthog"
+#  "Cercopithecus hamlyni": "Hamlyn monkey"
+#  "Felis catus": "Cat"
+#  "Capra hircus": "Goat"
+#  "Ovis aries": "Sheep"
+
+output_settings:
+  output_dir: "output"
+  evaluation_dir: "evaluation"
+  visualization_dir: "visualization"
+  dataset_dir: "coronaviridae-s/uniref90/20240321"
+  prefix: "host_multi"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

@@ -27,7 +27,7 @@ classification_settings:
     batch_size: 64
     id_col: "uniref90_id"
     sequence_col: "seq"
-    max_sequence_length: 1036 #3011 #1036 #624 # 6630 # 1024 # 1115
+    max_sequence_length: 1366 #3011 #1036 #624 # 6630 # 1024 # 1115
     truncate: True
     pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
@@ -55,7 +55,7 @@ classification_settings:
 #      "Big brown bat": [ "Eptesicus fuscus" ]
   training_settings:
     n_epochs: 50
-    max_lr: 1e-3
+    max_lr: 1e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -85,7 +85,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "rnn-l_6-d_1024-lr1e-5"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 6 # number of rnn layers
@@ -107,7 +107,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8-d_1024-lr1e-4"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
@@ -122,5 +122,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240229/host_multi"
-  prefix: "emb_sincos-lossfocalce_e50_msl1036" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240308/host_multi"
+  prefix: "emb_sincos-lossfocalce_e50_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

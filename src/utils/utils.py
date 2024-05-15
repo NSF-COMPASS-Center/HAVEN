@@ -42,7 +42,10 @@ def transform_labels(df, label_settings, classification_type=None, silent=False)
     if not silent:
         print(f"label_idx_map={label_idx_map}\nidx_label_map={idx_label_map}")
 
-    df[label_col] = df[label_col].transform(lambda x: label_idx_map[x])
+    try:
+        df[label_col] = df[label_col].transform(lambda x: label_idx_map[x] if x in label_idx_map else 0)
+    except KeyError:
+        pass # bypass keyerrors # hack for novel virus idv prediction
     return df, idx_label_map
 
 

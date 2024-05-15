@@ -5,7 +5,7 @@ config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "output/raw/uniref90_embl_vertebrates_idv_c5/20240229/host_multi"
+  input_dir: "output/raw/uniref90_embl_vertebrates_idv/20240401/host_multi"
 
   file_names:
     "fnn-l_10-d_1024-lr1e-3": "idv_nv_msl1036_fnn-l_10-d_1024-lr1e-3_output.csv"
@@ -13,10 +13,11 @@ input_settings:
     "rnn-l_6-d_1024-lr1e-5": "idv_nv_msl1036_rnn-l_6-d_1024-lr1e-5_output.csv"
     "lstm-l_2-d_1024-lr1e-3": "idv_nv_msl1036_lstm-l_2-d_1024-lr1e-3_output.csv"
     "TF-ENC-msl1036-d1024-lr1e-4": "idv_nv_msl1036_transformer-l_6-h_8-d_1024-lr1e-4_output.csv"
-    # "TF-FNN2l-d1024-lr1e-5": "20240228/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-5_output.csv"
+    "VirProBERT": "fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
 
 evaluation_settings:
-  type: "multi"
+  type: "binary"
+  positive_label: "Human"
   # metrics
   auroc: False
   auprc: True
@@ -46,5 +47,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20240228/host_multi_nv_idv_all_models"
+  dataset_dir: "uniref90/20240401/host_multi_nv_idv_all_models"
   prefix: "nv_idv"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
