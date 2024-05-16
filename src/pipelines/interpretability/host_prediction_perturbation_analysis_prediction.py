@@ -9,7 +9,6 @@ import tqdm
 from utils import utils, dataset_utils, nn_utils
 from models.nlp.transformer import transformer
 from models.nlp import cnn1d, rnn, lstm, fnn
-from models.baseline import kmer_fnn
 from models.cv import cnn2d, cnn2d_pool
 from training.fine_tuning import host_prediction
 
@@ -59,11 +58,6 @@ def execute(config):
             # Set the pre_trained model within the task config
             model["pre_trained_model"] = pre_trained_encoder_model
             prediction_model = host_prediction.get_host_prediction_model(model)
-
-        elif "kmer-fnn" in model_name:
-            print(f"Executing K-mer-FNN in {mode} mode")
-            model["input_dim"] = train_dataset_loader.dataset.get_kmer_keys_count()
-            prediction_model = kmer_fnn.get_fnn_model(model)
 
         elif "fnn" in model_name:
             print(f"Executing FNN in {mode} mode")

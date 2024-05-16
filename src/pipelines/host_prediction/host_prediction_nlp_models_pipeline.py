@@ -13,7 +13,6 @@ from utils import utils, dataset_utils, nn_utils, kmer_utils
 from training.early_stopping import EarlyStopping
 from models.nlp.transformer import transformer
 from models.nlp import cnn1d, rnn, lstm, fnn
-from models.baseline import kmer_fnn
 from models.cv import cnn2d, cnn2d_pool
 
 
