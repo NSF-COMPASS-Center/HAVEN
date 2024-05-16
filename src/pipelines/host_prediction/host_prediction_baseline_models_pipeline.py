@@ -61,24 +61,15 @@ def execute(input_settings, output_settings, classification_settings):
         train_df, test_df = dataset_utils.split_dataset_stratified(df, input_split_seeds[iter],
                                                                    classification_settings["train_proportion"], stratify_col=label_col)
 
-        # train_df[split_col] = "train"
-        # test_df[split_col] = "test"
-        # df = pd.concat([train_df, test_df])
-
         # 4. Compute kmer features
         # Get kmer keys only on training dataset
-
         kmer_keys = kmer_utils.get_kmer_keys(train_df, k=k, sequence_col=sequence_col, kmer_prevalence_threshold=kmer_settings["kmer_prevalence_threshold"])
         train_kmer_df = kmer_utils.compute_kmer_features(train_df, k, id_col, sequence_col, label_col, kmer_keys=kmer_keys)
         test_kmer_df = kmer_utils.compute_kmer_features(test_df, k, id_col, sequence_col, label_col, kmer_keys=kmer_keys)
 
-        # 6. get the split column again to distinguish train and test datasets
-        #kmer_df = kmer_df.join(df["split"], on=id_col, how="left")
-        #print(f"kmer_df size after join with split on id = {kmer_df.shape}")
-
         X_train, X_test, y_train, y_test = get_standardized_datasets(train_kmer_df, test_kmer_df, label_col=label_col)
 
-        # 7. Perform classification
+        # 5. Perform classification
         for model in models:
             if model["active"] is False:
                 print(f"Skipping {model['name']} ...")

@@ -1,6 +1,5 @@
 from models.nlp.transformer import transformer
-from models.nlp.fnn import fnn
-from models.nlp import cnn1d, rnn, lstm
+from models.nlp import cnn1d, rnn, lstm, fnn
 from utils import nn_utils
 import joblib
 

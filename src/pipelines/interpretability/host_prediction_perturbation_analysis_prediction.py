@@ -8,8 +8,8 @@ import tqdm
 
 from utils import utils, dataset_utils, nn_utils
 from models.nlp.transformer import transformer
-from models.nlp import cnn1d, rnn, lstm
-from models.nlp.fnn import fnn, kmer_fnn
+from models.nlp import cnn1d, rnn, lstm, fnn
+from models.baseline import kmer_fnn
 from models.cv import cnn2d, cnn2d_pool
 from training.fine_tuning import host_prediction
 

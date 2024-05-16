@@ -7,13 +7,21 @@ import random
 
 
 def run(X_train, X_test, y_train, lr_settings):
-    lr_model = LogisticRegression(solver="saga", penalty="l1", class_weight="balanced", max_iter=5000)
+    # solver: saga - Stochastic Average Gradient Descent with Support for L1 (lasso) penalty
+    # penalty: L1 (lasso) - regaularization term is "absolute value of magnitude" of coefficients
+    # random_state: seed used to shuffle data by the solver. Fixed integer ensures reproducability of results with sag, saga, or liblinear solvers.
+    lr_model = LogisticRegression(solver="saga",
+                                  penalty="l1",
+                                  class_weight="balanced",
+                                  max_iter=int(lr_settings["max_iter"]),
+                                  random_state=random.randint(0, 10000))
     classification_type = lr_settings["classification_type"]
     if classification_type == "multi":
         print("Multiclass Logistic Regression Model")
         # multinomial: multi-class cross-entropy loss
         # ovr: one-versus-rest
         lr_model.multi_class = lr_settings["multiclass_type"]
+
         # for multi_class=ovr, use all cores in the CPU for parallel processing.
         # this setting is ignored and set to default=1 for multi_class=multinomial
         lr_model.n_jobs = -1

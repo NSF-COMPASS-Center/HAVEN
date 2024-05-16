@@ -12,8 +12,8 @@ import wandb
 from utils import utils, dataset_utils, nn_utils, kmer_utils
 from training.early_stopping import EarlyStopping
 from models.nlp.transformer import transformer
-from models.nlp import cnn1d, rnn, lstm
-from models.nlp.fnn import fnn, kmer_fnn
+from models.nlp import cnn1d, rnn, lstm, fnn
+from models.baseline import kmer_fnn
 from models.cv import cnn2d, cnn2d_pool
 
 
@@ -57,14 +57,6 @@ def execute(input_settings, output_settings, classification_settings):
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                      classification_type=classification_settings["type"])
 
-        # only if the feature type is kmer, computer the kmer features over the entire datatset
-        # TODO: can this be moved to nn_utils and compute kmer features only over the training dataset? will that affect the performance? how will we compute features for the testing dataset
-        kmer_keys = None
-        if sequence_settings["feature_type"] == "kmer":
-            kmer_keys = kmer_utils.get_kmer_keys(df,
-                                                 k=sequence_settings["kmer_settings"]["k"],
-                                                 sequence_col=sequence_col)
-            sequence_settings["kmer_keys"] = kmer_keys
         # 3. Split dataset
         # full df into training and testing datasets in the ratio configured in the config file
         train_df, test_df = dataset_utils.split_dataset_stratified(df, input_split_seeds[iter],
@@ -108,11 +100,6 @@ def execute(input_settings, output_settings, classification_settings):
             if model_name not in results:
                 # first iteration
                 results[model_name] = []
-
-            if "kmer-fnn" in model_name:
-                print(f"Executing K-mer-FNN in {mode} mode")
-                model["input_dim"] = train_dataset_loader.dataset.get_kmer_keys_count()
-                nlp_model = kmer_fnn.get_fnn_model(model)
 
             elif "fnn" in model_name:
                 print(f"Executing FNN in {mode} mode")
