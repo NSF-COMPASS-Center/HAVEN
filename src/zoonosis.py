@@ -48,10 +48,10 @@ def main():
     elif config_type == "feature_importance":
         feature_importance.execute(config)
     else:
-        print("ERROR: Unsupported configuration for config_type. Supported values=transfer_learning", "host_prediction", "evaluation")
+        print("ERROR: Unsupported configuration for config_type. Supported values=transfer_learning, host_prediction, evaluation, host_prediction_perturbation")
     return
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
     exit(0)

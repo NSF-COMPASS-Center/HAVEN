@@ -20,20 +20,30 @@ def execute(input_settings, output_settings, classification_settings):
     visualizations_dir = output_settings["visualizations_dir"]
     sub_dir = output_settings["sub_dir"]
     output_prefix = output_settings["prefix"]
-    output_prefix = "_" + output_prefix if output_prefix is not None else ""
+    output_prefix = output_prefix if output_prefix is not None else ""
 
     # classification settings
-    k = classification_settings["kmer_settings"]["k"]
-    classification_type = classification_settings["type"]
     models = classification_settings["models"]
-    id_col = classification_settings["id_col"]
-    sequence_col = classification_settings["sequence_col"]
-    n_iters = classification_settings["n_iterations"]
-
     label_settings = classification_settings["label_settings"]
-    label_col = label_settings["label_col"]
+    sequence_settings = classification_settings["sequence_settings"]
+    kmer_settings = sequence_settings["kmer_settings"]
+    n_iters = classification_settings["n_iterations"]
+    classification_type = classification_settings["type"]
 
-    output_filename_prefix = f"kmer_k{k}_{label_col}_{classification_type}" + output_prefix + "_"
+    id_col = sequence_settings["id_col"]
+    sequence_col = sequence_settings["sequence_col"]
+    feature_type = sequence_settings["feature_type"]
+    label_col = label_settings["label_col"]
+    split_col = "split"
+    k = kmer_settings["k"]
+
+    # wandb_config = {
+    #     "n_epochs": training_settings["n_epochs"],
+    #     "lr": training_settings["max_lr"],
+    #     "max_sequence_length": sequence_settings["max_sequence_length"],
+    #     "dataset": input_file_names[0]
+    # }
+    output_filename_prefix = f"{feature_type}_k{kmer_settings['k']}_{label_col}_{classification_type}_{output_prefix}"
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
 
     results = {}
@@ -46,27 +56,27 @@ def execute(input_settings, output_settings, classification_settings):
                                 cols=[id_col, sequence_col, label_col])
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
-                                                     classification_type=classification_settings["type"])
+                                                     classification_type=classification_type)
         # 3. Split dataset
         train_df, test_df = dataset_utils.split_dataset_stratified(df, input_split_seeds[iter],
                                                                    classification_settings["train_proportion"], stratify_col=label_col)
 
-        train_df["split"] = "train"
-        test_df["split"] = "test"
-        df = pd.concat([train_df, test_df])
+        # train_df[split_col] = "train"
+        # test_df[split_col] = "test"
+        # df = pd.concat([train_df, test_df])
 
-        # # 4. filter out noise: labels configured to be excluded, NaN labels
-        # df = utils.filter_noise(df, label_settings)
+        # 4. Compute kmer features
+        # Get kmer keys only on training dataset
 
-        # 5. Compute kmer features
-        kmer_df = kmer_utils.compute_kmer_features(df, k, id_col, sequence_col, label_col)
-        print(f"back in prediction_with_inputs_split = {kmer_df.shape}")
+        kmer_keys = kmer_utils.get_kmer_keys(train_df, k=k, sequence_col=sequence_col, kmer_prevalence_threshold=kmer_settings["kmer_prevalence_threshold"])
+        train_kmer_df = kmer_utils.compute_kmer_features(train_df, k, id_col, sequence_col, label_col, kmer_keys=kmer_keys)
+        test_kmer_df = kmer_utils.compute_kmer_features(test_df, k, id_col, sequence_col, label_col, kmer_keys=kmer_keys)
 
         # 6. get the split column again to distinguish train and test datasets
-        kmer_df = kmer_df.join(df["split"], on=id_col, how="left")
-        print(f"kmer_df size after join with split on id = {kmer_df.shape}")
+        #kmer_df = kmer_df.join(df["split"], on=id_col, how="left")
+        #print(f"kmer_df size after join with split on id = {kmer_df.shape}")
 
-        X_train, X_test, y_train, y_test = get_standardized_datasets(kmer_df, label_col=label_col)
+        X_train, X_test, y_train, y_test = get_standardized_datasets(train_kmer_df, test_kmer_df, label_col=label_col)
 
         # 7. Perform classification
         for model in models:
@@ -84,10 +94,10 @@ def execute(input_settings, output_settings, classification_settings):
             model["label_col"] = label_col
             model["classification_type"] = classification_type
 
-            if model["name"] == "lr":
+            if "lr" in model_name:
                 print("Executing Logistic Regression")
                 y_pred, feature_importance_df, validation_scores_df, classifier = logistic_regression.run(X_train, X_test, y_train, model)
-            elif model["name"] == "rf":
+            elif "rf" in model_name:
                 print("Executing Random Forest")
                 y_pred, feature_importance_df, validation_scores_df, classifier = random_forest.run(X_train, X_test, y_train, model)
             else:
@@ -111,7 +121,7 @@ def execute(input_settings, output_settings, classification_settings):
             validation_scores[model_name].append(validation_scores_df)
 
             # write the classification model
-            utils.write_output_model(classifier, output_results_dir, output_filename_prefix + f"itr{iter}", model_name)
+            utils.write_output_model(classifier, output_results_dir, f"{output_filename_prefix}_itr{iter}", model_name)
 
     # write the raw results in csv files
     utils.write_output(results, output_results_dir, output_filename_prefix, "output",)
@@ -119,14 +129,11 @@ def execute(input_settings, output_settings, classification_settings):
     utils.write_output(validation_scores, output_results_dir, output_filename_prefix, "validation_scores")
 
     # create plots for validation scores
-    plot_validation_scores(validation_scores, os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
+    # plot_validation_scores(validation_scores, os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
 
 
-def get_standardized_datasets(df, label_col):
-    drop_cols = ["split", label_col]
-
-    train_df = df[df["split"] == "train"]
-    test_df = df[df["split"] == "test"]
+def get_standardized_datasets(train_df, test_df, label_col):
+    drop_cols = [label_col]
 
     X_train = train_df.drop(columns=drop_cols)
     y_train = train_df[label_col]

@@ -15,7 +15,7 @@ def run(X_train, X_test, y_train, lr_settings):
         # ovr: one-versus-rest
         lr_model.multi_class = lr_settings["multiclass_type"]
         # for multi_class=ovr, use all cores in the CPU for parallel processing.
-        # this settingis ignored and set to default=1 for multi_class=multinomial
+        # this setting is ignored and set to default=1 for multi_class=multinomial
         lr_model.n_jobs = -1
 
     # K-Fold Cross Validation: START #

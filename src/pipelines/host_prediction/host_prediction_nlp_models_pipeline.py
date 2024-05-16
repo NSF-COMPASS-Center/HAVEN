@@ -58,7 +58,7 @@ def execute(input_settings, output_settings, classification_settings):
                                                      classification_type=classification_settings["type"])
 
         # only if the feature type is kmer, computer the kmer features over the entire datatset
-        # TODO: can this be moved to nn_utils and computer kmer features only over the training dataset? will that affect the performance? how will we compute features for the testing dataset
+        # TODO: can this be moved to nn_utils and compute kmer features only over the training dataset? will that affect the performance? how will we compute features for the testing dataset
         kmer_keys = None
         if sequence_settings["feature_type"] == "kmer":
             kmer_keys = kmer_utils.get_kmer_keys(df,
