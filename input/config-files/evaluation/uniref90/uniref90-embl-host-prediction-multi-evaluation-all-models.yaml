@@ -8,6 +8,9 @@ input_settings:
   input_dir: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5"
 
   file_names:
+    "LR-maxitr5000": "20240515/host_multi/kmer_k3_virus_host_name_multi__lr_output.csv"
+    "RF": "20240515/host_multi/kmer_k3_virus_host_name_multi__rf_output.csv"
+    "LR-maxitr500": "20240516/host_multi/kmer_k3_virus_host_name_multi__lr_output.csv"
     # "fnn-l_10-d_1024-lr1e-3": "20240229/host_multi/emb_sincos-lossfocalce_e50_msl1036_fnn-l_10-d_1024-lr1e-3_output.csv"
     # "CNN-l_4-d_1024-k3s1-lr1e-3": "20240229/host_multi/emb_sincos-lossfocalce_e50_msl1036_cnn-l_4-d_1024-k3s1-lr1e-3_output.csv"
     "CNN": "20240229/host_multi/emb_sincos-lossfocalce_e50_msl1036_cnn-l_4-d_1024-k3s1-lr1e-3_output.csv"
@@ -59,5 +62,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20240312/prelim_exam"
+  dataset_dir: "uniref90/20240517/host_multi_all_models"
   prefix: "host_multi_all_models"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

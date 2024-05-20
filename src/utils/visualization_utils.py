@@ -16,7 +16,7 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None, figure_config=DE
         ax.axhline(baseline, color="gray", linestyle="--")
     ax.set_ylim(0.0, 1)
     ax.set_xlabel("", size=20, labelpad=5)
-    ax.set_ylabel("AUPRC", size=20)
+    ax.set_ylabel(y_col.uppercase, size=20)
     # plt.xticks(rotation=45)
     wrap_xticklabels(ax)
     view(output_file_path)
