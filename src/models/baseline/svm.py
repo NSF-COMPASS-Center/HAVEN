@@ -13,7 +13,7 @@ def run(X_train, X_test, y_train, svm_settings):
 
     svm_model = SVC(kernel=svm_settings["kernel"], # supported types: ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’
                     class_weight="balanced", # uses the values of y to automatically adjust weights inversely proportional to class frequencies in the input data
-                    max_itr=-1, # no_limit
+                    max_iter=-1, # no_limit
                     verbose=True,
                     decision_function_shape="ovr",
                     break_ties=False, # the first class among the tied classes is returned. If True, ties are broken using the confidence values of the decision function
