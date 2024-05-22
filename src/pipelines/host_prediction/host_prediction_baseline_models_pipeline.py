@@ -5,7 +5,7 @@ from pathlib import Path
 from sklearn.preprocessing import MinMaxScaler
 
 from utils import utils, dataset_utils, kmer_utils, visualization_utils
-from models.baseline import logistic_regression, random_forest
+from models.baseline import logistic_regression, random_forest, svm
 
 
 def execute(input_settings, output_settings, classification_settings):
@@ -91,6 +91,9 @@ def execute(input_settings, output_settings, classification_settings):
             elif "rf" in model_name:
                 print("Executing Random Forest")
                 y_pred, feature_importance_df, validation_scores_df, classifier = random_forest.run(X_train, X_test, y_train, model)
+            elif "svm" in model_name:
+                print("Executing Support Vector Machine")
+                y_pred, feature_importance_df, validation_scores_df, classifier = svm.run(X_train, X_test, y_train, model)
             else:
                 continue
 
@@ -101,23 +104,27 @@ def execute(input_settings, output_settings, classification_settings):
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = iter
 
-            # Remap the class indices to original input labels
-            feature_importance_df.rename(index=index_label_map, inplace=True)
-            feature_importance_df["itr"] = iter
-
             validation_scores_df["itr"] = iter
 
             results[model_name].append(result_df)
-            feature_importance[model_name].append(feature_importance_df)
             validation_scores[model_name].append(validation_scores_df)
+
+            # If model returns feature importance:
+            # Remap the class indices to original input labels
+            if feature_importance_df:
+                feature_importance_df.rename(index=index_label_map, inplace=True)
+                feature_importance_df["itr"] = iter
+                feature_importance[model_name].append(feature_importance_df)
 
             # write the classification model
             utils.write_output_model(classifier, output_results_dir, f"{output_filename_prefix}_itr{iter}", model_name)
 
     # write the raw results in csv files
     utils.write_output(results, output_results_dir, output_filename_prefix, "output",)
-    utils.write_output(feature_importance, output_results_dir, output_filename_prefix, "feature_imp")
     utils.write_output(validation_scores, output_results_dir, output_filename_prefix, "validation_scores")
+    # if feature importance exists:
+    if len(feature_importance) > 0:
+        utils.write_output(feature_importance, output_results_dir, output_filename_prefix, "feature_imp")
 
     # create plots for validation scores
     # plot_validation_scores(validation_scores, os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
