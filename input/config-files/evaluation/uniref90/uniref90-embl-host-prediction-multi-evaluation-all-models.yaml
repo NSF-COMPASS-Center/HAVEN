@@ -10,7 +10,8 @@ input_settings:
   file_names:
     "LR-maxitr5000": "20240515/host_multi/kmer_k3_virus_host_name_multi__lr_output.csv"
     "RF": "20240515/host_multi/kmer_k3_virus_host_name_multi__rf_output.csv"
-    "LR-maxitr500": "20240516/host_multi/kmer_k3_virus_host_name_multi__lr_output.csv"
+    # "LR-maxitr500": "20240516/host_multi/kmer_k3_virus_host_name_multi__lr_output.csv"
+    "SVM": "20240522/host_multi/kmer_k3_virus_host_name_multi__svm_output.csv"
     # "fnn-l_10-d_1024-lr1e-3": "20240229/host_multi/emb_sincos-lossfocalce_e50_msl1036_fnn-l_10-d_1024-lr1e-3_output.csv"
     # "CNN-l_4-d_1024-k3s1-lr1e-3": "20240229/host_multi/emb_sincos-lossfocalce_e50_msl1036_cnn-l_4-d_1024-k3s1-lr1e-3_output.csv"
     "CNN": "20240229/host_multi/emb_sincos-lossfocalce_e50_msl1036_cnn-l_4-d_1024-k3s1-lr1e-3_output.csv"
