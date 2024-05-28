@@ -100,7 +100,7 @@ def execute(input_settings, output_settings, classification_settings):
                 # first iteration
                 results[model_name] = []
 
-            elif "fnn" in model_name:
+            if "fnn" in model_name:
                 print(f"Executing FNN in {mode} mode")
                 nlp_model = fnn.get_fnn_model(model)
 
