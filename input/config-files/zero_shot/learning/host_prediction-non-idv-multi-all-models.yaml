@@ -46,13 +46,13 @@ classification_settings:
       "Cattle": [ "Bos taurus" ]
   training_settings:
     n_epochs: 50
-    max_lr: 1e-4
+    max_lr: 1e-3
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
   models:
     - name: "fnn-l_10-d_1024-lr1e-3"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
@@ -63,7 +63,7 @@ classification_settings:
       manual_seed:  # whole number
 
     - name: "cnn-l_4-d_1024-k3s1-lr1e-3"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 4
@@ -87,7 +87,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2-d_1024-lr1e-3"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
@@ -98,7 +98,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8-d_1024-lr1e-4"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
