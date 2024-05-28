@@ -1,4 +1,4 @@
-config_type: "host_prediction" # options: data_preprocessor, host_prediction, evaluation
+config_type: "host_prediction" # options: data_preprocessor, host_prediction, evaluation, transfer_learning
 
 # Input Settings:
   ## initialize base input folder name
