@@ -79,7 +79,7 @@ def execute(input_settings, output_settings, classification_settings):
         nlp_model = None
         # model store filepath
         model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
-        Path(os.path.dirname(model_filepath)).mkdir(parents=True, exist_ok=True)
+        Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
 
         for model in models:
             model_name = model["name"]
@@ -145,7 +145,7 @@ def execute(input_settings, output_settings, classification_settings):
                 # used for zero-shot evaluation
                 # load the pre-trained model
                 nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
-                result_df = test_model(model, test_dataset_loader)
+                result_df = test_model(nlp_model, test_dataset_loader)
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values: 'train', 'test'.")
                 exit(1)
@@ -195,7 +195,6 @@ def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_load
         if early_stopper.early_stop:
             print("Breaking off training loop due to early stop")
             break
-
     # END: Model training with early stopping using validation
 
     # test the model
