@@ -59,7 +59,7 @@ def execute(input_settings, output_settings, classification_settings):
         val_dataset_loader = None
         test_dataset_loader = None
         # 3. Split dataset
-        if not classification_settings["split_input"]:
+        if classification_settings["split_input"]:
 
             # full df into training and testing datasets in the ratio configured in the config file
             train_df, test_df = dataset_utils.split_dataset_stratified(df, input_settings["split_seeds"][iter],
