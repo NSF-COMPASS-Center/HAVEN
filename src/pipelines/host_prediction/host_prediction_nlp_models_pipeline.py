@@ -20,7 +20,6 @@ def execute(input_settings, output_settings, classification_settings):
     # input settings
     input_dir = input_settings["input_dir"]
     input_file_names = input_settings["file_names"]
-    input_split_seeds = input_settings["split_seeds"]
 
     # output settings
     output_dir = output_settings["output_dir"]
@@ -56,34 +55,28 @@ def execute(input_settings, output_settings, classification_settings):
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                      classification_type=classification_settings["type"])
 
+        train_dataset_loader, val_dataset_loader, test_dataset_loader = None
         # 3. Split dataset
-        # full df into training and testing datasets in the ratio configured in the config file
-        train_df, test_df = dataset_utils.split_dataset_stratified(df, input_split_seeds[iter],
-                                                                   classification_settings["train_proportion"],
-                                                                   stratify_col=label_col)
-        # split testing set into validation and testing datasets in equal proportion
-        # so 80:20 will now be 80:10:10
-        val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5,
-                                                                 stratify_col=label_col)
-        train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col)
-        val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
-        test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
-
         if not classification_settings["split_input"]:
-            # for zero-shot evaluation, the class weights are computed using the dataset (full) that was used to train the model
-            # since the evaluation dataset may or may not contain all the labels
-            pre_train_df = dataset_utils.read_dataset(input_dir, input_settings["pre_training_file_name"],
-                                                      cols=[id_col, sequence_col, label_col])
-            pre_train_df, _ = utils.transform_labels(pre_train_df, label_settings,
-                                                     classification_type=classification_settings["type"])
-            train_dataset_loader = dataset_utils.get_dataset_loader(pre_train_df, sequence_settings, label_col)
 
+            # full df into training and testing datasets in the ratio configured in the config file
+            train_df, test_df = dataset_utils.split_dataset_stratified(df, input_settings["split_seeds"][iter],
+                                                                       classification_settings["train_proportion"],
+                                                                   stratify_col=label_col)
+            # split testing set into validation and testing datasets in equal proportion
+            # so 80:20 will now be 80:10:10
+            val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5,
+                                                                     stratify_col=label_col)
+            train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col)
+            val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
+            test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
+        else:
+            # used in zero shot evaluation, where split_input=False in classification_settings and mode=test in model
             test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col)
-            val_dataset_loader = test_dataset_loader
 
         nlp_model = None
         # model store filepath
-        model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
+        model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
         Path(os.path.dirname(model_filepath)).mkdir(parents=True, exist_ok=True)
 
         for model in models:
@@ -141,17 +134,31 @@ def execute(input_settings, output_settings, classification_settings):
                        job_type=model_name,
                        name=f"iter_{iter}")
 
-            # Execute the NLP model
-            if mode == "test":
+            if mode == "train":
+                # train the model
+                result_df, nlp_model = run_model(nlp_model, train_dataset_loader, val_dataset_loader,
+                                                 test_dataset_loader,
+                                                 model["loss"], training_settings, model_name)
+            elif mode == "test":
+                # used for zero-shot evaluation
+                # load the pre-trained model
                 nlp_model.load_state_dict(torch.load(model["pretrained_model_path"]))
-            result_df, nlp_model = run_model(nlp_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
-                                             model["loss"], training_settings, model_name, mode)
+                result_df = test_model(model, test_dataset_loader)
+            else:
+                print(f"ERROR: Unsupported mode '{mode}'. Supported values: 'train', 'test'.")
+                exit(1)
+
             #  Create the result dataframe and remap the class indices to original input labels
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = iter
             results[model_name].append(result_df)
-            torch.save(nlp_model.state_dict(), model_filepath.format(model_name=model_name, itr=iter))
+
+            if classification_settings["save_model"]:
+                # save the trained model
+                model_filepath = model_store_filepath.format(model_name=model_name, itr=iter)
+                torch.save(nlp_model.state_dict(), model_filepath)
+                print(f"Model output written to {model_filepath}")
 
             wandb.finish()
     # write the raw results in csv files
@@ -159,8 +166,7 @@ def execute(input_settings, output_settings, classification_settings):
     utils.write_output(results, output_results_dir, output_prefix, "output")
 
 
-def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, model_name,
-              mode):
+def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, model_name):
     tbw = SummaryWriter()
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
@@ -177,25 +183,28 @@ def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_load
         final_div_factor=training_settings["final_div_factor"])
     early_stopper = EarlyStopping(patience=10, min_delta=0)
     model.train_iter = 0
-    model.test_iter = 0
-    if mode == "train":
-        # train the model only if set to train mode
-        for e in range(n_epochs):
-            model = run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
-                              lr_scheduler, early_stopper, tbw, model_name, e)
-            # check if early stopping condition was satisfied and stop accordingly
-            if early_stopper.early_stop:
-                print("Breaking off training loop due to early stop")
-                break
+    model.val_iter = 0
 
-    result_df, _ = evaluate_model(model, test_dataset_loader, criterion, tbw, model_name, epoch=None, log_loss=False)
+    # START: Model training with early stopping using validation
+    for e in range(n_epochs):
+        model = run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+                          lr_scheduler, early_stopper, tbw, model_name, e)
+        # check if early stopping condition was satisfied and stop accordingly
+        if early_stopper.early_stop:
+            print("Breaking off training loop due to early stop")
+            break
+
+    # END: Model training with early stopping using validation
+
+    # test the model
+    result_df = test_model(model, test_dataset_loader)
     return result_df, model
 
 
 def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw,
               model_name,
               epoch):
-    # Training
+    # training
     model.train()
     for _, record in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
         input, label = record
@@ -223,17 +232,16 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         pbar.set_description(
             f"{model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
 
-    # Validation
-    _, val_loss = evaluate_model(model, val_dataset_loader, criterion, tbw, model_name, epoch, log_loss=True)
+    # validation
+    val_loss = validate_model(model, val_dataset_loader, criterion, tbw, model_name, epoch)
     early_stopper(val_loss)
     return model
 
 
-def evaluate_model(model, dataset_loader, criterion, tbw, model_name, epoch, log_loss=False):
+def validate_model(model, dataset_loader, criterion, tbw, model_name, epoch):
     with torch.no_grad():
         model.eval()
 
-        results = []
         val_loss = []
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
             input, label = record
@@ -243,18 +251,34 @@ def evaluate_model(model, dataset_loader, criterion, tbw, model_name, epoch, log
 
             loss = criterion(output, label.long())
             curr_val_loss = loss.item()
-            model.test_iter += 1
-            if log_loss:
-                wandb.log({
-                    "validation-loss": float(curr_val_loss)
-                })
-                tbw.add_scalar(f"{model_name}/validation-loss", float(curr_val_loss), model.test_iter)
-                pbar.set_description(
-                    f"{model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.test_iter}, epoch={epoch + 1}")
+            model.val_iter += 1
+
+            # log validation loss
+            wandb.log({
+                "validation-loss": float(curr_val_loss)
+            })
+            tbw.add_scalar(f"{model_name}/validation-loss", float(curr_val_loss), model.val_iter)
+            pbar.set_description(
+                f"{model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.val_iter}, epoch={epoch + 1}")
             val_loss.append(curr_val_loss)
+
+    return mean(val_loss)
+
+
+def test_model(model, dataset_loader):
+    with torch.no_grad():
+        model.eval()
+
+        results = []
+        for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
+            input, label = record
+
+            output = model(input)  # b x n_classes
+            output = output.to(nn_utils.get_device())
+
             # to get probabilities of the output
             output = F.softmax(output, dim=-1)
             result_df = pd.DataFrame(output.cpu().numpy())
             result_df["y_true"] = label.cpu().numpy()
             results.append(result_df)
-    return pd.concat(results, ignore_index=True), mean(val_loss)
+    return pd.concat(results, ignore_index=True)

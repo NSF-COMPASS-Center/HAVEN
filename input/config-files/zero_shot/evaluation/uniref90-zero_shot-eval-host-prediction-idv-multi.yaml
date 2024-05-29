@@ -6,19 +6,17 @@ config_sub_type: "host_prediction"
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/uniref90/20240131"
+  input_dir: "input/data/uniref90/20240131/idv_non_idv_common_hosts"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  # file_names: [ "uniref90_final_msl1114.csv" ]
   file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_non_idv_common_hosts_w_seq_idv_c4.csv" ]
-  pre_training_file_name: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
+  # split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 16
+    batch_size: 64
     id_col: "uniref90_id"
     sequence_col: "seq"
     max_sequence_length: 1366 # 6630 # 1024 # 1115
@@ -43,6 +41,7 @@ fine_tune_settings:
   split_input: False
   train_proportion: 0.01
   classification_type: "multi"
+  save_model: False
 
   training_settings:
     n_epochs_freeze: 0
@@ -65,15 +64,15 @@ fine_tune_settings:
     - name: "host_prediction_fnn_2l_d1024_lr1e-4"
       active: True
       mode: "test" # supported values: train, test
-      fine_tuned_model_path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5/20240307/host_multi/fine_tuning/host_prediction_fnn_2l_d1024_lr1e-4_fe20_ufe30_itr0.pth"
+      fine_tuned_model_path: "output/raw/uniref90_embl_vertebrates_idv_common_hosts_non_idv_t0.005_c4/20240528/host_multi/fine_tuning/host_prediction_fnn_2l_d1024_lr1e-4_itr4.pth"
       loss: "FocalLoss"
       depth: 2
-      n_classes: 5
+      n_classes: 4
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_idv/20240401/host_multi/fine_tuning"
+  sub_dir: "uniref90_embl_vertebrates_idv_common_hosts_non_idv_t0.005_c4/20240528/host_multi/zero_shot_eval_idv"
   prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
