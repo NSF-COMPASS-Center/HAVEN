@@ -55,7 +55,9 @@ def execute(input_settings, output_settings, classification_settings):
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                      classification_type=classification_settings["type"])
 
-        train_dataset_loader, val_dataset_loader, test_dataset_loader = None
+        train_dataset_loader = None
+        val_dataset_loader = None
+        test_dataset_loader = None
         # 3. Split dataset
         if not classification_settings["split_input"]:
 

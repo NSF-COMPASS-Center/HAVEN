@@ -69,7 +69,9 @@ def execute(config):
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                            classification_type=fine_tune_settings["classification_type"])
 
-        train_dataset_loader, val_dataset_loader, test_dataset_loader = None
+        train_dataset_loader = None
+        val_dataset_loader = None
+        test_dataset_loader = None
         # 3. Split dataset
         if fine_tune_settings["split_input"]:
             # full df into training and testing datasets in the ratio configured in the config file
