@@ -119,4 +119,3 @@ def wrap_ticklabels(ax, axis, label_width=10, break_long_words=False):
         ax.set_yticklabels(wrapped_labels, rotation=0)
     else:
         print(f"ERROR: Invalid axis = {axis}. Supported values = 'x', 'y'.")
-

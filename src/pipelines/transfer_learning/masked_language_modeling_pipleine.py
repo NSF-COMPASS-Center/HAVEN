@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch
 import tqdm
 from statistics import mean
+import wandb
 
 from utils import utils, dataset_utils, nn_utils, evaluation_utils
 from training.early_stopping import EarlyStopping
@@ -48,6 +49,14 @@ def execute(config):
     mlm_settings["pad_token_val"] = pad_token_val
     mlm_settings["encoder_dim"] = encoder_settings["input_dim"]
 
+    wandb_config = {
+        "n_epochs": training_settings["n_epochs"],
+        "lr": training_settings["max_lr"],
+        "max_sequence_length": sequence_settings["max_sequence_length"],
+        "batch_size": sequence_settings["batch_size"],
+        "dataset": input_file_names[0]
+    }
+
     # Path to store the pre-trained encoder model
     encoder_model_name = encoder_settings["model_name"]
     encoder_model_filepath = os.path.join(output_dir, results_dir, sub_dir, encoder_model_name + "_itr{itr}.pth")
@@ -59,6 +68,15 @@ def execute(config):
 
     for iter in range(n_iters):
         print(f"Iteration {iter}")
+        # Initialize Weights & Biases for each run
+        wandb_config["hidden_dim"] = encoder_settings["hidden_dim"]
+        wandb_config["depth"] = encoder_settings["depth"]
+        wandb.init(project="zoonosis-host-prediction",
+                   config=wandb_config,
+                   group=training_settings["experiment"],
+                   job_type=encoder_model_name,
+                   name=f"iter_{iter}")
+
         # 1. Read the data files
         df = dataset_utils.read_dataset(input_dir, input_file_names,
                                 cols=[id_col, sequence_col])
