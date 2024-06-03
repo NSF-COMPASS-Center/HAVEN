@@ -23,6 +23,8 @@ classification_settings:
   split_input: True
   train_proportion: 0.8
   type: "multi"
+  save_model: True
+
   sequence_settings:
     batch_size: 64
     id_col: "uniref90_id"

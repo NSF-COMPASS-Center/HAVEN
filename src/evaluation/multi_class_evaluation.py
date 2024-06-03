@@ -63,6 +63,7 @@ class MultiClassEvaluation(EvaluationBase):
 
         return pd.concat(pr_curves, ignore_index=True), mean(auprcs)
 
+
     def convert_probability_to_prediction(self, df_itr):
         y_pred_prob = df_itr[self.y_pred_columns]
         return [y for y in y_pred_prob.idxmax(axis="columns")]

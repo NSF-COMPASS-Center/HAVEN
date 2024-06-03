@@ -1,5 +1,4 @@
 from pipelines.host_prediction import host_prediction_nlp_models_pipeline, host_prediction_baseline_models_pipeline
-from pipelines.interpretability import host_prediction_perturbation_analysis_prediction
 
 
 def execute(config):
@@ -17,5 +16,3 @@ def execute(config):
         host_prediction_baseline_models_pipeline.execute(input_settings, output_settings, classification_settings)
     elif type == "nlp":
         host_prediction_nlp_models_pipeline.execute(input_settings, output_settings, classification_settings)
-    elif type == "perturbed_dataset_prediction":
-        host_prediction_perturbation_analysis_prediction.execute(input_settings, output_settings, classification_settings)

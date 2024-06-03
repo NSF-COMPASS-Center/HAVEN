@@ -42,6 +42,7 @@ fine_tune_settings:
   split_input: True
   train_proportion: 0.8
   classification_type: "multi"
+  save_model: True
 
   training_settings:
     n_epochs_freeze: 20

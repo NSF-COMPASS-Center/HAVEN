@@ -6,21 +6,21 @@ config_sub_type: "masked_language_modeling"
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/uniref90"
+  input_dir: "input/data/uniref90/20240131"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_viridae_20231113_parsed.csv" ]
+  file_names: [ "uniref90_viridae.csv" ]
   # file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 64
+    batch_size: 32
     id_col: "uniref90_id"
     sequence_col: "seq"
-    max_sequence_length: 512 # 6630 # 1024 # 1115
+    max_sequence_length: 2048 # 6630 # 1024 # 1115
     truncate: True
     pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
@@ -40,6 +40,7 @@ encoder_settings:
   hidden_dim: 1024
 
 training_settings:
+  experiment: "mlm"
   n_iterations: 1
   split_input: True
   train_proportion: 0.8
@@ -48,10 +49,10 @@ training_settings:
   pct_start: 0.10
   div_factor: 25.0
   final_div_factor: 10000.0
-  checkpoint_path: "output/raw/uniref90/20231115/pre_training/mlm/checkpoints/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0_checkpt26.pth"
+  checkpoint_path:
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90/20231115/pre_training/mlm"
-  prefix: "mlm_transformer_encoder-l_6-h_8-lr1e-4_uniref90viridae_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90/20240603/pre_training/mlm"
+  prefix: "mlm_transformer_encoder-l_6-h_8-lr1e-4_uniref90viridae_msl2048" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

@@ -1,4 +1,4 @@
-config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation
+config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation, transfer_learning
 config_sub_type: "host_prediction"
 
 # Input Settings:
@@ -42,6 +42,7 @@ fine_tune_settings:
   split_input: True
   train_proportion: 0.8
   classification_type: "multi"
+  save_model: True
 
   training_settings:
     n_epochs_freeze: 0

@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch
 import tqdm
 from statistics import mean
+import wandb
 
 from utils import utils, dataset_utils, nn_utils, evaluation_utils
 from training.early_stopping import EarlyStopping
@@ -48,6 +49,14 @@ def execute(config):
     mlm_settings["pad_token_val"] = pad_token_val
     mlm_settings["encoder_dim"] = encoder_settings["input_dim"]
 
+    wandb_config = {
+        "n_epochs": training_settings["n_epochs"],
+        "lr": training_settings["max_lr"],
+        "max_sequence_length": sequence_settings["max_sequence_length"],
+        "batch_size": sequence_settings["batch_size"],
+        "dataset": input_file_names[0]
+    }
+
     # Path to store the pre-trained encoder model
     encoder_model_name = encoder_settings["model_name"]
     encoder_model_filepath = os.path.join(output_dir, results_dir, sub_dir, encoder_model_name + "_itr{itr}.pth")
@@ -59,6 +68,15 @@ def execute(config):
 
     for iter in range(n_iters):
         print(f"Iteration {iter}")
+        # Initialize Weights & Biases for each run
+        wandb_config["hidden_dim"] = encoder_settings["hidden_dim"]
+        wandb_config["depth"] = encoder_settings["depth"]
+        wandb.init(project="zoonosis-host-prediction",
+                   config=wandb_config,
+                   group=training_settings["experiment"],
+                   job_type=encoder_model_name,
+                   name=f"iter_{iter}")
+
         # 1. Read the data files
         df = dataset_utils.read_dataset(input_dir, input_file_names,
                                 cols=[id_col, sequence_col])
@@ -84,8 +102,9 @@ def execute(config):
 
         mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
                         training_settings, encoder_model_name, pad_token_val,
-                        mlm_checkpoint_filepath.format_map(itr=iter)) # format_map method is used to avoid missing KeyError for 'checkpt'
+                        mlm_checkpoint_filepath.replace("{itr}", str(iter)))
         torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
+        wandb.finish()
 
 def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
         training_settings, encoder_model_name, pad_token_val, mlm_checkpoint_filepath):
@@ -151,6 +170,12 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         model.train_iter += 1
         curr_lr = lr_scheduler.get_last_lr()[0]
         train_loss = loss.item()
+        # log training loss
+        wandb.log({
+            "learning-rate": float(curr_lr),
+            "training-loss": float(train_loss)
+        })
+
         tbw.add_scalar(f"{encoder_model_name}/learning-rate", float(curr_lr), model.train_iter)
         tbw.add_scalar(f"{encoder_model_name}/training-loss", float(train_loss), model.train_iter)
         pbar.set_description(
@@ -180,6 +205,12 @@ def evaluate_model(model, dataset_loader, criterion, tbw, encoder_model_name, ep
             model.test_iter += 1
             if log_loss:
                 f1_micro, f1_macro = evaluation_utils.get_f1_score(y_true=label, y_pred=output, select_non_zero=True)
+                # log validation loss
+                wandb.log({
+                    "validation-loss": float(curr_val_loss),
+                    "f1_micro": f1_micro,
+                    "f1_macro": f1_macro
+                })
                 tbw.add_scalar(f"{encoder_model_name}/validation-loss", float(curr_val_loss), model.test_iter)
                 tbw.add_scalar(f"{encoder_model_name}/f1_micro", f1_micro, model.test_iter)
                 tbw.add_scalar(f"{encoder_model_name}/f1_macro", f1_macro, model.test_iter)

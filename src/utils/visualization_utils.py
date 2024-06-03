@@ -3,7 +3,7 @@ import seaborn as sns
 import textwrap
 
 DEFAULT_FIGURE_CONFIG = {
-    "figsize": (9, 7),
+    "figsize": (12, 7),
     "xtick.labelsize": 20,
     "ytick.labelsize": 20
 }
@@ -16,9 +16,9 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None, figure_config=DE
         ax.axhline(baseline, color="gray", linestyle="--")
     ax.set_ylim(0.0, 1)
     ax.set_xlabel("", size=20, labelpad=5)
-    ax.set_ylabel("AUPRC", size=20)
+    ax.set_ylabel(y_col.upper(), size=20)
     # plt.xticks(rotation=45)
-    wrap_xticklabels(ax)
+    wrap_ticklabels(ax, axis="x", break_long_words=True)
     view(output_file_path)
 
 
@@ -31,6 +31,8 @@ def curve_plot(df, x_col, y_col, color_group_col, style_group_col, output_file_p
     ax = sns.lineplot(data=df, x=x_col, y=y_col, hue=color_group_col, style=style_group_col, hue_order=hue_order)
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
+    ax.set_xlabel(x_col.upper(), size=20, labelpad=5)
+    ax.set_ylabel(y_col.upper(), size=20)
     plt.legend(bbox_to_anchor=(1.02, 1), loc="upper left", borderaxespad=0)
     view(output_file_path)
 
@@ -44,6 +46,7 @@ def heat_map(df, output_file_path=None, figure_config=DEFAULT_FIGURE_CONFIG):
 def class_distribution_plot(df, output_file_path, figure_config=DEFAULT_FIGURE_CONFIG):
     pre_plot_config(figure_config)
     ax = sns.barplot(data=df, x="label", y="label_count", hue="group")
+    ax.bar_label(ax.containers[0], fontsize=10)
     plt.xticks(rotation=20)
     view(output_file_path)
 
@@ -96,9 +99,23 @@ def view(output_file_path=None):
         plt.savefig(output_file_path)
 
 
-def wrap_xticklabels(ax, label_width=10, break_long_words=False):
+def wrap_ticklabels(ax, axis, label_width=10, break_long_words=False):
     wrapped_labels = []
-    for label in ax.get_xticklabels():
+    labels=None
+    if axis == "x":
+        labels = ax.get_xticklabels()
+    elif axis == "y":
+        labels = ax.get_yticklabels()
+    else:
+        print(f"ERROR: Invalid axis = {axis}. Supported values = 'x', 'y'.")
+
+    for label in labels:
         label_text = label.get_text()
         wrapped_labels.append(textwrap.fill(text=label_text, width=label_width, break_long_words=break_long_words))
-    ax.set_xticklabels(wrapped_labels, rotation=0)
+
+    if axis == "x":
+        ax.set_xticklabels(wrapped_labels, rotation=0)
+    elif axis == "y":
+        ax.set_yticklabels(wrapped_labels, rotation=0)
+    else:
+        print(f"ERROR: Invalid axis = {axis}. Supported values = 'x', 'y'.")

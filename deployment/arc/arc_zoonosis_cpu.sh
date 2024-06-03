@@ -28,7 +28,7 @@ echo "Project directory: $PROJECT_DIR"
 # Execute python script
 SCRIPT_LOCATION=$PROJECT_DIR/src/zoonosis.py
 CONFIG_FILE=$2
-LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M).log
+LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
 
