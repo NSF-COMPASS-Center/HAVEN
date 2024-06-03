@@ -102,8 +102,9 @@ def execute(config):
 
         mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
                         training_settings, encoder_model_name, pad_token_val,
-                        mlm_checkpoint_filepath.format_map(itr=iter)) # format_map method is used to avoid missing KeyError for 'checkpt'
+                        mlm_checkpoint_filepath.replace("{itr}", str(iter)))
         torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
+        wandb.finish()
 
 def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
         training_settings, encoder_model_name, pad_token_val, mlm_checkpoint_filepath):
@@ -169,6 +170,12 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         model.train_iter += 1
         curr_lr = lr_scheduler.get_last_lr()[0]
         train_loss = loss.item()
+        # log training loss
+        wandb.log({
+            "learning-rate": float(curr_lr),
+            "training-loss": float(train_loss)
+        })
+
         tbw.add_scalar(f"{encoder_model_name}/learning-rate", float(curr_lr), model.train_iter)
         tbw.add_scalar(f"{encoder_model_name}/training-loss", float(train_loss), model.train_iter)
         pbar.set_description(
@@ -198,6 +205,12 @@ def evaluate_model(model, dataset_loader, criterion, tbw, encoder_model_name, ep
             model.test_iter += 1
             if log_loss:
                 f1_micro, f1_macro = evaluation_utils.get_f1_score(y_true=label, y_pred=output, select_non_zero=True)
+                # log validation loss
+                wandb.log({
+                    "validation-loss": float(curr_val_loss),
+                    "f1_micro": f1_micro,
+                    "f1_macro": f1_macro
+                })
                 tbw.add_scalar(f"{encoder_model_name}/validation-loss", float(curr_val_loss), model.test_iter)
                 tbw.add_scalar(f"{encoder_model_name}/f1_micro", f1_micro, model.test_iter)
                 tbw.add_scalar(f"{encoder_model_name}/f1_macro", f1_macro, model.test_iter)

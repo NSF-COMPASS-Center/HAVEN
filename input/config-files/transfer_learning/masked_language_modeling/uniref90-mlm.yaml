@@ -6,11 +6,11 @@ config_sub_type: "masked_language_modeling"
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/uniref90"
+  input_dir: "input/data/uniref90/20240131"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_viridae_20231113_parsed.csv" ]
+  file_names: [ "uniref90_viridae.csv" ]
   # file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
