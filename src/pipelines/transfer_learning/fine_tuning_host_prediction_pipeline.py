@@ -11,7 +11,7 @@ import wandb
 
 from utils import utils, dataset_utils, nn_utils
 from training.early_stopping import EarlyStopping
-from training.fine_tuning import host_prediction
+from training.transfer_learning.fine_tuning import host_prediction
 from models.nlp.transformer import transformer
 
 

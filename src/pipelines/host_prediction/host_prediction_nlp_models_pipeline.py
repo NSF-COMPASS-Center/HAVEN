@@ -9,7 +9,7 @@ import tqdm
 from statistics import mean
 import wandb
 
-from utils import utils, dataset_utils, nn_utils, kmer_utils
+from utils import utils, dataset_utils, nn_utils
 from training.early_stopping import EarlyStopping
 from models.nlp.transformer import transformer
 from models.nlp import cnn1d, rnn, lstm, fnn
@@ -60,7 +60,7 @@ def execute(input_settings, output_settings, classification_settings):
         test_dataset_loader = None
         # 3. Split dataset
         if classification_settings["split_input"]:
-
+            input_split_seeds = input_settings["split_seeds"]
             # full df into training and testing datasets in the ratio configured in the config file
             train_df, test_df = dataset_utils.split_dataset_stratified(df, input_settings["split_seeds"][iter],
                                                                        classification_settings["train_proportion"],
