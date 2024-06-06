@@ -4,6 +4,7 @@ import argparse
 from pipelines.host_prediction import host_prediction_pipeline
 from pipelines.transfer_learning import masked_language_modeling_pipleine, fine_tuning_host_prediction_pipeline
 from pipelines.interpretability import host_prediction_perturbation_analysis_prediction
+from pipelines.few_shot_learning import few_shot_learning_host_prediction
 from evaluation import evaluation
 from models.baseline import feature_importance
 from utils import utils
@@ -33,6 +34,8 @@ def main():
         else:
             print(f"ERROR: Unsupported config_sub_type '{config_sub_type}' for config_type '{config_type}'.\nSupported values=masked_langage_modeling",
                   "host_prediction")
+    elif config_type == "few-shot-learning":
+        few_shot_learning_host_prediction.execute(config)
     # classification: host-prediction
     elif config_type == "host_prediction":
         host_prediction_pipeline.execute(config)

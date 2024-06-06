@@ -62,7 +62,7 @@ def execute(input_settings, output_settings, classification_settings):
         if classification_settings["split_input"]:
             input_split_seeds = input_settings["split_seeds"]
             # full df into training and testing datasets in the ratio configured in the config file
-            train_df, test_df = dataset_utils.split_dataset_stratified(df, input_settings["split_seeds"][iter],
+            train_df, test_df = dataset_utils.split_dataset_stratified(df, input_split_seeds[iter],
                                                                        classification_settings["train_proportion"],
                                                                    stratify_col=label_col)
             # split testing set into validation and testing datasets in equal proportion

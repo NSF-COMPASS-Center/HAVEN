@@ -1,4 +1,4 @@
-from models.nlp.embedding.padding import Padding
+from datasets.collations.padding import Padding
 
 
 class PaddingWithID(Padding):

@@ -1,0 +1,94 @@
+config_type: "few_shot_learning" # options: data_preprocessor, host_prediction, evaluation, transfer_learning, few_shot_learning
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "input/data/uniref90/20240131/idv_non_idv_common_hosts"
+
+  # Name of file(s) in subdirectory to be read and processed.
+  # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
+  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_idv_common_hosts_w_seq_non_idv_t0.005_c4.csv" ]
+  # seeds to split the files into training and testing
+  # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
+  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
+
+sequence_settings:
+    batch_size: 64
+    id_col: "uniref90_id"
+    sequence_col: "seq"
+    max_sequence_length: 1366 # 6630 # 1024 # 1115
+    truncate: True
+    pad_token_val: 0
+    feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
+
+label_settings:
+    label_col: "virus_host_name"
+    exclude_labels: [ "nan" ]
+    label_groupings:
+      "Human": [ "Homo sapiens" ]
+      "Rhesus macaque": [ "Macaca mulatta" ]
+      "Cat": [ "Felis catus" ]
+      "Cattle": [ "Bos taurus" ]
+
+
+few_shot_learn_settings:
+  experiment: "few_shot_learning"
+  n_iterations: 5
+  n_epochs: 10
+  split_inputs: True
+  train_proportion: 0.7
+  val_proportion: 0.1
+  test_proportion: 0.2
+  classification_type: "multi"
+  save_model: True
+
+  meta_train_settings:
+    n_way: 20
+    n_shot: 30
+    n_query: 5
+    max_lr: 1e-4
+    pct_start: 0.10
+    div_factor: 25.0
+    final_div_factor: 10000.0
+
+  meta_validate_settings:
+    n_way: 20
+    n_shot: 30
+    n_query: 5
+    max_lr: 1e-4
+    pct_start: 0.10
+    div_factor: 25.0
+    final_div_factor: 10000.0
+
+  meta_test_settings:
+    n_way: 20
+    n_shot: 30
+    n_query: 5
+    max_lr: 1e-4
+    pct_start: 0.10
+    div_factor: 25.0
+    final_div_factor: 10000.0
+
+pre_trained_models:
+  - name: "transformer_encoder-l_6-h_8-lr1e-4-mlm_fnn_2l_d1024_lr1e-4"
+    active: True
+    path: "output/raw/uniref90/20231115/pre_training/mlm/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0.pth"
+    model_settings:
+      n_heads: 8
+      depth: 6
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+      n_tokens: 26
+    loss: "FocalLoss"
+    depth: 2
+    n_classes: 4
+    input_dim: 512 # input embedding dimension
+    hidden_dim: 1024
+
+output_settings:
+  output_dir: "output"
+  results_dir: "raw"
+  sub_dir: "uniref90_embl_vertebrates_idv_common_hosts_non_idv_t0.005_c4/20240528/host_multi/fine_tuning"
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

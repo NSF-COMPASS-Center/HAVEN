@@ -1,12 +1,15 @@
+import math
+import random
+
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 
 import pandas as pd
 import os
 
-from utils import utils, nn_utils, kmer_utils
-from models.nlp.embedding.padding import Padding, PaddingUnlabeled
-from models.nlp.embedding.padding_with_id import PaddingWithID
+from utils import utils, kmer_utils
+from datasets.collations.padding import Padding, PaddingUnlabeled
+from datasets.collations.padding_with_id import PaddingWithID
 from datasets.protein_sequence_dataset import ProteinSequenceDataset
 from datasets.protein_sequence_unlabeled_dataset import ProteinSequenceUnlabeledDataset
 from datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWithID
@@ -40,6 +43,35 @@ def split_dataset_stratified(df, seed, train_proportion, stratify_col=None):
     print(f"Size of train_dataset = {train_df.shape}")
     print(f"Size of test_dataset = {test_df.shape}")
     return train_df, test_df
+
+
+def split_dataset_for_few_shot_learning(df, label_col, train_proportion=0.7, val_proportion=0.1, test_proportion=0.2, seed=0):
+    print(f"Splitting dataset based on '{label_col}' with seed={seed}, train_proportion={train_proportion}, val_proportion={val_proportion}, and test_proportion={test_proportion}")
+    labels = set(df[label_col].unique())
+    n_labels = len(labels)
+    n_train_labels = int(math.floor(n_labels * train_proportion))
+    n_val_labels = int(math.floor(n_labels * val_proportion))
+    n_test_labels = int(math.floor(n_test * val_proportion))
+
+    print(f"# unique labels = {n_labels},\n# train labels = {n_train_labels}\n# val labels = {n_val_labels}\n#test labels = {n_test_labels}")
+    random.seed(seed)
+    train_labels = set(random.sample(labels, n_train_labels))
+
+    labels = labels - train_labels
+    val_labels = set(random.sample(labels, n_val_labels))
+
+    labels = labels - val_labels
+    test_labels = set(random.sample(labels, n_test_labels))
+
+    train_df = df[df[label_col].isin(list(train_labels))]
+    val_df = df[df[label_col].isin(list(val_labels))]
+    test_df = df[df[label_col].isin(list(test_labels))]
+
+    print(f"Training: # samples = {train_df.shape[0]}, # labels = {len(train_labels)}")
+    print(f"Validation: # samples = {val_df.shape[0]}, # labels = {len(val_labels)}")
+    print(f"Testing: # samples = {test_df.shape[0]}, # labels = {len(test_labels)}")
+
+    return train_df, val_df, test_df
 
 
 def load_dataset(input_dir, input_file_names, sequence_settings, cols, label_settings, label_col, classification_type):
