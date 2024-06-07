@@ -1,6 +1,8 @@
 from utils import nn_utils
 import torch
 from sklearn.model_selection import train_test_split
+
+
 class FewShotLearningEpisode:
     """
     Collate function for N-Way-K-Shot Few Shot Learning dataloaders.
@@ -20,6 +22,15 @@ class FewShotLearningEpisode:
 
     def __call__(self, batch):
         sequences, labels = zip(*batch)
+        support_sequences = []
+        support_labels = []
+        query_sequences = []
+        query_labels = []
+
+        unique_labels = labels.unique(sorted=True)
+
+        # TODO: fix this - incorrect login
+        # we need N-way-K-shot split for support and query
         support_sequences, support_labels, query_sequences, query_labels = train_test_split(sequences, labels,
                                                                                            train_size=n_way*n_shot,
                                                                                            test_size=n_way*n_query,

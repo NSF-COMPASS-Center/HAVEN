@@ -15,6 +15,8 @@ from datasets.protein_sequence_unlabeled_dataset import ProteinSequenceUnlabeled
 from datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWithID
 from datasets.protein_sequence_kmer_dataset import ProteinSequenceKmerDataset
 from datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
+from datasets.collations.fsl_episode import FewShotLearningEpisode
+from datasets.samplers.fsl_task_sampler import FewShotLearningTaskSampler
 
 
 # read datasets using config properties
@@ -46,14 +48,20 @@ def split_dataset_stratified(df, seed, train_proportion, stratify_col=None):
 
 
 def split_dataset_for_few_shot_learning(df, label_col, train_proportion=0.7, val_proportion=0.1, test_proportion=0.2, seed=0):
-    print(f"Splitting dataset based on '{label_col}' with seed={seed}, train_proportion={train_proportion}, val_proportion={val_proportion}, and test_proportion={test_proportion}")
+    print(f"Splitting dataset based on '{label_col}' with seed={seed}, "
+          f"train_proportion={train_proportion}, "
+          f"val_proportion={val_proportion}, "
+          f"and test_proportion={test_proportion}")
     labels = set(df[label_col].unique())
     n_labels = len(labels)
     n_train_labels = int(math.floor(n_labels * train_proportion))
     n_val_labels = int(math.floor(n_labels * val_proportion))
     n_test_labels = int(math.floor(n_test * val_proportion))
 
-    print(f"# unique labels = {n_labels},\n# train labels = {n_train_labels}\n# val labels = {n_val_labels}\n#test labels = {n_test_labels}")
+    print(f"# unique labels = {n_labels},"
+          f"\n# train labels = {n_train_labels}\n"
+          f"# val labels = {n_val_labels}\n"
+          f"#test labels = {n_test_labels}")
     random.seed(seed)
     train_labels = set(random.sample(labels, n_train_labels))
 
@@ -85,7 +93,8 @@ def load_dataset_with_df(df, sequence_settings, label_settings, label_col, class
     return index_label_map, dataset_loader
 
 
-def load_kmer_dataset(input_dir, input_file_names, seed, train_proportion, id_col, seq_col, label_col, label_settings, classification_type, k, kmer_keys=None):
+def load_kmer_dataset(input_dir, input_file_names, seed, train_proportion,
+                      id_col, seq_col, label_col, label_settings, classification_type, k, kmer_keys=None):
     split_col = "split"
     df = read_dataset(input_dir, input_file_names,
                             cols=[id_col, seq_col, label_col])
@@ -163,10 +172,35 @@ def get_kmer_dataset_loader(df, sequence_settings, label_col):
     return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
 
 
-def get_cgr_dataset_loader(df, sequence_settings, label_col):
+def get_cgr_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings):
     dataset = ProteinSequenceCGRDataset(df,
                                         id_col=sequence_settings["id_col"],
                                         label_col=label_col,
                                         img_dir=sequence_settings["cgr_settings"]["img_dir"],
                                         img_size=sequence_settings["cgr_settings"]["img_size"])
     return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
+
+
+def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings):
+    n_way = few_shot_learn_settings["n_way"]
+    n_shot = few_shot_learn_settings["n_shot"]
+    n_query = few_shot_learn_settings["n_query"]
+
+    dataset = ProteinSequenceDataset(df=df,
+                                     seq_col=sequence_settings["seq_col"],
+                                     max_seq_len=sequence_settings["max_sequence_length"],
+                                     truncate=sequence_settings["truncate"],
+                                     label_col=label_col)
+
+    fsl_episode = FewShotLearningEpisode(n_way=n_way,
+                                         n_shot=n_shot,
+                                         n_query=n_query)
+
+    task_sampler = FewShotLearningTaskSampler(dataset=df,
+                                              n_way=n_way,
+                                              n_shot=n_shot,
+                                              n_query=n_query,
+                                              n_task=few_shot_learn_settings["n_task"])
+    return DataLoader(dataset=dataset,
+                      sampler=task_sampler,
+                      collate_fn=fsl_episode)

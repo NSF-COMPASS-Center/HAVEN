@@ -36,40 +36,36 @@ label_settings:
 few_shot_learn_settings:
   experiment: "few_shot_learning"
   n_iterations: 5
-  n_epochs: 10
   split_inputs: True
   train_proportion: 0.7
   val_proportion: 0.1
   test_proportion: 0.2
   classification_type: "multi"
   save_model: True
+  n_epochs: 10
+  n_tasks:
+  max_lr: 1e-4
+  pct_start: 0.10
+  div_factor: 25.0
+  final_div_factor: 10000.0
 
   meta_train_settings:
     n_way: 20
     n_shot: 30
     n_query: 5
+    n_tasks:
     max_lr: 1e-4
-    pct_start: 0.10
-    div_factor: 25.0
-    final_div_factor: 10000.0
 
   meta_validate_settings:
     n_way: 20
     n_shot: 30
     n_query: 5
-    max_lr: 1e-4
-    pct_start: 0.10
-    div_factor: 25.0
-    final_div_factor: 10000.0
 
   meta_test_settings:
     n_way: 20
     n_shot: 30
     n_query: 5
-    max_lr: 1e-4
-    pct_start: 0.10
-    div_factor: 25.0
-    final_div_factor: 10000.0
+
 
 pre_trained_models:
   - name: "transformer_encoder-l_6-h_8-lr1e-4-mlm_fnn_2l_d1024_lr1e-4"

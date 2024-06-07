@@ -10,6 +10,7 @@ from statistics import mean
 import wandb
 
 from utils import utils, dataset_utils, nn_utils
+from training.few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
 
 def execute(config):
@@ -37,12 +38,13 @@ def execute(config):
 
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
+    max_sequence_length = sequence_settings["max_sequence_length"]
     label_col = label_settings["label_col"]
 
     wandb_config = {
         "n_epochs": few_shot_learn_settings["n_epochs"],
         "lr": few_shot_learn_settings["max_lr"],
-        "max_sequence_length": sequence_settings["max_sequence_length"],
+        "max_sequence_length": max_sequence_length,
         "dataset": input_file_names[0]
     }
 
@@ -54,8 +56,8 @@ def execute(config):
                                         cols=[id_col, sequence_col, label_col])
 
         # 2. Transform labels
-        df, index_label_map = utils.transform_labels(df, label_settings,
-                                                     classification_type=classification_settings["type"])
+        # df, index_label_map = utils.transform_labels(df, label_settings,
+        #                                              classification_type=classification_settings["type"])
 
         train_dataset_loader = None
         val_dataset_loader = None
@@ -69,5 +71,187 @@ def execute(config):
                                                                                           val_proportion=few_shot_learn_settings["val_proportion"],
                                                                                           test_proportion=few_shot_learn_settings["test_proportion"],
                                                                                           seed=input_split_seeds[iter])
+
+            train_dataset_loader = dataset_utils.get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings["meta_train_settings"])
+            val_dataset_loader = dataset_utils.get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings["meta_validate_settings"])
+            test_dataset_loader = dataset_utils.get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings["meta_test_settings"])
+
+        pre_trained_model = None
         pre_trained_models = config["pre_trained_models"]
 
+        # model store filepath
+        model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
+        Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
+
+        for pre_trained_model in pre_trained_models:
+            model_name = pre_trained_model["name"]
+            # Set necessary values within model_settings object for cleaner code and to avoid passing multiple arguments.
+            pre_trained_model["model_settings"]["max_seq_len"] = max_sequence_length
+
+            if model["active"] is False:
+                print(f"Skipping {model_name} ...")
+                continue
+
+            if model_name not in results:
+                # first iteration
+                results[model_name] = []
+
+            if "fnn" in model_name:
+                print(f"Executing FNN")
+                nlp_model = fnn.get_fnn_model(model)
+
+            elif "cnn" in model_name:
+                print(f"Executing CNN")
+                nlp_model = cnn1d.get_cnn_model(model)
+
+            elif "rnn" in model_name:
+                print(f"Executing RNN")
+                nlp_model = rnn.get_rnn_model(model)
+
+            elif "lstm" in model_name:
+                print(f"Executing LSTM")
+                nlp_model = lstm.get_lstm_model(model)
+
+            elif "transformer" in model_name:
+                print(f"Executing Transformer")
+                nlp_model = transformer.get_transformer_encoder_classifier(model)
+
+            else:
+                print(f"ERROR: Unrecognized model '{model_name}'.")
+                continue
+
+            # Initialize Weights & Biases for each run
+            wandb.init(project="zoonosis-host-prediction",
+                       config=wandb_config,
+                       group=few_shot_learn_settings["experiment"],
+                       job_type=model_name,
+                       name=f"iter_{iter}")
+
+            few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=pre_trained_model)
+            run_few_shot_learning(few_shot_classifier, train_dataset_loader, val_dataset_loader, few_shot_learning_settings,
+                                  meta_train_settings, meta_validate_settings, model_name)
+
+            #  Create the result dataframe and remap the class indices to original input labels
+            result_df.rename(columns=index_label_map, inplace=True)
+            result_df["y_true"] = result_df["y_true"].map(index_label_map)
+            result_df["itr"] = iter
+            results[model_name].append(result_df)
+
+            if few_shot_learn_settings["save_model"]:
+                # save the trained model
+                model_filepath = model_store_filepath.format(model_name=model_name, itr=iter)
+                torch.save(nlp_model.state_dict(), model_filepath)
+                print(f"Model output written to {model_filepath}")
+
+            wandb.finish()
+
+            # write the raw results in csv files
+            output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
+            utils.write_output(results, output_results_dir, output_prefix, "output")
+
+
+def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, few_shot_learning_settings, meta_train_settings, meta_validate_settings, model_name):
+    tbw = SummaryWriter()
+    n_epochs = few_shot_learning_settings["n_epochs"]
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=few_shot_learning_settings["max_lr"], weight_decay=1e-4)
+    lr_scheduler = OneCycleLR(
+        optimizer=optimizer,
+        max_lr=float(few_shot_learning_settings["max_lr"]),
+        epochs=n_epochs,
+        steps_per_epoch=len(train_dataset_loader),
+        pct_start=few_shot_learning_settings["pct_start"],
+        anneal_strategy='cos',
+        div_factor=few_shot_learning_settings["div_factor"],
+        final_div_factor=few_shot_learning_settings["final_div_factor"])
+    model.train_iter = 0
+    model.val_iter = 0
+
+    # meta training with validation
+    for e in range(n_epochs):
+        # training
+        model = meta_train_model(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+                          lr_scheduler, early_stopper, tbw, model_name, e)
+        # validation
+        meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, epoch)
+
+    # meta testing
+    result_df = meta_test_model(model, test_dataset_loader)
+
+    return result_df, model
+
+
+def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw, model_name, epoch):
+    model.train()
+    for _, record in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
+        support_images, support_labels, query_images, query_labels = record
+
+        optimizer.zero_grad()
+
+        output = model(input)
+        output = output.to(nn_utils.get_device())
+
+        loss = criterion(output, label.long())
+        loss.backward()
+
+        optimizer.step()
+        lr_scheduler.step()
+
+        model.train_iter += 1
+        curr_lr = lr_scheduler.get_last_lr()[0]
+        train_loss = loss.item()
+        wandb.log({
+            "learning-rate": float(curr_lr),
+            "training-loss": float(train_loss)
+        })
+        tbw.add_scalar(f"{model_name}/learning-rate", float(curr_lr), model.train_iter)
+        tbw.add_scalar(f"{model_name}/training-loss", float(train_loss), model.train_iter)
+        pbar.set_description(
+            f"{model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
+    return model
+
+
+def meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, epoch):
+    with torch.no_grad():
+        model.eval()
+
+        val_loss = []
+        for _, record in enumerate(pbar := tqdm.tqdm(val_dataset_loader)):
+            support_images, support_labels, query_images, query_labels = record
+
+            output = model(input)  # b x n_classes
+            output = output.to(nn_utils.get_device())
+
+            loss = criterion(output, label.long())
+            curr_val_loss = loss.item()
+            model.val_iter += 1
+
+            # log validation loss
+            wandb.log({
+                "validation-loss": float(curr_val_loss)
+            })
+            tbw.add_scalar(f"{model_name}/validation-loss", float(curr_val_loss), model.val_iter)
+            pbar.set_description(
+                f"{model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.val_iter}, epoch={epoch + 1}")
+            val_loss.append(curr_val_loss)
+
+    return
+
+
+def meta_test_model(model, test_dataset_loader):
+    with torch.no_grad():
+        model.eval()
+
+        results = []
+        for _, record in enumerate(pbar := tqdm.tqdm(test_dataset_loader)):
+            support_images, support_labels, query_images, query_labels = record
+
+            output = model(input)  # b x n_classes
+            output = output.to(nn_utils.get_device())
+
+            # to get probabilities of the output
+            output = F.softmax(output, dim=-1)
+            result_df = pd.DataFrame(output.cpu().numpy())
+            result_df["y_true"] = label.cpu().numpy()
+            results.append(result_df)
+    return pd.concat(results, ignore_index=True)
