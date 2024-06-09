@@ -1,4 +1,4 @@
-from utils import nn_utils
+from utils import utils
 import torch
 from sklearn.model_selection import train_test_split
 
@@ -28,8 +28,13 @@ class FewShotLearningEpisode:
         query_labels = []
 
         unique_labels = labels.unique(sorted=True)
+        label_idx_map, idx_label_map = utils.get_label_vocabulary(unique_labels)
 
-        # TODO: fix this - incorrect login
+        # convert the labels to integers
+        for key, val in label_idx_map.items():
+            labels = torch.where(labels == val, key, labels)
+
+        # TODO: fix this - incorrect logic
         # we need N-way-K-shot split for support and query
         support_sequences, support_labels, query_sequences, query_labels = train_test_split(sequences, labels,
                                                                                            train_size=n_way*n_shot,

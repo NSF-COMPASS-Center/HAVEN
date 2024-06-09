@@ -10,7 +10,6 @@ input_settings:
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5.csv" ]
-  # file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -26,7 +25,7 @@ classification_settings:
   save_model: True
 
   sequence_settings:
-    batch_size: 32
+    batch_size: 16
     id_col: "uniref90_id"
     sequence_col: "seq"
     max_sequence_length: 2048 #3011 #1036 #624 # 6630 # 1024 # 1115 # 1366
@@ -57,13 +56,13 @@ classification_settings:
 #      "Big brown bat": [ "Eptesicus fuscus" ]
   training_settings:
     n_epochs: 50
-    max_lr: 1e-3
+    max_lr: 1e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
   models:
     - name: "fnn-l_10-d_1024-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
@@ -74,7 +73,7 @@ classification_settings:
       manual_seed:  # whole number
 
     - name: "cnn-l_4-d_1024-k3s1-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 4
@@ -98,7 +97,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2-d_1024-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
@@ -109,7 +108,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8-d_1024-lr1e-4"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
