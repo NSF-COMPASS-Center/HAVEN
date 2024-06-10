@@ -25,7 +25,7 @@ class CNN_1D_Model(nn.Module):
         self.conv1d_hidden_layers = nn_utils.create_clones(self.conv1d_hidden, N-1)
         self.linear = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, X):
+    def get_embedding(self, X):
         X = self.embedding(X)  # b x n x d
         X = torch.einsum("bnd->bdn", X)  # b x d x n (conv1d requires number of channels as the second dimension)
         X = self.conv1d(X)
@@ -40,8 +40,11 @@ class CNN_1D_Model(nn.Module):
 
         # aggregate the embeddings from cnn
         # mean of the representations of all tokens
-        self.cnn_emb = X.mean(dim=1)
-        y = self.linear(self.cnn_emb)
+        return X.mean(dim=1)
+
+    def forward(self, X):
+        self.input_embedding = self.get_embedding(X)
+        y = self.linear(self.input_embedding)
         return y
 
 

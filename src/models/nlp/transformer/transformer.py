@@ -62,15 +62,16 @@ class TransformerEncoderClassifier(nn.Module):
         # last linear layer: input_dim--> n_classes
         self.linear_output = nn.Linear(input_dim, n_classes)
 
-    def forward(self, X, mask=None):
+
+    def get_embedding(self, X, mask=None):
         X = self.embedding(X)
         X = self.encoder(X, mask)
 
         # pool the model embeddings of all tokens in the input sequence using mean
-        X = X.mean(dim=1)
+        return X.mean(dim=1)
 
-        # embedding to be used for interpretability
-        self.tf_enc_embedding = X
+    def forward(self, X, mask=None):
+        self.input_embedding = self.get_embedding(X, mask)
 
         y = self.linear_output(X)
         return y

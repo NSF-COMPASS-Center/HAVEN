@@ -1,4 +1,5 @@
 import random
+from typing import Iterator, List
 
 import torch
 from torch.utils.data import Sampler
@@ -29,24 +30,29 @@ class FewShotLearningTaskSampler(Sampler):
         self.n_shot = n_shot
         self.n_query = n_query
         self.n_task = n_task
-        self.label_index_map: {} # label: [list of indices of samples of  the label in the dataset]
-        self.initialize_label_index_map()
+        self.label_item_index_map = {} # label: [list of indices of samples of  the label in the dataset]
+        self.initialize_label_item_index_map()
 
 
-    def initialize_label_index_map(self):
+    def initialize_label_item_index_map(self):
         for index, label in enumerate(self.dataset.get_labels()):
-            if label in self.label_index_map:
-                # if the label is already there in the map, add item (index) to the list of indices
-                self.label_index_map.append(index)
+            if label in self.label_item_index_map:
+                # if the label is already there in the map, add item (index) to the label's list of indices
+                self.label_item_index_map[label].append(index)
             else:
                 # label is not present in the map, i.e., new label encountered
                 # initialize a list containing the item (index)
-                self.label_index_map[label] = [index]
+                self.label_item_index_map[label] = [index]
+
+        # remove labels without atleast n_shot + n_query samples
+        self.label_item_index_map = dict(
+            filter(lambda x: len(x[1]) >= self.n_shot + self.n_query, self.label_item_index_map.items())  # x is a tuple key, val from self.label_item_index_map.items()
+        )
 
     def __len__(self):
-        return self.n_tasks
+        return self.n_task
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[List[int]]:
         """
         For each task:
             1. Sample n_way labels uniformly at random from the set of labels
@@ -58,8 +64,8 @@ class FewShotLearningTaskSampler(Sampler):
         for _ in range(self.n_task):
             sequence_indices = []
             # for each batch, randomly sample n_way labels
-            labels = random.sample(self.label_index_map.keys(), self.n_way)
+            labels = random.sample(self.label_item_index_map.keys(), self.n_way)
             for label in labels:
                 # for each label, randomly sample n_shot + n_query sequences
-                sequence_indices.append(torch.tensor(random.sample(self.label_index_map[label], self.n_shot + self.n_query)))
+                sequence_indices.append(torch.tensor(random.sample(self.label_item_index_map[label], self.n_shot + self.n_query)))
             yield torch.cat(sequence_indices).tolist()

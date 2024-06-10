@@ -3,12 +3,14 @@ import pandas as pd
 from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.tensorboard import SummaryWriter
-import torch.nn.functional as F
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
 import tqdm
-from statistics import mean
 import wandb
 
+from models.nlp.transformer import transformer
+from models.nlp import cnn1d, rnn, lstm, fnn
 from utils import utils, dataset_utils, nn_utils
 from training.few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
@@ -35,6 +37,7 @@ def execute(config):
     meta_validate_settings = few_shot_learn_settings["meta_validate_settings"]
     meta_test_settings = few_shot_learn_settings["meta_test_settings"]
     n_iters = few_shot_learn_settings["n_iterations"]
+    n_task = few_shot_learn_settings["n_task"]
 
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
@@ -64,7 +67,7 @@ def execute(config):
         test_dataset_loader = None
 
         # 3. Split dataset
-        if classification_settings["split_input"]:
+        if few_shot_learn_settings["split_input"]:
             input_split_seeds = input_settings["split_seeds"]
             train_df, val_df, test_df = dataset_utils.split_dataset_for_few_shot_learning(df, label_col=label_col,
                                                                                           train_proportion=few_shot_learn_settings["train_proportion"],
@@ -72,9 +75,9 @@ def execute(config):
                                                                                           test_proportion=few_shot_learn_settings["test_proportion"],
                                                                                           seed=input_split_seeds[iter])
 
-            train_dataset_loader = dataset_utils.get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings["meta_train_settings"])
-            val_dataset_loader = dataset_utils.get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings["meta_validate_settings"])
-            test_dataset_loader = dataset_utils.get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings["meta_test_settings"])
+            train_dataset_loader = dataset_utils.get_episodic_dataset_loader(train_df, sequence_settings, label_col, meta_train_settings, n_task)
+            val_dataset_loader = dataset_utils.get_episodic_dataset_loader(val_df, sequence_settings, label_col, meta_validate_settings, n_task)
+            test_dataset_loader = dataset_utils.get_episodic_dataset_loader(test_df, sequence_settings, label_col, meta_test_settings, n_task)
 
         pre_trained_model = None
         pre_trained_models = config["pre_trained_models"]
@@ -83,10 +86,11 @@ def execute(config):
         model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
         Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
 
-        for pre_trained_model in pre_trained_models:
-            model_name = pre_trained_model["name"]
+        for model in pre_trained_models:
+            model_name = model["name"]
             # Set necessary values within model_settings object for cleaner code and to avoid passing multiple arguments.
-            pre_trained_model["model_settings"]["max_seq_len"] = max_sequence_length
+            model_settings = model["model_settings"]
+            model_settings["max_seq_len"] = max_sequence_length
 
             if model["active"] is False:
                 print(f"Skipping {model_name} ...")
@@ -98,23 +102,23 @@ def execute(config):
 
             if "fnn" in model_name:
                 print(f"Executing FNN")
-                nlp_model = fnn.get_fnn_model(model)
+                pre_trained_model = fnn.get_fnn_model(model_settings)
 
             elif "cnn" in model_name:
                 print(f"Executing CNN")
-                nlp_model = cnn1d.get_cnn_model(model)
+                pre_trained_model = cnn1d.get_cnn_model(model_settings)
 
             elif "rnn" in model_name:
                 print(f"Executing RNN")
-                nlp_model = rnn.get_rnn_model(model)
+                pre_trained_model = rnn.get_rnn_model(model_settings)
 
             elif "lstm" in model_name:
                 print(f"Executing LSTM")
-                nlp_model = lstm.get_lstm_model(model)
+                pre_trained_model = lstm.get_lstm_model(model_settings)
 
             elif "transformer" in model_name:
                 print(f"Executing Transformer")
-                nlp_model = transformer.get_transformer_encoder_classifier(model)
+                pre_trained_model = transformer.get_transformer_encoder_classifier(model_settings)
 
             else:
                 print(f"ERROR: Unrecognized model '{model_name}'.")
@@ -128,19 +132,17 @@ def execute(config):
                        name=f"iter_{iter}")
 
             few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=pre_trained_model)
-            run_few_shot_learning(few_shot_classifier, train_dataset_loader, val_dataset_loader, few_shot_learning_settings,
+            result_df, few_shot_classifier = run_few_shot_learning(few_shot_classifier, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learn_settings,
                                   meta_train_settings, meta_validate_settings, model_name)
 
-            #  Create the result dataframe and remap the class indices to original input labels
-            result_df.rename(columns=index_label_map, inplace=True)
-            result_df["y_true"] = result_df["y_true"].map(index_label_map)
+
             result_df["itr"] = iter
             results[model_name].append(result_df)
 
             if few_shot_learn_settings["save_model"]:
                 # save the trained model
                 model_filepath = model_store_filepath.format(model_name=model_name, itr=iter)
-                torch.save(nlp_model.state_dict(), model_filepath)
+                torch.save(few_shot_classifier.state_dict(), model_filepath)
                 print(f"Model output written to {model_filepath}")
 
             wandb.finish()
@@ -150,11 +152,11 @@ def execute(config):
             utils.write_output(results, output_results_dir, output_prefix, "output")
 
 
-def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, few_shot_learning_settings, meta_train_settings, meta_validate_settings, model_name):
+def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learning_settings, meta_train_settings, meta_validate_settings, model_name):
     tbw = SummaryWriter()
     n_epochs = few_shot_learning_settings["n_epochs"]
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=few_shot_learning_settings["max_lr"], weight_decay=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=float(few_shot_learning_settings["max_lr"]), weight_decay=1e-4)
     lr_scheduler = OneCycleLR(
         optimizer=optimizer,
         max_lr=float(few_shot_learning_settings["max_lr"]),
@@ -170,10 +172,10 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, few_s
     # meta training with validation
     for e in range(n_epochs):
         # training
-        model = meta_train_model(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
-                          lr_scheduler, early_stopper, tbw, model_name, e)
+        model = meta_train_model(model, train_dataset_loader, criterion, optimizer,
+                          lr_scheduler, tbw, model_name, e)
         # validation
-        meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, epoch)
+        meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e)
 
     # meta testing
     result_df = meta_test_model(model, test_dataset_loader)
@@ -181,17 +183,17 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, few_s
     return result_df, model
 
 
-def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw, model_name, epoch):
+def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_scheduler, tbw, model_name, epoch):
     model.train()
     for _, record in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
-        support_images, support_labels, query_images, query_labels = record
+        support_sequences, support_labels, query_sequences, query_labels, _ = record
 
         optimizer.zero_grad()
 
-        output = model(input)
+        output = model(support_sequences, support_labels, query_sequences)
         output = output.to(nn_utils.get_device())
 
-        loss = criterion(output, label.long())
+        loss = criterion(output, query_labels.long())
         loss.backward()
 
         optimizer.step()
@@ -217,12 +219,12 @@ def meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e
 
         val_loss = []
         for _, record in enumerate(pbar := tqdm.tqdm(val_dataset_loader)):
-            support_images, support_labels, query_images, query_labels = record
+            support_sequences, support_labels, query_sequences, query_labels, _ = record
 
-            output = model(input)  # b x n_classes
+            output = model(support_sequences, support_labels, query_sequences)
             output = output.to(nn_utils.get_device())
 
-            loss = criterion(output, label.long())
+            loss = criterion(output, query_labels.long())
             curr_val_loss = loss.item()
             model.val_iter += 1
 
@@ -234,7 +236,6 @@ def meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e
             pbar.set_description(
                 f"{model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.val_iter}, epoch={epoch + 1}")
             val_loss.append(curr_val_loss)
-
     return
 
 
@@ -244,14 +245,20 @@ def meta_test_model(model, test_dataset_loader):
 
         results = []
         for _, record in enumerate(pbar := tqdm.tqdm(test_dataset_loader)):
-            support_images, support_labels, query_images, query_labels = record
+            support_sequences, support_labels, query_sequences, query_labels, idx_label_map = record
 
-            output = model(input)  # b x n_classes
+            output = model(support_sequences, support_labels, query_sequences)
             output = output.to(nn_utils.get_device())
 
             # to get probabilities of the output
             output = F.softmax(output, dim=-1)
             result_df = pd.DataFrame(output.cpu().numpy())
-            result_df["y_true"] = label.cpu().numpy()
+            result_df["y_true"] = query_labels.cpu().numpy()
+
+            # remap the class indices to original input labels
+            result_df.rename(columns=idx_label_map, inplace=True)
+            result_df["y_true"] = result_df["y_true"].map(idx_label_map)
+
             results.append(result_df)
+
     return pd.concat(results, ignore_index=True)

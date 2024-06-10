@@ -34,7 +34,7 @@ def main():
         else:
             print(f"ERROR: Unsupported config_sub_type '{config_sub_type}' for config_type '{config_type}'.\nSupported values=masked_langage_modeling",
                   "host_prediction")
-    elif config_type == "few-shot-learning":
+    elif config_type == "few_shot_learning":
         few_shot_learning_host_prediction.execute(config)
     # classification: host-prediction
     elif config_type == "host_prediction":
@@ -51,7 +51,7 @@ def main():
     elif config_type == "feature_importance":
         feature_importance.execute(config)
     else:
-        print("ERROR: Unsupported configuration for config_type. Supported values=transfer_learning, host_prediction, evaluation, host_prediction_perturbation")
+        print("ERROR: Unsupported configuration for config_type. Supported values=transfer_learning, host_prediction, evaluation, host_prediction_perturbation, few_shot_learning")
     return
 
 
