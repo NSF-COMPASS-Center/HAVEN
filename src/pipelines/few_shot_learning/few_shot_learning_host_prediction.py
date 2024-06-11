@@ -11,7 +11,7 @@ import wandb
 
 from models.nlp.transformer import transformer
 from models.nlp import cnn1d, rnn, lstm, fnn
-from utils import utils, dataset_utils, nn_utils
+from utils import utils, dataset_utils, nn_utils, evaluation_utils
 from training.few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
 
@@ -52,6 +52,7 @@ def execute(config):
     }
 
     results = {}
+    evaluation_metrics = {}
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
@@ -99,6 +100,7 @@ def execute(config):
             if model_name not in results:
                 # first iteration
                 results[model_name] = []
+                evaluation_metrics[model_name] = []
 
             if "fnn" in model_name:
                 print(f"Executing FNN")
@@ -132,12 +134,14 @@ def execute(config):
                        name=f"iter_{iter}")
 
             few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=pre_trained_model)
-            result_df, few_shot_classifier = run_few_shot_learning(few_shot_classifier, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learn_settings,
+            result_df, auprc_df, few_shot_classifier = run_few_shot_learning(few_shot_classifier, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learn_settings,
                                   meta_train_settings, meta_validate_settings, model_name)
 
 
             result_df["itr"] = iter
+            auprc_df["itr"] = iter
             results[model_name].append(result_df)
+            evaluation_metrics[model_name].append(auprc_df)
 
             if few_shot_learn_settings["save_model"]:
                 # save the trained model
@@ -147,9 +151,10 @@ def execute(config):
 
             wandb.finish()
 
-            # write the raw results in csv files
-            output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
-            utils.write_output(results, output_results_dir, output_prefix, "output")
+    # write the raw results in csv files
+    output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
+    utils.write_output(results, output_results_dir, output_prefix, "output")
+    utils.write_output(evaluation_metrics, output_results_dir, output_prefix, "classwise_auprc")
 
 
 def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learning_settings, meta_train_settings, meta_validate_settings, model_name):
@@ -178,9 +183,9 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
         meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e)
 
     # meta testing
-    result_df = meta_test_model(model, test_dataset_loader)
+    result_df, auprc_df = meta_test_model(model, test_dataset_loader)
 
-    return result_df, model
+    return result_df, auprc_df, model
 
 
 def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_scheduler, tbw, model_name, epoch):
@@ -244,6 +249,7 @@ def meta_test_model(model, test_dataset_loader):
         model.eval()
 
         results = []
+        evaluation_metrics = []
         for _, record in enumerate(pbar := tqdm.tqdm(test_dataset_loader)):
             support_sequences, support_labels, query_sequences, query_labels, idx_label_map = record
 
@@ -258,7 +264,9 @@ def meta_test_model(model, test_dataset_loader):
             # remap the class indices to original input labels
             result_df.rename(columns=idx_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(idx_label_map)
-
             results.append(result_df)
 
-    return pd.concat(results, ignore_index=True)
+            _, auprc_df = evaluation_utils.compute_class_auprc(result_df, y_pred_columns=list(idx_label_map.values()), y_true_col="y_true")
+            evaluation_metrics.append(auprc_df)
+
+    return pd.concat(results, ignore_index=True), pd.concat(evaluation_metrics, ignore_index=True)
