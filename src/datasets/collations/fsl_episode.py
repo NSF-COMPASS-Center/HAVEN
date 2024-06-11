@@ -40,7 +40,7 @@ class FewShotLearningEpisode:
         # convert the labels to integers
         for key, val in label_idx_map.items():
             labels = np.where(labels == key, val, labels)
-        labels = torch.tensor(labels.astype(np.float), device=nn_utils.get_device())
+        labels = torch.tensor(labels.astype(float), device=nn_utils.get_device())
 
         support_sequence = []
         support_labels = []
