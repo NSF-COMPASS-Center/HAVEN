@@ -18,7 +18,7 @@ class HostPrediction(nn.Module):
         # last linear layer: hidden_dim--> n_classes
         self.linear_op = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, X):
+    def get_embedding(self, X):
         X = self.pre_trained_model(X, mask=None)
         # pool the pre_trained_model embeddings of all tokens in the input sequence using mean
         X = X.mean(dim=1)
@@ -27,8 +27,12 @@ class HostPrediction(nn.Module):
         # hidden
         for linear_layer in self.linear_hidden_n:
             X = F.relu(linear_layer(X))
+        return X
+
+    def forward(self, X):
         # embedding to be used for interpretability of the fine-tuned model
-        self.fine_tuned_embedding = X
+        self.fine_tuned_embedding = self.get_embedding(X)
+
         y = self.linear_op(X)
         return y
 

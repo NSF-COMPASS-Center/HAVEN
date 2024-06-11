@@ -27,7 +27,7 @@ sequence_settings:
 
 pre_train_settings:
   model_name: "masked_language_modeling"
-  model_path: "output/raw/uniref90/20240603/pre_training/mlm/checkpoints/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0_checkpt13.pth"
+  model_path: "output/raw/uniref90/20240603/pre_training/mlm/checkpoints/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0_checkpt16.pth"
   encoder_settings:
     model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
     n_heads: 8
@@ -45,8 +45,8 @@ fine_tune_settings:
   save_model: True
 
   training_settings:
-    n_epochs_freeze: 0
-    n_epochs_unfreeze: 50
+    n_epochs_freeze: 20
+    n_epochs_unfreeze: 30
     max_lr: 1e-4
     pct_start: 0.10
     div_factor: 25.0

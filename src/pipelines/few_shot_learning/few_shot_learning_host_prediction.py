@@ -10,6 +10,7 @@ import tqdm
 import wandb
 
 from models.nlp.transformer import transformer
+from training.transfer_learning.fine_tuning import host_prediction
 from models.nlp import cnn1d, rnn, lstm, fnn
 from utils import utils, dataset_utils, nn_utils, evaluation_utils
 from training.few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
@@ -121,6 +122,22 @@ def execute(config):
                 print(f"Executing Transformer")
                 pre_trained_model = transformer.get_transformer_encoder_classifier(model_settings)
 
+            elif "virprobert" in model_name:
+                print(f"Executing VirProBERT (pre-trained and fine tuned model)")
+                # Load the pre-trained Transformer Encoder in the pre-trained (MLM) and fine-tuned (Host prediction) VirProBERT
+                mlm_encoder_settings = model_settings["encoder_settings"]
+                mlm_encoder_settings["n_tokens"] += 2
+                # add max_sequence_length to pre_train_encoder_settings
+                mlm_encoder_settings["max_seq_len"] = max_sequence_length
+                # load pre-trained encoder model
+                mlm_encoder_model = transformer.get_transformer_encoder(mlm_encoder_settings)
+
+                # Set the pre_trained model within the virprobert model config
+                # NOTE: this pre_trained_model is the MLM pre-trained model
+                # this is different from the what we call "pre_trained" in the context of few-shot-learning,
+                # i.e., model pre-trained for Host prediction.
+                model_settings["pre_trained_model"] = mlm_encoder_model
+                pre_trained_model = host_prediction.get_host_prediction_model(model_settings)
             else:
                 print(f"ERROR: Unrecognized model '{model_name}'.")
                 continue
