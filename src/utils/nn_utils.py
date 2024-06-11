@@ -79,7 +79,7 @@ def save_checkpoint(model, optimizer, lr_scheduler, epoch, file_path):
     torch.save(checkpoint, file_path.format(checkpt=epoch))
 
 
-def load_checkpoint(model, file_path):
+def load_model_from_checkpoint(model, file_path):
     checkpoint = torch.load(file_path, map_location=get_device())
     model.load_state_dict(checkpoint["model_state_dict"])
     return model
