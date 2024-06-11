@@ -81,7 +81,14 @@ def save_checkpoint(model, optimizer, lr_scheduler, epoch, file_path):
 
 def load_model_from_checkpoint(model, file_path):
     checkpoint = torch.load(file_path, map_location=get_device())
-    model.load_state_dict(checkpoint["model_state_dict"])
+    model_state_dict = checkpoint["model_state_dict"]
+
+    modified_model_state_dict = {}
+    for k, v in model_state_dict.items():
+        if "encoder_model." in k:
+            k = k.partition("encoder_model.")[-1]
+            modified_model_state_dict[k] = v
+    model.load_state_dict(modified_model_state_dict)
     return model
 
 def load_checkpoint(model, optimizer, lr_scheduler, file_path):
