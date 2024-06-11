@@ -11,6 +11,7 @@ from utils import utils, kmer_utils
 from datasets.collations.padding import Padding, PaddingUnlabeled
 from datasets.collations.padding_with_id import PaddingWithID
 from datasets.protein_sequence_dataset import ProteinSequenceDataset
+from datasets.protein_sequence_with_label_dataset import ProteinSequenceWithLabelDataset
 from datasets.protein_sequence_unlabeled_dataset import ProteinSequenceUnlabeledDataset
 from datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWithID
 from datasets.protein_sequence_kmer_dataset import ProteinSequenceKmerDataset
@@ -56,12 +57,12 @@ def split_dataset_for_few_shot_learning(df, label_col, train_proportion=0.7, val
     n_labels = len(labels)
     n_train_labels = int(math.floor(n_labels * train_proportion))
     n_val_labels = int(math.floor(n_labels * val_proportion))
-    n_test_labels = int(math.floor(n_test * val_proportion))
+    n_test_labels = int(math.floor(n_labels * test_proportion))
 
-    print(f"# unique labels = {n_labels},"
-          f"\n# train labels = {n_train_labels}\n"
+    print(f"# unique labels = {n_labels}\n"
+          f"# train labels = {n_train_labels}\n"
           f"# val labels = {n_val_labels}\n"
-          f"#test labels = {n_test_labels}")
+          f"# test labels = {n_test_labels}")
     random.seed(seed)
     train_labels = set(random.sample(labels, n_train_labels))
 
@@ -172,7 +173,7 @@ def get_kmer_dataset_loader(df, sequence_settings, label_col):
     return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
 
 
-def get_cgr_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings):
+def get_cgr_dataset_loader(df, sequence_settings, label_col):
     dataset = ProteinSequenceCGRDataset(df,
                                         id_col=sequence_settings["id_col"],
                                         label_col=label_col,
@@ -181,26 +182,28 @@ def get_cgr_dataset_loader(df, sequence_settings, label_col, few_shot_learn_sett
     return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
 
 
-def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings):
+def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings, n_task):
     n_way = few_shot_learn_settings["n_way"]
     n_shot = few_shot_learn_settings["n_shot"]
     n_query = few_shot_learn_settings["n_query"]
 
-    dataset = ProteinSequenceDataset(df=df,
-                                     seq_col=sequence_settings["seq_col"],
+    dataset = ProteinSequenceWithLabelDataset(df=df,
+                                     sequence_col=sequence_settings["sequence_col"],
                                      max_seq_len=sequence_settings["max_sequence_length"],
                                      truncate=sequence_settings["truncate"],
                                      label_col=label_col)
 
     fsl_episode = FewShotLearningEpisode(n_way=n_way,
                                          n_shot=n_shot,
-                                         n_query=n_query)
+                                         n_query=n_query,
+                                         max_length=sequence_settings["max_sequence_length"],
+                                         pad_value=sequence_settings["pad_token_val"])
 
-    task_sampler = FewShotLearningTaskSampler(dataset=df,
+    task_sampler = FewShotLearningTaskSampler(dataset=dataset,
                                               n_way=n_way,
                                               n_shot=n_shot,
                                               n_query=n_query,
-                                              n_task=few_shot_learn_settings["n_task"])
+                                              n_task=n_task)
     return DataLoader(dataset=dataset,
-                      sampler=task_sampler,
+                      batch_sampler=task_sampler,
                       collate_fn=fsl_episode)

@@ -25,7 +25,7 @@ classification_settings:
   save_model: True
 
   sequence_settings:
-    batch_size: 16
+    batch_size: 32
     id_col: "uniref90_id"
     sequence_col: "seq"
     max_sequence_length: 2048 #3011 #1036 #624 # 6630 # 1024 # 1115 # 1366

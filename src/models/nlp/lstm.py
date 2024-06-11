@@ -19,7 +19,7 @@ class LSTM_Model(nn.Module):
                          batch_first=True)
         self.linear = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, X):
+    def get_embedding(self, X):
         X = self.embedding(X)
         hidden_input = self.init_zeros(batch_size=X.size(0))
         cell_input = self.init_zeros(batch_size=X.size(0))
@@ -32,8 +32,11 @@ class LSTM_Model(nn.Module):
 
         # aggregate the embeddings from lstm
         # mean of the representations of all tokens
-        self.lstm_emb = output.mean(dim=1)
-        y = self.linear(self.lstm_emb)
+        return output.mean(dim=1)
+
+    def forward(self, X):
+        self.input_embedding = self.get_embedding(X)
+        y = self.linear(self.input_embedding)
         return y
 
     def init_zeros(self, batch_size):
