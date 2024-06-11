@@ -53,7 +53,7 @@ def split_dataset_for_few_shot_learning(df, label_col, train_proportion=0.7, val
           f"train_proportion={train_proportion}, "
           f"val_proportion={val_proportion}, "
           f"and test_proportion={test_proportion}")
-    labels = set(df[label_col].unique())
+    labels = list(df[label_col].unique())
     n_labels = len(labels)
     n_train_labels = int(math.floor(n_labels * train_proportion))
     n_val_labels = int(math.floor(n_labels * val_proportion))
@@ -66,15 +66,17 @@ def split_dataset_for_few_shot_learning(df, label_col, train_proportion=0.7, val
     random.seed(seed)
     train_labels = set(random.sample(labels, n_train_labels))
 
-    labels = labels - train_labels
+    # Random sampling from a set is deprecated since Python 3.9 and will be removed in a subsequent version.
+    # Hack: Convert 'labels' back to list
+    labels = list(set(labels) - train_labels)
     val_labels = set(random.sample(labels, n_val_labels))
 
-    labels = labels - val_labels
-    test_labels = set(random.sample(labels, n_test_labels))
+    labels = list(set(labels) - val_labels)
+    test_labels = random.sample(labels, n_test_labels)
 
     train_df = df[df[label_col].isin(list(train_labels))]
     val_df = df[df[label_col].isin(list(val_labels))]
-    test_df = df[df[label_col].isin(list(test_labels))]
+    test_df = df[df[label_col].isin(test_labels)]
 
     print(f"Training: # samples = {train_df.shape[0]}, # labels = {len(train_labels)}")
     print(f"Validation: # samples = {val_df.shape[0]}, # labels = {len(val_labels)}")
