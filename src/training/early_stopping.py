@@ -15,7 +15,7 @@ class EarlyStopping:
 
     def __call__(self, val_loss):
         if self.current_best_loss - val_loss > self.min_delta:
-            #  validation loss decreased more than the threshold. There is improvement.
+            # validation loss decreased more than the threshold. There is improvement.
             # Reset the current_best_loss to the new val loss
             # Reset the patience_counter
             self.current_best_loss = val_loss

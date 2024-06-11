@@ -6,12 +6,14 @@ from torch.utils.tensorboard import SummaryWriter
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from statistics import mean
 import tqdm
 import wandb
 
 from models.nlp.transformer import transformer
 from training.transfer_learning.fine_tuning import host_prediction
 from models.nlp import cnn1d, rnn, lstm, fnn
+from training.early_stopping import EarlyStopping
 from utils import utils, dataset_utils, nn_utils, evaluation_utils
 from training.few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
@@ -81,6 +83,7 @@ def execute(config):
             test_dataset_loader = dataset_utils.get_episodic_dataset_loader(test_df, sequence_settings, label_col, meta_test_settings)
 
         pre_trained_model = None
+        few_shot_classifier = None
         pre_trained_model_path = None
         pre_trained_models = config["pre_trained_models"]
 
@@ -91,6 +94,10 @@ def execute(config):
         for model in pre_trained_models:
             model_name = model["name"]
             pre_trained_model_path = model["path"]
+            mode = model["mode"]
+            # when mode == 'train', pre_trained_model_path points to a pre-trained host prediction classifier
+            # when mode = 'test', pre_trained_model_path points to a pre-trained few shot classifier
+
             # Set necessary values within model_settings object for cleaner code and to avoid passing multiple arguments.
             model_settings = model["model_settings"]
             model_settings["max_seq_len"] = max_sequence_length
@@ -144,9 +151,6 @@ def execute(config):
                 print(f"ERROR: Unrecognized model '{model_name}'.")
                 continue
 
-            # Load the pre-trained model
-            pre_trained_model.load_state_dict(torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
-
             # Initialize Weights & Biases for each run
             wandb.init(project="zoonosis-host-prediction",
                        config=wandb_config,
@@ -154,10 +158,22 @@ def execute(config):
                        job_type=model_name,
                        name=f"iter_{iter}")
 
-            few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=pre_trained_model)
-            result_df, auprc_df, few_shot_classifier = run_few_shot_learning(few_shot_classifier, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learn_settings,
-                                  meta_train_settings, meta_validate_settings, model_name)
+            if mode == "train":
+                # Load the pre-trained host prediction model
+                pre_trained_model.load_state_dict(torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
+                few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=pre_trained_model)
+                result_df, auprc_df, few_shot_classifier = run_few_shot_learning(few_shot_classifier, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learn_settings,
+                                      meta_train_settings, meta_validate_settings, model_name)
+            elif mode == "test":
+                # mode=test used for cross-domain few-shot evaluation: prediction of hosts in novel virus (hosts may or may not be novel)
+                few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=pre_trained_model)
 
+                # load the pre-trained few-shot classifier
+                few_shot_classifier.load_state_dict(torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
+                result_df, auprc_df, few_shot_classifier = meta_test_model(few_shot_classifier, test_dataset_loader)
+            else:
+                print(f"ERROR: Unsupported mode '{mode}'. Supported values are ['train', 'test'].")
+                exit(1)
 
             result_df["itr"] = iter
             auprc_df["itr"] = iter
@@ -192,6 +208,7 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
         anneal_strategy='cos',
         div_factor=few_shot_learning_settings["div_factor"],
         final_div_factor=few_shot_learning_settings["final_div_factor"])
+    early_stopper = EarlyStopping(patience=10, min_delta=0)
     model.train_iter = 0
     model.val_iter = 0
 
@@ -201,7 +218,12 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
         model = meta_train_model(model, train_dataset_loader, criterion, optimizer,
                           lr_scheduler, tbw, model_name, e)
         # validation
-        meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e)
+        val_loss = meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e)
+        early_stopper(val_loss)
+
+        if early_stopper.early_stop:
+            print("Breaking off training loop due to early stop.")
+            break
 
     # meta testing
     result_df, auprc_df = meta_test_model(model, test_dataset_loader)
@@ -262,7 +284,7 @@ def meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e
             pbar.set_description(
                 f"{model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.val_iter}, epoch={epoch + 1}")
             val_loss.append(curr_val_loss)
-    return
+    return mean(val_loss)
 
 
 def meta_test_model(model, test_dataset_loader):
