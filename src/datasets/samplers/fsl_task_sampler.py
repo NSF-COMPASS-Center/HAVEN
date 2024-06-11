@@ -64,7 +64,7 @@ class FewShotLearningTaskSampler(Sampler):
         for _ in range(self.n_task):
             sequence_indices = []
             # for each batch, randomly sample n_way labels
-            labels = random.sample(self.label_item_index_map.keys(), self.n_way)
+            labels = random.sample(list(self.label_item_index_map.keys()), self.n_way)
             for label in labels:
                 # for each label, randomly sample n_shot + n_query sequences
                 sequence_indices.append(torch.tensor(random.sample(self.label_item_index_map[label], self.n_shot + self.n_query)))
