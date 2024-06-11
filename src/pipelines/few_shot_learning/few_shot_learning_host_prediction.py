@@ -37,7 +37,6 @@ def execute(config):
     meta_validate_settings = few_shot_learn_settings["meta_validate_settings"]
     meta_test_settings = few_shot_learn_settings["meta_test_settings"]
     n_iters = few_shot_learn_settings["n_iterations"]
-    n_task = few_shot_learn_settings["n_task"]
 
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
@@ -76,9 +75,9 @@ def execute(config):
                                                                                           test_proportion=few_shot_learn_settings["test_proportion"],
                                                                                           seed=input_split_seeds[iter])
 
-            train_dataset_loader = dataset_utils.get_episodic_dataset_loader(train_df, sequence_settings, label_col, meta_train_settings, n_task)
-            val_dataset_loader = dataset_utils.get_episodic_dataset_loader(val_df, sequence_settings, label_col, meta_validate_settings, n_task)
-            test_dataset_loader = dataset_utils.get_episodic_dataset_loader(test_df, sequence_settings, label_col, meta_test_settings, n_task)
+            train_dataset_loader = dataset_utils.get_episodic_dataset_loader(train_df, sequence_settings, label_col, meta_train_settings)
+            val_dataset_loader = dataset_utils.get_episodic_dataset_loader(val_df, sequence_settings, label_col, meta_validate_settings)
+            test_dataset_loader = dataset_utils.get_episodic_dataset_loader(test_df, sequence_settings, label_col, meta_test_settings)
 
         pre_trained_model = None
         pre_trained_models = config["pre_trained_models"]

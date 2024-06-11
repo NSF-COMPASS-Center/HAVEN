@@ -182,7 +182,7 @@ def get_cgr_dataset_loader(df, sequence_settings, label_col):
     return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
 
 
-def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings, n_task):
+def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings):
     n_way = few_shot_learn_settings["n_way"]
     n_shot = few_shot_learn_settings["n_shot"]
     n_query = few_shot_learn_settings["n_query"]
@@ -203,7 +203,7 @@ def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn
                                               n_way=n_way,
                                               n_shot=n_shot,
                                               n_query=n_query,
-                                              n_task=n_task)
+                                              n_task=few_shot_learn_settings["n_task"])
     return DataLoader(dataset=dataset,
                       batch_sampler=task_sampler,
                       collate_fn=fsl_episode)
