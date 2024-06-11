@@ -81,6 +81,7 @@ def execute(config):
             test_dataset_loader = dataset_utils.get_episodic_dataset_loader(test_df, sequence_settings, label_col, meta_test_settings)
 
         pre_trained_model = None
+        pre_trained_model_path = None
         pre_trained_models = config["pre_trained_models"]
 
         # model store filepath
@@ -89,6 +90,7 @@ def execute(config):
 
         for model in pre_trained_models:
             model_name = model["name"]
+            pre_trained_model_path = model["path"]
             # Set necessary values within model_settings object for cleaner code and to avoid passing multiple arguments.
             model_settings = model["model_settings"]
             model_settings["max_seq_len"] = max_sequence_length
@@ -141,6 +143,9 @@ def execute(config):
             else:
                 print(f"ERROR: Unrecognized model '{model_name}'.")
                 continue
+
+            # Load the pre-trained model
+            pre_trained_model.load_state_dict(torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
 
             # Initialize Weights & Biases for each run
             wandb.init(project="zoonosis-host-prediction",
