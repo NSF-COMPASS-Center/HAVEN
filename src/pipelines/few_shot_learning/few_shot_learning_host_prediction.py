@@ -173,7 +173,7 @@ def execute(config):
 
                 # load the pre-trained few-shot classifier
                 few_shot_classifier.load_state_dict(torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
-                result_df, auprc_df, few_shot_classifier = meta_test_model(few_shot_classifier, test_dataset_loader)
+                result_df, auprc_df = meta_test_model(few_shot_classifier, test_dataset_loader)
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values are ['train', 'test'].")
                 exit(1)
