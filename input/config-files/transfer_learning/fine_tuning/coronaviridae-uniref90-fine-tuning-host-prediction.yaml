@@ -27,7 +27,7 @@ sequence_settings:
 
 pre_train_settings:
   model_name: "masked_language_modeling"
-  model_path: "output/raw/uniref90/20240603/pre_training/mlm/checkpoints/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0_checkpt16.pth"
+  model_path: "output/raw/uniref90/20240603/pre_training/mlm/checkpoints/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0_checkpt18.pth"
   encoder_settings:
     model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
     n_heads: 8

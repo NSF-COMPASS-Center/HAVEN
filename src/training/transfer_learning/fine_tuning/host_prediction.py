@@ -32,8 +32,7 @@ class HostPrediction(nn.Module):
     def forward(self, X):
         # embedding to be used for interpretability of the fine-tuned model
         self.fine_tuned_embedding = self.get_embedding(X)
-
-        y = self.linear_op(X)
+        y = self.linear_op(self.fine_tuned_embedding)
         return y
 
 
