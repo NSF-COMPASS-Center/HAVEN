@@ -81,6 +81,9 @@ def execute(config):
             train_dataset_loader = dataset_utils.get_episodic_dataset_loader(train_df, sequence_settings, label_col, meta_train_settings)
             val_dataset_loader = dataset_utils.get_episodic_dataset_loader(val_df, sequence_settings, label_col, meta_validate_settings)
             test_dataset_loader = dataset_utils.get_episodic_dataset_loader(test_df, sequence_settings, label_col, meta_test_settings)
+        else:
+            # used in zero shot evaluation, where split_input=False in classification_settings and mode=test in model
+            test_dataset_loader = dataset_utils.get_episodic_dataset_loader(df, sequence_settings, label_col, meta_test_settings)
 
         pre_trained_model = None
         few_shot_classifier = None
