@@ -117,7 +117,7 @@ def execute(config):
 
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
-                                                     classification_type=classification_settings["type"], silent=False)
+                                                     classification_type=classification_settings["type"], silent=True)
 
         # 3. Get dataset loader
         test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col, include_id_col=True)
