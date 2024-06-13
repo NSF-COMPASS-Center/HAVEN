@@ -137,7 +137,7 @@ def execute(config):
             elif "virprobert" in model_name:
                 print(f"Executing VirProBERT (pre-trained and fine tuned model)")
                 # Load the pre-trained Transformer Encoder in the pre-trained (MLM) and fine-tuned (Host prediction) VirProBERT
-                mlm_encoder_settings = model_settings["encoder_settings"]
+                mlm_encoder_settings = model_settings["encoder_settings"].copy()
                 mlm_encoder_settings["n_tokens"] += 2
                 # add max_sequence_length to pre_train_encoder_settings
                 mlm_encoder_settings["max_seq_len"] = max_sequence_length
