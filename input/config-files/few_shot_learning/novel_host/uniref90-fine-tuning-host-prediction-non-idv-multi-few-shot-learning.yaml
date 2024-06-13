@@ -72,7 +72,7 @@ pre_trained_models:
 #      hidden_dim: 1024
 
   - name: "transformer-l_6-h_8-d_1024-lr1e-4"
-    active: False
+    active: True
     mode: "train"
     path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/transformer-l_6-h_8-d_1024-lr1e-4_itr0.pth"
     model_settings:
@@ -84,7 +84,7 @@ pre_trained_models:
       n_classes: 5
 
   - name: "virprobert"
-    active: True
+    active: False
     mode: "train"
     path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5/20240611/host_multi/fine_tuning/host_prediction_fnn_2l_d1024_lr1e-4_itr0.pth"
     model_settings:
@@ -103,5 +103,5 @@ pre_trained_models:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv/20240612/host_multi/few_shot_learning"
+  sub_dir: "uniref90_embl_vertebrates_non_idv/20240613/host_multi/few_shot_learning"
   prefix: "fsl_non_idv_uniref90viridae_msl2048" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
