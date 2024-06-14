@@ -90,9 +90,12 @@ def execute(config):
 
         # load pre-trained encoder model
         pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
-        # TODO: REVERT THIS HACK OF LOADING A CHECKPOINT
-        pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model, pre_train_settings["model_path"])
-        # pre_trained_encoder_model.load_state_dict(torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
+        pre_trained_encoder_model.load_state_dict(
+            torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
+
+        # HACK to load models from checkpoints. CAUTION: Use only under dire circumstances
+        # pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model, pre_train_settings["model_path"])
+
 
         fine_tune_model = None
         for task in tasks:
