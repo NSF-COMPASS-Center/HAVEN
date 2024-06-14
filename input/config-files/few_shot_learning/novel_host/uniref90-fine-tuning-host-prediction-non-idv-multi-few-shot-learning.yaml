@@ -55,7 +55,7 @@ few_shot_learn_settings:
   meta_test_settings:
     n_way: 3
     n_shot: 5
-    n_query: 10
+    n_query: -1
     n_task: 100
 
 

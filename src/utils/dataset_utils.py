@@ -18,6 +18,7 @@ from datasets.protein_sequence_kmer_dataset import ProteinSequenceKmerDataset
 from datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
 from datasets.collations.fsl_episode import FewShotLearningEpisode
 from datasets.samplers.fsl_task_sampler import FewShotLearningTaskSampler
+from datasets.samplers.fsl_test_task_sampler import FewShotLearningTestTaskSampler
 
 
 # read datasets using config properties
@@ -201,7 +202,14 @@ def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn
                                          max_length=sequence_settings["max_sequence_length"],
                                          pad_value=sequence_settings["pad_token_val"])
 
-    task_sampler = FewShotLearningTaskSampler(dataset=dataset,
+    if n_query == -1:
+        # test dataset_loader, use a different task sampler
+        task_sampler = FewShotLearningTestTaskSampler(dataset=dataset,
+                                                  n_way=n_way,
+                                                  n_shot=n_shot,
+                                                  n_task=few_shot_learn_settings["n_task"])
+    else:
+        task_sampler = FewShotLearningTaskSampler(dataset=dataset,
                                               n_way=n_way,
                                               n_shot=n_shot,
                                               n_query=n_query,

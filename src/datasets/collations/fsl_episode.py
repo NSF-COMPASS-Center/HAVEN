@@ -42,13 +42,17 @@ class FewShotLearningEpisode:
             labels = np.where(labels == key, val, labels)
         labels = torch.tensor(labels.astype(float), device=nn_utils.get_device())
 
-        support_sequence = []
-        support_labels = []
+        label_indices_map = {}
+        # map of label: indices where the label occurs
+        for label in idx_label_map.keys():
+            label_indices_map[label] = torch.nonzero(labels == label)
 
-        label_indices = torch.cat([torch.nonzero(labels == label) for label in idx_label_map.keys()])
-        label_indices = label_indices.reshape((self.n_way, self.n_shot + self.n_query)) # assuming the the labels are ordered as [[0, 0, 0, ...0, 1, 1, ..., 1, 2, 2, ...., 2]]
-        support_indices = label_indices[:, : self.n_shot].flatten()
-        query_indices = label_indices[:, self.n_shot : self.n_shot + self.n_query + 1].flatten() # assuming there are n_shot + n_query samples
+        # for each label, select the first n_shot samples for support set
+        support_indices = torch.cat([val[: self.n_shot] for val in label_indices_map.values()]).flatten()
+
+        # for each label, select the remaining samples (i.e., after the n_shot support samples) for query set.
+        # this allows for varying query set size for each label and can be used for the test dataset loader as is.
+        query_indices = torch.cat([val[self.n_shot:] for val in label_indices_map.values()]).flatten()
 
         support_sequences = padded_sequences[support_indices]
         support_labels = labels[support_indices]
