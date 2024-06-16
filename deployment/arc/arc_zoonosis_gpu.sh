@@ -2,7 +2,7 @@
 
 #SBATCH -J zoonosis-nlp
 #SBATCH --account=seqevol
-#SBATCH --partition=a100_normal_q
+#SBATCH --partition=dgx_normal_q
 
 #SBATCH --mem=250G
 #SBATCH --nodes=1
@@ -14,6 +14,8 @@
 module reset
 module load
 # Load conda
+
+
 module load Anaconda3
 #Load CUDA
 module load cuda11.2/toolkit

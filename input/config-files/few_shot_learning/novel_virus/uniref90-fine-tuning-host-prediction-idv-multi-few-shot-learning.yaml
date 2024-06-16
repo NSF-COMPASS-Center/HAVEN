@@ -57,6 +57,7 @@ few_shot_learn_settings:
     n_shot: 5
     n_query: -1 # -1 to test on all remaining samples of the test class
     n_task: 100
+    batch_size: 32
 
 
 pre_trained_models:
@@ -86,7 +87,7 @@ pre_trained_models:
   - name: "virprobert"
     active: True
     mode: "test"
-    path: "output/raw/uniref90_embl_vertebrates_non_idv/20240612/host_multi/few_shot_learning/virprobert_itr0.pth"
+    path: "output/raw/uniref90_embl_vertebrates_non_idv/20240612/host_multi/few_shot_learning/virprobert_itr2.pth"
     model_settings:
       depth: 2
       n_classes: 5

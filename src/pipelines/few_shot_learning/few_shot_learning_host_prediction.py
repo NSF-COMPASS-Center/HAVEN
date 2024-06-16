@@ -166,14 +166,14 @@ def execute(config):
                 pre_trained_model.load_state_dict(torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
                 few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=pre_trained_model)
                 result_df, auprc_df, few_shot_classifier = run_few_shot_learning(few_shot_classifier, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learn_settings,
-                                      meta_train_settings, meta_validate_settings, model_name)
+                                      meta_train_settings, meta_validate_settings, meta_test_settings, model_name)
             elif mode == "test":
                 # mode=test used for cross-domain few-shot evaluation: prediction of hosts in novel virus (hosts may or may not be novel)
                 few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=pre_trained_model)
 
                 # load the pre-trained few-shot classifier
                 few_shot_classifier.load_state_dict(torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
-                result_df, auprc_df = meta_test_model(few_shot_classifier, test_dataset_loader)
+                result_df, auprc_df = meta_test_model(few_shot_classifier, test_dataset_loader, batch_size=meta_test_settings["batch_size"])
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values are ['train', 'test'].")
                 exit(1)
@@ -197,7 +197,7 @@ def execute(config):
     utils.write_output(evaluation_metrics, output_results_dir, output_prefix, "classwise_auprc")
 
 
-def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learning_settings, meta_train_settings, meta_validate_settings, model_name):
+def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learning_settings, meta_train_settings, meta_validate_settings, meta_test_settings, model_name):
     tbw = SummaryWriter()
     n_epochs = few_shot_learning_settings["n_epochs"]
     criterion = nn.CrossEntropyLoss()
@@ -229,7 +229,7 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
             break
 
     # meta testing
-    result_df, auprc_df = meta_test_model(model, test_dataset_loader)
+    result_df, auprc_df = meta_test_model(model, test_dataset_loader, batch_size=meta_test_settings["batch_size"])
 
     return result_df, auprc_df, model
 
@@ -290,7 +290,7 @@ def meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e
     return mean(val_loss)
 
 
-def meta_test_model(model, test_dataset_loader):
+def meta_test_model(model, test_dataset_loader, batch_size):
     with torch.no_grad():
         model.eval()
 
@@ -299,7 +299,7 @@ def meta_test_model(model, test_dataset_loader):
         for _, record in enumerate(pbar := tqdm.tqdm(test_dataset_loader)):
             support_sequences, support_labels, query_sequences, query_labels, idx_label_map = record
 
-            output = model(support_sequences, support_labels, query_sequences)
+            output = model.predict(support_sequences, support_labels, query_sequences, batch_size=batch_size)
             output = output.to(nn_utils.get_device())
 
             # to get probabilities of the output
