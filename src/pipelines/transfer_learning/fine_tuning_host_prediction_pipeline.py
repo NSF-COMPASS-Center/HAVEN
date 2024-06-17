@@ -11,7 +11,7 @@ import wandb
 
 from utils import utils, dataset_utils, nn_utils
 from training.early_stopping import EarlyStopping
-from training.fine_tuning import host_prediction
+from training.transfer_learning.fine_tuning import host_prediction
 from models.nlp.transformer import transformer
 
 
@@ -20,6 +20,7 @@ def execute(config):
     input_settings = config["input_settings"]
     input_dir = input_settings["input_dir"]
     input_file_names = input_settings["file_names"]
+    input_split_seeds = input_settings["split_seeds"]
 
     # output settings
     output_settings = config["output_settings"]
@@ -89,7 +90,12 @@ def execute(config):
 
         # load pre-trained encoder model
         pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
-        pre_trained_encoder_model.load_state_dict(torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
+        pre_trained_encoder_model.load_state_dict(
+            torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
+
+        # HACK to load models from checkpoints. CAUTION: Use only under dire circumstances
+        # pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model, pre_train_settings["model_path"])
+
 
         fine_tune_model = None
         for task in tasks:

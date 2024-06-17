@@ -20,7 +20,7 @@ class FNN_Model(nn.Module):
         # last linear layer: hidden_dim--> n_classes
         self.linear_op = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, X):
+    def get_embedding(self, X):
         X = self.embedding(X)
         # input linear layer
         X = F.relu(self.linear_ip(X))
@@ -28,8 +28,11 @@ class FNN_Model(nn.Module):
         for linear_layer in self.linear_hidden_n:
             X = F.relu(linear_layer(X))
         # mean of the representations of all tokens
-        self.fnn_emb = X.mean(dim=1)
-        y = self.linear_op(self.fnn_emb)
+        return X.mean(dim=1)
+
+    def forward(self, X):
+        self.input_embedding = self.get_embedding(X)
+        y = self.linear_op(self.input_embedding)
         return y
 
 

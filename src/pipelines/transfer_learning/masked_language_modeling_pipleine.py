@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.tensorboard import SummaryWriter
@@ -10,10 +9,10 @@ import tqdm
 from statistics import mean
 import wandb
 
-from utils import utils, dataset_utils, nn_utils, evaluation_utils
+from utils import dataset_utils, nn_utils, evaluation_utils
 from training.early_stopping import EarlyStopping
 from models.nlp.transformer import transformer
-from training import pre_training_masked_language_modeling
+from training.transfer_learning.pre_training import pre_training_masked_language_modeling
 
 
 def execute(config):

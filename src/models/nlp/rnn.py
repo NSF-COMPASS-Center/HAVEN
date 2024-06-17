@@ -18,7 +18,7 @@ class RNN_Model(nn.Module):
                        batch_first=True)
         self.linear = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, X):
+    def get_embedding(self, X):
         X = self.embedding(X)
         hidden_input = self.init_hidden(batch_size=X.size(0))
 
@@ -30,8 +30,11 @@ class RNN_Model(nn.Module):
 
         # aggregate the embeddings from rnn
         # mean of the representations of all tokens
-        self.rnn_emb = output.mean(dim=1)
-        y = self.linear(self.rnn_emb)
+        return output.mean(dim=1)
+
+    def forward(self, X):
+        self.input_embedding = self.get_embedding(X)
+        y = self.linear(self.input_embedding)
         return y
 
     def init_hidden(self, batch_size):

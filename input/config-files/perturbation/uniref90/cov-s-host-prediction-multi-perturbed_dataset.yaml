@@ -4,16 +4,16 @@ config_type: "host_prediction_perturbation" # options: data_preprocessor, host_p
   ## initialize base input folder name
   ## provide path to dataset folder
 input_settings:
-  perturbed_dataset_dir: "input/data/coronaviridae/20240313/sarscov2/uniref90/perturbation_dataset/multi"
+  perturbed_dataset_dir: "input/data/coronaviridae/20240313/sarscov2/aligned/uniref90/perturbation_dataset/multi"
 
 classification_settings:
   model_type: "perturbed_dataset_prediction"  # options: baseline, nlp, perturbed_dataset_prediction
   type: "multi"
   sequence_settings:
-    batch_size: 16
+    batch_size: 32
     id_col: "uniref90_id"
-    sequence_col: "seq"
-    max_sequence_length: 1366 # max=2169
+    sequence_col: "aligned_seq"
+    max_sequence_length: 2048 # 1366 # max=2169
     truncate: True
     pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
@@ -38,11 +38,12 @@ classification_settings:
       "Horshoe bat": ["rhinolophus sp."]
       "Ferret": ["mustela putorius"]
       "Chinese rufous horseshoe bat": ["rhinolophus sinicus"]
+
   models:
     - name: "transfer_learning_mlm_fnn_2l_lr1e-4"
       active: True
       mode: "test"
-      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240320/fine_tuning/host_prediction/multi/host_prediction_fnn_2l_d1024_lr1e-4_itr0.pth"
+      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240614/fine_tuning/host_prediction/multi/host_prediction_fnn_2l_d1024_lr1e-4_aligned_itr4.pth"
       depth: 2
       n_classes: 8
       input_dim: 512 # input embedding dimension
@@ -59,5 +60,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_perturbation/20240527/sars-cov-2/uniref90/cov-S-multi-transfer_learning_mlm_fnn_2l_lr1e-4"
+  sub_dir: "coronaviridae_s_prot_perturbation/20240616/sars-cov-2/uniref90/cov-S-multi-transfer_learning_mlm_fnn_2l_lr1e-4/aligned_msl2048"
   prefix: "tl_tf_multi" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

@@ -9,6 +9,8 @@ from pathlib import Path
 import os
 from sklearn.utils.class_weight import compute_class_weight
 import yaml
+from torch.nn.utils.rnn import pad_sequence
+import torch.nn as nn
 
 ### functions related to labels, grouping, and label vocabulary
 
@@ -161,6 +163,18 @@ def get_histogram(values, n_bins=12):
     for i in range(n_bins):
         hist_map.append({"start": bins[i], "end":bins[i+1], "count": freq[i], "percentage": freq[i]/n*100})
 
-
     hist_df = pd.DataFrame(hist_map)
     return hist_df
+
+
+### functions related to sequences and opertatipns
+
+def pad_sequences(sequences, max_length, pad_value):
+    # pad the first sequence to the desired fixed length
+    # NOTE: the fixed length padding will work only if size of all sequences are less than or equal to the desired max_length
+    sequences[0] = nn.ConstantPad1d((0, max_length - sequences[0].shape[0]), pad_value)(sequences[0])
+
+    # use pytorch utility pad_sequences for variable length padding w.r.t to the first sequence
+    padded_sequences = pad_sequence(sequences, batch_first=True, padding_value=pad_value)
+
+    return padded_sequences
