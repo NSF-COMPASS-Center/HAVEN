@@ -120,7 +120,7 @@ def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
         anneal_strategy='cos',
         div_factor=training_settings["div_factor"],
         final_div_factor=training_settings["final_div_factor"])
-    early_stopper = EarlyStopping(patience=10, min_delta=0)
+    early_stopper = EarlyStopping(patience=3, min_delta=0)
 
     # check and resume from checkpoint, if available
     last_epoch = -1

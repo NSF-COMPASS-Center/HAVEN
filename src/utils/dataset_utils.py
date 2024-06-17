@@ -139,14 +139,15 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
     max_seq_len = sequence_settings["max_sequence_length"]
     pad_sequence_val = sequence_settings["pad_token_val"]
     truncate = sequence_settings["truncate"]
+    split_sequence = sequence_settings["split_sequence"]
 
     dataset = None
     collate_func = None
     if exclude_label:
-        dataset = ProteinSequenceUnlabeledDataset(df, seq_col, max_seq_len, truncate)
+        dataset = ProteinSequenceUnlabeledDataset(df, seq_col, max_seq_len, truncate, split_sequence)
         collate_func = PaddingUnlabeled(max_seq_len, pad_sequence_val)
     else:
-        dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, label_col)
+        dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, split_sequence, label_col)
         collate_func = Padding(max_seq_len, pad_sequence_val)
 
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func)
