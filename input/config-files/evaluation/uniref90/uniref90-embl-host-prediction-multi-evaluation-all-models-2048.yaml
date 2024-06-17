@@ -26,7 +26,7 @@ input_settings:
     # "Pretrain-TF-d1024-lr1e-5": "20240228/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-5_output.csv"
     # "Pretrain-TF-d1024-lr1e-4-w_freeze": "20240307/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_fe20_ufe30_output.csv"
     "Protein-BERT": "20240306/protein_bert/prediction_results_20240308_022609_mapped.csv"
-    "VirPro-BERT": "20240611/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl2048_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    "VirPro-BERT": "20240614/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl2048_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
     # "Pretrain-TF-d1024-lr1e-5-w_freeze": "20240306/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-5_output.csv"
     # "Pretrain-TF-d1024-lr1e-5-ModFL": "20240302/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_0l_d512_lr1e-5-modfl_p-1_output.csv"
     # "Pretrain-TF-d1024-lr1e-5-RL": "20240302/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_0l_d512_lr1e-5-modrl_p-1_output.csv"
@@ -63,5 +63,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20240611/host_multi_all_models"
+  dataset_dir: "uniref90/20240616/host_multi_all_models"
   prefix: "host_multi_all_models-msl2048"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

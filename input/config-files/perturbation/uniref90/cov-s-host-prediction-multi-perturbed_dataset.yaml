@@ -43,7 +43,7 @@ classification_settings:
     - name: "transfer_learning_mlm_fnn_2l_lr1e-4"
       active: True
       mode: "test"
-      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240611/fine_tuning/host_prediction/multi/host_prediction_fnn_2l_d1024_lr1e-4_aligned_itr4.pth"
+      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240614/fine_tuning/host_prediction/multi/host_prediction_fnn_2l_d1024_lr1e-4_aligned_itr4.pth"
       depth: 2
       n_classes: 8
       input_dim: 512 # input embedding dimension
@@ -60,5 +60,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_perturbation/20240612/sars-cov-2/uniref90/cov-S-multi-transfer_learning_mlm_fnn_2l_lr1e-4/aligned_msl2048"
+  sub_dir: "coronaviridae_s_prot_perturbation/20240616/sars-cov-2/uniref90/cov-S-multi-transfer_learning_mlm_fnn_2l_lr1e-4/aligned_msl2048"
   prefix: "tl_tf_multi" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
