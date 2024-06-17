@@ -34,7 +34,7 @@ class ProteinSequenceUnlabeledDataset(Dataset):
     def split_sequences(self):
         text_wrappper = TextWrapper(width=self.max_seq_len)
         # decompose the sequence column into a list of strings of broken down sequences
-        self.data[self.sequence_col] = self.data.apply(lambda x: text_wrappper.wrap(x)) # returns a list of substrings of the desired length
+        self.data[self.sequence_col] = self.data[self.sequence_col].apply(lambda x: text_wrappper.wrap(x)) # returns a list of substrings of the desired length
         # explode the sequece column
         self.data = self.data.explode(self.sequence_col)
 
