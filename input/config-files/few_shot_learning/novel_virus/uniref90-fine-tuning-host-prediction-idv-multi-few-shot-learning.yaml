@@ -19,6 +19,7 @@ sequence_settings:
     sequence_col: "seq"
     max_sequence_length: 2048 # 6630 # 1024 # 1115
     truncate: True
+    split_sequence: False
     pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
