@@ -160,9 +160,10 @@ def get_token_with_id_dataset_loader(df, sequence_settings, label_col):
     max_seq_len = sequence_settings["max_sequence_length"]
     pad_sequence_val = sequence_settings["pad_token_val"]
     truncate = sequence_settings["truncate"]
+    split_sequence = sequence_settings["split_sequence"]
 
 
-    dataset = ProteinSequenceDatasetWithID(df, id_col, seq_col, max_seq_len, truncate, label_col)
+    dataset = ProteinSequenceDatasetWithID(df, id_col, seq_col, max_seq_len, truncate, split_sequence, label_col)
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
                       collate_fn=PaddingWithID(max_seq_len, pad_sequence_val))
 
@@ -195,6 +196,7 @@ def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn
                                      sequence_col=sequence_settings["sequence_col"],
                                      max_seq_len=sequence_settings["max_sequence_length"],
                                      truncate=sequence_settings["truncate"],
+                                     split_sequence = sequence_settings["split_sequence"],
                                      label_col=label_col)
 
     fsl_episode = FewShotLearningEpisode(n_way=n_way,

@@ -7,7 +7,7 @@ import torch
 
 
 class ProteinSequenceUnlabeledDataset(Dataset):
-    def __init__(self, df, sequence_col, max_seq_len, truncate, split_sequences):
+    def __init__(self, df, sequence_col, max_seq_len, truncate, split_sequence):
         super(ProteinSequenceUnlabeledDataset, self).__init__()
         self.sequence_col = sequence_col
         self.max_seq_len = max_seq_len
@@ -20,7 +20,7 @@ class ProteinSequenceUnlabeledDataset(Dataset):
         self.data = df
         if truncate:
             self.data = self.truncate_dataset(df)
-        if split_sequences:
+        if split_sequence:
             self.split_sequences()
 
     def __len__(self) -> int:
