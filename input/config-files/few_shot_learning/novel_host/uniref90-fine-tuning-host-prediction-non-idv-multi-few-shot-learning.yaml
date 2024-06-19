@@ -9,7 +9,8 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_tcount10_fsl.csv" ]
+  # file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_tcount10_fsl.csv" ]
+  file_names: [ "input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_lt_1percent_prevalence.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -72,7 +73,7 @@ pre_trained_models:
 #      hidden_dim: 1024
 
   - name: "transformer-l_6-h_8-d_1024-lr1e-4"
-    active: False
+    active: True
     mode: "train"
     path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/transformer-l_6-h_8-d_1024-lr1e-4_itr0.pth"
     model_settings:
@@ -103,5 +104,5 @@ pre_trained_models:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv/20240613/host_multi/few_shot_learning"
-  prefix: "fsl_non_idv_uniref90viridae_msl2048" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90_embl_vertebrates_non_idv/20240619/host_multi/few_shot_learning"
+  prefix: "fsl_uniref90viridae_non_idv_lt_1percent_msl2048" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
