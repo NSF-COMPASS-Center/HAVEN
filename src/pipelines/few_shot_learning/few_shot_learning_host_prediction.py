@@ -15,7 +15,7 @@ from transfer_learning.fine_tuning import host_prediction
 from models.nlp import cnn1d, rnn, lstm, fnn
 from training.early_stopping import EarlyStopping
 from utils import utils, dataset_utils, nn_utils, evaluation_utils
-from few_shot_learning import PrototypicalNetworkFewShotClassifier
+from few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
 
 def execute(config):
