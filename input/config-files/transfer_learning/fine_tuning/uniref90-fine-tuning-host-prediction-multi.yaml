@@ -30,6 +30,7 @@ pre_train_settings:
   model_path: "output/raw/uniref90/20240603/pre_training/mlm/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0.pth"
   encoder_settings:
     model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
+    embedding: "linear"
     n_heads: 8
     depth: 6
     input_dim: 512 # input embedding dimension
