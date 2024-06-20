@@ -59,6 +59,7 @@ few_shot_learn_settings:
     n_shot: 5
     n_query: -1
     n_task: 100
+    batch_size: 32
 
 
 pre_trained_models:
@@ -95,6 +96,7 @@ pre_trained_models:
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       encoder_settings:
+        embedding: "linear"
         n_heads: 8
         depth: 6
         input_dim: 512 # input embedding dimension

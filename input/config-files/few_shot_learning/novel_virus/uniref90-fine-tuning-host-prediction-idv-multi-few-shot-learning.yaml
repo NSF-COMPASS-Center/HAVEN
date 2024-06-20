@@ -74,9 +74,9 @@ pre_trained_models:
 #      hidden_dim: 1024
 
   - name: "transformer-l_6-h_8-d_1024-lr1e-4"
-    active: False
+    active: True
     mode: "test"
-    path: "output/raw/uniref90_embl_vertebrates_non_idv/20240610/host_multi/few_shot_learning/transformer-l_6-h_8-d_1024-lr1e-4_itr0.pth" #"output/raw/uniref90_embl_vertebrates_non_idv/20240613/host_multi/few_shot_learning/transformer-l_6-h_8-d_1024-lr1e-4_itr0.pth"
+    path: "output/raw/uniref90_embl_vertebrates_non_idv/20240613/host_multi/few_shot_learning/transformer-l_6-h_8-d_1024-lr1e-4_itr2.pth"
     model_settings:
       n_heads: 8
       depth: 6
@@ -86,7 +86,7 @@ pre_trained_models:
       n_classes: 5
 
   - name: "virprobert"
-    active: True
+    active: False
     mode: "test"
     path: "output/raw/uniref90_embl_vertebrates_non_idv/20240612/host_multi/few_shot_learning/virprobert_itr2.pth"
     model_settings:
@@ -95,6 +95,7 @@ pre_trained_models:
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       encoder_settings:
+        embedding: "linear"
         n_heads: 8
         depth: 6
         input_dim: 512 # input embedding dimension
