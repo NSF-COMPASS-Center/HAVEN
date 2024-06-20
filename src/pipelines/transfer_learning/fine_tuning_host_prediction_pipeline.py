@@ -11,7 +11,7 @@ import wandb
 
 from utils import utils, dataset_utils, nn_utils
 from training.early_stopping import EarlyStopping
-from training.transfer_learning.fine_tuning import host_prediction
+from transfer_learning.fine_tuning import host_prediction
 from models.nlp.transformer import transformer
 
 
@@ -58,7 +58,7 @@ def execute(config):
     }
 
     # fine_tune_model store filepath
-    fine_tune_model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{task_name}_itr{itr}.pth")
+    fine_tune_model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{task_name}_itr{itr}.pth")
     Path(os.path.dirname(fine_tune_model_filepath)).mkdir(parents=True, exist_ok=True)
 
     for iter in range(n_iters):
@@ -95,7 +95,6 @@ def execute(config):
 
         # HACK to load models from checkpoints. CAUTION: Use only under dire circumstances
         # pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model, pre_train_settings["model_path"])
-
 
         fine_tune_model = None
         for task in tasks:
@@ -148,7 +147,7 @@ def execute(config):
 
             if fine_tune_settings["save_model"]:
                 # save the fine_tuned model
-                model_filepath = fine_tune_model_filepath.format(task_name=task_name, itr=iter)
+                model_filepath = fine_tune_model_filepath.format(output_prefix=output_prefix, task_name=task_name, itr=iter)
                 torch.save(fine_tune_model.state_dict(), model_filepath)
                 print(f"Model output written to {model_filepath}")
 
@@ -207,10 +206,13 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
             break
     # END: Model training with early stopping using validation
 
-    # test the model
-    result_df = test_model(model, test_dataset_loader)
+    # choose the model with the lowest validation loss from the early stopper
+    best_performing_model = early_stopper.get_current_best_model()
 
-    return result_df, model
+    # test the model
+    result_df = test_model(best_performing_model, test_dataset_loader)
+
+    return result_df, best_performing_model
 
 
 def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw, task_name,

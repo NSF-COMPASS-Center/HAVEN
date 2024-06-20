@@ -12,7 +12,7 @@ import wandb
 from utils import dataset_utils, nn_utils, evaluation_utils
 from training.early_stopping import EarlyStopping
 from models.nlp.transformer import transformer
-from training.transfer_learning.pre_training import pre_training_masked_language_modeling
+from transfer_learning.pre_training import pre_training_masked_language_modeling
 
 
 def execute(config):
@@ -58,8 +58,8 @@ def execute(config):
 
     # Path to store the pre-trained encoder model
     encoder_model_name = encoder_settings["model_name"]
-    encoder_model_filepath = os.path.join(output_dir, results_dir, sub_dir, encoder_model_name + "_itr{itr}.pth")
-    mlm_checkpoint_filepath = os.path.join(output_dir, results_dir, sub_dir, "checkpoints", encoder_model_name + "_itr{itr}_checkpt{checkpt}.pth")
+    encoder_model_filepath = os.path.join(output_dir, results_dir, sub_dir, f"{encoder_model_name}_{output_prefix}" + "_itr{itr}.pth")
+    mlm_checkpoint_filepath = os.path.join(output_dir, results_dir, sub_dir, "checkpoints", f"{encoder_model_name}_{output_prefix}" + "_itr{itr}_checkpt{checkpt}.pth")
     # creating parent directories for mlm_checkpoint_filepath ensures that all parent directories for encoder_model_filepath are also created.
     Path(os.path.dirname(mlm_checkpoint_filepath)).mkdir(parents=True, exist_ok=True)
 
@@ -81,16 +81,13 @@ def execute(config):
                                 cols=[id_col, sequence_col])
 
         # 2. Split dataset
-        # full df into training and testing datasets in the ratio configured in the config file
-        train_df, test_df = dataset_utils.split_dataset(df, input_split_seeds[iter],
+        # full df into training and validation datasets in the ratio configured in the config file
+        # there is no explicit testing dataset as this is self-supervised training
+        train_df, val_df = dataset_utils.split_dataset(df, input_split_seeds[iter],
                                                                    training_settings["train_proportion"])
-        # split testing set into validation and testing datasets in equal proportion
-        # so 80:20 will now be 80:10:10
-        val_df, test_df = dataset_utils.split_dataset(test_df, input_split_seeds[iter], 0.5)
 
         train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, exclude_label=True)
         val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, exclude_label=True)
-        test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, exclude_label=True)
 
         # 3. instantiate the encoder model
         encoder_model = transformer.get_transformer_encoder(encoder_settings)
@@ -99,14 +96,14 @@ def execute(config):
         mlm_model = pre_training_masked_language_modeling.get_mlm_model(encoder_model=encoder_model,
                                                                         mlm_model=mlm_settings)
 
-        mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
+        mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader,
                         training_settings, encoder_model_name, pad_token_val,
                         mlm_checkpoint_filepath.replace("{itr}", str(iter)))
         torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
         wandb.finish()
 
-def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
-        training_settings, encoder_model_name, pad_token_val, mlm_checkpoint_filepath):
+def run(model, train_dataset_loader, val_dataset_loader, training_settings,
+        encoder_model_name, pad_token_val, mlm_checkpoint_filepath):
     tbw = SummaryWriter()
     criterion = nn.CrossEntropyLoss(ignore_index=pad_token_val)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -144,12 +141,13 @@ def run(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
                                  lr_scheduler.state_dict(),
                                  e, mlm_checkpoint_filepath)
 
-    evaluate_model(model, test_dataset_loader, criterion, tbw, encoder_model_name, epoch=None, log_loss=False)
-    return model
+    # no need to evaluate on a test dataset as this is self-supervised learning
+    # return the current best model, i.e. the model with the lowest validation loss
+    return early_stopper.get_current_best_model()
 
 
-def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw, encoder_model_name,
-              epoch):
+def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper,
+              tbw, encoder_model_name, epoch):
     # Training
     model.train()
     for _, input in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
