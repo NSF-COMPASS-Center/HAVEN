@@ -222,7 +222,7 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
                           lr_scheduler, tbw, model_name, e)
         # validation
         val_loss = meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e)
-        early_stopper(val_loss)
+        early_stopper(model, val_loss)
 
         if early_stopper.early_stop:
             print("Breaking off training loop due to early stop.")

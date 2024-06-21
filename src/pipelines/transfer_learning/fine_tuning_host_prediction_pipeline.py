@@ -249,7 +249,7 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
 
     # validation
     val_loss = validate_model(model, val_dataset_loader, criterion, tbw, task_name, epoch)
-    early_stopper(val_loss)
+    early_stopper(model, val_loss)
     return model
 
 

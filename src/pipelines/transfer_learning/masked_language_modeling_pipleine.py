@@ -180,7 +180,7 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
 
     # Validation
     val_loss = evaluate_model(model, val_dataset_loader, criterion, tbw, encoder_model_name, epoch, log_loss=True)
-    early_stopper(val_loss)
+    early_stopper(model, val_loss)
     return model
 
 
