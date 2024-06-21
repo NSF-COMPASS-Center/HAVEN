@@ -49,7 +49,7 @@ training_settings:
   n_iterations: 1
   split_input: True
   train_proportion: 0.8
-  n_epochs: 30
+  n_epochs: 50
   max_lr: 1e-4
   pct_start: 0.10
   div_factor: 25.0
