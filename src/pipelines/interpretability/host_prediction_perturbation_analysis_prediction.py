@@ -10,7 +10,7 @@ from utils import utils, dataset_utils, nn_utils
 from models.nlp.transformer import transformer
 from models.nlp import cnn1d, rnn, lstm, fnn
 from models.cv import cnn2d, cnn2d_pool
-from training.transfer_learning.fine_tuning import host_prediction
+from transfer_learning.fine_tuning import host_prediction
 
 
 def execute(config):

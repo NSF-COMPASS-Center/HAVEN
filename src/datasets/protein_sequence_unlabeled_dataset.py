@@ -1,12 +1,13 @@
 from torch.utils.data import Dataset
 from utils import utils, nn_utils
+from textwrap import TextWrapper
 
 import numpy as np
 import torch
 
 
 class ProteinSequenceUnlabeledDataset(Dataset):
-    def __init__(self, df, sequence_col, max_seq_len, truncate):
+    def __init__(self, df, sequence_col, max_seq_len, truncate, split_sequence):
         super(ProteinSequenceUnlabeledDataset, self).__init__()
         self.sequence_col = sequence_col
         self.max_seq_len = max_seq_len
@@ -19,6 +20,8 @@ class ProteinSequenceUnlabeledDataset(Dataset):
         self.data = df
         if truncate:
             self.data = self.truncate_dataset(df)
+        if split_sequence:
+            self.split_sequences()
 
     def __len__(self) -> int:
         return self.data.shape[0]
@@ -27,6 +30,13 @@ class ProteinSequenceUnlabeledDataset(Dataset):
         # Truncating sequences to fixed length of sequence_max_length
         df[self.sequence_col] = df[self.sequence_col].apply(lambda x: x[0:self.max_seq_len])
         return df
+
+    def split_sequences(self):
+        text_wrappper = TextWrapper(width=self.max_seq_len)
+        # decompose the sequence column into a list of strings of broken down sequences
+        self.data[self.sequence_col] = self.data[self.sequence_col].apply(lambda x: text_wrappper.wrap(x)) # returns a list of substrings of the desired length
+        # explode the sequece column
+        self.data = self.data.explode(self.sequence_col)
 
     def __getitem__(self, idx: int):
         # loc selects based on index in df

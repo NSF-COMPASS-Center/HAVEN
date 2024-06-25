@@ -11,11 +11,11 @@ import tqdm
 import wandb
 
 from models.nlp.transformer import transformer
-from training.transfer_learning.fine_tuning import host_prediction
+from transfer_learning.fine_tuning import host_prediction
 from models.nlp import cnn1d, rnn, lstm, fnn
 from training.early_stopping import EarlyStopping
 from utils import utils, dataset_utils, nn_utils, evaluation_utils
-from training.few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
+from few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
 
 def execute(config):
@@ -91,7 +91,7 @@ def execute(config):
         pre_trained_models = config["pre_trained_models"]
 
         # model store filepath
-        model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
+        model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{model_name}_itr{itr}.pth")
         Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
 
         for model in pre_trained_models:
@@ -185,7 +185,7 @@ def execute(config):
 
             if few_shot_learn_settings["save_model"]:
                 # save the trained model
-                model_filepath = model_store_filepath.format(model_name=model_name, itr=iter)
+                model_filepath = model_store_filepath.format(output_prefix=output_prefix, model_name=model_name, itr=iter)
                 torch.save(few_shot_classifier.state_dict(), model_filepath)
                 print(f"Model output written to {model_filepath}")
 
@@ -222,16 +222,19 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
                           lr_scheduler, tbw, model_name, e)
         # validation
         val_loss = meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e)
-        early_stopper(val_loss)
+        early_stopper(model, val_loss)
 
         if early_stopper.early_stop:
             print("Breaking off training loop due to early stop.")
             break
 
-    # meta testing
-    result_df, auprc_df = meta_test_model(model, test_dataset_loader, batch_size=meta_test_settings["batch_size"])
+    # choose the model with the lowest validation loss from the early stopper
+    best_performing_model = early_stopper.get_current_best_model()
 
-    return result_df, auprc_df, model
+    # meta testing
+    result_df, auprc_df = meta_test_model(best_performing_model, test_dataset_loader, batch_size=meta_test_settings["batch_size"])
+
+    return result_df, auprc_df, best_performing_model
 
 
 def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_scheduler, tbw, model_name, epoch):

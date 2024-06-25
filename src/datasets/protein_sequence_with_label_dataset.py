@@ -5,8 +5,8 @@ import numpy as np
 import torch
 
 class ProteinSequenceWithLabelDataset(ProteinSequenceDataset):
-    def __init__(self, df, sequence_col, max_seq_len, truncate, label_col):
-        super(ProteinSequenceWithLabelDataset, self).__init__(df, sequence_col, max_seq_len, truncate, label_col)
+    def __init__(self, df, sequence_col, max_seq_len, truncate, split_sequence, label_col):
+        super(ProteinSequenceWithLabelDataset, self).__init__(df, sequence_col, max_seq_len, truncate, split_sequence, label_col)
 
     def __getitem__(self, idx: int):
         # loc selects based on index in df

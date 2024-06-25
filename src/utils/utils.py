@@ -169,10 +169,10 @@ def get_histogram(values, n_bins=12):
 
 ### functions related to sequences and opertatipns
 
-def pad_sequences(sequences, max_length, pad_value):
+def pad_sequences(sequences, max_seq_length, pad_value):
     # pad the first sequence to the desired fixed length
     # NOTE: the fixed length padding will work only if size of all sequences are less than or equal to the desired max_length
-    sequences[0] = nn.ConstantPad1d((0, max_length - sequences[0].shape[0]), pad_value)(sequences[0])
+    sequences[0] = nn.ConstantPad1d((0, max_seq_length - sequences[0].shape[0]), pad_value)(sequences[0])
 
     # use pytorch utility pad_sequences for variable length padding w.r.t to the first sequence
     padded_sequences = pad_sequence(sequences, batch_first=True, padding_value=pad_value)

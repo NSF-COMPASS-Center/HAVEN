@@ -78,7 +78,7 @@ def execute(input_settings, output_settings, classification_settings):
 
         nlp_model = None
         # model store filepath
-        model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{model_name}_itr{itr}.pth")
+        model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{model_name}_itr{itr}.pth")
         Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
 
         for model in models:
@@ -158,7 +158,7 @@ def execute(input_settings, output_settings, classification_settings):
 
             if classification_settings["save_model"]:
                 # save the trained model
-                model_filepath = model_store_filepath.format(model_name=model_name, itr=iter)
+                model_filepath = model_store_filepath.format(output_prefix=output_prefix, model_name=model_name, itr=iter)
                 torch.save(nlp_model.state_dict(), model_filepath)
                 print(f"Model output written to {model_filepath}")
 
@@ -197,9 +197,13 @@ def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_load
             break
     # END: Model training with early stopping using validation
 
+    # choose the model with the lowest validation loss from the early stopper
+    best_performing_model = early_stopper.get_current_best_model()
+
     # test the model
-    result_df = test_model(model, test_dataset_loader)
-    return result_df, model
+    result_df = test_model(best_performing_model, test_dataset_loader)
+
+    return result_df, best_performing_model
 
 
 def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw,
@@ -235,7 +239,7 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
 
     # validation
     val_loss = validate_model(model, val_dataset_loader, criterion, tbw, model_name, epoch)
-    early_stopper(val_loss)
+    early_stopper(model, val_loss)
     return model
 
 

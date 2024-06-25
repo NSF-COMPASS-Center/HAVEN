@@ -9,7 +9,8 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_tcount10_fsl.csv" ]
+  # file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_tcount10_fsl.csv" ]
+  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_lt_1percent_prevalence.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -19,6 +20,7 @@ sequence_settings:
     sequence_col: "seq"
     max_sequence_length: 2048 # 6630 # 1024 # 1115
     truncate: True
+    split_sequence: False
     pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
@@ -27,7 +29,7 @@ label_settings:
 
 few_shot_learn_settings:
   experiment: "few_shot_learning_novel_host"
-  n_iterations: 3
+  n_iterations: 5
   split_input: True
   train_proportion: 0.7
   val_proportion: 0.1
@@ -57,6 +59,7 @@ few_shot_learn_settings:
     n_shot: 5
     n_query: -1
     n_task: 100
+    batch_size: 32
 
 
 pre_trained_models:
@@ -93,6 +96,7 @@ pre_trained_models:
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       encoder_settings:
+        embedding: "linear"
         n_heads: 8
         depth: 6
         input_dim: 512 # input embedding dimension
@@ -103,5 +107,5 @@ pre_trained_models:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv/20240613/host_multi/few_shot_learning"
-  prefix: "fsl_non_idv_uniref90viridae_msl2048" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90_embl_vertebrates_non_idv/20240620/host_multi/few_shot_learning"
+  prefix: "fsl_uniref90viridae_non_idv_lt_1percent_msl2048" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
