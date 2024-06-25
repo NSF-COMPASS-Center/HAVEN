@@ -14,8 +14,7 @@ class FewShotLearningEpisode:
             - # query_sequences: n_way * n_query
             - # query_labels: n_way * n_query
     """
-    def __init__(self, n_way, n_shot, n_query, pad_value, max_length):
-        self.n_way = n_way
+    def __init__(self, n_shot, n_query, pad_value, max_length):
         self.n_shot = n_shot
         self.n_query = n_query
         self.pad_value = pad_value

@@ -200,6 +200,7 @@ def execute(config):
 def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learning_settings, meta_train_settings, meta_validate_settings, meta_test_settings, model_name):
     tbw = SummaryWriter()
     n_epochs = few_shot_learning_settings["n_epochs"]
+    batch_size = few_shot_learning_settings["batch_size"]
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=float(few_shot_learning_settings["max_lr"]), weight_decay=1e-4)
     lr_scheduler = OneCycleLR(
@@ -219,9 +220,9 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
     for e in range(n_epochs):
         # training
         model = meta_train_model(model, train_dataset_loader, criterion, optimizer,
-                          lr_scheduler, tbw, model_name, e)
+                          lr_scheduler, tbw, model_name, e, batch_size)
         # validation
-        val_loss = meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e)
+        val_loss = meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e, batch_size)
         early_stopper(model, val_loss)
 
         if early_stopper.early_stop:
@@ -232,19 +233,19 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
     best_performing_model = early_stopper.get_current_best_model()
 
     # meta testing
-    result_df, auprc_df = meta_test_model(best_performing_model, test_dataset_loader, batch_size=meta_test_settings["batch_size"])
+    result_df, auprc_df = meta_test_model(best_performing_model, test_dataset_loader, batch_size)
 
     return result_df, auprc_df, best_performing_model
 
 
-def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_scheduler, tbw, model_name, epoch):
+def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_scheduler, tbw, model_name, epoch, batch_size):
     model.train()
     for _, record in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
         support_sequences, support_labels, query_sequences, query_labels, _ = record
 
         optimizer.zero_grad()
 
-        output = model(support_sequences, support_labels, query_sequences)
+        output = model(support_sequences, support_labels, query_sequences, batch_size)
         output = output.to(nn_utils.get_device())
 
         loss = criterion(output, query_labels.long())
@@ -267,7 +268,7 @@ def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_sched
     return model
 
 
-def meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, epoch):
+def meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, epoch, batch_size):
     with torch.no_grad():
         model.eval()
 
@@ -275,7 +276,7 @@ def meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e
         for _, record in enumerate(pbar := tqdm.tqdm(val_dataset_loader)):
             support_sequences, support_labels, query_sequences, query_labels, _ = record
 
-            output = model(support_sequences, support_labels, query_sequences)
+            output = model(support_sequences, support_labels, query_sequences, batch_size)
             output = output.to(nn_utils.get_device())
 
             loss = criterion(output, query_labels.long())
@@ -302,7 +303,7 @@ def meta_test_model(model, test_dataset_loader, batch_size):
         for _, record in enumerate(pbar := tqdm.tqdm(test_dataset_loader)):
             support_sequences, support_labels, query_sequences, query_labels, idx_label_map = record
 
-            output = model.predict(support_sequences, support_labels, query_sequences, batch_size=batch_size)
+            output = model(support_sequences, support_labels, query_sequences, batch_size=batch_size)
             output = output.to(nn_utils.get_device())
 
             # to get probabilities of the output

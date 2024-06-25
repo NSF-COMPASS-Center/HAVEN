@@ -37,29 +37,35 @@ few_shot_learn_settings:
   classification_type: "multi"
   save_model: True
   n_epochs: 25
+  batch_size: 32
   max_lr: 1e-4
   pct_start: 0.10
   div_factor: 25.0
   final_div_factor: 10000.0
 
   meta_train_settings:
-    n_way: 3
+    n_way_type: "varying" # supported values: 'fixed', 'varying'
+    # if n_way_type = 'fixed', n_way is an integer;
+    # else if n_way_type = 'varying', n_way is a tuple as [n_way_min, n_way_max]
+    ## if n_way_max is not defined (e.g. [3, ], then n_way_max is set to the total number of labels in the dataset
+    n_way: [ 3, ] # e.g.: 3 or [3, 10]
     n_shot: 5
     n_query: 10
-    n_task: 500
+    n_task: 100
 
   meta_validate_settings:
-    n_way: 3
+    n_way_type: "varying"
+    n_way: [ 3, ]
     n_shot: 5
     n_query: 10
     n_task: 100
 
   meta_test_settings:
-    n_way: 3
+    n_way_type: "fixed"
+    n_way: # default = if n_way is not configured, n_way is set to the , total number of labels in the dataset
     n_shot: 5
-    n_query: -1
-    n_task: 100
-    batch_size: 32
+    n_query: -1 # -1 to test on all remaining samples of the test class
+    n_task: 1
 
 
 pre_trained_models:
