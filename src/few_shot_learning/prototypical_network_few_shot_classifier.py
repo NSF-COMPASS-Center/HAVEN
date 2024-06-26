@@ -8,19 +8,17 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
         self.pre_trained_model = pre_trained_model
 
     def forward(self, support_sequences, support_labels, query_sequences, batch_size):
-        support_features = self.get_embedding(support_sequences, batch_size)
-
         # compute prototypes for each label
         prototypes = []
 
         # unique returns the labels in sorted order
         # we assume the labels are always (0, 1, ...., n_way-1)
-        for i in torch.unique(support_labels):
+        for label in torch.unique(support_labels):
             # assuming n_shot is within the server memory constraints
             # i.e, n_shot <= batch_size
             label_support_features = self.pre_trained_model.get_embedding(
                 support_sequences[
-                    torch.nonzero(support_labels == label) # torch.nonzero gives the indices with non-zero elements
+                    torch.nonzero(support_labels == label).squeeze() # torch.nonzero gives the indices with non-zero elements but it adds a dimension as [n, 1] hence we use squeeze to remove the added extra dimension
                 ]
             )
             # prototype is the mean of the support features
