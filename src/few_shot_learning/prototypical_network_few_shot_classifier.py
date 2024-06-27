@@ -25,7 +25,7 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
             prototypes.append(label_support_features.mean(0))
 
         # assuming order is maintained and the prototype vector for each label is located at the corresponding index
-        prototypes = torch.cat(prototypes) # n_way X embedding_dimension
+        prototypes = torch.stack(prototypes) # n_way X embedding_dimension
 
         # compute queries in batches of fixed size as per the memory constraints of the server
         query_features = self.get_embedding(query_sequences, batch_size)
