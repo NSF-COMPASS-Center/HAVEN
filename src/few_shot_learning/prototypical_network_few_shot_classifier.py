@@ -5,7 +5,7 @@ import gc
 class PrototypicalNetworkFewShotClassifier(nn.Module):
     def __init__(self, pre_trained_model):
         super(PrototypicalNetworkFewShotClassifier, self).__init__()
-        self.pre_trained_model = pre_trained_model
+        self.pre_trained_model = nn.DataParallel(pre_trained_model)
 
     def forward(self, support_sequences, support_labels, query_sequences, batch_size):
         # compute prototypes for each label
@@ -27,7 +27,7 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
 
         del support_sequences # mark for deletion
         gc.collect() # garbage collection to free up memory
-        
+
         # assuming order is maintained and the prototype vector for each label is located at the corresponding index
         prototypes = torch.stack(prototypes) # n_way X embedding_dimension
 
