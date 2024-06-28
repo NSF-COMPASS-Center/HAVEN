@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+import gc
 
 
 def scaled_dot_product_attention(Q, K, V, mask=None):
@@ -87,8 +88,10 @@ class MultiHeadAttention(nn.Module):
         # 3. Concat all the heads
         X = X.transpose(1, 2).contiguous().view(batch_size, -1, self.h * self.d_attn_head)
 
-        del Q
-        del K
-        del V
+        del Q # mark for deletion
+        del K # mark for deletion
+        del V # mark for deletion
+        gc.collect() # garbage collection to free up memory
+
         # 4. Apply final output linear transformation
         return self.W_O(X)

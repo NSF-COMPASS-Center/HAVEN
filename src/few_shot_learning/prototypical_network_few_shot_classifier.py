@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+import gc
 
 class PrototypicalNetworkFewShotClassifier(nn.Module):
     def __init__(self, pre_trained_model):
@@ -23,7 +23,11 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
             )
             # prototype is the mean of the support features
             prototypes.append(label_support_features.mean(0))
+            del label_support_features # mark for deletion
 
+        del support_sequences # mark for deletion
+        gc.collect() # garbage collection to free up memory
+        
         # assuming order is maintained and the prototype vector for each label is located at the corresponding index
         prototypes = torch.stack(prototypes) # n_way X embedding_dimension
 
