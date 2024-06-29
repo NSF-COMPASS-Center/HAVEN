@@ -14,7 +14,7 @@ class FewShotLearningVaryingTaskSampler(FewShotLearningTaskSampler):
         3. Sample n_support + n_query samples for each class
     """
 
-    def __init__(self, dataset, n_way_range: list[int], n_shot: int, n_query: int, n_task: int):
+    def __init__(self, dataset, n_way_range: List[int], n_shot: int, n_query: int, n_task: int):
         """
         Args:
             dataset: dataset of protein sequences
