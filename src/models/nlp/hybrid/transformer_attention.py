@@ -3,11 +3,11 @@ from models.nlp.transformer.multi_head_attention import MultiHeadAttention
 from models.nlp.transformer.feed_forward_layer import FeedForwardLayer
 from utils import nn_utils
 import torch
-
+import torch.nn.functional as F
 
 # only encoder
 class TransformerAttention(nn.Module):
-    def __init__(self, pre_trained_model, chunk_len, h=8, input_dim=512, hidden_dim=2048, stride=1, n_classes=1):
+    def __init__(self, pre_trained_model, chunk_len, h=8, input_dim=512, hidden_dim=2048, stride=1, depth=2, n_classes=1):
         super(TransformerAttention, self).__init__()
         self.pre_trained_model = pre_trained_model
         self.self_attn = MultiHeadAttention(h, input_dim)
@@ -59,6 +59,7 @@ def get_model(model):
                                  h = model["n_heads"],
                                  input_dim=model["input_dim"],
                                  hidden_dim=model["hidden_dim"],
+                                 depth=model["depth"],
                                  stride=model["stride"],
                                  n_classes=model["n_classes"])
     print(model)
