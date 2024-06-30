@@ -79,7 +79,7 @@ fine_tune_settings:
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
-      stride: 128
+      stride: 64
       n_heads: 8
       loss: "FocalLoss"
       depth: 2
