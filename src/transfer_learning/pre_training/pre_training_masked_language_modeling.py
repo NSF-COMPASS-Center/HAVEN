@@ -6,8 +6,7 @@ from utils import nn_utils, constants
 
 # only encoder
 class MaskedLanguageModel(nn.Module):
-    def __init__(self, encoder_model, encoder_dim, no_mask_token_vals, n_tokens,
-                 mask_prob=0.15, random_mask_prob=0.1, no_change_mask_prob=0.1):
+    def __init__(self, encoder_model, encoder_dim, mask_prob=0.15, random_mask_prob=0.1, no_change_mask_prob=0.1):
         super(MaskedLanguageModel, self).__init__()
         self.encoder_model = encoder_model
         self.pad_token_val = constants.PAD_TOKEN_VAL
@@ -77,8 +76,6 @@ class MaskedLanguageModel(nn.Module):
 def get_mlm_model(encoder_model, mlm_model):
     mlm_model = MaskedLanguageModel(encoder_model=encoder_model,
                                     encoder_dim=mlm_model["encoder_dim"],
-                                    no_mask_token_vals=mlm_model["no_mask_token_vals"],
-                                    n_tokens=mlm_model["n_tokens"],
                                     mask_prob=mlm_model["mask_prob"],
                                     random_mask_prob=mlm_model["random_mask_prob"],
                                     no_change_mask_prob=mlm_model["no_change_mask_prob"])

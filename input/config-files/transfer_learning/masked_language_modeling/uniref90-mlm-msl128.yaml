@@ -42,7 +42,7 @@ encoder_settings:
   padding: 0
 
 training_settings:
-  experiment: "pre-training-mlm"
+  experiment: "pre-training-mlm-cls"
   n_iterations: 1
   split_input: True
   train_proportion: 0.9
