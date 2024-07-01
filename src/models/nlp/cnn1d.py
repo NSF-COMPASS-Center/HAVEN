@@ -7,9 +7,9 @@ from utils import nn_utils
 
 
 class CNN_1D_Model(nn.Module):
-    def __init__(self, n_tokens, max_seq_len, n_classes, N, input_dim, hidden_dim, kernel_size, stride):
+    def __init__(self, vocab_size, max_seq_len, n_classes, N, input_dim, hidden_dim, kernel_size, stride):
         super(CNN_1D_Model, self).__init__()
-        self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
+        self.embedding = EmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim)
         self.conv1d = Conv1d(in_channels=input_dim,
                              out_channels=hidden_dim,
                              kernel_size=kernel_size,
@@ -49,7 +49,7 @@ class CNN_1D_Model(nn.Module):
 
 
 def get_cnn_model(model):
-    cnn_model = CNN_1D_Model(n_tokens=model["n_tokens"],
+    cnn_model = CNN_1D_Model(vocab_size=model["vocab_size"],
                           max_seq_len=model["max_seq_len"],
                           n_classes=model["n_classes"],
                           N = model["depth"],

@@ -6,12 +6,12 @@ from utils import nn_utils
 
 
 class LSTM_Model(nn.Module):
-    def __init__(self, n_tokens, max_seq_len, n_classes, N, input_dim, hidden_dim):
+    def __init__(self, vocab_size, max_seq_len, n_classes, N, input_dim, hidden_dim):
         super(LSTM_Model, self).__init__()
         # assuming hidden state dimension = cell state dimension = hidden_dim
         self.hidden_dim = hidden_dim
         self.N = N
-        self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
+        self.embedding = EmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim)
         # assuming hidden state dimension = cell state dimension = output_dimension = hidden_dim and projection_size=0
         self.lstm = LSTM(input_size=input_dim,
                          hidden_size=hidden_dim,
@@ -45,7 +45,7 @@ class LSTM_Model(nn.Module):
 
 
 def get_lstm_model(model):
-    lstm_model = LSTM_Model(n_tokens=model["n_tokens"],
+    lstm_model = LSTM_Model(vocab_size=model["vocab_size"],
                             max_seq_len=model["max_seq_len"],
                             n_classes=model["n_classes"],
                             N=model["depth"],

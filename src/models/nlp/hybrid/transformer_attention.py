@@ -10,6 +10,7 @@ class TransformerAttention(nn.Module):
     def __init__(self, pre_trained_model, chunk_len, h=8, input_dim=512, hidden_dim=2048, stride=1, depth=2, n_classes=1):
         super(TransformerAttention, self).__init__()
         self.pre_trained_model = pre_trained_model
+        self.input_dim = input_dim
         self.self_attn = MultiHeadAttention(h, input_dim)
         self.feed_forward = FeedForwardLayer(input_dim, hidden_dim)
         self.chunk_len = chunk_len
@@ -27,27 +28,45 @@ class TransformerAttention(nn.Module):
         self.linear_op = nn.Linear(hidden_dim, n_classes)
 
     def forward(self, X):
-        # X: b \times n
+        # X: b x n where n is the maximum sequence length in the batch
         # 1. split into chunks
         batch_size = X.shape[0] # batch_size
-        X_chunk_emb = []
-        for i in range(batch_size):
-            X_i = X[i].unfold(dimension=0, size=self.chunk_len, step=self.stride)
-            X_i = self.pre_trained_model(X_i, mask=None)
-            X_i = X_i.mean(dim=1)
-            X_chunk_emb.append(X_i)
-        X = torch.stack(X_chunk_emb)
-        X = self.self_attn(X, X, X)
-        X = self.feed_forward(X)
+        # split each sequence into smaller chunks along the dimension of the sequence length
+        # let # chunks = n_chunks (depending on chunk_len and stride)
+        X = X.unfold(dimension=1, size=self.chunk_len, step=self.stride) # b x n_c x chunk_len
 
-        # pool the pre_trained_model embeddings of all tokens in the input sequence using mean
-        X = X.mean(dim=1)
+        # reshape the tensor to individual sequences of chunk_len diregarding the sequence dimension (i.e. batch)
+        # contiguous ensure contiguous memory allocation for every value in the tensor
+        # this will enable reshaping using view which only changes the shape(view) of the tensor without creating a copy
+        # reshape() 'might' create a copy. Hence, we use view to save memory
+        # since we only need to generate embeddings for each chunk where the sequence identity does not matter
+        X = X.contiguous().view(-1, self.chunk_len) # (b * n_c) x chunk_len
+
+        # generate embeddings
+        X = self.pre_trained_model(X, mask=None)   # (b * n_c) x chunk_len x input_dim
+
+        # reshape back into sequences of chunks, i.e. re-introduce the batch dimension.
+        # here -1 will account for n_c which changes with the sequence length in every batch
+        X = X.view(batch_size, -1, self.chunk_len, self.input_dim) # b x n_c x chunk_len x input_dim
+
+        # mean of the embeddings of tokens in every chunk to create a representative vector for each chunk
+        # mean along chunk_len dimension, i.e dim=2
+        X = X.mean(dim=2) # b x n_c x input_dim
+
+        # attention between the chunks in every sequence
+        X = self.self_attn(X, X, X) # b x n_c x input_dim
+
+        # feed-forward for projection + non-linear activation
+        X = self.feed_forward(X) # b x n_c x input_dim
+
+        # pool the embeddings of all chunks in the input sequence using mean to generate a vector embedding for each sequence
+        X = X.mean(dim=1) # b x input_dim
+
         # input linear layer
         X = F.relu(self.linear_ip(X))
         # hidden
         for linear_layer in self.linear_hidden_n:
             X = F.relu(linear_layer(X))
-        # embedding to be used for interpretability of the fine-tuned model
         y = self.linear_op(X)
         return y
 
