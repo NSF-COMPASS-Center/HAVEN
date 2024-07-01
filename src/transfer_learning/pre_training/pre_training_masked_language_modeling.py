@@ -12,11 +12,13 @@ class MaskedLanguageModel(nn.Module):
         self.pad_token_val = constants.PAD_TOKEN_VAL
         self.mask_token_val = constants.MASK_TOKEN_VAL
         self.no_mask_token_vals = [constants.PAD_TOKEN_VAL, constants.CLS_TOKEN_VAL]
-        self.n_tokens = constants.N_TOKENS
+        self.n_tokens = len(constants.AMINO_ACID_VOCABULARY) + 1 # n_tokens = size of amino_acid vocab + 1 (for the pad_token)
         self.mask_prob = mask_prob
         self.random_mask_prob = random_mask_prob
         self.no_change_mask_prob = no_change_mask_prob
 
+        # cross entropy loss expects targets as the class indices which in our case is the same as the amino acid vocab token value
+        # pad token val of 0 will be ignored as per the definition of CrossEntropyLoss(ignore_index=pad_token_val) in mlm pipeline.
         self.output_projection = nn.Linear(encoder_dim, self.n_tokens)
 
     def mask_sequence_batch(self, sequence_batch):
@@ -47,7 +49,8 @@ class MaskedLanguageModel(nn.Module):
         random_mask_pos = torch.nonzero(random_token_mask, as_tuple=True)
 
         # random tokens to be used for replacement in each of the selected positions
-        random_mask_tokens = torch.randint(low=0, high=self.n_tokens, size=(len(random_mask_pos[0]), ),
+        # low is NOT equal to 0 beause 0 is pad token value
+        random_mask_tokens = torch.randint(low=1, high=self.n_tokens, size=(len(random_mask_pos[0]), ),
                                            device=nn_utils.get_device(),
                                            dtype=sequence_batch.dtype)
         # replace the random token positions with the generated random tokens

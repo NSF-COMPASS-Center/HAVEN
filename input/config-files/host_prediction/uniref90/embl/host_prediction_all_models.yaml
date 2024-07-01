@@ -114,7 +114,6 @@ classification_settings:
       with_convolution: False
       n_heads: 8
       depth: 6
-      n_tokens: 27
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024

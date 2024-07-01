@@ -9,10 +9,10 @@ from utils import nn_utils
 
 # encoder-decoder architecture
 class Transformer(nn.Module):
-    def __init__(self, n_tokens, max_seq_len, n_classes, N=6, input_dim=512, hidden_dim=1024, h=8):
+    def __init__(self, vocab_size, max_seq_len, n_classes, N=6, input_dim=512, hidden_dim=1024, h=8):
         super(Transformer, self).__init__()
-        self.source_embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
-        self.target_embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
+        self.source_embedding = EmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim)
+        self.target_embedding = EmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim)
         self.encoder = Encoder(EncoderLayer(h, input_dim, hidden_dim), N)
         self.decoder = Decoder(DecoderLayer(h, input_dim, hidden_dim), N)
 
@@ -30,9 +30,9 @@ class Transformer(nn.Module):
 
 # only encoder
 class TransformerEncoder(nn.Module):
-    def __init__(self, n_tokens, max_seq_len, N=6, input_dim=512, hidden_dim=1024, h=8):
+    def __init__(self, vocab_size, max_seq_len, N=6, input_dim=512, hidden_dim=1024, h=8):
         super(TransformerEncoder, self).__init__()
-        self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
+        self.embedding = EmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim)
         self.encoder = Encoder(EncoderLayer(h, input_dim, hidden_dim), N)
 
     def forward(self, X, mask):
@@ -42,23 +42,23 @@ class TransformerEncoder(nn.Module):
 
 # only encoder + convolution embedding
 class TransformerEncoder_Conv1D(TransformerEncoder):
-    def __init__(self, n_tokens, max_seq_len, N=6, input_dim=512, hidden_dim=1024, h=8, kernel_size=3, stride=1, padding=0):
-        super(TransformerEncoder, self).__init__(n_tokens, max_seq_len, N, input_dim, hidden_dim, h)
+    def __init__(self, vocab_size, max_seq_len, N=6, input_dim=512, hidden_dim=1024, h=8, kernel_size=3, stride=1, padding=0):
+        super(TransformerEncoder, self).__init__(vocab_size, max_seq_len, N, input_dim, hidden_dim, h)
         # override the default embedding layer with convolution embedding layer
-        self.embedding = ConvolutionEmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim,
+        self.embedding = ConvolutionEmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim,
                                                    kernel_size=kernel_size, stride=stride, padding=padding)
 
 
 def get_transformer_encoder(model):
     if model["embedding"] == "convolution":
-        tf_model = TransformerEncoder_Conv1D(n_tokens=model["n_tokens"],
+        tf_model = TransformerEncoder_Conv1D(vocab_size = model["vocab_size"],
                                       max_seq_len=model["max_seq_len"],
                                       N=model["depth"],
                                       input_dim=model["input_dim"],
                                       hidden_dim=model["hidden_dim"],
                                       h=model["n_heads"])
     else: # default: Embedding
-        tf_model = TransformerEncoder(n_tokens=model["n_tokens"],
+        tf_model = TransformerEncoder(vocab_size=model["vocab_size"],
                                       max_seq_len=model["max_seq_len"],
                                       N=model["depth"],
                                       input_dim=model["input_dim"],
@@ -71,9 +71,9 @@ def get_transformer_encoder(model):
 
 # encoder classifier
 class TransformerEncoderClassifier(nn.Module):
-    def __init__(self, n_tokens, max_seq_len, N=6, input_dim=512, hidden_dim=1024, h=8, n_classes=None):
+    def __init__(self, vocab_size, max_seq_len, N=6, input_dim=512, hidden_dim=1024, h=8, n_classes=None):
         super(TransformerEncoderClassifier, self).__init__()
-        self.embedding = EmbeddingLayer(vocab_size=n_tokens, max_seq_len=max_seq_len, dim=input_dim)
+        self.embedding = EmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim)
         self.encoder = Encoder(EncoderLayer(h, input_dim, hidden_dim), N)
         # last linear layer: input_dim--> n_classes
         self.linear_output = nn.Linear(input_dim, n_classes)
@@ -94,7 +94,7 @@ class TransformerEncoderClassifier(nn.Module):
 
 
 def get_transformer_encoder_classifier(model):
-    tf_model = TransformerEncoderClassifier(n_tokens=model["n_tokens"],
+    tf_model = TransformerEncoderClassifier(vocab_size=model["vocab_size"],
                                             max_seq_len=model["max_seq_len"],
                                             N=model["depth"],
                                             input_dim=model["input_dim"],

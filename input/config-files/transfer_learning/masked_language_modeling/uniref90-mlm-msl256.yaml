@@ -28,7 +28,6 @@ sequence_settings:
 
 mlm_settings:
   no_mask_token_vals: [ 0 ]
-  n_tokens: 26
   mask_prob: 0.15
   random_mask_prob: 0.1
   no_change_mask_prob: 0.1

@@ -39,8 +39,8 @@ def execute(config):
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
 
-    # add n_tokens, max_sequence_length to encoder_settings
-    encoder_settings["n_tokens"] = constants.N_TOKENS
+    # add vocab_size, max_sequence_length to encoder_settings
+    encoder_settings["vocab_size"] = constants.VOCAB_SIZE
     encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"] + 1 # adding one for CLS token
 
     # add encoder_dim (which is defined in input_dim of encoder_settings) to mlm_settings
@@ -155,6 +155,7 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         # transpose from b x max_seq_len x n_tokens -> b x n_tokens x max_seq_len
         # because CrossEntropyLoss expected input to be of the shape b x n_classes x number_dimensions_for_loss
         # in this case, number_of_dimensions_for_loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
+        # here n_tokens = size of AMINO_ACID_VOCAB  + 1 (for pad_token_val)
         output = output.transpose(1, 2).to(nn_utils.get_device())
         loss = criterion(output, label.long())
         loss.backward()

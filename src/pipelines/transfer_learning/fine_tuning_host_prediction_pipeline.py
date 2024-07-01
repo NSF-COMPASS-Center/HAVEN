@@ -38,7 +38,7 @@ def execute(config):
     training_settings = fine_tune_settings["training_settings"]
 
     pre_train_encoder_settings = pre_train_settings["encoder_settings"]
-    pre_train_encoder_settings["n_tokens"] = constants.N_TOKENS
+    pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
     n_iters = fine_tune_settings["n_iterations"]
 
     sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
