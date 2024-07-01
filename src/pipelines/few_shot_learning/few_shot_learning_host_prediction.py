@@ -14,7 +14,7 @@ from models.nlp.transformer import transformer
 from transfer_learning.fine_tuning import host_prediction
 from models.nlp import cnn1d, rnn, lstm, fnn
 from training.early_stopping import EarlyStopping
-from utils import utils, dataset_utils, nn_utils, evaluation_utils
+from utils import utils, dataset_utils, nn_utils, evaluation_utils, constants
 from few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
 
@@ -138,7 +138,7 @@ def execute(config):
                 print(f"Executing VirProBERT (pre-trained and fine tuned model)")
                 # Load the pre-trained Transformer Encoder in the pre-trained (MLM) and fine-tuned (Host prediction) VirProBERT
                 mlm_encoder_settings = model_settings["encoder_settings"].copy()
-                mlm_encoder_settings["n_tokens"] += 2
+                mlm_encoder_settings["n_tokens"] = constants.N_TOKENS
                 # add max_sequence_length to pre_train_encoder_settings
                 mlm_encoder_settings["max_seq_len"] = max_sequence_length
                 # load pre-trained encoder model

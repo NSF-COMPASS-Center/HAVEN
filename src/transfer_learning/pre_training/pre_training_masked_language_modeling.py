@@ -1,19 +1,19 @@
 import torch.nn as nn
 import torch
 from models.nlp.transformer.transformer import TransformerEncoder
-from utils import nn_utils
+from utils import nn_utils, constants
 
 
 # only encoder
 class MaskedLanguageModel(nn.Module):
-    def __init__(self, encoder_model, encoder_dim, pad_token_val, no_mask_token_vals, n_tokens,
+    def __init__(self, encoder_model, encoder_dim, no_mask_token_vals, n_tokens,
                  mask_prob=0.15, random_mask_prob=0.1, no_change_mask_prob=0.1):
         super(MaskedLanguageModel, self).__init__()
         self.encoder_model = encoder_model
-        self.pad_token_val = pad_token_val
-        self.mask_token_val = n_tokens + 1
-        self.no_mask_token_vals = no_mask_token_vals
-        self.n_tokens = n_tokens + 2 # accounting for pad_token_val and mask_token_val
+        self.pad_token_val = constants.PAD_TOKEN_VAL
+        self.mask_token_val = constants.MASK_TOKEN_VAL
+        self.no_mask_token_vals = [constants.PAD_TOKEN_VAL, constants.CLS_TOKEN_VAL]
+        self.n_tokens = constants.N_TOKENS
         self.mask_prob = mask_prob
         self.random_mask_prob = random_mask_prob
         self.no_change_mask_prob = no_change_mask_prob
@@ -77,7 +77,6 @@ class MaskedLanguageModel(nn.Module):
 def get_mlm_model(encoder_model, mlm_model):
     mlm_model = MaskedLanguageModel(encoder_model=encoder_model,
                                     encoder_dim=mlm_model["encoder_dim"],
-                                    pad_token_val=mlm_model["pad_token_val"],
                                     no_mask_token_vals=mlm_model["no_mask_token_vals"],
                                     n_tokens=mlm_model["n_tokens"],
                                     mask_prob=mlm_model["mask_prob"],

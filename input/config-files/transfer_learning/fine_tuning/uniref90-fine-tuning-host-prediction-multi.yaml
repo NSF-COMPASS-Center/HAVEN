@@ -75,11 +75,11 @@ fine_tune_settings:
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
 
-    - name: "hybrid_attention_s2_fnn_2l_d1024_lr1e-4"
+    - name: "hybrid_attention_s128_fnn_2l_d1024_lr1e-4"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
-      stride: 64
+      stride: 128
       n_heads: 8
       loss: "FocalLoss"
       depth: 2

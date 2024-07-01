@@ -1,10 +1,10 @@
-from utils import utils, nn_utils
+from utils import utils, nn_utils, constants
 import torch
 import torch.nn as nn
 
 class Padding:
-    def __init__(self, max_seq_length, pad_value=0):
-        self.pad_value = pad_value
+    def __init__(self, max_seq_length):
+        self.pad_value = constants.PAD_TOKEN_VAL
         self.max_seq_length = max_seq_length
 
     def __call__(self, batch):

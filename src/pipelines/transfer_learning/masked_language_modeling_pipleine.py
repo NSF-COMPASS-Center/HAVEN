@@ -9,7 +9,7 @@ import tqdm
 from statistics import mean
 import wandb
 
-from utils import dataset_utils, nn_utils, evaluation_utils
+from utils import dataset_utils, nn_utils, evaluation_utils, constants
 from training.early_stopping import EarlyStopping
 from models.nlp.transformer import transformer
 from transfer_learning.pre_training import pre_training_masked_language_modeling
@@ -38,14 +38,12 @@ def execute(config):
     n_iters = training_settings["n_iterations"]
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
-    pad_token_val = sequence_settings["pad_token_val"]
 
     # add n_tokens, max_sequence_length to encoder_settings
-    encoder_settings["n_tokens"] = mlm_settings["n_tokens"] + 2  # (accounting for pad_token_val and mask_token_val)
-    encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"]
+    encoder_settings["n_tokens"] = constants.N_TOKENS
+    encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"] + 1 # adding one for CLS token
 
-    # add pad_token_val, encoder_dim (which is defined in input_dim of encoder_settings) to mlm_settings
-    mlm_settings["pad_token_val"] = pad_token_val
+    # add encoder_dim (which is defined in input_dim of encoder_settings) to mlm_settings
     mlm_settings["encoder_dim"] = encoder_settings["input_dim"]
 
     wandb_config = {
@@ -97,15 +95,15 @@ def execute(config):
                                                                         mlm_model=mlm_settings)
 
         mlm_model = run(mlm_model, train_dataset_loader, val_dataset_loader,
-                        training_settings, encoder_model_name, pad_token_val,
+                        training_settings, encoder_model_name,
                         mlm_checkpoint_filepath.replace("{itr}", str(iter)))
         torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
         wandb.finish()
 
 def run(model, train_dataset_loader, val_dataset_loader, training_settings,
-        encoder_model_name, pad_token_val, mlm_checkpoint_filepath):
+        encoder_model_name, mlm_checkpoint_filepath):
     tbw = SummaryWriter()
-    criterion = nn.CrossEntropyLoss(ignore_index=pad_token_val)
+    criterion = nn.CrossEntropyLoss(ignore_index=constants.PAD_TOKEN_VAL)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     n_epochs = training_settings["n_epochs"]
     lr_scheduler = OneCycleLR(

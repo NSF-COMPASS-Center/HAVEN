@@ -9,7 +9,7 @@ import tqdm
 from statistics import mean
 import wandb
 
-from utils import utils, dataset_utils, nn_utils
+from utils import utils, dataset_utils, nn_utils, constants
 from training.early_stopping import EarlyStopping
 from transfer_learning.fine_tuning import host_prediction
 from models.nlp.transformer import transformer
@@ -38,7 +38,7 @@ def execute(config):
     training_settings = fine_tune_settings["training_settings"]
 
     pre_train_encoder_settings = pre_train_settings["encoder_settings"]
-    pre_train_encoder_settings["n_tokens"] += 2  # (accounting for pad_token_val and mask_token_val)
+    pre_train_encoder_settings["n_tokens"] = constants.N_TOKENS
     n_iters = fine_tune_settings["n_iterations"]
 
     sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]

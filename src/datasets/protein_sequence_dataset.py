@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset
-from utils import utils, nn_utils
+from utils import utils, nn_utils, constants
 from textwrap import TextWrapper
 
 import numpy as np
@@ -7,22 +7,15 @@ import torch
 
 
 class ProteinSequenceDataset(Dataset):
-    def __init__(self, df, sequence_col, max_seq_len, truncate, split_sequence, label_col):
+    def __init__(self, df, sequence_col, max_seq_len, truncate, label_col):
         super(ProteinSequenceDataset, self).__init__()
         self.sequence_col = sequence_col
         self.max_seq_len = max_seq_len
         self.label_col = label_col
-        self.amino_acid_map = {"A": 1, "R": 2, "N": 3, "D": 4, "C": 5,
-                               "Q": 6, "E": 7, "G": 8, "H": 9, "I": 10,
-                               "L": 11, "K": 12, "M": 13, "F": 14, "P": 15,
-                               "O": 16, "S": 17, "U": 18, "T": 19, "W": 20,
-                               "Y": 21, "V": 22, "B": 23, "Z": 24, "X": 25,
-                               "J": 26, "-": 0}
+        self.amino_acid_map = constants.AMINO_ACID_VOCABULARY
         self.data = df
         if truncate:
             self.data = self.truncate_dataset(df)
-        if split_sequence:
-            self.split_sequences()
 
     def __len__(self) -> int:
         return self.data.shape[0]
@@ -31,13 +24,6 @@ class ProteinSequenceDataset(Dataset):
         # Truncating sequences to fixed length of sequence_max_length
         df.loc[:, self.sequence_col] = df[self.sequence_col].apply(lambda x: x[0:self.max_seq_len])
         return df
-
-    def split_sequences(self):
-        text_wrappper = TextWrapper(width=self.max_seq_len)
-        # decompose the sequence column into a list of strings of broken down sequences
-        self.data[self.sequence_col] = self.data.apply(lambda x: text_wrappper.wrap(x)) # returns a list of substrings of the desired length
-        # explode the sequece column
-        self.data = self.data.explode(self.sequence_col)
 
     def get_labels(self):
         return self.data[self.label_col]

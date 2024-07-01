@@ -138,7 +138,6 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
     seq_col = sequence_settings["sequence_col"]
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
-    pad_sequence_val = sequence_settings["pad_token_val"]
     truncate = sequence_settings["truncate"]
     split_sequence = sequence_settings["split_sequence"]
 
@@ -146,10 +145,10 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
     collate_func = None
     if exclude_label:
         dataset = ProteinSequenceUnlabeledDataset(df, seq_col, max_seq_len, truncate, split_sequence)
-        collate_func = PaddingUnlabeled(max_seq_len, pad_sequence_val)
+        collate_func = PaddingUnlabeled(max_seq_len)
     else:
         dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, split_sequence, label_col)
-        collate_func = Padding(max_seq_len, pad_sequence_val)
+        collate_func = Padding(max_seq_len)
 
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func)
 
@@ -159,14 +158,13 @@ def get_token_with_id_dataset_loader(df, sequence_settings, label_col):
     id_col = sequence_settings["id_col"]
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
-    pad_sequence_val = sequence_settings["pad_token_val"]
     truncate = sequence_settings["truncate"]
     split_sequence = sequence_settings["split_sequence"]
 
 
     dataset = ProteinSequenceDatasetWithID(df, id_col, seq_col, max_seq_len, truncate, split_sequence, label_col)
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
-                      collate_fn=PaddingWithID(max_seq_len, pad_sequence_val))
+                      collate_fn=PaddingWithID(max_seq_len))
 
 
 def get_kmer_dataset_loader(df, sequence_settings, label_col):
@@ -229,8 +227,7 @@ def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn
 
     fsl_episode = FewShotLearningEpisode(n_shot=few_shot_learn_settings["n_shot"],
                                          n_query=few_shot_learn_settings["n_query"],
-                                         max_length=sequence_settings["max_sequence_length"],
-                                         pad_value=sequence_settings["pad_token_val"])
+                                         max_length=sequence_settings["max_sequence_length"])
 
     return DataLoader(dataset=dataset,
                       batch_sampler=get_few_shot_learning_task_sampler(dataset, few_shot_learn_settings),

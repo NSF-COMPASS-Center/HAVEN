@@ -1,0 +1,10 @@
+PAD_TOKEN_VAL = 100
+CLS_TOKEN_VAL = 101
+MASK_TOKEN_VAL = 102
+AMINO_ACID_VOCABULARY = {"A": 1, "R": 2, "N": 3, "D": 4, "C": 5,
+                         "Q": 6, "E": 7, "G": 8, "H": 9, "I": 10,
+                         "L": 11, "K": 12, "M": 13, "F": 14, "P": 15,
+                         "O": 16, "S": 17, "U": 18, "T": 19, "W": 20,
+                         "Y": 21, "V": 22, "B": 23, "Z": 24, "X": 25,
+                         "J": 26, "-": 0}
+N_TOKENS = len(AMINO_ACID_VOCABULARY) + 3 # accounting for PAD_TOKEN_VAL, CLS_TOKEN_VAL, and MASK_TOKEN_VAL

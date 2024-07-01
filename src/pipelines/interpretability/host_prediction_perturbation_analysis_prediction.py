@@ -6,7 +6,7 @@ from torch.utils.tensorboard import SummaryWriter
 import torch
 import tqdm
 
-from utils import utils, dataset_utils, nn_utils
+from utils import utils, dataset_utils, nn_utils, constants
 from models.nlp.transformer import transformer
 from models.nlp import cnn1d, rnn, lstm, fnn
 from models.cv import cnn2d, cnn2d_pool
@@ -51,7 +51,7 @@ def execute(config):
         if "transfer_learning" in model_name:
             print(f"Executing Transfer Learning (Pre-trained and fine tuned model) in {mode} mode")
             pre_train_encoder_settings = model["pre_train_settings"]
-            pre_train_encoder_settings["n_tokens"] += 2
+            pre_train_encoder_settings["n_tokens"] = constants.N_TOKENS
             # add max_sequence_length to pre_train_encoder_settings
             pre_train_encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"]
             # load pre-trained encoder model
