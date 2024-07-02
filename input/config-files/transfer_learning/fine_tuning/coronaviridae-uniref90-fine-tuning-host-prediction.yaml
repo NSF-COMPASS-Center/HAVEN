@@ -17,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 16
+    batch_size: 32
     id_col: "uniref90_id"
     sequence_col: "aligned_seq"
     truncate: False
@@ -26,7 +26,7 @@ sequence_settings:
 
 pre_train_settings:
   model_name: "masked_language_modeling"
-  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240618/transformer_encoder-l_6-h_8-lr1e-4_msl128_splitseq_mlm_itr0.pth"
+  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240618/transformer_encoder-l_6-h_8-lr1e-4_msl256_splitseq_mlm_itr0.pth"
   encoder_settings:
     model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
     embedding: "linear"
@@ -35,7 +35,7 @@ pre_train_settings:
     input_dim: 512 # input embedding dimension
     hidden_dim: 1024
     n_tokens: 26
-    max_seq_len: 128
+    max_seq_len: 256
 
 fine_tune_settings:
   experiment: "fine_tune_model_hybrid_coronaviridae_uniref_aligned_s_prot_multi"
@@ -96,4 +96,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240701/host_multi/fine_tuning_hybrid"
-  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
