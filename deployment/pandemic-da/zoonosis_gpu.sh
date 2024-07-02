@@ -2,9 +2,6 @@
 
 echo "Conda information:"
 conda info
-# set GPU devices
-export CUDA_VISIBLE_DEVICES=1,2
-
 
 # Execute python script
 SCRIPT_LOCATION=./src/zoonosis.py

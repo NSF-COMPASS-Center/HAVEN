@@ -22,7 +22,6 @@ sequence_settings:
     sequence_col: "seq"
     truncate: False
     split_sequence: False
-    pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 pre_train_settings:
@@ -75,11 +74,11 @@ fine_tune_settings:
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
 
-    - name: "hybrid_attention_s128_fnn_2l_d1024_lr1e-4"
+    - name: "hybrid_attention_s32_fnn_2l_d1024_lr1e-4"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
-      stride: 128
+      stride: 32
       n_heads: 8
       loss: "FocalLoss"
       depth: 2
