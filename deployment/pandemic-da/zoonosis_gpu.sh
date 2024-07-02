@@ -3,6 +3,7 @@
 echo "Conda information:"
 conda info
 
+
 # Execute python script
 SCRIPT_LOCATION=./src/zoonosis.py
 CONFIG_FILE=$1
