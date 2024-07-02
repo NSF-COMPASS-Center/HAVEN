@@ -13,9 +13,8 @@ classification_settings:
     batch_size: 32
     id_col: "uniref90_id"
     sequence_col: "aligned_seq"
-    max_sequence_length: 2048 # 1366 # max=2169
-    truncate: True
-    pad_token_val: 0
+    truncate: False
+    split: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
     kmer_settings:
       k: 3
@@ -41,7 +40,7 @@ classification_settings:
 
   models:
     - name: "transfer_learning_mlm_fnn_2l_lr1e-4"
-      active: True
+      active: False
       mode: "test"
       model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240614/fine_tuning/host_prediction/multi/host_prediction_fnn_2l_d1024_lr1e-4_aligned_itr4.pth"
       depth: 2
@@ -55,28 +54,29 @@ classification_settings:
         depth: 6
         input_dim: 512 # input embedding dimension
         hidden_dim: 1024
-        n_tokens: 26
 
-    - name: "transfer_learning_mlm_fnn_2l_lr1e-4"
+    - name: "hybrid_attention_s64_fnn_2l_d1024_lr1e-4"
       active: True
       mode: "test"
-      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240614/fine_tuning/host_prediction/multi/host_prediction_fnn_2l_d1024_lr1e-4_aligned_itr4.pth"
+      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240701/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr0.pth"
       depth: 2
       n_classes: 8
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
+      n_heads: 8
+      stride: 64
       pre_train_settings:
-        model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
         embedding: "linear"
         n_heads: 8
         depth: 6
         input_dim: 512 # input embedding dimension
         hidden_dim: 1024
-        n_tokens: 26
+        max_seq_len: 256
+
 
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_perturbation/20240616/sars-cov-2/uniref90/cov-S-multi-transfer_learning_mlm_fnn_2l_lr1e-4/aligned_msl2048"
+  sub_dir: "coronaviridae_s_prot_perturbation/20240702/sars-cov-2/uniref90/cov-S-multi-transfer_learning_mlm_hybrid_attn_fnn_2l_lr1e-4/aligned_msl256_s64"
   prefix: "tl_tf_multi" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

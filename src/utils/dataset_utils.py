@@ -159,10 +159,9 @@ def get_token_with_id_dataset_loader(df, sequence_settings, label_col):
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
     truncate = sequence_settings["truncate"]
-    split_sequence = sequence_settings["split_sequence"]
 
 
-    dataset = ProteinSequenceDatasetWithID(df, id_col, seq_col, max_seq_len, truncate, split_sequence, label_col)
+    dataset = ProteinSequenceDatasetWithID(df, id_col, seq_col, max_seq_len, truncate, label_col)
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
                       collate_fn=PaddingWithID(max_seq_len))
 
