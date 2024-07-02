@@ -117,7 +117,7 @@ def execute(config):
 
             elif "hybrid_attention" in task_name:
                 print(f"Executing Hybrid Attention fine tuning in {mode} mode")
-                # madd maximum sequence length of pretrained model as the chunk size
+                # add maximum sequence length of pretrained model as the chunk size
                 task["chunk_len"] = pre_train_encoder_settings["max_seq_len"]
                 fine_tune_model = transformer_attention.get_model(task)
             else:

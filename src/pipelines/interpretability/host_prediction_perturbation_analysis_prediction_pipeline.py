@@ -8,6 +8,7 @@ import tqdm
 
 from utils import utils, dataset_utils, nn_utils, constants
 from models.nlp.transformer import transformer
+from models.nlp.hybrid import transformer_attention
 from models.nlp import cnn1d, rnn, lstm, fnn
 from models.cv import cnn2d, cnn2d_pool
 from transfer_learning.fine_tuning import host_prediction
@@ -40,8 +41,6 @@ def execute(config):
 
     for model in models:
         model_name = model["name"]
-        # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
-        model["max_seq_len"] = sequence_settings["max_sequence_length"]
         mode = model["mode"]
 
         if model["active"] is False:
@@ -51,14 +50,25 @@ def execute(config):
         if "transfer_learning" in model_name:
             print(f"Executing Transfer Learning (Pre-trained and fine tuned model) in {mode} mode")
             pre_train_encoder_settings = model["pre_train_settings"]
-            pre_train_encoder_settings["n_tokens"] = constants.N_TOKENS
-            # add max_sequence_length to pre_train_encoder_settings
-            pre_train_encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"]
+            pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
             # load pre-trained encoder model
             pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
             # Set the pre_trained model within the task config
             model["pre_trained_model"] = pre_trained_encoder_model
             prediction_model = host_prediction.get_host_prediction_model(model)
+
+        elif "hybrid_attention" in model_name:
+            print(f"Executing Hybrid Attention fine tuning in {mode} mode")
+            # add maximum sequence length of pretrained model as the chunk size
+            # load pre-trained encoder model
+            pre_train_encoder_settings = model["pre_train_settings"]
+            pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
+            pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
+
+            model["pre_trained_model"] = pre_trained_encoder_model
+            model["chunk_len"] = pre_train_encoder_settings["max_seq_len"]
+            sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
+            prediction_model = transformer_attention.get_model(model)
 
         elif "fnn" in model_name:
             print(f"Executing FNN in {mode} mode")
