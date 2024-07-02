@@ -222,7 +222,6 @@ def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn
                                      sequence_col=sequence_settings["sequence_col"],
                                      max_seq_len=sequence_settings["max_sequence_length"],
                                      truncate=sequence_settings["truncate"],
-                                     split_sequence = sequence_settings["split_sequence"],
                                      label_col=label_col)
 
     fsl_episode = FewShotLearningEpisode(n_shot=few_shot_learn_settings["n_shot"],

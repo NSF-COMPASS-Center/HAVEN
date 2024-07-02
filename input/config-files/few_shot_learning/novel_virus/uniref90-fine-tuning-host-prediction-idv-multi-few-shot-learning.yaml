@@ -20,7 +20,6 @@ sequence_settings:
     max_sequence_length: 2048 # 6630 # 1024 # 1115
     truncate: True
     split_sequence: False
-    pad_token_val: 0
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 label_settings:
@@ -61,10 +60,10 @@ few_shot_learn_settings:
 
   meta_test_settings:
     n_way_type: "fixed"
-    n_way: # default = if n_way is not configured, n_way is set to the , total number of labels in the dataset
+    n_way: 3 # default = if n_way is not configured, n_way is set to the , total number of labels in the dataset
     n_shot: 5
     n_query: -1 # -1 to test on all remaining samples of the test class
-    n_task: 1
+    n_task: 100
 
 
 pre_trained_models:
@@ -80,7 +79,7 @@ pre_trained_models:
 #      hidden_dim: 1024
 
   - name: "transformer-l_6-h_8-d_1024-lr1e-4"
-    active: True
+    active: False
     mode: "test"
     path: "output/raw/uniref90_embl_vertebrates_non_idv/20240613/host_multi/few_shot_learning/transformer-l_6-h_8-d_1024-lr1e-4_itr2.pth"
     model_settings:
@@ -92,9 +91,9 @@ pre_trained_models:
       n_classes: 5
 
   - name: "virprobert"
-    active: False
+    active: True
     mode: "test"
-    path: "output/raw/uniref90_embl_vertebrates_non_idv/20240612/host_multi/few_shot_learning/virprobert_itr2.pth"
+    path: "output/raw/uniref90_embl_vertebrates_non_idv/20240625/host_multi/few_shot_learning/fsl_tr_w3s5q10_te_w3s5q-1_e25b32_msl2048_split70-10-20_virprobert_itr0.pth"
     model_settings:
       depth: 2
       n_classes: 5
@@ -106,11 +105,9 @@ pre_trained_models:
         depth: 6
         input_dim: 512 # input embedding dimension
         hidden_dim: 1024
-        n_tokens: 26
-
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_idv/20240614/host_multi/few_shot_learning"
-  prefix: "3_way5shot_q_all_fsl_idv_uniref90viridae_msl2048" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90_embl_vertebrates_idv/20240625/host_multi/few_shot_learning"
+  prefix: "fsl_tr_w3s5q10_te_w3s5q-1_e25b32_msl2048_split70-10-20" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
