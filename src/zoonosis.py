@@ -35,7 +35,7 @@ def main():
             print(f"ERROR: Unsupported config_sub_type '{config_sub_type}' for config_type '{config_type}'.\nSupported values=masked_langage_modeling",
                   "host_prediction")
     elif config_type == "few_shot_learning":
-        few_shot_learning_host_prediction.execute(config)
+        few_shot_learning_host_prediction_pipeline.execute(config)
     # classification: host-prediction
     elif config_type == "host_prediction":
         host_prediction_pipeline.execute(config)
@@ -44,7 +44,7 @@ def main():
         evaluation.execute(config)
     # evaluation
     elif config_type == "host_prediction_perturbation":
-        host_prediction_perturbation_analysis_prediction.execute(config)
+        host_prediction_perturbation_analysis_prediction_pipeline.execute(config)
 
     # feature_importance for baseline models
     # TODO: >>>> DEPRECATED <<<< (Remove all corresponding code)

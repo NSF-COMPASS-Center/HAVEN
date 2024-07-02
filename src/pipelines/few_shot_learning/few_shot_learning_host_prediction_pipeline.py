@@ -138,7 +138,7 @@ def execute(config):
                 print(f"Executing VirProBERT (pre-trained and fine tuned model)")
                 # Load the pre-trained Transformer Encoder in the pre-trained (MLM) and fine-tuned (Host prediction) VirProBERT
                 mlm_encoder_settings = model_settings["encoder_settings"].copy()
-                mlm_encoder_settings["n_tokens"] = constants.N_TOKENS
+                mlm_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
                 # add max_sequence_length to pre_train_encoder_settings
                 mlm_encoder_settings["max_seq_len"] = max_sequence_length
                 # load pre-trained encoder model
@@ -173,7 +173,7 @@ def execute(config):
 
                 # load the pre-trained few-shot classifier
                 few_shot_classifier.load_state_dict(torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
-                result_df, auprc_df = meta_test_model(few_shot_classifier, test_dataset_loader, batch_size=meta_test_settings["batch_size"])
+                result_df, auprc_df = meta_test_model(few_shot_classifier, test_dataset_loader, batch_size=few_shot_learn_settings["batch_size"])
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values are ['train', 'test'].")
                 exit(1)
