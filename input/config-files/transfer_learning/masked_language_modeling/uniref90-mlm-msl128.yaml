@@ -17,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 256
+    batch_size: 1024
     id_col: "uniref90_id"
     sequence_col: "seq"
     max_sequence_length: 128 # 6630 # 1024 # 1115
@@ -54,4 +54,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "uniref90-viridae/pre-training/mlm/20240701"
-  prefix: "msl128_b256_splitseq_mlm_cls" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "msl128_b1024_splitseq_mlm_cls" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
