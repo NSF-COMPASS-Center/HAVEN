@@ -40,30 +40,14 @@ class TransformerEncoder(nn.Module):
         X = self.encoder(X, mask)
         return X
 
-# only encoder + convolution embedding
-class TransformerEncoder_Conv1D(TransformerEncoder):
-    def __init__(self, vocab_size, max_seq_len, N=6, input_dim=512, hidden_dim=1024, h=8, kernel_size=3, stride=1, padding=0):
-        super(TransformerEncoder, self).__init__(vocab_size, max_seq_len, N, input_dim, hidden_dim, h)
-        # override the default embedding layer with convolution embedding layer
-        self.embedding = ConvolutionEmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim,
-                                                   kernel_size=kernel_size, stride=stride, padding=padding)
-
 
 def get_transformer_encoder(model):
-    if model["embedding"] == "convolution":
-        tf_model = TransformerEncoder_Conv1D(vocab_size = model["vocab_size"],
-                                      max_seq_len=model["max_seq_len"],
-                                      N=model["depth"],
-                                      input_dim=model["input_dim"],
-                                      hidden_dim=model["hidden_dim"],
-                                      h=model["n_heads"])
-    else: # default: Embedding
-        tf_model = TransformerEncoder(vocab_size=model["vocab_size"],
-                                      max_seq_len=model["max_seq_len"],
-                                      N=model["depth"],
-                                      input_dim=model["input_dim"],
-                                      hidden_dim=model["hidden_dim"],
-                                      h=model["n_heads"])
+    tf_model = TransformerEncoder(vocab_size=model["vocab_size"],
+                                  max_seq_len=model["max_seq_len"],
+                                  N=model["depth"],
+                                  input_dim=model["input_dim"],
+                                  hidden_dim=model["hidden_dim"],
+                                  h=model["n_heads"])
     print(tf_model)
     print("Number of parameters = ", sum(p.numel() for p in tf_model.parameters() if p.requires_grad))
     return tf_model.to(nn_utils.get_device())

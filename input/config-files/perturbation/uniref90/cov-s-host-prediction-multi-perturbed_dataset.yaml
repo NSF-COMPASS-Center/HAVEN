@@ -4,7 +4,7 @@ config_type: "host_prediction_perturbation" # options: data_preprocessor, host_p
   ## initialize base input folder name
   ## provide path to dataset folder
 input_settings:
-  perturbed_dataset_dir: "input/data/coronaviridae/20240313/sarscov2/aligned/uniref90/perturbation_dataset/WIV04"
+  perturbed_dataset_dir: "input/data/coronaviridae/20240313/sarscov2/aligned/uniref90/perturbation_dataset/multi"
 
 classification_settings:
   model_type: "perturbed_dataset_prediction"  # options: baseline, nlp, perturbed_dataset_prediction

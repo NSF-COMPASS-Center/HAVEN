@@ -25,7 +25,7 @@ def scaled_dot_product_attention(Q, K, V, mask=None):
     scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(
         d_k)  # transpose(-2, -1) is same as transpose(0, 1) for 2D tensor
 
-    # mask is used while training the decoder
+    # mask is used to ignore(mask) the specified positions and not pay attention to them.
     if mask is not None:
         mask = mask.unsqueeze(1) # add a dimension for the heads in multihead attention
         # replace all zero entries with negative infinity
