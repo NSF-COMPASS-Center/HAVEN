@@ -10,4 +10,4 @@ AMINO_ACID_VOCABULARY = {"A": 1, "R": 2, "N": 3, "D": 4, "C": 5,
 # the total size of the vocabulary. We need this hack because the token values serve as indices for the embedding look-up vocabulary in nn.Embedding.
 # hence we need the maximum value and not just the total number of tokens
 VOCAB_SIZE = max([max(AMINO_ACID_VOCABULARY.values()), PAD_TOKEN_VAL, CLS_TOKEN_VAL, MASK_TOKEN_VAL]) + 1
-# VOCAB_SIZE = 28
+VOCAB_SIZE = 28
