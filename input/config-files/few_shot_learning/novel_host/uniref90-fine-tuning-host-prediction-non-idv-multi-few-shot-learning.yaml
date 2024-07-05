@@ -107,7 +107,6 @@ pre_trained_models:
         depth: 6
         input_dim: 512 # input embedding dimension
         hidden_dim: 1024
-        n_tokens: 26
 
 
 output_settings:

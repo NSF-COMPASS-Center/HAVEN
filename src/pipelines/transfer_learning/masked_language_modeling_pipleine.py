@@ -103,7 +103,7 @@ def execute(config):
 def run(model, train_dataset_loader, val_dataset_loader, training_settings,
         encoder_model_name, mlm_checkpoint_filepath):
     tbw = SummaryWriter()
-    criterion = nn.CrossEntropyLoss(ignore_index=constants.PAD_TOKEN_VAL)
+    criterion = nn.CrossEntropyLoss(ignore_index=constants.PAD_TOKEN_VAL) # all non masked positions are replaced with pad_token_val in the label
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     n_epochs = training_settings["n_epochs"]
     lr_scheduler = OneCycleLR(
@@ -152,10 +152,9 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
         optimizer.zero_grad()
 
         output, label = model(input)
-        # transpose from b x max_seq_len x n_tokens -> b x n_tokens x max_seq_len
+        # transpose from b x max_seq_len x AMINO_ACID_VOCAB_size -> b x AMINO_ACID_VOCAB_size x max_seq_len
         # because CrossEntropyLoss expected input to be of the shape b x n_classes x number_dimensions_for_loss
-        # in this case, number_of_dimensions_for_loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
-        # here n_tokens = size of AMINO_ACID_VOCAB  + 1 (for pad_token_val)
+        # in this case, number_of_dimensions_for_loss = max_seq_len as every sequence in the batch will have a loss corresponding to each token position
         output = output.transpose(1, 2).to(nn_utils.get_device())
         loss = criterion(output, label.long())
         loss.backward()

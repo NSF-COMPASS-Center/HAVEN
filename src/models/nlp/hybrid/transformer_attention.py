@@ -36,10 +36,10 @@ class TransformerAttention(nn.Module):
         X = X.unfold(dimension=1, size=self.chunk_len, step=self.stride) # b x n_c x chunk_len
 
         # reshape the tensor to individual sequences of chunk_len diregarding the sequence dimension (i.e. batch)
-        # contiguous ensure contiguous memory allocation for every value in the tensor
-        # this will enable reshaping using view which only changes the shape(view) of the tensor without creating a copy
-        # reshape() 'might' create a copy. Hence, we use view to save memory
         # since we only need to generate embeddings for each chunk where the sequence identity does not matter
+        # contiguous ensures contiguous memory allocation for every value in the tensor
+        # this will enable reshaping using view which only changes the shape(view) of the tensor without creating a copy
+        # reshape() 'might' create a copy. Hence, we use view() to save memory
         X = X.contiguous().view(-1, self.chunk_len) # (b * n_c) x chunk_len
 
         # generate embeddings
@@ -65,6 +65,7 @@ class TransformerAttention(nn.Module):
         # input linear layer
         X = F.relu(self.linear_ip(X))
         # hidden
+        self.embedding = X
         for linear_layer in self.linear_hidden_n:
             X = F.relu(linear_layer(X))
         y = self.linear_op(X)
