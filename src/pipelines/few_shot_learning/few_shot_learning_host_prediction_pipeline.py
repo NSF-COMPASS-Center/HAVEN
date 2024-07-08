@@ -2,7 +2,6 @@ import os
 import pandas as pd
 from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
-from torch.utils.tensorboard import SummaryWriter
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -197,8 +196,9 @@ def execute(config):
     utils.write_output(evaluation_metrics, output_results_dir, output_prefix, "classwise_auprc")
 
 
-def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learning_settings, meta_train_settings, meta_validate_settings, meta_test_settings, model_name):
-    tbw = SummaryWriter()
+def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
+                          few_shot_learning_settings, meta_train_settings, meta_validate_settings, meta_test_settings,
+                          model_name):
     n_epochs = few_shot_learning_settings["n_epochs"]
     batch_size = few_shot_learning_settings["batch_size"]
     criterion = nn.CrossEntropyLoss()
@@ -220,9 +220,9 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
     for e in range(n_epochs):
         # training
         model = meta_train_model(model, train_dataset_loader, criterion, optimizer,
-                          lr_scheduler, tbw, model_name, e, batch_size)
+                          lr_scheduler, model_name, e, batch_size)
         # validation
-        val_loss = meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e, batch_size)
+        val_loss = meta_validate_model(model, val_dataset_loader, criterion, model_name, e, batch_size)
         early_stopper(model, val_loss)
 
         if early_stopper.early_stop:
@@ -238,7 +238,7 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
     return result_df, auprc_df, best_performing_model
 
 
-def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_scheduler, tbw, model_name, epoch, batch_size):
+def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_scheduler, model_name, epoch, batch_size):
     model.train()
     for _, record in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
         support_sequences, support_labels, query_sequences, query_labels, _ = record
@@ -261,14 +261,12 @@ def meta_train_model(model, train_dataset_loader, criterion, optimizer, lr_sched
             "learning-rate": float(curr_lr),
             "training-loss": float(train_loss)
         })
-        tbw.add_scalar(f"{model_name}/learning-rate", float(curr_lr), model.train_iter)
-        tbw.add_scalar(f"{model_name}/training-loss", float(train_loss), model.train_iter)
         pbar.set_description(
             f"{model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
     return model
 
 
-def meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, epoch, batch_size):
+def meta_validate_model(model, val_dataset_loader, criterion, model_name, epoch, batch_size):
     with torch.no_grad():
         model.eval()
 
@@ -287,7 +285,6 @@ def meta_validate_model(model, val_dataset_loader, criterion, tbw, model_name, e
             wandb.log({
                 "validation-loss": float(curr_val_loss)
             })
-            tbw.add_scalar(f"{model_name}/validation-loss", float(curr_val_loss), model.val_iter)
             pbar.set_description(
                 f"{model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.val_iter}, epoch={epoch + 1}")
             val_loss.append(curr_val_loss)

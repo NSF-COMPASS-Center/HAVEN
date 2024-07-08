@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
-from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
 import torch.nn as nn
 import torch
@@ -102,7 +101,6 @@ def execute(config):
 
 def run(model, train_dataset_loader, val_dataset_loader, training_settings,
         encoder_model_name, mlm_checkpoint_filepath):
-    tbw = SummaryWriter()
     criterion = nn.CrossEntropyLoss(ignore_index=constants.PAD_TOKEN_VAL) # all non masked positions are replaced with pad_token_val in the label
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     n_epochs = training_settings["n_epochs"]
@@ -127,7 +125,7 @@ def run(model, train_dataset_loader, val_dataset_loader, training_settings,
 
     for e in range(last_epoch+1, n_epochs):
         model = run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
-                          lr_scheduler, early_stopper, tbw, encoder_model_name, e)
+                          lr_scheduler, early_stopper, encoder_model_name, e)
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
             print("Breaking off training loop due to early stop")
@@ -145,7 +143,7 @@ def run(model, train_dataset_loader, val_dataset_loader, training_settings,
 
 
 def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper,
-              tbw, encoder_model_name, epoch):
+              encoder_model_name, epoch):
     # Training
     model.train()
     for _, input in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
@@ -171,18 +169,16 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
             "training-loss": float(train_loss)
         })
 
-        tbw.add_scalar(f"{encoder_model_name}/learning-rate", float(curr_lr), model.train_iter)
-        tbw.add_scalar(f"{encoder_model_name}/training-loss", float(train_loss), model.train_iter)
         pbar.set_description(
             f"{encoder_model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
 
     # Validation
-    val_loss = evaluate_model(model, val_dataset_loader, criterion, tbw, encoder_model_name, epoch, log_loss=True)
+    val_loss = evaluate_model(model, val_dataset_loader, criterion, encoder_model_name, epoch, log_loss=True)
     early_stopper(model, val_loss)
     return model
 
 
-def evaluate_model(model, dataset_loader, criterion, tbw, encoder_model_name, epoch, log_loss=False):
+def evaluate_model(model, dataset_loader, criterion, encoder_model_name, epoch, log_loss=False):
     with torch.no_grad():
         model.eval()
 
@@ -206,9 +202,7 @@ def evaluate_model(model, dataset_loader, criterion, tbw, encoder_model_name, ep
                     "f1_micro": f1_micro,
                     "f1_macro": f1_macro
                 })
-                tbw.add_scalar(f"{encoder_model_name}/validation-loss", float(curr_val_loss), model.test_iter)
-                tbw.add_scalar(f"{encoder_model_name}/f1_micro", f1_micro, model.test_iter)
-                tbw.add_scalar(f"{encoder_model_name}/f1_macro", f1_macro, model.test_iter)
+
                 pbar.set_description(
                     f"{encoder_model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.test_iter}, epoch={epoch + 1}")
             val_loss.append(curr_val_loss)

@@ -2,7 +2,6 @@ import os
 import pandas as pd
 from pathlib import Path
 import torch.nn.functional as F
-from torch.utils.tensorboard import SummaryWriter
 import torch
 import tqdm
 
@@ -148,7 +147,6 @@ def execute(config):
 
 
 def evaluate_model(model, dataset_loader, id_col):
-    tbw = SummaryWriter()
     with torch.no_grad():
         model.eval()
 
