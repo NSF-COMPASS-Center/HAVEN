@@ -24,21 +24,15 @@ class FewShotLearningTestTaskSampler(FewShotLearningTaskSampler):
             n_query: =-1, no limit on the number of sequences for query set. Use all remaining examples after selecting for support set.
             n_task: number of tasks (a.k.a batches)
         """
-        n_query = -1
-        super().__init__(dataset, n_way, n_shot, n_query, n_task)
+        super().__init__(dataset=dataset, n_shot=n_shot, n_query=-1, n_task=n_task)
+
+        self.n_way = n_way
+        # if n_way is not configured, use all the labels in the dataset
+        if self.n_way is None:
+            self.n_way = self.n_labels
 
 
-    def initialize_label_item_index_map(self):
-        print("Initializing label index map for Few Shot Learning test dataset sampler.")
-        for index, label in enumerate(self.dataset.get_labels()):
-            if label in self.label_item_index_map:
-                # if the label is already there in the map, add item (index) to the label's list of indices
-                self.label_item_index_map[label].append(index)
-            else:
-                # label is not present in the map, i.e., new label encountered
-                # initialize a list containing the item (index)
-                self.label_item_index_map[label] = [index]
-
+    def filter_labels(self):
         # remove labels without atleast n_shot + 1 samples
         # + 1 because we need atleast one sample of the label for testing in the query set
         self.label_item_index_map = dict(
@@ -53,7 +47,6 @@ class FewShotLearningTestTaskSampler(FewShotLearningTaskSampler):
         Return:
             list of varying length lists of indices = n_way * (number of sequences)
         """
-
         for _ in range(self.n_task):
             sequence_indices = []
             # for each batch, randomly sample n_way labels

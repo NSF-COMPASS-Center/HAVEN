@@ -1,4 +1,4 @@
-from utils import utils, nn_utils
+from utils import utils, nn_utils, constants
 import torch
 import numpy as np
 
@@ -14,11 +14,10 @@ class FewShotLearningEpisode:
             - # query_sequences: n_way * n_query
             - # query_labels: n_way * n_query
     """
-    def __init__(self, n_way, n_shot, n_query, pad_value, max_length):
-        self.n_way = n_way
+    def __init__(self, n_shot, n_query, max_length):
         self.n_shot = n_shot
         self.n_query = n_query
-        self.pad_value = pad_value
+        self.pad_value = constants.PAD_TOKEN_VAL
         self.max_length = max_length
 
     def __call__(self, batch):

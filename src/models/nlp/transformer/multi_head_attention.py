@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+import gc
 
 
 def scaled_dot_product_attention(Q, K, V, mask=None):
@@ -24,7 +25,7 @@ def scaled_dot_product_attention(Q, K, V, mask=None):
     scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(
         d_k)  # transpose(-2, -1) is same as transpose(0, 1) for 2D tensor
 
-    # mask is used while training the decoder
+    # mask is used to ignore(mask) the specified positions and not pay attention to them.
     if mask is not None:
         mask = mask.unsqueeze(1) # add a dimension for the heads in multihead attention
         # replace all zero entries with negative infinity
@@ -87,8 +88,10 @@ class MultiHeadAttention(nn.Module):
         # 3. Concat all the heads
         X = X.transpose(1, 2).contiguous().view(batch_size, -1, self.h * self.d_attn_head)
 
-        del Q
-        del K
-        del V
+        del Q # mark for deletion
+        del K # mark for deletion
+        del V # mark for deletion
+        gc.collect() # garbage collection to free up memory
+
         # 4. Apply final output linear transformation
         return self.W_O(X)

@@ -9,11 +9,11 @@ import tqdm
 from statistics import mean
 import wandb
 
-from utils import utils, dataset_utils, nn_utils
+from utils import utils, dataset_utils, nn_utils, constants
 from training.early_stopping import EarlyStopping
 from transfer_learning.fine_tuning import host_prediction
 from models.nlp.transformer import transformer
-
+from models.nlp.hybrid import transformer_attention
 
 def execute(config):
     # input settings
@@ -38,10 +38,10 @@ def execute(config):
     training_settings = fine_tune_settings["training_settings"]
 
     pre_train_encoder_settings = pre_train_settings["encoder_settings"]
-    pre_train_encoder_settings["n_tokens"] += 2  # (accounting for pad_token_val and mask_token_val)
-    # add max_sequence_length to pre_train_encoder_settings
-    pre_train_encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"]
+    pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
     n_iters = fine_tune_settings["n_iterations"]
+
+    sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
 
     tasks = fine_tune_settings["task_settings"]
     id_col = sequence_settings["id_col"]
@@ -53,7 +53,7 @@ def execute(config):
         "n_epochs_freeze": training_settings["n_epochs_freeze"],
         "n_epochs_unfreeze": training_settings["n_epochs_unfreeze"],
         "lr": training_settings["max_lr"],
-        "max_sequence_length": sequence_settings["max_sequence_length"],
+        "max_sequence_length": pre_train_encoder_settings["max_seq_len"],
         "dataset": input_file_names[0]
     }
 
@@ -114,6 +114,12 @@ def execute(config):
             if "host_prediction" in task_name:
                 print(f"Executing Host Prediction fine tuning in {mode} mode")
                 fine_tune_model = host_prediction.get_host_prediction_model(task)
+
+            elif "hybrid_attention" in task_name:
+                print(f"Executing Hybrid Attention fine tuning in {mode} mode")
+                # add maximum sequence length of pretrained model as the chunk size
+                task["chunk_len"] = pre_train_encoder_settings["max_seq_len"]
+                fine_tune_model = transformer_attention.get_model(task)
             else:
                 continue
 

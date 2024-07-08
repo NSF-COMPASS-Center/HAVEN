@@ -1,23 +1,24 @@
 import torch.nn as nn
 import torch
 from models.nlp.transformer.transformer import TransformerEncoder
-from utils import nn_utils
+from utils import nn_utils, constants
 
 
 # only encoder
 class MaskedLanguageModel(nn.Module):
-    def __init__(self, encoder_model, encoder_dim, pad_token_val, no_mask_token_vals, n_tokens,
-                 mask_prob=0.15, random_mask_prob=0.1, no_change_mask_prob=0.1):
+    def __init__(self, encoder_model, encoder_dim, mask_prob=0.15, random_mask_prob=0.1, no_change_mask_prob=0.1):
         super(MaskedLanguageModel, self).__init__()
         self.encoder_model = encoder_model
-        self.pad_token_val = pad_token_val
-        self.mask_token_val = n_tokens + 1
-        self.no_mask_token_vals = no_mask_token_vals
-        self.n_tokens = n_tokens + 2 # accounting for pad_token_val and mask_token_val
+        self.pad_token_val = constants.PAD_TOKEN_VAL
+        self.mask_token_val = constants.MASK_TOKEN_VAL
+        self.no_mask_token_vals = [constants.PAD_TOKEN_VAL, constants.CLS_TOKEN_VAL]
+        self.n_tokens = len(constants.AMINO_ACID_VOCABULARY) + 1 # n_tokens = size of amino_acid vocab + 1 (for the pad_token)
         self.mask_prob = mask_prob
         self.random_mask_prob = random_mask_prob
         self.no_change_mask_prob = no_change_mask_prob
 
+        # cross entropy loss expects targets as the class indices which in our case is the same as the amino acid vocab token value
+        # pad token val of 0 will be ignored as per the definition of CrossEntropyLoss(ignore_index=pad_token_val) in mlm pipeline.
         self.output_projection = nn.Linear(encoder_dim, self.n_tokens)
 
     def mask_sequence_batch(self, sequence_batch):
@@ -48,7 +49,8 @@ class MaskedLanguageModel(nn.Module):
         random_mask_pos = torch.nonzero(random_token_mask, as_tuple=True)
 
         # random tokens to be used for replacement in each of the selected positions
-        random_mask_tokens = torch.randint(low=0, high=self.n_tokens, size=(len(random_mask_pos[0]), ),
+        # low is NOT equal to 0 beause 0 is pad token value
+        random_mask_tokens = torch.randint(low=1, high=self.n_tokens, size=(len(random_mask_pos[0]), ),
                                            device=nn_utils.get_device(),
                                            dtype=sequence_batch.dtype)
         # replace the random token positions with the generated random tokens
@@ -77,9 +79,6 @@ class MaskedLanguageModel(nn.Module):
 def get_mlm_model(encoder_model, mlm_model):
     mlm_model = MaskedLanguageModel(encoder_model=encoder_model,
                                     encoder_dim=mlm_model["encoder_dim"],
-                                    pad_token_val=mlm_model["pad_token_val"],
-                                    no_mask_token_vals=mlm_model["no_mask_token_vals"],
-                                    n_tokens=mlm_model["n_tokens"],
                                     mask_prob=mlm_model["mask_prob"],
                                     random_mask_prob=mlm_model["random_mask_prob"],
                                     no_change_mask_prob=mlm_model["no_change_mask_prob"])

@@ -9,7 +9,7 @@ import tqdm
 from statistics import mean
 import wandb
 
-from utils import utils, dataset_utils, nn_utils
+from utils import utils, dataset_utils, nn_utils, constants
 from training.early_stopping import EarlyStopping
 from models.nlp.transformer import transformer
 from models.nlp import cnn1d, rnn, lstm, fnn
@@ -84,6 +84,7 @@ def execute(input_settings, output_settings, classification_settings):
         for model in models:
             model_name = model["name"]
             # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
+            model["vocab_size"] = constants.VOCAB_SIZE
             model["max_seq_len"] = sequence_settings["max_sequence_length"]
             mode = model["mode"]
 
@@ -180,7 +181,7 @@ def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_load
         epochs=n_epochs,
         steps_per_epoch=len(train_dataset_loader),
         pct_start=training_settings["pct_start"],
-        anneal_strategy='cos',
+        anneal_strategy="cos",
         div_factor=training_settings["div_factor"],
         final_div_factor=training_settings["final_div_factor"])
     early_stopper = EarlyStopping(patience=10, min_delta=0)

@@ -17,7 +17,8 @@ from datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWith
 from datasets.protein_sequence_kmer_dataset import ProteinSequenceKmerDataset
 from datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
 from datasets.collations.fsl_episode import FewShotLearningEpisode
-from datasets.samplers.fsl_task_sampler import FewShotLearningTaskSampler
+from datasets.samplers.fsl_fixed_task_sampler import FewShotLearningFixedTaskSampler
+from datasets.samplers.fsl_varying_task_sampler import FewShotLearningVaryingTaskSampler
 from datasets.samplers.fsl_test_task_sampler import FewShotLearningTestTaskSampler
 
 
@@ -137,7 +138,6 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
     seq_col = sequence_settings["sequence_col"]
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
-    pad_sequence_val = sequence_settings["pad_token_val"]
     truncate = sequence_settings["truncate"]
     split_sequence = sequence_settings["split_sequence"]
 
@@ -145,10 +145,10 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
     collate_func = None
     if exclude_label:
         dataset = ProteinSequenceUnlabeledDataset(df, seq_col, max_seq_len, truncate, split_sequence)
-        collate_func = PaddingUnlabeled(max_seq_len, pad_sequence_val)
+        collate_func = PaddingUnlabeled(max_seq_len)
     else:
-        dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, split_sequence, label_col)
-        collate_func = Padding(max_seq_len, pad_sequence_val)
+        dataset = ProteinSequenceDataset(df, seq_col, max_seq_len, truncate, label_col)
+        collate_func = Padding(max_seq_len)
 
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func)
 
@@ -158,14 +158,12 @@ def get_token_with_id_dataset_loader(df, sequence_settings, label_col):
     id_col = sequence_settings["id_col"]
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
-    pad_sequence_val = sequence_settings["pad_token_val"]
     truncate = sequence_settings["truncate"]
-    split_sequence = sequence_settings["split_sequence"]
 
 
-    dataset = ProteinSequenceDatasetWithID(df, id_col, seq_col, max_seq_len, truncate, split_sequence, label_col)
+    dataset = ProteinSequenceDatasetWithID(df, id_col, seq_col, max_seq_len, truncate, label_col)
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
-                      collate_fn=PaddingWithID(max_seq_len, pad_sequence_val))
+                      collate_fn=PaddingWithID(max_seq_len))
 
 
 def get_kmer_dataset_loader(df, sequence_settings, label_col):
@@ -187,36 +185,48 @@ def get_cgr_dataset_loader(df, sequence_settings, label_col):
     return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
 
 
-def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings):
-    n_way = few_shot_learn_settings["n_way"]
+def get_few_shot_learning_task_sampler(dataset, few_shot_learn_settings):
+    n_way_type = few_shot_learn_settings["n_way_type"]
+    n_way = few_shot_learn_settings["n_way"] # incase of varying, n_way will contain a range as list(int)
     n_shot = few_shot_learn_settings["n_shot"]
     n_query = few_shot_learn_settings["n_query"]
+    n_task = few_shot_learn_settings["n_task"]
 
+    task_sampler = None
+    if n_way_type == "varying":
+        task_sampler = FewShotLearningVaryingTaskSampler(dataset=dataset,
+                                                         n_way_range=n_way,
+                                                         n_shot=n_shot,
+                                                         n_query=n_query,
+                                                         n_task=n_task)
+    elif n_way_type == "fixed":
+        # further subtyping based on number of query samples to determine training or testing dataset
+        if n_query == -1:
+            # test dataset_loader, use a different task sampler
+            task_sampler = FewShotLearningTestTaskSampler(dataset=dataset,
+                                                          n_way=n_way,
+                                                          n_shot=n_shot,
+                                                          n_task=n_task)
+        else:
+            task_sampler = FewShotLearningFixedTaskSampler(dataset=dataset,
+                                                           n_way=n_way,
+                                                           n_shot=n_shot,
+                                                           n_query=n_query,
+                                                           n_task=n_task)
+    return task_sampler
+
+
+def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn_settings):
     dataset = ProteinSequenceWithLabelDataset(df=df,
                                      sequence_col=sequence_settings["sequence_col"],
                                      max_seq_len=sequence_settings["max_sequence_length"],
                                      truncate=sequence_settings["truncate"],
-                                     split_sequence = sequence_settings["split_sequence"],
                                      label_col=label_col)
 
-    fsl_episode = FewShotLearningEpisode(n_way=n_way,
-                                         n_shot=n_shot,
-                                         n_query=n_query,
-                                         max_length=sequence_settings["max_sequence_length"],
-                                         pad_value=sequence_settings["pad_token_val"])
+    fsl_episode = FewShotLearningEpisode(n_shot=few_shot_learn_settings["n_shot"],
+                                         n_query=few_shot_learn_settings["n_query"],
+                                         max_length=sequence_settings["max_sequence_length"])
 
-    if n_query == -1:
-        # test dataset_loader, use a different task sampler
-        task_sampler = FewShotLearningTestTaskSampler(dataset=dataset,
-                                                  n_way=n_way,
-                                                  n_shot=n_shot,
-                                                  n_task=few_shot_learn_settings["n_task"])
-    else:
-        task_sampler = FewShotLearningTaskSampler(dataset=dataset,
-                                              n_way=n_way,
-                                              n_shot=n_shot,
-                                              n_query=n_query,
-                                              n_task=few_shot_learn_settings["n_task"])
     return DataLoader(dataset=dataset,
-                      batch_sampler=task_sampler,
+                      batch_sampler=get_few_shot_learning_task_sampler(dataset, few_shot_learn_settings),
                       collate_fn=fsl_episode)
