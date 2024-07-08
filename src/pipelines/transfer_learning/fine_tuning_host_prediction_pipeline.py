@@ -53,7 +53,7 @@ def execute(config):
         "n_epochs_freeze": training_settings["n_epochs_freeze"],
         "n_epochs_unfreeze": training_settings["n_epochs_unfreeze"],
         "lr": training_settings["max_lr"],
-        "max_sequence_length": sequence_settings["max_seq_len"],
+        "max_sequence_length": sequence_settings["max_sequence_length"],
         "dataset": input_file_names[0],
         "output_prefix": output_prefix
     }
