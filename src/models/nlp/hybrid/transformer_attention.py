@@ -46,7 +46,7 @@ class TransformerAttention(nn.Module):
         if self.cls_token:
             # add cls token to the beginning to every segment
             # add the CLS token at the beginning of the sequence
-            cls_tokens = torch.full(size=(X.shape[0], 1), fill_value=constants.CLS_TOKEN_VAL)
+            cls_tokens = torch.full(size=(X.shape[0], 1), fill_value=constants.CLS_TOKEN_VAL, device=nn_utils.get_device())
             X = torch.cat([cls_tokens, X], dim=1)
 
         # generate embeddings
