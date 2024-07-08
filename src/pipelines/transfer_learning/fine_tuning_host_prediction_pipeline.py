@@ -41,6 +41,7 @@ def execute(config):
     n_iters = fine_tune_settings["n_iterations"]
 
     sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
+    pre_train_encoder_settings["max_seq_len"] += 1  # adding 1 for the CLS token
 
     tasks = fine_tune_settings["task_settings"]
     id_col = sequence_settings["id_col"]
@@ -53,7 +54,8 @@ def execute(config):
         "n_epochs_unfreeze": training_settings["n_epochs_unfreeze"],
         "lr": training_settings["max_lr"],
         "max_sequence_length": pre_train_encoder_settings["max_seq_len"],
-        "dataset": input_file_names[0]
+        "dataset": input_file_names[0],
+        "output_prefix": output_prefix
     }
 
     # fine_tune_model store filepath
@@ -116,8 +118,9 @@ def execute(config):
 
             elif "hybrid_attention" in task_name:
                 print(f"Executing Hybrid Attention fine tuning in {mode} mode")
-                # add maximum sequence length of pretrained model as the chunk size
-                task["chunk_len"] = pre_train_encoder_settings["max_seq_len"]
+                # add maximum sequence length of pretrained model as the segment size from the sequence_settings
+                # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
+                task["segment_len"] = sequence_settings["max_sequence_length"]
                 fine_tune_model = transformer_attention.get_model(task)
             else:
                 continue
