@@ -46,65 +46,29 @@ def execute(config):
             print(f"Skipping {model_name} ...")
             continue
 
+        sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
+
+        pre_train_encoder_settings = model["pre_train_settings"]
+        pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
+        pre_train_encoder_settings["max_seq_len"] += 1 # adding 1 for the CLS token
+        # load pre-trained encoder model
+        pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
+        model["pre_trained_model"] = pre_trained_encoder_model
+
         if "transfer_learning" in model_name:
             print(f"Executing Transfer Learning (Pre-trained and fine tuned model) in {mode} mode")
-            pre_train_encoder_settings = model["pre_train_settings"]
-            pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
-            # load pre-trained encoder model
-            pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
-            # Set the pre_trained model within the task config
-            model["pre_trained_model"] = pre_trained_encoder_model
             prediction_model = host_prediction.get_host_prediction_model(model)
 
         elif "hybrid_attention" in model_name:
             print(f"Executing Hybrid Attention fine tuning in {mode} mode")
-            # add maximum sequence length of pretrained model as the chunk size
-            # load pre-trained encoder model
-            pre_train_encoder_settings = model["pre_train_settings"]
-            pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
-            pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
-
-            model["pre_trained_model"] = pre_trained_encoder_model
-            model["chunk_len"] = pre_train_encoder_settings["max_seq_len"]
-            sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
+            # add maximum sequence length of pretrained model as the segment_len size
+            model["segment_len"] = sequence_settings["max_sequence_length"]
             prediction_model = transformer_attention.get_model(model)
 
-        elif "fnn" in model_name:
-            print(f"Executing FNN in {mode} mode")
-            prediction_model = fnn.get_fnn_model(model)
-
-        elif "cgr-cnn-pool" in model_name:
-            print(f"Executing CGR-CNN-Pool in {mode} mode")
-            model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
-            prediction_model = cnn2d_pool.get_cnn_model(model)
-
-        elif "cgr-cnn" in model_name:
-            print(f"Executing CGR-CNN in {mode} mode")
-            model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
-            prediction_model = cnn2d.get_cnn_model(model)
-
-        elif "cnn" in model_name:
-            print(f"Executing CNN in {mode} mode")
-            prediction_model = cnn1d.get_cnn_model(model)
-
-        elif "rnn" in model_name:
-            print(f"Executing RNN in {mode} mode")
-            prediction_model = rnn.get_rnn_model(model)
-
-        elif "lstm" in model_name:
-            print(f"Executing LSTM in {mode} mode")
-            prediction_model = lstm.get_lstm_model(model)
-
-        elif "host_prediction" in model_name:
-            print(f"Executing Host Prediction fine tuning in {mode} mode")
-            prediction_model = host_prediction.get_host_prediction_model(model)
-
         else:
-                continue
+            continue
 
-        # Execute the NLP model
-        if mode == "test":
-            prediction_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
+        prediction_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
 
     output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
     # create any missing parent directories
