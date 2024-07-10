@@ -46,9 +46,9 @@ def execute(config):
             print(f"Skipping {model_name} ...")
             continue
 
-        sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
-
         pre_train_encoder_settings = model["pre_train_settings"]
+        sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
+        
         pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
         pre_train_encoder_settings["max_seq_len"] += 1 # adding 1 for the CLS token
         # load pre-trained encoder model
