@@ -41,7 +41,7 @@ def execute(config):
     n_iters = fine_tune_settings["n_iterations"]
 
     sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
-    # pre_train_encoder_settings["max_seq_len"] += 1  # adding 1 for the CLS token
+    pre_train_encoder_settings["max_seq_len"] += 1  # adding 1 for the CLS token
 
     tasks = fine_tune_settings["task_settings"]
     id_col = sequence_settings["id_col"]
