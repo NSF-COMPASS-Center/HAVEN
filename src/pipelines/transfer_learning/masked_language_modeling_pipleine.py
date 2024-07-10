@@ -50,7 +50,8 @@ def execute(config):
         "lr": training_settings["max_lr"],
         "max_sequence_length": sequence_settings["max_sequence_length"],
         "batch_size": sequence_settings["batch_size"],
-        "dataset": input_file_names[0]
+        "dataset": input_file_names[0],
+        "output_prefix": output_prefix
     }
 
     # Path to store the pre-trained encoder model
