@@ -55,12 +55,15 @@ class TransformerAttention(nn.Module):
         # reshape back into sequences of chunks, i.e. re-introduce the batch dimension.
         # here -1 will account for n_s which changes with the sequence length in every batch
         # we use segment_len + 1 to account for the added CLS token
-        X = X.view(batch_size, -1, self.segment_len + 1, self.input_dim) # b x n_s x segment_len + 1 x input_dim
+
+        if self.cls_token:
+            X = X.view(batch_size, -1, self.segment_len + 1, self.input_dim) # b x n_s x segment_len + 1 x input_dim
+        else:
+            X = X.view(batch_size, -1, self.segment_len, self.input_dim)  # b x n_s x segment_len + 1 x input_dim
 
         if self.cls_token:
             # OPTION 1: representative vector for each segment = CLS token embedding in every segmen
             X = X[:, :, 0, :]
-
         else:
             # OPTION 1: representative vector for each segment = mean of the embeddings of tokens in every segment
             # mean along segment_len dimension, i.e dim=2
