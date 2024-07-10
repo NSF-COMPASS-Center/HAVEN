@@ -64,6 +64,7 @@ classification_settings:
       hidden_dim: 1024
       n_heads: 8
       stride: 64
+      cls_token: True
       pre_train_settings:
         n_heads: 8
         depth: 6
