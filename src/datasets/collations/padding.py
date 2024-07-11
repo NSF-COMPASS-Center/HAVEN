@@ -16,13 +16,16 @@ class Padding:
 
 
 class PaddingUnlabeled:
-    def __init__(self, max_seq_length, pad_value=0):
-        self.pad_value = pad_value
-        self.max_seq_length = max_seq_length
+    def __init__(self, max_seq_length, cls_token):
+        self.pad_value = constants.PAD_TOKEN_VAL
+        if cls_token:
+            # self.max_seq_length + 1: adding 1 to account for CLS token which has been added in the ProteinSequenceUnlabeledDataset itself
+            # this is not needed in Padding because the CLS token is not added in ProteinSequenceDataset, but in TransformerAttention.forward() method
+            self.max_seq_length = max_seq_length + 1
+        else:
+            self.max_seq_length = max_seq_length
 
     def __call__(self, batch):
         sequences = [seq.clone().detach() for seq in batch]
-        # self.max_seq_length + 1: adding 1 to account for CLS token which has been added in the ProteinSequenceUnlabeledDataset itself
-        # this is not needed in Padding because the CLS token is not added in ProteinSequenceDataset, but in TransformerAttention.forward() method
-        padded_sequences = utils.pad_sequences(sequences, self.max_seq_length + 1, self.pad_value)
+        padded_sequences = utils.pad_sequences(sequences, self.max_seq_length, self.pad_value)
         return padded_sequences

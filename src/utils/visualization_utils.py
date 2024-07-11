@@ -1,13 +1,13 @@
 import matplotlib
-#matplotlib.use("TkAgg")
+# matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 import textwrap
 
 DEFAULT_FIGURE_CONFIG = {
     "figsize": (12, 7),
-    "xtick.labelsize": 20,
-    "ytick.labelsize": 20
+    "xtick.labelsize": 18,
+    "ytick.labelsize": 18
 }
 
 
@@ -19,7 +19,7 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None, figure_config=DE
     ax.set_ylim(0.0, 1)
     ax.set_xlabel("", size=20, labelpad=5)
     ax.set_ylabel(y_col.upper(), size=20)
-    # plt.xticks(rotation=45)
+    plt.xticks(rotation=45)
     wrap_ticklabels(ax, axis="x", break_long_words=True)
     view(output_file_path)
 
