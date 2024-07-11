@@ -4,7 +4,7 @@ config_type: "host_prediction_perturbation" # options: data_preprocessor, host_p
   ## initialize base input folder name
   ## provide path to dataset folder
 input_settings:
-  perturbed_dataset_dir: "input/data/coronaviridae/20240313/sarscov2/aligned/uniref90/perturbation_dataset/WIV04/"
+  perturbed_dataset_dir: "input/data/coronaviridae/20240313/sarscov2/aligned/uniref90/perturbation_dataset/multi/"
 
 classification_settings:
   model_type: "perturbed_dataset_prediction"  # options: baseline, nlp, perturbed_dataset_prediction
@@ -57,14 +57,14 @@ classification_settings:
     - name: "hybrid_attention_msl256vs30_s64_fnn_2l_d1024_lr1e-4"
       active: True
       mode: "test"
-      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240709/host_multi/fine_tuning_hybrid_cls_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr4.pth"
+      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240701/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr4.pth"
       depth: 2
       n_classes: 8
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       n_heads: 8
       stride: 64
-      cls_token: True
+      cls_token: False
       pre_train_settings:
         n_heads: 8
         depth: 6
@@ -77,5 +77,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_perturbation/20240710/sars-cov-2/uniref90/cov-S-multi-transfer_learning_mlm_cls_hybrid_attn_fnn_2l_lr1e-4/aligned_msl256vs30_s64"
+  sub_dir: "coronaviridae_s_prot_perturbation/20240702/sars-cov-2/uniref90/cov-S-multi-transfer_learning_mlm_hybrid_attn_fnn_2l_lr1e-4/aligned_msl256_s64/"
   prefix: "tl_tf_multi" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
