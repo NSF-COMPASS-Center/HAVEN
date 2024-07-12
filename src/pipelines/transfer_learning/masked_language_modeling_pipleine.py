@@ -40,7 +40,7 @@ def execute(config):
 
     # add vocab_size, max_sequence_length to encoder_settings
     encoder_settings["vocab_size"] = constants.VOCAB_SIZE
-    encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"] # + 1 # adding one for CLS token
+    encoder_settings["max_seq_len"] = sequence_settings["max_sequence_length"]  + 1 # adding one for CLS token
 
     # add encoder_dim (which is defined in input_dim of encoder_settings) to mlm_settings
     mlm_settings["encoder_dim"] = encoder_settings["input_dim"]

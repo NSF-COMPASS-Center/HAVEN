@@ -23,6 +23,7 @@ sequence_settings:
     max_sequence_length: 512 # 6630 # 1024 # 1115
     truncate: False
     split_sequence: True
+    cls_token: True
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 mlm_settings:
@@ -47,7 +48,7 @@ training_settings:
   pct_start: 0.10
   div_factor: 25.0
   final_div_factor: 10000.0
-  checkpoint_path: ""
+  checkpoint_path: "output/raw/uniref90-viridae/pre-training/mlm/20240710/checkpoints/transformer_encoder-l_6-h_8-lr1e-4_msl512_b1024_splitseq_mlm_cls_vs30_itr0_checkpt12.pth"
 
 
 output_settings:
