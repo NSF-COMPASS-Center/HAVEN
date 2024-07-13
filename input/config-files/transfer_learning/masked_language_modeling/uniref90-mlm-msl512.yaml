@@ -48,11 +48,11 @@ training_settings:
   pct_start: 0.10
   div_factor: 25.0
   final_div_factor: 10000.0
-  checkpoint_path: "output/raw/uniref90-viridae/pre-training/mlm/20240710/checkpoints/transformer_encoder-l_6-h_8-lr1e-4_msl512_b1024_splitseq_mlm_cls_vs30_itr0_checkpt12.pth"
+  checkpoint_path: ""
 
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90-viridae/pre-training/mlm/20240710"
-  prefix: "msl512_b512_splitseq_mlm_cls_vs30" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90-viridae/pre-training/mlm/20240712"
+  prefix: "msl512_b512_splitseq_mlm_cls" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
