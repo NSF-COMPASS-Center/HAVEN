@@ -36,7 +36,7 @@ pre_train_settings:
     max_seq_len: 256
 
 fine_tune_settings:
-  experiment: "fine_tuning_hybrid_cls_coronaviridae_s_prot_uniprot_aligned"
+  experiment: "fine_tuning_hybrid_coronaviridae_s_prot_uniprot_aligned"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
