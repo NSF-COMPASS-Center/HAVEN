@@ -2,16 +2,16 @@ import torch
 import torch.nn as nn
 from models.nlp.embedding.embedding import EmbeddingLayer
 from torch.nn import LSTM
-from utils import nn_utils
+from utils import nn_utils, constants
 
 
 class LSTM_Model(nn.Module):
-    def __init__(self, vocab_size, max_seq_len, n_classes, N, input_dim, hidden_dim):
+    def __init__(self, vocab_size, n_classes, N, input_dim, hidden_dim):
         super(LSTM_Model, self).__init__()
         # assuming hidden state dimension = cell state dimension = hidden_dim
         self.hidden_dim = hidden_dim
         self.N = N
-        self.embedding = EmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim)
+        self.embedding = nn.Embedding(vocab_size, input_dim, padding_idx=constants.PAD_TOKEN_VAL)
         # assuming hidden state dimension = cell state dimension = output_dimension = hidden_dim and projection_size=0
         self.lstm = LSTM(input_size=input_dim,
                          hidden_size=hidden_dim,
@@ -35,7 +35,7 @@ class LSTM_Model(nn.Module):
         return output.mean(dim=1)
 
     def forward(self, X):
-        self.input_embedding = self.get_embedding(X)
+        self.input_embedding = self.get_embedding(X.long())
         y = self.linear(self.input_embedding)
         return y
 
@@ -46,7 +46,6 @@ class LSTM_Model(nn.Module):
 
 def get_lstm_model(model):
     lstm_model = LSTM_Model(vocab_size=model["vocab_size"],
-                            max_seq_len=model["max_seq_len"],
                             n_classes=model["n_classes"],
                             N=model["depth"],
                             input_dim=model["input_dim"],

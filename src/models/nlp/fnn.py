@@ -1,15 +1,16 @@
 import torch.nn as nn
 import torch.nn.functional as F
 from models.nlp.embedding.embedding import EmbeddingLayer
-from utils import nn_utils
+from utils import nn_utils, constants
 
 
 class FNN_Model(nn.Module):
-    def __init__(self, vocab_size, max_seq_len, n_classes, N, input_dim, hidden_dim):
+    def __init__(self, vocab_size, n_classes, N, input_dim, hidden_dim):
         super(FNN_Model, self).__init__()
         self.hidden_dim = hidden_dim
         self.N = N
-        self.embedding = EmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim)
+        self.embedding = nn.Embedding(vocab_size, input_dim, padding_idx=constants.PAD_TOKEN_VAL)
+
         # first linear layer: input_dim --> hidden_dim
         self.linear_ip = nn.Linear(input_dim, hidden_dim)
 
@@ -21,7 +22,7 @@ class FNN_Model(nn.Module):
         self.linear_op = nn.Linear(hidden_dim, n_classes)
 
     def get_embedding(self, X):
-        X = self.embedding(X)
+        X = self.embedding(X.long())
         # input linear layer
         X = F.relu(self.linear_ip(X))
         # hidden
@@ -38,7 +39,6 @@ class FNN_Model(nn.Module):
 
 def get_fnn_model(model):
     fnn_model = FNN_Model(vocab_size=model["vocab_size"],
-                          max_seq_len=model["max_seq_len"],
                           n_classes=model["n_classes"],
                           N=model["depth"],
                           input_dim=model["input_dim"],

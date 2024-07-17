@@ -9,7 +9,7 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5.csv" ]
+  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -28,15 +28,11 @@ classification_settings:
     batch_size: 32
     id_col: "uniref90_id"
     sequence_col: "seq"
-    max_sequence_length: 2048 #3011 #1036 #624 # 6630 # 1024 # 1115 # 1366
-    truncate: True
-    pad_token_val: 0
+    max_sequence_length:
+    truncate: False
+    split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
-    kmer_settings:
-      k: 3
-    cgr_settings:
-      img_size: 32
-      img_dir: "input/data/uniref90/cgr_images"
+
   label_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan" ]
@@ -46,23 +42,17 @@ classification_settings:
       "Capybara": [ "Hydrochoerus hydrochaeris" ]
       "Himalayan marmot": [ "Marmota himalayana" ]
       "Red junglefowl": [ "Gallus gallus" ]
-#      "Common carp": [ "Cyprinus carpio" ]
-#      "South Island robin": [ "Petroica australis" ]
-#      "Cat": [ "Felis catus" ]
-#      "Sonoran Desert tortoise": [ "Gopherus morafkai" ]
-#      "Brush mouse": [ "Peromyscus boylii" ]
-#      "Yellow-bellied marmot": [ "Marmota flaviventris" ]
-#      "Cattle": [ "Bos taurus" ]
-#      "Big brown bat": [ "Eptesicus fuscus" ]
+
   training_settings:
     n_epochs: 50
-    max_lr: 1e-4
+    max_lr: 1e-3
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
+
   models:
     - name: "fnn-l_10-d_1024-lr1e-3"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
@@ -103,11 +93,12 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "transformer-l_6-h_8-d_1024-lr1e-4"
-      active: True
+    - name: "transformer-l_6-h_8-d_1024-msl0248-lr1e-4"
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
+      max_seq_len: 2048
       n_heads: 8
       depth: 6
       n_classes: 5
@@ -118,5 +109,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi"
-  prefix: "emb_sincos-lossfocalce_e50_msl2048" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi"
+  prefix: "nlp_no_msl" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

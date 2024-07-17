@@ -173,11 +173,11 @@ def pad_sequences(sequences, max_seq_length, pad_value):
     # the sequences are padded w.r.t the longest sequence in the batch
     padded_sequences = pad_sequence(sequences, batch_first=True, padding_value=pad_value)
 
-    # check if the (maximum) length of the sequences in the batch is less than max_seq_len
+    # if there is a maximum sequence length configured, check if the (maximum) length of the sequences in the batch is less than max_seq_len
     # it is sufficient to check the length of the first sequence as the entire batch will have the same sequence length
     # if maximum length of the sequences in the batch is less than max_seq_len, repad the entire batch using ConstantPad1d
     padded_seq_length = padded_sequences[0].shape[0]
-    if padded_seq_length < max_seq_length:
+    if max_seq_length and padded_seq_length < max_seq_length:
         padded_sequences = nn.ConstantPad1d((0, max_seq_length - padded_seq_length), pad_value)(padded_sequences)
 
     return padded_sequences

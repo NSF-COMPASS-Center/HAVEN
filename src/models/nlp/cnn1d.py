@@ -3,13 +3,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from models.nlp.embedding.embedding import EmbeddingLayer
 from torch.nn import Conv1d
-from utils import nn_utils
+from utils import nn_utils, constants
 
 
 class CNN_1D_Model(nn.Module):
-    def __init__(self, vocab_size, max_seq_len, n_classes, N, input_dim, hidden_dim, kernel_size, stride):
+    def __init__(self, vocab_size, n_classes, N, input_dim, hidden_dim, kernel_size, stride):
         super(CNN_1D_Model, self).__init__()
-        self.embedding = EmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim)
+        self.embedding = nn.Embedding(vocab_size, input_dim, padding_idx=constants.PAD_TOKEN_VAL)
         self.conv1d = Conv1d(in_channels=input_dim,
                              out_channels=hidden_dim,
                              kernel_size=kernel_size,
@@ -26,7 +26,7 @@ class CNN_1D_Model(nn.Module):
         self.linear = nn.Linear(hidden_dim, n_classes)
 
     def get_embedding(self, X):
-        X = self.embedding(X)  # b x n x d
+        X = self.embedding(X.long())  # b x n x d
         X = torch.einsum("bnd->bdn", X)  # b x d x n (conv1d requires number of channels as the second dimension)
         X = self.conv1d(X)
         X = torch.einsum("bdn -> bnd", X)  # revert back to b x n x d (batch x updated length of sequence x output_channels dimension)
@@ -50,7 +50,6 @@ class CNN_1D_Model(nn.Module):
 
 def get_cnn_model(model):
     cnn_model = CNN_1D_Model(vocab_size=model["vocab_size"],
-                          max_seq_len=model["max_seq_len"],
                           n_classes=model["n_classes"],
                           N = model["depth"],
                           input_dim=model["input_dim"],
