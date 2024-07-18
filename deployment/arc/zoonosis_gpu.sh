@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH -J zoonosis-nlp
-#SBATCH --account=seqevol
-#SBATCH --partition=dgx_normal_q
+#SBATCH --account=personal
+#SBATCH --partition=a100
 
 #SBATCH --mem=300G
 #SBATCH --nodes=1
