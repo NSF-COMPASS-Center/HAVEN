@@ -45,14 +45,14 @@ classification_settings:
 
   training_settings:
     n_epochs: 50
-    max_lr: 1e-3
+    max_lr: 1e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
 
   models:
     - name: "fnn-l_10-d_1024-lr1e-3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 10
@@ -93,12 +93,12 @@ classification_settings:
       hidden_dim: 1024
       manual_seed:  # whole numbers
 
-    - name: "transformer-l_6-h_8-d_1024-msl0248-lr1e-4"
-      active: False
+    - name: "transformer-l_6-h_8-d_1024-msl2048-lr1e-4"
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
-      max_seq_len: 2048
+      max_seq_len: 3036 # this is needed only for the positional encoding initialization
       n_heads: 8
       depth: 6
       n_classes: 5

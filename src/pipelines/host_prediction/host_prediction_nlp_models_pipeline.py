@@ -113,7 +113,6 @@ def execute(input_settings, output_settings, classification_settings):
 
             elif "transformer" in model_name:
                 print(f"Executing Transformer in {mode} mode")
-                model["max_seq_len"] = sequence_settings["max_sequence_length"]
                 nlp_model = transformer.get_transformer_encoder_classifier(model)
 
             else:
