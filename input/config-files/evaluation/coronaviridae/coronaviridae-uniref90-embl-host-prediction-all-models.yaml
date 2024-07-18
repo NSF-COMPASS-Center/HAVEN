@@ -10,7 +10,7 @@ input_settings:
   file_names:
 #    "Binary-Aligned": "20240320/fine_tuning/host_prediction/binary/mlm_tfenc_l6_h8_lr1e-4_uniref90_coronaviridae_s_aligned_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
 #    "Binary": "20240320/fine_tuning/host_prediction/binary/mlm_tfenc_l6_h8_lr1e-4_uniref90_coronaviridae_s_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
-    "VirProBERT-msl1024": "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240320/fine_tuning/host_prediction/multi/mlm_tfenc_l6_h8_lr1e-4_uniref90_coronaviridae_s_aligned_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    "VirProBERT-msl366": "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240320/fine_tuning/host_prediction/multi/mlm_tfenc_l6_h8_lr1e-4_uniref90_coronaviridae_s_aligned_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
     # "Multi": "20240320/fine_tuning/host_prediction/multi/mlm_tfenc_l6_h8_lr1e-4_uniref90_coronaviridae_s_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
     "VirProBERT-msl2048": "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240611/fine_tuning/host_prediction/multi/mlm_tfenc_l6_h8_lr1e-4_uniref90_coronaviridae_s_aligned_msl2048_host_prediction_fnn_2l_d1024_lr1e-4_aligned_output.csv"
     # "VirProBERT-msl2048-2": "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240614/fine_tuning/host_prediction/multi/mlm_tfenc_l6_h8_lr1e-4_uniref90_coronaviridae_s_aligned_msl2048_host_prediction_fnn_2l_d1024_lr1e-4_aligned_output.csv"

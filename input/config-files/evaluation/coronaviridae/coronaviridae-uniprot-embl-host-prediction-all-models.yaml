@@ -8,6 +8,7 @@ input_settings:
   input_dir: "output/raw"
 
   file_names:
+    "Hybrid-msl128s64_vs30": "coronaviridae_s_prot_uniprot_embl_vertebrates_aligned_t0.01_c8/20240716/host_multi/fine_tuning_hybrid_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-msl128s64_CLS_vs103": "coronaviridae_s_prot_uniprot_embl_vertebrates_aligned_t0.01_c8/20240710/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-msl128s64_CLS_vs30": "coronaviridae_s_prot_uniprot_embl_vertebrates_aligned_t0.01_c8/20240711/host_multi/fine_tuning_hybrid_cls_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-msl256s64_CLS_vs103": "coronaviridae_s_prot_uniprot_embl_vertebrates_aligned_t0.01_c8/20240710/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
