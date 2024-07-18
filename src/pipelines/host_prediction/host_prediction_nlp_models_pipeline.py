@@ -42,8 +42,13 @@ def execute(input_settings, output_settings, classification_settings):
         "n_epochs": training_settings["n_epochs"],
         "lr": training_settings["max_lr"],
         "max_sequence_length": sequence_settings["max_sequence_length"],
-        "dataset": input_file_names[0]
+        "dataset": input_file_names[0],
+        "output_prefix": output_prefix
     }
+
+    # model store filepath
+    model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{model_name}_itr{itr}.pth")
+    Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
 
     for iter in range(n_iters):
         print(f"Iteration {iter}")
@@ -63,7 +68,7 @@ def execute(input_settings, output_settings, classification_settings):
             # full df into training and testing datasets in the ratio configured in the config file
             train_df, test_df = dataset_utils.split_dataset_stratified(df, input_split_seeds[iter],
                                                                        classification_settings["train_proportion"],
-                                                                   stratify_col=label_col)
+                                                                       stratify_col=label_col)
             # split testing set into validation and testing datasets in equal proportion
             # so 80:20 will now be 80:10:10
             val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5,
@@ -76,15 +81,10 @@ def execute(input_settings, output_settings, classification_settings):
             test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col)
 
         nlp_model = None
-        # model store filepath
-        model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{model_name}_itr{itr}.pth")
-        Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
-
         for model in models:
             model_name = model["name"]
             # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
             model["vocab_size"] = constants.VOCAB_SIZE
-            model["max_seq_len"] = sequence_settings["max_sequence_length"]
             mode = model["mode"]
 
             if model["active"] is False:
@@ -98,16 +98,6 @@ def execute(input_settings, output_settings, classification_settings):
             if "fnn" in model_name:
                 print(f"Executing FNN in {mode} mode")
                 nlp_model = fnn.get_fnn_model(model)
-
-            elif "cgr-cnn-pool" in model_name:
-                print(f"Executing CGR-CNN-Pool in {mode} mode")
-                model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
-                nlp_model = cnn2d_pool.get_cnn_model(model)
-
-            elif "cgr-cnn" in model_name:
-                print(f"Executing CGR-CNN in {mode} mode")
-                model["img_size"] = sequence_settings["cgr_settings"]["img_size"]
-                nlp_model = cnn2d.get_cnn_model(model)
 
             elif "cnn" in model_name:
                 print(f"Executing CNN in {mode} mode")
@@ -138,8 +128,7 @@ def execute(input_settings, output_settings, classification_settings):
 
             if mode == "train":
                 # train the model
-                result_df, nlp_model = run_model(nlp_model, train_dataset_loader, val_dataset_loader,
-                                                 test_dataset_loader,
+                result_df, nlp_model = run_model(nlp_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
                                                  model["loss"], training_settings, model_name)
             elif mode == "test":
                 # used for zero-shot evaluation

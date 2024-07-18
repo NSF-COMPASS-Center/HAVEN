@@ -73,7 +73,7 @@ class TransformerEncoderClassifier(nn.Module):
     def forward(self, X, mask=None):
         self.input_embedding = self.get_embedding(X, mask)
 
-        y = self.linear_output(X)
+        y = self.linear_output(self.input_embedding)
         return y
 
 

@@ -19,7 +19,7 @@ def box_plot(df, x_col, y_col, output_file_path, baseline=None, figure_config=DE
     ax.set_ylim(0.0, 1)
     ax.set_xlabel("", size=20, labelpad=5)
     ax.set_ylabel(y_col.upper(), size=20)
-    wrap_ticklabels(ax, axis="x", label_width=12, break_long_words=True)
+    wrap_ticklabels(ax, axis="x", label_width=14, break_long_words=True)
     plt.xticks(rotation=90)
     view(output_file_path)
 
