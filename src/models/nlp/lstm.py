@@ -20,7 +20,7 @@ class LSTM_Model(nn.Module):
         self.linear = nn.Linear(hidden_dim, n_classes)
 
     def get_embedding(self, X):
-        X = self.embedding(X)
+        X = self.embedding(X.long())
         hidden_input = self.init_zeros(batch_size=X.size(0))
         cell_input = self.init_zeros(batch_size=X.size(0))
 
@@ -35,7 +35,7 @@ class LSTM_Model(nn.Module):
         return output.mean(dim=1)
 
     def forward(self, X):
-        self.input_embedding = self.get_embedding(X.long())
+        self.input_embedding = self.get_embedding(X)
         y = self.linear(self.input_embedding)
         return y
 

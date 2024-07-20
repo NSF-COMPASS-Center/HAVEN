@@ -22,6 +22,7 @@ input_settings:
     "RNN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/nlp_no_msl_rnn-l_6-d_1024-lr1e-5_output.csv"
     # "LSTM-l_2-d_1024-lr1e-3": "20240229/host_multi/emb_sincos-lossfocalce_e50_msl1036_lstm-l_2-d_1024-lr1e-3_output.csv"
     "LSTM-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/emb_sincos-lossfocalce_e50_msl2048_lstm-l_2-d_1024-lr1e-3_output.csv"
+    "LSTM": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/nlp_no_msl_lstm-l_2-d_1024-lr1e-3_output.csv"
     # "TF-Enc-msl1036-d1024-lr1e-4": "20240228/host_multi/emb_sincos-d1024-lossfocalce_e50_msl1036_transformer-l_6-h_8-lr1e-4_output.csv"
     "TF-Enc-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/emb_sincos-lossfocalce_e50_msl2048_transformer-l_6-h_8-d_1024-lr1e-4_output.csv"
     # "TF-Enc-msl1336-d1024-lr1e-4": "20240308/host_multi/emb_sincos-lossfocalce_e50_msl1366_transformer-l_6-h_8-d_1024-lr1e-4_output.csv"
@@ -35,6 +36,7 @@ input_settings:
     "Hybrid-msl128-vs28": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240715/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-msl256-vs28": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240710/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-msl128-CLS-vs103": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240708/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    "Hybrid-msl128-CLS-vs30": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240715/host_multi/fine_tuning_hybrid_cls_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     # "Pretrain-TF-d1024-lr1e-5-w_freeze": "20240306/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-5_output.csv"
     # "Pretrain-TF-d1024-lr1e-5-ModFL": "20240302/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_0l_d512_lr1e-5-modfl_p-1_output.csv"
     # "Pretrain-TF-d1024-lr1e-5-RL": "20240302/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_0l_d512_lr1e-5-modrl_p-1_output.csv"
@@ -43,7 +45,7 @@ input_settings:
 evaluation_settings:
   type: "multi"
   # metrics
-  auroc: True
+  auroc: False
   auprc: True
   f1: False
   accuracy: False
