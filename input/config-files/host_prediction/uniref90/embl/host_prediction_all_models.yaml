@@ -25,7 +25,7 @@ classification_settings:
   save_model: True
 
   sequence_settings:
-    batch_size: 8
+    batch_size: 32
     id_col: "uniref90_id"
     sequence_col: "seq"
     max_sequence_length:
@@ -45,7 +45,7 @@ classification_settings:
 
   training_settings:
     n_epochs: 50
-    max_lr: 1e-4
+    max_lr: 1e-3
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -84,7 +84,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "lstm-l_2-d_1024-lr1e-3"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       depth: 2
@@ -94,7 +94,7 @@ classification_settings:
       manual_seed:  # whole numbers
 
     - name: "transformer-l_6-h_8-d_1024-msl2048-lr1e-4"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
@@ -109,5 +109,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi"
+  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240722/host_multi"
   prefix: "nlp_no_msl" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

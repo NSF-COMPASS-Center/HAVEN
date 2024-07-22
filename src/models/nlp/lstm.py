@@ -24,11 +24,11 @@ class LSTM_Model(nn.Module):
         hidden_input = self.init_zeros(batch_size=X.size(0))
         cell_input = self.init_zeros(batch_size=X.size(0))
 
-        # return values from rnn:
+        # return values from lstm: output, (hidden_output, cell_output)
         # output: output features from the last layer for each token: num_lstm_layers x batch_size X sequence_length X hidden_dim
         # hidden_output: final hidden state (embedding) for each sequence: num_lstm_layers x batch_size X hidden_dim
         # cell_output: final cell state (embedding) for each sequence: num_lstm_layers x batch_size X hidden_dim
-        output, (hidden_output, cell_output) = self.lstm(X, (hidden_input, cell_input))
+        output, _ = self.lstm(X, (hidden_input, cell_input))
 
         # aggregate the embeddings from lstm
         # mean of the representations of all tokens
