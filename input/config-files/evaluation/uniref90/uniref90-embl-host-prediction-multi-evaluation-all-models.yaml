@@ -10,6 +10,7 @@ input_settings:
   file_names:
     "LR-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240515/host_multi/kmer_k3_virus_host_name_multi__lr_output.csv"
     "RF-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240515/host_multi/kmer_k3_virus_host_name_multi__rf_output.csv"
+    "RF": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240723/host_multi/kmer_k3_virus_host_name_multi__rf_output.csv"
     # "LR-maxitr500": "20240516/host_multi/kmer_k3_virus_host_name_multi__lr_output.csv"
     "SVM-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240522/host_multi/kmer_k3_virus_host_name_multi__svm_output.csv"
     "FNN-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/emb_sincos-lossfocalce_e50_msl2048_fnn-l_10-d_1024-lr1e-3_output.csv"
