@@ -31,9 +31,9 @@ def parse_args():
 def generate_splits(input_files, train_proportion, seed, output_dir, generate_train=True, generate_test=True, stratify=None):
     for input_file in input_files:
         print(f"Input file = {input_file}")
-        file_name = os.path.basename(input_file)
-        train_dataset_file_path = os.path.join(output_dir, file_name + f"_tr{train_proportion}_train.csv")
-        test_dataset_file_path = os.path.join(output_dir, file_name + f"_tr{train_proportion}_test.csv")
+        file_name = Path(input_file).stem
+        train_dataset_file_path = os.path.join(output_dir, file_name + f"_s{seed}.train.csv")
+        test_dataset_file_path = os.path.join(output_dir, file_name + f"_s{seed}.test.csv")
         # create any missing parent directories
         Path(os.path.dirname(train_dataset_file_path)).mkdir(parents=True, exist_ok=True)
         Path(os.path.dirname(test_dataset_file_path)).mkdir(parents=True, exist_ok=True)

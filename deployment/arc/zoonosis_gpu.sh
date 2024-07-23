@@ -2,7 +2,7 @@
 
 #SBATCH -J zoonosis-nlp
 #SBATCH --account=personal
-#SBATCH --partition=a100
+#SBATCH --partition=a100_normal_q
 
 #SBATCH --mem=300G
 #SBATCH --nodes=1

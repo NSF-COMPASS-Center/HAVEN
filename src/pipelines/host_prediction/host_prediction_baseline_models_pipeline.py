@@ -111,7 +111,7 @@ def execute(input_settings, output_settings, classification_settings):
 
             # If model returns feature importance:
             # Remap the class indices to original input labels
-            if feature_importance_df:
+            if feature_importance_df is not None:
                 feature_importance_df.rename(index=index_label_map, inplace=True)
                 feature_importance_df["itr"] = iter
                 feature_importance[model_name].append(feature_importance_df)
