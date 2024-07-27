@@ -123,8 +123,8 @@ def execute(input_settings, output_settings, classification_settings):
     utils.write_output(results, output_results_dir, output_filename_prefix, "output",)
     utils.write_output(validation_scores, output_results_dir, output_filename_prefix, "validation_scores")
     # if feature importance exists:
-    if len(feature_importance) > 0:
-        utils.write_output(feature_importance, output_results_dir, output_filename_prefix, "feature_imp")
+    # if len(feature_importance) > 0:
+    #     utils.write_output(feature_importance, output_results_dir, output_filename_prefix, "feature_imp")
 
     # create plots for validation scores
     # plot_validation_scores(validation_scores, os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
