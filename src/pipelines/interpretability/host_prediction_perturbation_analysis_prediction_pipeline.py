@@ -50,7 +50,7 @@ def execute(config):
         sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
 
         pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
-        #pre_train_encoder_settings["max_seq_len"] += 1 # adding 1 for the CLS token
+        #more pre_train_encoder_settings["max_seq_len"] += 1 # adding 1 for the CLS token
         # load pre-trained encoder model
         pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
         model["pre_trained_model"] = pre_trained_encoder_model

@@ -57,7 +57,7 @@ classification_settings:
     - name: "hybrid_attention_msl256vs30_s64_fnn_2l_d1024_lr1e-4"
       active: True
       mode: "test"
-      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240716/host_multi/fine_tuning_hybrid_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr4.pth"
+      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240716/host_multi/fine_tuning_hybrid_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr0.pth"
       depth: 2
       n_classes: 8
       input_dim: 512 # input embedding dimension
