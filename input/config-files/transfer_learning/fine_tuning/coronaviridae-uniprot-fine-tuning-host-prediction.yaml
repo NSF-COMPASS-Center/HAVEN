@@ -33,7 +33,7 @@ pre_train_settings:
     depth: 6
     input_dim: 512 # input embedding dimension
     hidden_dim: 1024
-    max_seq_len: 512
+    max_seq_len: 256
 
 fine_tune_settings:
   experiment: "fine_tuning_hybrid_coronaviridae_s_prot_uniprot_aligned"
