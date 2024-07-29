@@ -4,7 +4,7 @@ config_type: "host_prediction_perturbation" # options: data_preprocessor, host_p
   ## initialize base input folder name
   ## provide path to dataset folder
 input_settings:
-  perturbed_dataset_dir: "input/data/coronaviridae/20240313/sarscov2/aligned/uniprot/perturbation_dataset/multi/"
+  perturbed_dataset_dir: "input/data/coronaviridae/20240313/sarscov2/aligned/uniprot/perturbation_dataset/WIV04/"
 
 classification_settings:
   model_type: "perturbed_dataset_prediction"  # options: baseline, nlp, perturbed_dataset_prediction
@@ -50,17 +50,17 @@ classification_settings:
         input_dim: 512 # input embedding dimension
         hidden_dim: 1024
 
-    - name: "hybrid_attention_msl256_s64_fnn_2l_d1024_lr1e-4"
+    - name: "hybrid_attention_msl512cls_vs30_s64_fnn_2l_d1024_lr1e-4"
       active: True
       mode: "test"
-      model_path: "output/raw/coronaviridae_s_prot_uniprot_embl_vertebrates_aligned_t0.01_c8/20240710/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr0.pth"
+      model_path: "output/raw/coronaviridae_s_prot_uniprot_embl_vertebrates_aligned_t0.01_c8/20240727/host_multi/fine_tuning_hybrid_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b1024vs30_s64_hybrid_attention_msl256s64_fnn_2l_d1024_lr1e-4_itr4.pth"
       depth: 2
       n_classes: 8
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       n_heads: 8
       stride: 64
-      cls_token: True
+      cls_token: False
       pre_train_settings:
         n_heads: 8
         depth: 6
@@ -68,10 +68,8 @@ classification_settings:
         hidden_dim: 1024
         max_seq_len: 256
 
-
-
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_perturbation/20240710/sars-cov-2/uniprot/cov-S-multi-transfer_learning_mlm_cls_hybrid_attn_fnn_2l_lr1e-4/aligned_msl256_s64"
+  sub_dir: "coronaviridae_s_prot_perturbation/20240729/sars-cov-2/uniprot/cov-S-multi-transfer_learning_mlm_hybrid_attn_fnn_2l_lr1e-4/aligned_msl256_s64_vs30"
   prefix: "tl_tf_multi" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

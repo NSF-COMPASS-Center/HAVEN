@@ -7,7 +7,7 @@ import torch
 
 class ProteinSequenceDatasetWithID(ProteinSequenceDataset):
     def __init__(self, df, id_col, sequence_col, max_seq_len, truncate, label_col):
-        super(ProteinSequenceDatasetWithID, self).__init__(df, sequence_col, max_seq_len, truncate, label_col)
+        super(ProteinSequenceDatasetWithID, self).__init__(df, sequence_col, label_col, truncate, max_seq_len)
         self.id_col = id_col
 
     def __getitem__(self, idx: int):
