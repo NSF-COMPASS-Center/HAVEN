@@ -12,7 +12,7 @@ perturb_pos_col = "perturb_pos"
 orig_token_col = "orig_token"
 new_token_col = "new_token"
 temp_col = "temp_col"
-id_col = "uniprot_id"
+id_col = "uniref90_id"
 id_parser_regex_pattern = re.compile("(.+)_([A-Z])_(\d+)_([A-Z])")
 
 def parse_args():
