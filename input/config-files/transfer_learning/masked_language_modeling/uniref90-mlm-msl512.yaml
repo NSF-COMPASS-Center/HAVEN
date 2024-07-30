@@ -17,38 +17,32 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 64
+    batch_size: 256
     id_col: "uniref90_id"
     sequence_col: "seq"
     max_sequence_length: 512 # 6630 # 1024 # 1115
     truncate: False
     split_sequence: True
-    pad_token_val: 0
+    cls_token: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 mlm_settings:
-  no_mask_token_vals: [ 0 ]
-  n_tokens: 26
   mask_prob: 0.15
   random_mask_prob: 0.1
   no_change_mask_prob: 0.1
 
 encoder_settings:
   model_name: "transformer_encoder-l_6-h_8-lr1e-4"
-  embedding: "linear" # supported values are 'linear', 'convolution'
   n_heads: 8
   depth: 6
   input_dim: 512 # input embedding dimension
   hidden_dim: 1024
-  kernel: 3
-  stride: 3
-  padding: 0
 
 training_settings:
   experiment: "pre-training-mlm"
   n_iterations: 1
   split_input: True
-  train_proportion: 0.8
+  train_proportion: 0.9
   n_epochs: 50
   max_lr: 1e-4
   pct_start: 0.10
@@ -60,5 +54,5 @@ training_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90-viridae/pre-training/mlm/20240618"
-  prefix: "msl512_splitseq_mlm" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90-viridae/pre-training/mlm/20240715"
+  prefix: "msl512_b512_splitseq_mlm_vs30" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

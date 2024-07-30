@@ -2,16 +2,16 @@ import torch
 import torch.nn as nn
 from models.nlp.embedding.embedding import EmbeddingLayer
 from torch.nn import LSTM
-from utils import nn_utils
+from utils import nn_utils, constants
 
 
 class LSTM_Model(nn.Module):
-    def __init__(self, vocab_size, max_seq_len, n_classes, N, input_dim, hidden_dim):
+    def __init__(self, vocab_size, n_classes, N, input_dim, hidden_dim):
         super(LSTM_Model, self).__init__()
         # assuming hidden state dimension = cell state dimension = hidden_dim
         self.hidden_dim = hidden_dim
         self.N = N
-        self.embedding = EmbeddingLayer(vocab_size=vocab_size, max_seq_len=max_seq_len, dim=input_dim)
+        self.embedding = nn.Embedding(vocab_size, input_dim, padding_idx=constants.PAD_TOKEN_VAL)
         # assuming hidden state dimension = cell state dimension = output_dimension = hidden_dim and projection_size=0
         self.lstm = LSTM(input_size=input_dim,
                          hidden_size=hidden_dim,
@@ -20,15 +20,15 @@ class LSTM_Model(nn.Module):
         self.linear = nn.Linear(hidden_dim, n_classes)
 
     def get_embedding(self, X):
-        X = self.embedding(X)
+        X = self.embedding(X.long())
         hidden_input = self.init_zeros(batch_size=X.size(0))
         cell_input = self.init_zeros(batch_size=X.size(0))
 
-        # return values from rnn:
+        # return values from lstm: output, (hidden_output, cell_output)
         # output: output features from the last layer for each token: num_lstm_layers x batch_size X sequence_length X hidden_dim
         # hidden_output: final hidden state (embedding) for each sequence: num_lstm_layers x batch_size X hidden_dim
         # cell_output: final cell state (embedding) for each sequence: num_lstm_layers x batch_size X hidden_dim
-        output, (hidden_output, cell_output) = self.lstm(X, (hidden_input, cell_input))
+        output, _ = self.lstm(X, (hidden_input, cell_input))
 
         # aggregate the embeddings from lstm
         # mean of the representations of all tokens
@@ -46,7 +46,6 @@ class LSTM_Model(nn.Module):
 
 def get_lstm_model(model):
     lstm_model = LSTM_Model(vocab_size=model["vocab_size"],
-                            max_seq_len=model["max_seq_len"],
                             n_classes=model["n_classes"],
                             N=model["depth"],
                             input_dim=model["input_dim"],

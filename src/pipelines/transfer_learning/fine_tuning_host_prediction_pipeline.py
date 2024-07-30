@@ -2,7 +2,6 @@ import os
 import pandas as pd
 from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
-from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
 import torch
 import tqdm
@@ -42,6 +41,7 @@ def execute(config):
     n_iters = fine_tune_settings["n_iterations"]
 
     sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
+    # pre_train_encoder_settings["max_seq_len"] += 1  # adding 1 for the CLS token
 
     tasks = fine_tune_settings["task_settings"]
     id_col = sequence_settings["id_col"]
@@ -53,8 +53,9 @@ def execute(config):
         "n_epochs_freeze": training_settings["n_epochs_freeze"],
         "n_epochs_unfreeze": training_settings["n_epochs_unfreeze"],
         "lr": training_settings["max_lr"],
-        "max_sequence_length": pre_train_encoder_settings["max_seq_len"],
-        "dataset": input_file_names[0]
+        "max_sequence_length": sequence_settings["max_sequence_length"],
+        "dataset": input_file_names[0],
+        "output_prefix": output_prefix
     }
 
     # fine_tune_model store filepath
@@ -117,8 +118,9 @@ def execute(config):
 
             elif "hybrid_attention" in task_name:
                 print(f"Executing Hybrid Attention fine tuning in {mode} mode")
-                # add maximum sequence length of pretrained model as the chunk size
-                task["chunk_len"] = pre_train_encoder_settings["max_seq_len"]
+                # add maximum sequence length of pretrained model as the segment size from the sequence_settings
+                # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
+                task["segment_len"] = sequence_settings["max_sequence_length"]
                 fine_tune_model = transformer_attention.get_model(task)
             else:
                 continue
@@ -165,7 +167,6 @@ def execute(config):
 
 
 def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, task_name):
-    tbw = SummaryWriter()
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -191,7 +192,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     # train for n_epochs_freeze
     for e in range(n_epochs_freeze):
         model = run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
-                          lr_scheduler, early_stopper, tbw, task_name, e)
+                          lr_scheduler, early_stopper, task_name, e)
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
             print("Breaking off frozen training loop due to early stop")
@@ -205,7 +206,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
 
     for e in range(n_epochs_unfreeze):
         model = run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
-                          lr_scheduler, early_stopper, tbw, task_name, e)
+                          lr_scheduler, early_stopper, task_name, e)
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
             print("Breaking off unfrozen training loop due to early stop")
@@ -221,7 +222,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     return result_df, best_performing_model
 
 
-def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, tbw, task_name,
+def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, task_name,
               epoch):
     # training
     model.train()
@@ -248,18 +249,16 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimi
             "learning-rate": float(curr_lr),
             "training-loss": float(train_loss)
         })
-        tbw.add_scalar(f"{task_name}/learning-rate", float(curr_lr), model.train_iter)
-        tbw.add_scalar(f"{task_name}/training-loss", float(train_loss), model.train_iter)
         pbar.set_description(
             f"{task_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
 
     # validation
-    val_loss = validate_model(model, val_dataset_loader, criterion, tbw, task_name, epoch)
+    val_loss = validate_model(model, val_dataset_loader, criterion, task_name, epoch)
     early_stopper(model, val_loss)
     return model
 
 
-def validate_model(model, dataset_loader, criterion, tbw, task_name, epoch):
+def validate_model(model, dataset_loader, criterion, task_name, epoch):
     with torch.no_grad():
         model.eval()
 
@@ -278,7 +277,6 @@ def validate_model(model, dataset_loader, criterion, tbw, task_name, epoch):
             wandb.log({
                 "validation-loss": float(curr_val_loss)
             })
-            tbw.add_scalar(f"{task_name}/validation-loss", float(curr_val_loss), model.val_iter)
             pbar.set_description(
                 f"{task_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.val_iter}, epoch={epoch + 1}")
             val_loss.append(curr_val_loss)

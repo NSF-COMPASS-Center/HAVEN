@@ -1,4 +1,4 @@
-config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation
+config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation, transfer_learning
 config_sub_type: "host_prediction"
 
 # Input Settings:
@@ -6,7 +6,7 @@ config_sub_type: "host_prediction"
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/coronaviridae/20240313/uniprot/aligned"
+  input_dir: "input/data/coronaviridae/20240313/uniprot/alignment"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
@@ -17,27 +17,26 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 16
+    batch_size: 8
     id_col: "uniprot_id"
     sequence_col: "aligned_seq"
-    max_sequence_length: 1366 # has to be equal to the configuration used for MLM pretraining
-    truncate: True
-    pad_token_val: 0
+    truncate: False
+    split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 pre_train_settings:
   model_name: "masked_language_modeling"
-  model_path: "output/raw/uniref90/20240603/pre_training/mlm/transformer_encoder-l_6-h_8-lr1e-4-mlm_itr0.pth"
+  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240715/transformer_encoder-l_6-h_8-lr1e-4_msl512_b512_splitseq_mlm_vs30_itr0.pth"
   encoder_settings:
     model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
     n_heads: 8
     depth: 6
     input_dim: 512 # input embedding dimension
     hidden_dim: 1024
-    n_tokens: 26
+    max_seq_len: 512
 
 fine_tune_settings:
-  experiment: "fine_tune_model_coronaviridae_uniprot_s_prot_multi"
+  experiment: "fine_tuning_hybrid_coronaviridae_s_prot_uniprot_aligned"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
@@ -69,10 +68,23 @@ fine_tune_settings:
 
 
   task_settings:
-    - name: "host_prediction_fnn_2l_d1024_lr1e-4_aligned"
+    - name: "host_prediction_fnn_2l_d1024_lr1e-4"
+      active: False
+      mode: "train" # supported values: train, test
+      fine_tuned_model_path: ""
+      loss: "FocalLoss"
+      depth: 2
+      n_classes: 8
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+
+    - name: "hybrid_attention_msl512s128_fnn_2l_d1024_lr1e-4"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
+      stride: 128
+      cls_token: False
+      n_heads: 8
       loss: "FocalLoss"
       depth: 2
       n_classes: 8
@@ -82,5 +94,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_uniprot_embl_vertebrates_t0.01_c8/20240326/fine_tuning/host_prediction/multi"
-  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniprot_coronaviridae_s_aligned_msl1366" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "coronaviridae_s_prot_uniprot_embl_vertebrates_aligned_t0.01_c8/20240729/host_multi/fine_tuning_hybrid_vs30"
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl512b512vs30_s128" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

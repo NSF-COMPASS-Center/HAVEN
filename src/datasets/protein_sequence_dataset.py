@@ -7,13 +7,13 @@ import torch
 
 
 class ProteinSequenceDataset(Dataset):
-    def __init__(self, df, sequence_col, max_seq_len, truncate, label_col):
+    def __init__(self, df, sequence_col, label_col, truncate, max_seq_len):
         super(ProteinSequenceDataset, self).__init__()
         self.sequence_col = sequence_col
-        self.max_seq_len = max_seq_len
         self.label_col = label_col
         self.amino_acid_map = constants.AMINO_ACID_VOCABULARY
         self.data = df
+        self.max_seq_len = max_seq_len
         if truncate:
             self.data = self.truncate_dataset(df)
 

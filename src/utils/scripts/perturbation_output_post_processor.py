@@ -12,7 +12,6 @@ perturb_pos_col = "perturb_pos"
 orig_token_col = "orig_token"
 new_token_col = "new_token"
 temp_col = "temp_col"
-id_col = "uniref90_id"
 id_parser_regex_pattern = re.compile("(.+)_([A-Z])_(\d+)_([A-Z])")
 
 def parse_args():
@@ -21,6 +20,8 @@ def parse_args():
                         help="Absolute path to input directory with all the prediction output files.\n")
     parser.add_argument("-od", "--output_dir", required=True,
                         help="Absolute path to output directory.\n")
+    parser.add_argument("-id_col", "--id_col", required=True,
+                        help="Name of the id column in the prediction output files. Examples: 'uniprot_id', 'uniref90_id'.\n")
     args = parser.parse_args()
     return args
 
@@ -36,7 +37,7 @@ def parse_id(id_val):
         return None
 
 
-def post_process_output(input_dir, output_dir):
+def post_process_output(input_dir, output_dir, id_col):
     input_files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
 
     processing_error = []
@@ -68,7 +69,8 @@ def main():
     config = parse_args()
     input_dir = config.input_dir
     output_dir = config.output_dir
-    post_process_output(input_dir, output_dir)
+    id_col = config.id_col
+    post_process_output(input_dir, output_dir, id_col)
     return
 
 

@@ -8,10 +8,10 @@ from utils import constants
 from datasets.protein_sequence_dataset import ProteinSequenceDataset
 
 class ProteinSequenceUnlabeledDataset(ProteinSequenceDataset):
-    def __init__(self, df, sequence_col, max_seq_len, truncate, split_sequence):
+    def __init__(self, df, sequence_col, max_seq_len, truncate, split_sequence, cls_token):
         super(ProteinSequenceUnlabeledDataset, self).__init__(df=df, sequence_col=sequence_col, max_seq_len=max_seq_len,
                                                               truncate=truncate, label_col=None)
-
+        self.cls_token = cls_token
         if split_sequence:
             self.split_sequences()
 
@@ -28,6 +28,7 @@ class ProteinSequenceUnlabeledDataset(ProteinSequenceDataset):
         record = self.data.iloc[idx, :]
         sequence = record[self.sequence_col]
         sequence_vector = np.array([self.amino_acid_map[a] for a in sequence])
-        # add the CLS token at the beginning of the sequence
-        sequence_vector = np.insert(sequence_vector, 0, constants.CLS_TOKEN_VAL)
+        if self.cls_token:
+            # add the CLS token at the beginning of the sequence
+            sequence_vector = np.insert(sequence_vector, 0, constants.CLS_TOKEN_VAL)
         return torch.tensor(sequence_vector, device=nn_utils.get_device(), dtype=torch.float64)
