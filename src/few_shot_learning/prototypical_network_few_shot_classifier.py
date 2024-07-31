@@ -30,21 +30,26 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
 
         # assuming order is maintained and the prototype vector for each label is located at the corresponding index
         prototypes = torch.stack(prototypes) # n_way X embedding_dimension
+        print("prototypes done")
 
-        # compute queries in batches of fixed size as per the memory constraints of the server
+        # process the queries in batches of fixed size as per the memory constraints of the server
         query_features = self.get_embedding(query_sequences, batch_size)
+        n_query_sequences = len(query_sequences)
+        self.output = []
+        for i in range(0, n_query_sequences, batch_size):
+            query_features = self.pre_trained_model.get_embedding(sequences[i: i + batch_size])
+            # cdist will compute the l2-norm aka euclidean distance ||x1-x2||^2
+            # we negate the distance: lesser the distance to a prototype, more likely to be the class label of the prototype
+            self.output.append(-torch.cdist(query_features, prototypes)) # shape = batch_size X n_way
 
-        # cdist will compute the l2-norm aka euclidean distance ||x1-x2||^2
-        # we negate the distance: lesser the distance to a prototype, more likely to be the class label of the prototype
-        self.output = -torch.cdist(query_features, prototypes) # shape n_query_features X n_way
-        return self.output
+        return torch.cat(self.output) # shape = n_query X n_way
 
-    # method to get generate embeddings for sequences in batches
-    def get_embedding(self, sequences, batch_size):
-        n_sequences = len(sequences)
-        features = []
-
-        for i in range(0, n_sequences, batch_size):
-            features.append(self.pre_trained_model.get_embedding(sequences[i: i + batch_size]))
-
-        return torch.cat(features)
+    # # method to get generate embeddings for sequences in batches
+    # def get_embedding(self, sequences, batch_size):
+    #     n_sequences = len(sequences)
+    #     features = []
+    #
+    #     for i in range(0, n_sequences, batch_size):
+    #         features.append(self.pre_trained_model.get_embedding(sequences[i: i + batch_size]))
+    #
+    #     return torch.cat(features)
