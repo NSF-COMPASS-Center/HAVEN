@@ -28,36 +28,37 @@ class TransformerAttention(nn.Module):
         # last linear layer: hidden_dim--> n_classes
         self.linear_op = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, X):
+    def get_embedding(self, X):
         # X: b x n where n is the maximum sequence length in the batch
         # 1. split into segments
-        batch_size = X.shape[0] # batch_size
+        batch_size = X.shape[0]  # batch_size
         # split each sequence into smaller segments along the dimension of the sequence length
         # let # segment = n_s (depending on segment_len and stride)
-        X = X.unfold(dimension=1, size=self.segment_len, step=self.stride) # b x n_s x segment_len
+        X = X.unfold(dimension=1, size=self.segment_len, step=self.stride)  # b x n_s x segment_len
 
         # reshape the tensor to individual sequences of segment_len diregarding the sequence dimension (i.e. batch)
         # since we only need to generate embeddings for each segment where the sequence identity does not matter
         # contiguous ensures contiguous memory allocation for every value in the tensor
         # this will enable reshaping using view which only changes the shape(view) of the tensor without creating a copy
         # reshape() 'might' create a copy. Hence, we use view() to save memory
-        X = X.contiguous().view(-1, self.segment_len) # (b * n_s) x segment_len
+        X = X.contiguous().view(-1, self.segment_len)  # (b * n_s) x segment_len
 
         if self.cls_token:
             # add cls token to the beginning to every segment
             # add the CLS token at the beginning of the sequence
-            cls_tokens = torch.full(size=(X.shape[0], 1), fill_value=constants.CLS_TOKEN_VAL, device=nn_utils.get_device())
+            cls_tokens = torch.full(size=(X.shape[0], 1), fill_value=constants.CLS_TOKEN_VAL,
+                                    device=nn_utils.get_device())
             X = torch.cat([cls_tokens, X], dim=1)
 
         # generate embeddings
-        X = self.pre_trained_model(X, mask=None)   # (b * n_s) x segment_len x input_dim
+        X = self.pre_trained_model(X, mask=None)  # (b * n_s) x segment_len x input_dim
 
         # reshape back into sequences of chunks, i.e. re-introduce the batch dimension.
         # here -1 will account for n_s which changes with the sequence length in every batch
         # we use segment_len + 1 to account for the added CLS token
 
         if self.cls_token:
-            X = X.view(batch_size, -1, self.segment_len + 1, self.input_dim) # b x n_s x segment_len + 1 x input_dim
+            X = X.view(batch_size, -1, self.segment_len + 1, self.input_dim)  # b x n_s x segment_len + 1 x input_dim
         else:
             X = X.view(batch_size, -1, self.segment_len, self.input_dim)  # b x n_s x segment_len + 1 x input_dim
 
@@ -67,24 +68,26 @@ class TransformerAttention(nn.Module):
         else:
             # OPTION 1: representative vector for each segment = mean of the embeddings of tokens in every segment
             # mean along segment_len dimension, i.e dim=2
-            X = X.mean(dim=2) # b x n_s x input_dim
-
+            X = X.mean(dim=2)  # b x n_s x input_dim
 
         # attention between the chunks in every sequence
-        X = self.self_attn(X, X, X) # b x n_s x input_dim
+        X = self.self_attn(X, X, X)  # b x n_s x input_dim
 
         # feed-forward for projection + non-linear activation
-        X = self.feed_forward(X) # b x n_s x input_dim
+        X = self.feed_forward(X)  # b x n_s x input_dim
 
         # pool the embeddings of all segments in the input sequence using mean to generate a vector embedding for each sequence
-        X = X.mean(dim=1) # b x input_dim
+        X = X.mean(dim=1)  # b x input_dim
 
         # input linear layer
         X = F.relu(self.linear_ip(X))
         # hidden
-        self.embedding = X
         for linear_layer in self.linear_hidden_n:
             X = F.relu(linear_layer(X))
+        return X
+
+    def forward(self, X):
+        X = self.get_embedding(X)
         y = self.linear_op(X)
         return y
 

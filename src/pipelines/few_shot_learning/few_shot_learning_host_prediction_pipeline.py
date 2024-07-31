@@ -12,6 +12,7 @@ import wandb
 from models.nlp.transformer import transformer
 from transfer_learning.fine_tuning import host_prediction
 from models.nlp import cnn1d, rnn, lstm, fnn
+from models.nlp.hybrid import transformer_attention
 from training.early_stopping import EarlyStopping
 from utils import utils, dataset_utils, nn_utils, evaluation_utils, constants
 from few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
@@ -48,27 +49,28 @@ def execute(config):
     wandb_config = {
         "n_epochs": few_shot_learn_settings["n_epochs"],
         "lr": few_shot_learn_settings["max_lr"],
-        "max_sequence_length": max_sequence_length,
-        "dataset": input_file_names[0]
+        "dataset": input_file_names[0],
+        "outout_prefix": output_prefix
     }
+
+    # model store filepath
+    model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{model_name}_itr{itr}.pth")
+    Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
 
     results = {}
     evaluation_metrics = {}
+
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
         df = dataset_utils.read_dataset(input_dir, input_file_names,
                                         cols=[id_col, sequence_col, label_col])
 
-        # 2. Transform labels
-        # df, index_label_map = utils.transform_labels(df, label_settings,
-        #                                              classification_type=classification_settings["type"])
-
         train_dataset_loader = None
         val_dataset_loader = None
         test_dataset_loader = None
 
-        # 3. Split dataset
+        # 2. Split dataset
         if few_shot_learn_settings["split_input"]:
             input_split_seeds = input_settings["split_seeds"]
             train_df, val_df, test_df = dataset_utils.split_dataset_for_few_shot_learning(df, label_col=label_col,
@@ -84,25 +86,20 @@ def execute(config):
             # used in zero shot evaluation, where split_input=False in classification_settings and mode=test in model
             test_dataset_loader = dataset_utils.get_episodic_dataset_loader(df, sequence_settings, label_col, meta_test_settings)
 
-        pre_trained_model = None
+        prediction_model = None
         few_shot_classifier = None
-        pre_trained_model_path = None
-        pre_trained_models = config["pre_trained_models"]
+        prediction_model_path = None
+        prediction_models = config["pre_trained_models"]
 
-        # model store filepath
-        model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{model_name}_itr{itr}.pth")
-        Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
-
-        for model in pre_trained_models:
+        for model in prediction_models:
             model_name = model["name"]
-            pre_trained_model_path = model["path"]
+            prediction_model_path = model["path"]
             mode = model["mode"]
             # when mode == 'train', pre_trained_model_path points to a pre-trained host prediction classifier
             # when mode = 'test', pre_trained_model_path points to a pre-trained few shot classifier
 
             # Set necessary values within model_settings object for cleaner code and to avoid passing multiple arguments.
             model_settings = model["model_settings"]
-            model_settings["max_seq_len"] = max_sequence_length
 
             if model["active"] is False:
                 print(f"Skipping {model_name} ...")
@@ -113,28 +110,12 @@ def execute(config):
                 results[model_name] = []
                 evaluation_metrics[model_name] = []
 
-            if "fnn" in model_name:
-                print(f"Executing FNN")
-                pre_trained_model = fnn.get_fnn_model(model_settings)
-
-            elif "cnn" in model_name:
-                print(f"Executing CNN")
-                pre_trained_model = cnn1d.get_cnn_model(model_settings)
-
-            elif "rnn" in model_name:
-                print(f"Executing RNN")
-                pre_trained_model = rnn.get_rnn_model(model_settings)
-
-            elif "lstm" in model_name:
-                print(f"Executing LSTM")
-                pre_trained_model = lstm.get_lstm_model(model_settings)
-
-            elif "transformer" in model_name:
+            if "transformer" in model_name:
                 print(f"Executing Transformer")
-                pre_trained_model = transformer.get_transformer_encoder_classifier(model_settings)
+                prediction_model = transformer.get_transformer_encoder_classifier(model_settings)
 
             elif "virprobert" in model_name:
-                print(f"Executing VirProBERT (pre-trained and fine tuned model)")
+                print(f"Executing VirProBERT (pre-trained and fine tuned model).")
                 # Load the pre-trained Transformer Encoder in the pre-trained (MLM) and fine-tuned (Host prediction) VirProBERT
                 mlm_encoder_settings = model_settings["encoder_settings"].copy()
                 mlm_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
@@ -148,7 +129,29 @@ def execute(config):
                 # this is different from the what we call "pre_trained" in the context of few-shot-learning,
                 # i.e., model pre-trained for Host prediction.
                 model_settings["pre_trained_model"] = mlm_encoder_model
-                pre_trained_model = host_prediction.get_host_prediction_model(model_settings)
+                prediction_model = host_prediction.get_host_prediction_model(model_settings)
+
+            elif "hybrid" in model_name:
+                print(f"Executing Hybrid Attention Model (pre-trained and fine tuned model).")
+                model_settings["encoder_settings"]["max_seq_len"] = sequence_settings["max_sequence_length"]
+                mlm_encoder_settings = model_settings["encoder_settings"].copy()
+                mlm_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
+                # add max_sequence_length to pre_train_encoder_settings
+                mlm_encoder_settings["max_seq_len"] = max_sequence_length
+                if model_settings["cls_token"]:
+                    mlm_encoder_settings["max_seq_len"] += 1
+                # load pre-trained encoder model
+                mlm_encoder_model = transformer.get_transformer_encoder(mlm_encoder_settings)
+                # Set the pre_trained model within the hybrid attn model config
+                # NOTE: this pre_trained_model is the MLM pre-trained model
+                # this is different from the what we call "pre_trained" in the context of few-shot-learning,
+                # i.e., model pre-trained for Host prediction.
+                model_settings["pre_trained_model"] = mlm_encoder_model
+                # add maximum sequence length of pretrained model as the segment size from the sequence_settings
+                # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token, if needed
+                model_settings["segment_len"] = max_sequence_length
+                prediction_model = transformer_attention.get_model(model_settings)
+
             else:
                 print(f"ERROR: Unrecognized model '{model_name}'.")
                 continue
@@ -162,16 +165,16 @@ def execute(config):
 
             if mode == "train":
                 # Load the pre-trained host prediction model
-                pre_trained_model.load_state_dict(torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
-                few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=pre_trained_model)
+                prediction_model.load_state_dict(torch.load(prediction_model_path, map_location=nn_utils.get_device()))
+                few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=prediction_model)
                 result_df, auprc_df, few_shot_classifier = run_few_shot_learning(few_shot_classifier, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learn_settings,
                                       meta_train_settings, meta_validate_settings, meta_test_settings, model_name)
             elif mode == "test":
                 # mode=test used for cross-domain few-shot evaluation: prediction of hosts in novel virus (hosts may or may not be novel)
-                few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=pre_trained_model)
+                few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=prediction_model)
 
                 # load the pre-trained few-shot classifier
-                few_shot_classifier.load_state_dict(torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
+                few_shot_classifier.load_state_dict(torch.load(prediction_model_path, map_location=nn_utils.get_device()))
                 result_df, auprc_df = meta_test_model(few_shot_classifier, test_dataset_loader, batch_size=few_shot_learn_settings["batch_size"])
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values are ['train', 'test'].")
