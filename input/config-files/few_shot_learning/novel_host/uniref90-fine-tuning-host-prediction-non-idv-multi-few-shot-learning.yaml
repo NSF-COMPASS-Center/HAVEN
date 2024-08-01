@@ -36,7 +36,7 @@ few_shot_learn_settings:
   classification_type: "multi"
   save_model: True
   n_epochs: 25
-  batch_size: 7
+  batch_size: 32
   max_lr: 1e-4
   pct_start: 0.10
   div_factor: 25.0
