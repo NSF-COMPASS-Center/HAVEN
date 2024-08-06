@@ -6,37 +6,37 @@ config_sub_type: "host_prediction"
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/coronaviridae/20240313/uniref"
+  input_dir: "input/data/coronaviridae/20240313/uniref/alignment"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   # file_names: [ "uniref90_final_msl1114.csv" ]
-  file_names: [ "coronaviridae_s_uniref90_embl_hosts_pruned_metadata_corrected_species_virus_host_vertebrates_w_seq_t0.01_c8.csv" ]
+  file_names: [ "coronaviridae_s_uniref90_embl_hosts_pruned_metadata_corrected_species_virus_host_vertebrates_w_seq_t0.01_c8_aligned.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 32
+    batch_size: 8
     id_col: "uniref90_id"
-    sequence_col: "seq"
+    sequence_col: "aligned_seq"
     truncate: False
     split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 pre_train_settings:
   model_name: "masked_language_modeling"
-  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240712/transformer_encoder-l_6-h_8-lr1e-4_msl128_b1024_splitseq_mlm_vs30_itr0.pth"
+  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240618/transformer_encoder-l_6-h_8-lr1e-4_msl512_splitseq_mlm_itr0.pth"
   encoder_settings:
     model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
     n_heads: 8
     depth: 6
     input_dim: 512 # input embedding dimension
     hidden_dim: 1024
-    max_seq_len: 128
+    max_seq_len: 512
 
 fine_tune_settings:
-  experiment: "fine_tuning_hybrid_coronaviridae_s_prot_uniref90"
+  experiment: "fine_tuning_hybrid_coronaviridae_s_prot_uniref90_aligned"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
@@ -82,7 +82,7 @@ fine_tune_settings:
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
-      stride: 64
+      stride: 128
       cls_token: False
       n_heads: 8
       loss: "FocalLoss"
@@ -94,5 +94,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240805/host_multi/fine_tuning_hybrid"
-  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b64vs30_s64" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240726/host_multi/fine_tuning_hybrid"
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl512b64_s128" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
