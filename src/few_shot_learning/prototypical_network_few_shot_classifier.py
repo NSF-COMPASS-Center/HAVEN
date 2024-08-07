@@ -41,6 +41,10 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
             # we negate the distance: lesser the distance to a prototype, more likely to be the class label of the prototype
             query_output.append(-torch.cdist(query_features, prototypes)) # shape batch_size X n_way
 
+        del query_sequences # mark for deletion
+        del query_features # mark for deletion
+        gc.collect() # garbage collection to free up memory
+
         self.output = torch.cat(query_output) # shape n_query X n_way
         return self.output
 
