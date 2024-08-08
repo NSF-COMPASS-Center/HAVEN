@@ -26,9 +26,6 @@ classification_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan"]
     label_groupings:
-#      "Human": [ "homo sapiens" ]
-#      "Non-Human": [ "NOT homo sapiens" ]
-
       "Chicken": [ "gallus gallus" ]
       "Human": [ "homo sapiens" ]
       "Cat": [ "felis catus" ]
@@ -54,7 +51,7 @@ classification_settings:
         input_dim: 512 # input embedding dimension
         hidden_dim: 1024
 
-    - name: "hybrid_attention_msl512cls_s128_fnn_2l_d1024_lr1e-4"
+    - name: "hybrid_attention_msl256_vs30_s64_fnn_2l_d1024_lr1e-4"
       active: True
       mode: "test"
       model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240805/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b1024vs30cls_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr4.pth"
