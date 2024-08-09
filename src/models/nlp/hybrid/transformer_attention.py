@@ -4,6 +4,7 @@ from models.nlp.transformer.feed_forward_layer import FeedForwardLayer
 from utils import nn_utils, constants
 import torch
 import torch.nn.functional as F
+from torch.nn import BatchNorm1d
 
 # only encoder
 class TransformerAttention(nn.Module):
@@ -20,10 +21,12 @@ class TransformerAttention(nn.Module):
         # Classification block
         # first linear layer: input_dim --> hidden_dim
         self.linear_ip = nn.Linear(input_dim, hidden_dim)
-
+        self.batch_norm_ip = BatchNorm1d(hidden_dim)
         self.linear_hidden = nn.Linear(hidden_dim, hidden_dim)
+        self.batch_norm_hidden = BatchNorm1d(hidden_dim)
         # intermediate hidden layers (number = N): hidden_dim --> hidden_dim
         self.linear_hidden_n = nn_utils.create_clones(self.linear_hidden, depth)
+        self.batch_norm_hidden_n = nn_utils.create_clones(self.batch_norm_hidden, depth)
 
         # last linear layer: hidden_dim--> n_classes
         self.linear_op = nn.Linear(hidden_dim, n_classes)
@@ -81,9 +84,11 @@ class TransformerAttention(nn.Module):
 
         # input linear layer
         X = F.relu(self.linear_ip(X))
+        X = self.batch_norm_ip(X)
         # hidden
-        for linear_layer in self.linear_hidden_n:
+        for i, linear_layer in enumerate(self.linear_hidden_n):
             X = F.relu(linear_layer(X))
+            X = self.batch_norm_hidden_n[i](X)
         return X
 
     def forward(self, X):
