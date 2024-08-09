@@ -1,7 +1,7 @@
 from utils import nn_utils
 from models.nlp.transformer.multi_head_attention import MultiHeadAttention
 from models.nlp.transformer.feed_forward_layer import FeedForwardLayer
-from models.nlp.transformer.normalization import NormalizationLayer
+from models.nlp.transformer.layer_normalization import LayerNormalization
 from models.nlp.transformer.residual_connection import ResidualConnectionLayer
 import torch.nn as nn
 
@@ -31,12 +31,12 @@ class Decoder(nn.Module):
     def __init__(self, layer, N=6):
         super(Decoder, self).__init__()
         self.layers = nn_utils.create_clones(layer, N)
-        self.norm = NormalizationLayer()
+        self.layer_norm = LayerNormalization()
         self.encoding = None
 
     def forward(self, X, source_emb, source_mask, target_mask):
         # pass through each layer sequentially
         for layer in self.layers:
             X = layer(X, source_emb, source_mask, target_mask)
-        self.decoding = self.norm(X)
+        self.decoding = self.layer_norm(X)
         return self.decoding
