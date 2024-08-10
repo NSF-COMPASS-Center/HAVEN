@@ -14,18 +14,18 @@ class FewShotLearningEpisode:
             - # query_sequences: n_way * n_query
             - # query_labels: n_way * n_query
     """
-    def __init__(self, n_shot, n_query, max_length):
+    def __init__(self, n_shot, n_query, max_seq_length):
         self.n_shot = n_shot
         self.n_query = n_query
         self.pad_value = constants.PAD_TOKEN_VAL
-        self.max_length = max_length
+        self.max_seq_length = max_seq_length
 
     def __call__(self, batch):
         sequences, labels = zip(*batch)
 
         # pad sequences
         sequences = [seq.clone().detach() for seq in sequences]
-        padded_sequences = utils.pad_sequences(sequences, self.max_length, self.pad_value)
+        padded_sequences = utils.pad_sequences(sequences, self.max_seq_length, self.pad_value)
 
         support_sequences = []
         support_labels = []

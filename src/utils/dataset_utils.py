@@ -225,7 +225,7 @@ def get_episodic_dataset_loader(df, sequence_settings, label_col, few_shot_learn
 
     fsl_episode = FewShotLearningEpisode(n_shot=few_shot_learn_settings["n_shot"],
                                          n_query=few_shot_learn_settings["n_query"],
-                                         max_length=sequence_settings["max_sequence_length"])
+                                         max_seq_length=sequence_settings["max_sequence_length"])
 
     return DataLoader(dataset=dataset,
                       batch_sampler=get_few_shot_learning_task_sampler(dataset, few_shot_learn_settings),

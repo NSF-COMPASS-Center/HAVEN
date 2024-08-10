@@ -20,11 +20,17 @@ input_settings:
     "Hybrid-sl128st64_CLS_vs30": "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240711/host_multi/fine_tuning_hybrid_cls_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-sl128st64_CLS_vs103": "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240708/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-sl256st64_vs28": "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240701/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    "Hybrid-sl256st64_vs30": "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240723/host_multi/fine_tuning_hybrid_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b1024vs30_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-sl256st64_CLS_vs30": "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240709/host_multi/fine_tuning_hybrid_cls_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-sl256st64_CLS_vs103": "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240710/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-sl512st128_vs30": "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240723/host_multi/fine_tuning_hybrid_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl512b512vs30_s128_hybrid_attention_s128_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-sl512st64_CLS_vs30": "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240715/host_multi/fine_tuning_hybrid_cls_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl512b512vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     "Hybrid-sl512st128_CLS_vs103": "coronaviridae_s_prot_uniref90_embl_vertebrates_aligned_t0.01_c8/20240717/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl512b512cls_s128_hybrid_attention_s128_fnn_2l_d1024_lr1e-4_output.csv"
+    "Hybrid-s128st64_vs30_UA": "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240805/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b64vs30_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    "Hybrid-s128st64_CLS_vs30_UA": "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240805/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024vs30cls_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    "Hybrid-s256st64_vs30_UA": "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240805/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b64vs30_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    "Hybrid-s256st64_CLS_vs30_UA": "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240805/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b1024vs30cls_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+
 evaluation_settings:
   type: "multi"
   # metrics
@@ -63,5 +69,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "coronaviridae-s/uniref90/20240702"
-  prefix: "host_multi_aligned"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
+  dataset_dir: "coronaviridae-s/uniref90/20240809"
+  prefix: "host_multi_align_unalign"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

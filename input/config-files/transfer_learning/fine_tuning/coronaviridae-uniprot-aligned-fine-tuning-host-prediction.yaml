@@ -1,0 +1,98 @@
+config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation, transfer_learning
+config_sub_type: "host_prediction"
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "input/data/coronaviridae/20240313/uniprot/alignment"
+
+  # Name of file(s) in subdirectory to be read and processed.
+  # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
+  # file_names: [ "uniref90_final_msl1114.csv" ]
+  file_names: [ "coronaviridae_s_uniprot_uniprot_metadata_embl_hosts_pruned_metadata_corrected_species_virus_host_vertebrates_w_seq_t0.01_c8_aligned.csv" ]
+  # seeds to split the files into training and testing
+  # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
+  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
+
+sequence_settings:
+    batch_size: 8
+    id_col: "uniprot_id"
+    sequence_col: "aligned_seq"
+    truncate: False
+    split_sequence: False
+    feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
+
+pre_train_settings:
+  model_name: "masked_language_modeling"
+  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240712/transformer_encoder-l_6-h_8-lr1e-4_msl512_b512_splitseq_mlm_cls_itr0.pth"
+  encoder_settings:
+    model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
+    n_heads: 8
+    depth: 6
+    input_dim: 512 # input embedding dimension
+    hidden_dim: 1024
+    max_seq_len: 512
+
+fine_tune_settings:
+  experiment: "fine_tuning_hybrid_coronaviridae_s_prot_uniprot_aligned"
+  n_iterations: 5
+  split_input: True
+  train_proportion: 0.8
+  classification_type: "multi"
+  save_model: True
+
+  training_settings:
+    n_epochs_freeze: 20
+    n_epochs_unfreeze: 30
+    max_lr: 1e-4
+    pct_start: 0.10
+    div_factor: 25.0
+    final_div_factor: 10000.0
+
+  label_settings:
+    label_col: "virus_host_name"
+    exclude_labels: [ "nan" ]
+    label_groupings:
+#      "Human": [ "homo sapiens" ]
+#      "Non-Human": [ "NOT homo sapiens" ]
+      "Pig": [ "sus scrofa" ]
+      "Human": [ "homo sapiens" ]
+      "Cat": [ "felis catus" ]
+      "Dromedary camel": [ "camelus dromedarius" ]
+      "Cattle": ["bos taurus"]
+      "Chicken": [ "gallus gallus" ]
+      "Gray wolf": [ "canis lupus" ]
+      "Yak": [ "bos grunniens" ]
+
+
+  task_settings:
+    - name: "host_prediction_fnn_2l_d1024_lr1e-4"
+      active: False
+      mode: "train" # supported values: train, test
+      fine_tuned_model_path: ""
+      loss: "FocalLoss"
+      depth: 2
+      n_classes: 8
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+
+    - name: "hybrid_attention_msl512s128cls_fnn_2l_d1024_lr1e-4"
+      active: True
+      mode: "train" # supported values: train, test
+      fine_tuned_model_path: ""
+      stride: 128
+      cls_token: True
+      n_heads: 8
+      loss: "FocalLoss"
+      depth: 2
+      n_classes: 8
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+
+output_settings:
+  output_dir: "output"
+  results_dir: "raw"
+  sub_dir: "coronaviridae_s_prot_uniprot_embl_vertebrates_aligned_t0.01_c8/20240730/host_multi/fine_tuning_hybrid_cls"
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl512b512cls_s128" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
