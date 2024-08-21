@@ -18,9 +18,9 @@ input_settings:
 sequence_settings:
   id_col: "uniref90_id"
   sequence_col: "seq"
-  truncate: True
+  truncate: False
   split: False
-  max_sequence_length: 2048
+  max_sequence_length: 256
   feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 label_settings:
@@ -36,7 +36,7 @@ few_shot_learn_settings:
   classification_type: "multi"
   save_model: True
   n_epochs: 25
-  batch_size: 4
+  batch_size: 16
   max_lr: 1e-4
   pct_start: 0.10
   div_factor: 25.0
@@ -92,7 +92,7 @@ pre_trained_models:
       n_classes: 5
 
   - name: "virprobert"
-    active: True
+    active: False
     mode: "train"
     path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5/20240611/host_multi/fine_tuning/host_prediction_fnn_2l_d1024_lr1e-4_itr0.pth"
     model_settings:
@@ -108,7 +108,7 @@ pre_trained_models:
         hidden_dim: 1024
 
   - name: "hybrid-attention_sl256st64vs30_fnn_2l_d1024_lr1e-4"
-    active: False
+    active: True
     mode: "train"
     path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240716/host_multi/fine_tuning_hybrid_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr4.pth"
     model_settings:
@@ -129,5 +129,5 @@ pre_trained_models:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv/20240807/host_multi/few_shot_learning"
+  sub_dir: "uniref90_embl_vertebrates_non_idv/20240820/host_multi/few_shot_learning"
   prefix: "fsl_tr_w3s5q10_te_w3s5q-1_e25b16_sl256st64vs30_split70-10-20" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
