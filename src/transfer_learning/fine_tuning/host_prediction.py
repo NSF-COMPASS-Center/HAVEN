@@ -24,8 +24,12 @@ class HostPrediction(nn.Module):
         X = X.mean(dim=1)
         return X
 
-    def forward(self, X):
-        X = self.get_embedding(X)
+    def forward(self, X, embedding_only=False):
+        X = self.pre_trained_model(X, mask=None)
+        # pool the pre_trained_model embeddings of all tokens in the input sequence using mean
+        X = X.mean(dim=1)
+        if embedding_only:
+            return X
         # input linear layer
         X = F.relu(self.linear_ip(X))
         # hidden
