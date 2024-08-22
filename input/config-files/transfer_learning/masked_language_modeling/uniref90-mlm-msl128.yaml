@@ -39,7 +39,7 @@ encoder_settings:
   hidden_dim: 1024
 
 training_settings:
-  experiment: "pre-training-mlm-allemb-cls"
+  experiment: "pre-training-mlm-allemb"
   n_iterations: 1
   split_input: True
   train_proportion: 0.9
@@ -54,5 +54,5 @@ training_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90-viridae/pre-training/mlm/20240805"
+  sub_dir: "uniref90-viridae/pre-training/mlm/20240821"
   prefix: "msl128_b512_splitseq_mlm_vs30_allemb" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
