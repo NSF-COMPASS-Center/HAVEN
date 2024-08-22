@@ -5,55 +5,53 @@ import gc
 class PrototypicalNetworkFewShotClassifier(nn.Module):
     def __init__(self, pre_trained_model):
         super(PrototypicalNetworkFewShotClassifier, self).__init__()
-        self.pre_trained_model = pre_trained_model
+        self.pre_trained_model = nn.DataParallel(pre_trained_model)
 
     def forward(self, support_sequences, support_labels, query_sequences, batch_size):
         # compute prototypes for each label
         prototypes = []
-
         # unique returns the labels in sorted order
         # we assume the labels are always (0, 1, ...., n_way-1)
         for label in torch.unique(support_labels):
             # assuming n_shot is within the server memory constraints
             # i.e, n_shot <= batch_size
-            label_support_features = self.pre_trained_model.get_embedding(
+            label_support_features = self.pre_trained_model(
                 support_sequences[
                     torch.nonzero(support_labels == label).squeeze() # torch.nonzero gives the indices with non-zero elements but it adds a dimension as [n, 1] hence we use squeeze to remove the added extra dimension
-                ]
+                ],
+                embedding_only=True
             )
             # prototype is the mean of the support features
             prototypes.append(label_support_features.mean(0))
             del label_support_features # mark for deletion
+            torch.cuda.empty_cache()
 
+        # memory cleanup
         del support_sequences # mark for deletion
+        torch.cuda.empty_cache()
         gc.collect() # garbage collection to free up memory
 
         # assuming order is maintained and the prototype vector for each label is located at the corresponding index
         prototypes = torch.stack(prototypes) # n_way X embedding_dimension
+        # compute output in batches
+        self.output = self.compute_output(query_sequences, batch_size, prototypes) # shape n_query X n_way
 
-        # compute querie features and output in batches of fixed size as per the memory constraints of the server
-        n_query_sequences = len(query_sequences)
-        query_output = []
-        for i in range(0, n_query_sequences, batch_size):
-            query_features = self.pre_trained_model.get_embedding(query_sequences[i: i + batch_size])
-
-            # cdist will compute the l2-norm aka euclidean distance ||x1-x2||^2
-            # we negate the distance: lesser the distance to a prototype, more likely to be the class label of the prototype
-            query_output.append(-torch.cdist(query_features, prototypes)) # shape batch_size X n_way
-
+        # memory cleanup
         del query_sequences # mark for deletion
-        del query_features # mark for deletion
+        torch.cuda.empty_cache()  # empty cachce
         gc.collect() # garbage collection to free up memory
 
-        self.output = torch.cat(query_output) # shape n_query X n_way
         return self.output
 
-    # method to get generate embeddings for sequences in batches
-    def get_embedding(self, sequences, batch_size):
+    # method to get compute output for query sequences by generating embeddings for sequences in batches, if required
+    def compute_output(self, sequences, batch_size, prototypes):
         n_sequences = len(sequences)
-        features = []
+        output = []
 
         for i in range(0, n_sequences, batch_size):
-            features.append(self.pre_trained_model.get_embedding(sequences[i: i + batch_size]))
+            query_features = self.pre_trained_model(query_sequences[i: i + batch_size], embedding_only=True)
+            output.append(-torch.cdist(query_features, prototypes))
+            del query_features
+            torch.cuda.empty_cache()
 
-        return
+        return output

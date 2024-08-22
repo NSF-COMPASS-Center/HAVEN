@@ -91,8 +91,12 @@ class TransformerAttention(nn.Module):
 #            X = self.batch_norm_hidden_n[i](X)
         return X
 
-    def forward(self, X):
+    def forward(self, X, embedding_only=False):
         X = self.get_embedding(X)
+        if embedding_only:
+            # used in Few Shot Learning
+            # Hack to use DataParallel and run on multiple GPUs since we can only call __call__() --> forward() using DataParallel
+            return X
         y = self.linear_op(X)
         return y
 

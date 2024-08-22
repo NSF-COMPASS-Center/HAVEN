@@ -9,5 +9,5 @@ class FeedForwardLayer(nn.Module):
         self.W_2 = nn.Linear(d_ff, d)
 
     def forward(self, X):
-        Z = F.relu(self.W_1(X))
-        return self.W_2(Z)
+        X = F.relu(self.W_1(X))
+        return self.W_2(X)

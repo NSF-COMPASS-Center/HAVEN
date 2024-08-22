@@ -117,7 +117,7 @@ pre_trained_models:
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
-      stride: 64
+      stride: 128
       cls_token: False
       encoder_settings:
         n_heads: 8
@@ -129,5 +129,5 @@ pre_trained_models:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv/20240807/host_multi/few_shot_learning"
-  prefix: "fsl_tr_w3s5q10_te_w3s5q-1_e25b16_sl256st64vs30_split70-10-20" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90_embl_vertebrates_non_idv/20240820/host_multi/few_shot_learning"
+  prefix: "fsl_tr_w3s5q10_te_w3s5q-1_e25b16_sl256st128vs30_split70-10-20" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

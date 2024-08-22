@@ -61,7 +61,6 @@ def execute(config):
     evaluation_metrics = {}
 
     for iter in range(n_iters):
-        print(f"Iteration {iter}")
         # 1. Read the data files
         df = dataset_utils.read_dataset(input_dir, input_file_names,
                                         cols=[id_col, sequence_col, label_col])
