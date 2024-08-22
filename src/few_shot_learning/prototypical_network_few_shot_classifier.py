@@ -33,9 +33,8 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
 
         # assuming order is maintained and the prototype vector for each label is located at the corresponding index
         prototypes = torch.stack(prototypes) # n_way X embedding_dimension
-
-        query_features = self.pre_trained_model(query_sequences, embedding_only=True)
-        self.output = -torch.cdist(query_features, prototypes) # shape n_query X n_way
+        # compute output in batches
+        self.output = self.compute_output(query_sequences, batch_size, prototypes) # shape n_query X n_way
 
         # memory cleanup
         del query_sequences # mark for deletion
@@ -44,12 +43,15 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
 
         return self.output
 
-    # method to get generate embeddings for sequences in batches
-    def get_embedding(self, sequences, batch_size):
+    # method to get compute output for query sequences by generating embeddings for sequences in batches, if required
+    def compute_output(self, sequences, batch_size, prototypes):
         n_sequences = len(sequences)
-        features = []
+        output = []
 
         for i in range(0, n_sequences, batch_size):
-            features.append(self.pre_trained_model.get_embedding(sequences[i: i + batch_size]))
+            query_features = self.pre_trained_model(query_sequences[i: i + batch_size], embedding_only=True)
+            output.append(-torch.cdist(query_features, prototypes))
+            del query_features
+            torch.cuda.empty_cache()
 
-        return
+        return output
