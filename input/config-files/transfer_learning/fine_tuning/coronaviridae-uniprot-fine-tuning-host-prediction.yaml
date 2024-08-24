@@ -26,7 +26,7 @@ sequence_settings:
 
 pre_train_settings:
   model_name: "masked_language_modeling"
-  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240712/transformer_encoder-l_6-h_8-lr1e-4_msl128_b1024_splitseq_mlm_vs30_itr0.pth"
+  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240705/transformer_encoder-l_6-h_8-lr1e-4_msl128_b1024_splitseq_mlm_cls_vs30_itr0.pth"
   encoder_settings:
     model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
     n_heads: 8
