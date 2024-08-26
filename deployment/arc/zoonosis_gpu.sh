@@ -4,9 +4,9 @@
 #SBATCH --account=seqevol
 #SBATCH --partition=a100_normal_q
 
-#SBATCH --mem=250G
+#SBATCH --mem=300G
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:4
+#SBATCH --gres=gpu:1
 #SBATCH -t 96:00:00 # wall-time required (# 144hrs = 6 days)
 
 
