@@ -44,8 +44,8 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
         return self.output
 
     # method to get compute output for query sequences by generating embeddings for sequences in batches, if required
-    def compute_output(self, sequences, batch_size, prototypes):
-        n_sequences = len(sequences)
+    def compute_output(self, query_sequences, batch_size, prototypes):
+        n_sequences = len(query_sequences)
         output = []
 
         for i in range(0, n_sequences, batch_size):
@@ -54,4 +54,4 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
             del query_features
             torch.cuda.empty_cache()
 
-        return output
+        return torch.cat(output)
