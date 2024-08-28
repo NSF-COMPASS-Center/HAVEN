@@ -219,22 +219,22 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
     model.train_iter = 0
     model.val_iter = 0
 
-    # # meta training with validation
-    # for e in range(n_epochs):
-    #     # training
-    #     model = meta_train_model(model, train_dataset_loader, criterion, optimizer,
-    #                       lr_scheduler, model_name, e, batch_size)
-    #     # validation
-    #     val_loss = meta_validate_model(model, val_dataset_loader, criterion, model_name, e, batch_size)
-    #     early_stopper(model, val_loss)
-    #
-    #     if early_stopper.early_stop:
-    #         print("Breaking off training loop due to early stop.")
-    #         break
-    #
-    # # choose the model with the lowest validation loss from the early stopper
-    # best_performing_model = early_stopper.get_current_best_model()
-    best_performing_model = model
+    # meta training with validation
+    for e in range(n_epochs):
+        # training
+        model = meta_train_model(model, train_dataset_loader, criterion, optimizer,
+                          lr_scheduler, model_name, e, batch_size)
+        # validation
+        val_loss = meta_validate_model(model, val_dataset_loader, criterion, model_name, e, batch_size)
+        early_stopper(model, val_loss)
+
+        if early_stopper.early_stop:
+            print("Breaking off training loop due to early stop.")
+            break
+
+    # choose the model with the lowest validation loss from the early stopper
+    best_performing_model = early_stopper.get_current_best_model()
+
     # meta testing
     result_df, auprc_df = meta_test_model(best_performing_model, test_dataset_loader, batch_size)
 
