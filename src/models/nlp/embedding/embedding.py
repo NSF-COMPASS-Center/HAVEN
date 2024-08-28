@@ -8,8 +8,8 @@ from utils import constants
 class EmbeddingLayer(nn.Module):
     def __init__(self, vocab_size, max_seq_len, dim):
         super(EmbeddingLayer, self).__init__()
-        # self.token_embedding = nn.Embedding(vocab_size, dim, padding_idx=constants.PAD_TOKEN_VAL) # here padding_idx denotes the index or token val used for padding
-        self.token_embedding = nn.Embedding(vocab_size, dim)
+        self.token_embedding = nn.Embedding(vocab_size, dim, padding_idx=constants.PAD_TOKEN_VAL) # here padding_idx denotes the index or token val used for padding
+        # self.token_embedding = nn.Embedding(vocab_size, dim)
         self.positional_embedding = PositionalEncoding(dim, max_seq_len)
 
     def forward(self, X):
