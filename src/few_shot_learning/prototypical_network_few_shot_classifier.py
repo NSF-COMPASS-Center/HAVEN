@@ -43,13 +43,15 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
 
         return self.output
 
-    # method to get compute output for query sequences by generating embeddings for sequences in batches, if required
+    # method to get compute output for query sequences by generating embeddings for sequences in mini_batches, if required
     def compute_output(self, query_sequences, batch_size, prototypes):
         n_sequences = len(query_sequences)
         output = []
 
         for i in range(0, n_sequences, batch_size):
-            query_features = self.pre_trained_model(query_sequences[i: i + batch_size], embedding_only=True)
+            mini_batch = query_sequences[i: i + batch_size]
+            print(f"mini_batch size = {mini_batch.shape}")
+            query_features = self.pre_trained_model(mini_batch, embedding_only=True)
             output.append(-torch.cdist(query_features, prototypes))
             del query_features
             torch.cuda.empty_cache()
