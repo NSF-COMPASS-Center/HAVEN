@@ -5,13 +5,14 @@
 import random
 
 import requests
-import pytaxonkit
+#import pytaxonkit
 import pandas as pd
 import os
 from Bio import SeqIO
 
 # UniProt keywords/contsant values
 UNIPROT_REST_API = "https://rest.uniprot.org/uniprotkb/search"
+UNIREF_REST_API = "https://rest.uniprot.org/uniref/%s.json"
 UNIREF90_QUERY_PARAM = "uniref_cluster_90:%s"
 
 # EMBL keywords/constant values
@@ -205,3 +206,15 @@ def query_embl(embl_ref_ids, temp_dir):
     # delete the temporary file
     os.remove(temp_output_file_path)
     return embl_host_mapping
+
+
+# query UniProt to get the cluster members of the UniRef cluster
+# input: uniref_id
+# output:
+def get_uniref_cluster_members(uniref_id):
+    response = requests.get(url=UNIREF_REST_API % uniref_id)
+    data = response.json()
+    print(f"Number of members = {data['memberCount']}")
+    member_ids = [member["memberId"] for member in data["members"]]
+    print(f"Member IDs count = {member_ids}")
+    return member_ids
