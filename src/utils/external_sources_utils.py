@@ -5,7 +5,7 @@
 import random
 
 import requests
-import pytaxonkit
+#import pytaxonkit
 import pandas as pd
 import os
 from Bio import SeqIO
@@ -213,8 +213,14 @@ def query_embl(embl_ref_ids, temp_dir):
 # output:
 def get_uniref_cluster_members(uniref_id):
     response = requests.get(url=UNIREF_REST_API % uniref_id)
-    data = response.json()
-    print(f"Number of members = {data['memberCount']}")
-    member_ids = [member["memberId"] for member in data["members"]]
-    print(f"Member IDs count = {member_ids}")
+    member_ids = []
+
+    if response.ok:
+        data = response.json()
+        member_count = data['memberCount']
+        print(f"Number of members = {member_count}")
+        member_ids = [data["representativeMember"]["memberId"]]
+        if member_count > 1:
+            member_ids += [member["memberId"] for member in data["members"]]
+    print(f"Member IDs count = {len(member_ids)}")
     return member_ids
