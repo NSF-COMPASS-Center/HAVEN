@@ -69,7 +69,7 @@ class TransformerAttention(nn.Module):
             # OPTION 1: representative vector for each segment = CLS token embedding in every segment
             X = X[:, :, 0, :]
         else:
-            # OPTION 1: representative vector for each segment = mean of the embeddings of tokens in every segment
+            # OPTION 2: representative vector for each segment = mean of the embeddings of tokens in every segment
             # mean along segment_len dimension, i.e dim=2
             X = X.mean(dim=2)  # b x n_s x input_dim
 
