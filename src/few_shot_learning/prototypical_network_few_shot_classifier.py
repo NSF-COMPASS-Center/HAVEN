@@ -16,9 +16,8 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
             # assuming n_shot is within the server memory constraints
             # i.e, n_shot <= batch_size
             label_support_features = self.pre_trained_model(
-                support_sequences[
-                    torch.nonzero(support_labels == label).squeeze() # torch.nonzero gives the indices with non-zero elements but it adds a dimension as [n, 1] hence we use squeeze to remove the added extra dimension
-                ],
+                torch.index_select(support_sequences, dim=0,
+                                   index=torch.nonzero(support_labels == label).squeeze()),  # torch.nonzero gives the indices with non-zero elements but it adds a dimension as [n, 1] hence we use squeeze to remove the added extra dimension
                 embedding_only=True
             )
             # prototype is the mean of the support features
