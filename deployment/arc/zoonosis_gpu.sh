@@ -6,8 +6,8 @@
 
 #SBATCH --mem=250G
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:1
-#SBATCH -t 00:30:00 # wall-time required (# 144hrs = 6 days)
+#SBATCH --gres=gpu:2
+#SBATCH -t 144:00:00 # wall-time required (# 144hrs = 6 days)
 
 
 # Load modules
@@ -37,7 +37,7 @@ LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
 echo "GPU check"
-~/anaconda3/envs/zoonosis/bin/python -c "import torch; print(f'GPU available: {torch.cuda.is_available()}')"
+~/anaconda3/envs/zoonosis/bin/python -c "import torch; print(f'GPU available: {torch.cuda.is_available()\n Available GPU devices: {torch.cuda.device_count()}')"
 echo "Zoonosis NLP models START"
 date
 ~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
