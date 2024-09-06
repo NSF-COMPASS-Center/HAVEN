@@ -37,7 +37,7 @@ LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
 echo "GPU check"
-~/anaconda3/envs/zoonosis/bin/python -c "import torch; print(f'GPU available: {torch.cuda.is_available()\n Available GPU devices: {torch.cuda.device_count()}')"
+~/anaconda3/envs/zoonosis/bin/python -c "import torch; print(f'GPU available: {torch.cuda.is_available(). Available GPU devices: {torch.cuda.device_count()}')"
 echo "Zoonosis NLP models START"
 date
 ~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
