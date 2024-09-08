@@ -218,9 +218,7 @@ def get_uniref_cluster_members(uniref_id):
     if response.ok:
         data = response.json()
         member_count = data['memberCount']
-        print(f"Number of members = {member_count}")
         member_ids = [data["representativeMember"]["memberId"]]
         if member_count > 1:
             member_ids += [member["memberId"] for member in data["members"]]
-    print(f"Member IDs count = {len(member_ids)}")
     return member_ids
