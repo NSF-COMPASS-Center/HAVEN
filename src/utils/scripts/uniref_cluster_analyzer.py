@@ -57,11 +57,12 @@ def analyze_cluster(uniref_id, output_dir):
             "embl_ref_id": embl_ref_id
         })
     cluster_df = pd.DataFrame(cluster)
-    embl_ref_ids = list(cluster_df["embl_ref_id"].unique())
-    print(f"Number of unique emb_ref_ids = {len(embl_ref_ids)}")
-    embl_mapping = external_sources_utils.query_embl(embl_ref_ids, temp_dir=output_dir)
+    if cluster_df.shape[0] > 0:
+        embl_ref_ids = list(cluster_df["embl_ref_id"].unique())
+        print(f"Number of unique emb_ref_ids = {len(embl_ref_ids)}")
+        embl_mapping = external_sources_utils.query_embl(embl_ref_ids, temp_dir=output_dir)
 
-    cluster_df["embl_host_name"] = cluster_df["embl_ref_id"].apply(lambda x: embl_mapping[x])
+        cluster_df["embl_host_name"] = cluster_df["embl_ref_id"].apply(lambda x: embl_mapping[x])
     return cluster_df
 
 
@@ -85,7 +86,7 @@ def analyze_clusters(input_file, id_col, label_col, output_dir):
         clusters.append(cluster_df)
 
     clusters_df = pd.concat(clusters)
-    output_file_path = os.path.join(output_dir, Path.stem(input_file) + "_members.csv")
+    output_file_path = os.path.join(output_dir, Path(input_file).stem + "_members.csv")
     print(f"Writing output at {output_file_path}")
     clusters_df.to_csv(output_file_path, index=None)
 
