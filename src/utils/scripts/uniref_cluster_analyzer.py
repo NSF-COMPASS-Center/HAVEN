@@ -57,11 +57,11 @@ def analyze_cluster(uniref_id, output_dir):
             "embl_ref_id": embl_ref_id
         })
     cluster_df = pd.DataFrame(cluster)
-    embl_ref_ids = list(cluster_df["embl_ref_id"].unique())
-    print(f"Number of unique emb_ref_ids = {len(embl_ref_ids)}")
-    embl_mapping = external_sources_utils.query_embl(embl_ref_ids, temp_dir=output_dir)
+    if cluster_df.shape[0] > 0:
+        embl_ref_ids = list(cluster_df["embl_ref_id"].unique())
+        embl_mapping = external_sources_utils.query_embl(embl_ref_ids, temp_dir=output_dir)
 
-    cluster_df["embl_host_name"] = cluster_df["embl_ref_id"].apply(lambda x: embl_mapping[x])
+        cluster_df["embl_host_name"] = cluster_df["embl_ref_id"].apply(lambda x: embl_mapping[x])
     return cluster_df
 
 
@@ -75,17 +75,20 @@ def analyze_clusters(input_file, id_col, label_col, output_dir):
         return
 
     clusters = []
-    for uniref_id in uniref_ids:
-        virus_host_name = df[df[id_col] == uniref_id][label_col].values[0]
-        print(f"Processing cluster '{uniref_id}'")
-        cluster_df = analyze_cluster(uniref_id, output_dir)
-        cluster_df[id_col] = uniref_id
-        cluster_df[label_col] = virus_host_name
-        print(f"Cluster {uniref_id} = {cluster_df.shape[0]} members")
-        clusters.append(cluster_df)
+    for i, uniref_id in enumerate(uniref_ids):
+        try:
+            virus_host_name = df[df[id_col] == uniref_id][label_col].values[0]
+            cluster_df = analyze_cluster(uniref_id, output_dir)
+            cluster_df[id_col] = uniref_id
+            cluster_df[label_col] = virus_host_name
+            print(f"{i}. {uniref_id}: {cluster_df.shape[0]}")
+            clusters.append(cluster_df)
+        except:
+            print("ERROR with uniref_id ", uniref_id)
+            continue
 
     clusters_df = pd.concat(clusters)
-    output_file_path = os.path.join(output_dir, Path.stem(input_file) + "_members.csv")
+    output_file_path = os.path.join(output_dir, Path(input_file).stem + "_members.csv")
     print(f"Writing output at {output_file_path}")
     clusters_df.to_csv(output_file_path, index=None)
 
