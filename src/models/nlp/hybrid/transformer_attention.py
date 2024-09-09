@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as F
 from torch.nn import BatchNorm1d
 
+
 # only encoder
 class TransformerAttention(nn.Module):
     def __init__(self, pre_trained_model, segment_len, cls_token, h=8, input_dim=512, hidden_dim=2048, stride=1, depth=2, n_classes=1):
@@ -115,4 +116,5 @@ def get_model(model):
                                  n_classes=model["n_classes"])
     print(model)
     print("Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
-    return model.to(nn_utils.get_device())
+    # Capability to distribute data for parallelization
+    return nn.DataParallel(model.to(nn_utils.get_device()))
