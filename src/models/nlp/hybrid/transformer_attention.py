@@ -117,4 +117,4 @@ def get_model(model):
     print(model)
     print("Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
     # Capability to distribute data for parallelization
-    return model.to(nn_utils.get_device())
+    return nn.DataParallel(model.to(nn_utils.get_device()))
