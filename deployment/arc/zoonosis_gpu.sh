@@ -4,10 +4,10 @@
 #SBATCH --account=seqevol
 #SBATCH --partition=dgx_normal_q
 
-#SBATCH --mem=300G
+#SBATCH --mem=250G
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:2
-#SBATCH -t 72:00:00 # wall-time required (# 144hrs = 6 days)
+#SBATCH -t 00:30:00 # wall-time required (# 144hrs = 6 days)
 
 
 # Load modules
