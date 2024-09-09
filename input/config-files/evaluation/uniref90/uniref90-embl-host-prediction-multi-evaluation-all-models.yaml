@@ -89,5 +89,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20240902/host_multi_all_models"
+  dataset_dir: "uniref90/20240909/host_multi_all_models"
   prefix: "host_multi_all_models_final_auroc"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
