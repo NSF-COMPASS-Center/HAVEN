@@ -46,13 +46,13 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
     def compute_output(self, query_sequences, batch_size, prototypes):
         n_sequences = len(query_sequences)
         output = []
-
+        n_gpus = torch.cuda.device_count()
         for i in range(0, n_sequences, batch_size):
             mini_batch = query_sequences[i: i + batch_size]
             query_features = None
 
-            if mini_batch.shape[0] == 1:
-                query_features = self.compute_query_features_for_single_sample(mini_batch)
+            if mini_batch.shape[0] < n_gpus:
+                query_features = self.compute_query_features_with_repetition(mini_batch, n_gpus)
             else:
                 query_features = self.pre_trained_model(mini_batch, embedding_only=True)
 
@@ -65,19 +65,17 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
 
         return torch.cat(output)
 
-    def compute_query_features_for_single_sample(self, mini_batch):
-        # if there's only one sample in the mini_batch, dataparallel will error out due to insufficient samples to split among the multiple GPUs
+    def compute_query_features_with_repetition(self, mini_batch, n_gpus):
+        # if number of samples in the mini_batch is less than the number of gpus available, dataparallel will error out due to insufficient samples to split among the multiple GPUs
         # work around (though hacky):
-        # 1. create copies of the single sample such that every GPU will have one sample
-        # 2. use only the features from the first GPU for the first sample and ignore the embeddings from the remaining GPUs
+        # 1. create copies of the mini_batch such that every GPU will have the same mini_batch
+        # 2. use only the features from the first GPU for the mini_batch and ignore the embeddings from the remaining GPUs
 
-        n_gpus = torch.cuda.device_count()
         # 1 indicates not changing the size in that dimension
         # i.e, number of times times for repitition = 1 (technically zero), so no repitition along the columns(second dimension)
         mini_batch = mini_batch.repeat(n_gpus, 1)
         query_features = self.pre_trained_model(mini_batch, embedding_only=True)
-
-        # return only the features for the first sample from the first GPU
+        # return only the features for the mini_batch from the first GPU
         # add a batch dimension, i.e. dimension at axis=0 with value=1
         return query_features[0].unsqueeze(0)
 
