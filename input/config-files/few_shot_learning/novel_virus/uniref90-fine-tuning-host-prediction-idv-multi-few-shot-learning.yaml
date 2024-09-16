@@ -27,7 +27,7 @@ label_settings:
 
 few_shot_learn_settings:
   experiment: "few_shot_learning_novel_virus"
-  n_iterations: 5
+  n_iterations: 1
   split_input: False
   train_proportion: 0.7
   val_proportion: 0.1
@@ -35,7 +35,7 @@ few_shot_learn_settings:
   classification_type: "multi"
   save_model: True
   n_epochs: 100
-  batch_size: 32
+  batch_size: 64
   max_lr: 1e-4
   pct_start: 0.10
   div_factor: 25.0
