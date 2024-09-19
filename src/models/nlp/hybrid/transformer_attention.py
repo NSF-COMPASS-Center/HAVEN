@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as F
 from torch.nn import BatchNorm1d
 
+
 # only encoder
 class TransformerAttention(nn.Module):
     def __init__(self, pre_trained_model, segment_len, cls_token, h=8, input_dim=512, hidden_dim=2048, stride=1, depth=2, n_classes=1):
@@ -21,12 +22,12 @@ class TransformerAttention(nn.Module):
         # Classification block
         # first linear layer: input_dim --> hidden_dim
         self.linear_ip = nn.Linear(input_dim, hidden_dim)
-        # self.batch_norm_ip = BatchNorm1d(hidden_dim)
+        self.batch_norm_ip = BatchNorm1d(hidden_dim)
         self.linear_hidden = nn.Linear(hidden_dim, hidden_dim)
-        # self.batch_norm_hidden = BatchNorm1d(hidden_dim)
+        self.batch_norm_hidden = BatchNorm1d(hidden_dim)
         # intermediate hidden layers (number = N): hidden_dim --> hidden_dim
         self.linear_hidden_n = nn_utils.create_clones(self.linear_hidden, depth)
-        # self.batch_norm_hidden_n = nn_utils.create_clones(self.batch_norm_hidden, depth)
+        self.batch_norm_hidden_n = nn_utils.create_clones(self.batch_norm_hidden, depth)
 
         # last linear layer: hidden_dim--> n_classes
         self.linear_op = nn.Linear(hidden_dim, n_classes)
@@ -69,7 +70,7 @@ class TransformerAttention(nn.Module):
             # OPTION 1: representative vector for each segment = CLS token embedding in every segment
             X = X[:, :, 0, :]
         else:
-            # OPTION 1: representative vector for each segment = mean of the embeddings of tokens in every segment
+            # OPTION 2: representative vector for each segment = mean of the embeddings of tokens in every segment
             # mean along segment_len dimension, i.e dim=2
             X = X.mean(dim=2)  # b x n_s x input_dim
 
@@ -84,15 +85,21 @@ class TransformerAttention(nn.Module):
 
         # input linear layer
         X = F.relu(self.linear_ip(X))
-#        X = self.batch_norm_ip(X)
+        if batch_size > 1: # batch_norm is applicable only when batch_size is > 1
+            X = self.batch_norm_ip(X)
         # hidden
         for i, linear_layer in enumerate(self.linear_hidden_n):
             X = F.relu(linear_layer(X))
-#            X = self.batch_norm_hidden_n[i](X)
+            if batch_size > 1: # batch_norm is applicable only when batch_size is > 1
+                X = self.batch_norm_hidden_n[i](X)
         return X
 
-    def forward(self, X):
+    def forward(self, X, embedding_only=False):
         X = self.get_embedding(X)
+        if embedding_only:
+            # used in Few Shot Learning
+            # Hack to use DataParallel and run on multiple GPUs since we can only call __call__() --> forward() using DataParallel
+            return X
         y = self.linear_op(X)
         return y
 
@@ -109,4 +116,6 @@ def get_model(model):
                                  n_classes=model["n_classes"])
     print(model)
     print("Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
+    # Capability to distribute data for parallelization
     return model.to(nn_utils.get_device())
+    # return nn.DataParallel(model.to(nn_utils.get_device()))

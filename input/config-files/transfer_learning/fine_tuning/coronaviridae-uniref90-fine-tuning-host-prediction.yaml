@@ -17,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 32
+    batch_size: 64
     id_col: "uniref90_id"
     sequence_col: "seq"
     truncate: False
@@ -26,17 +26,17 @@ sequence_settings:
 
 pre_train_settings:
   model_name: "masked_language_modeling"
-  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240705/transformer_encoder-l_6-h_8-lr1e-4_msl128_b1024_splitseq_mlm_cls_vs30_itr0.pth"
+  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240821/transformer_encoder-l_6-h_8-lr1e-4_msl256_b512_splitseq_mlm_vs30cls_allemb_itr0.pth"
   encoder_settings:
     model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
     n_heads: 8
     depth: 6
     input_dim: 512 # input embedding dimension
     hidden_dim: 1024
-    max_seq_len: 128
+    max_seq_len: 256
 
 fine_tune_settings:
-  experiment: "fine_tuning_hybrid_coronaviridae_s_prot_uniref90"
+  experiment: "fine_tuning_hybrid_allemb_batchnorm_coronaviridae_s_prot_uniref90"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
@@ -46,7 +46,7 @@ fine_tune_settings:
   training_settings:
     n_epochs_freeze: 20
     n_epochs_unfreeze: 30
-    max_lr: 1e-4
+    max_lr: 1e-5
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -78,7 +78,7 @@ fine_tune_settings:
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
 
-    - name: "hybrid_attention_s64_fnn_2l_d1024_lr1e-4"
+    - name: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
@@ -94,5 +94,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240805/host_multi/fine_tuning_hybrid_cls"
-  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024vs30cls_s64" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240909/host_multi/fine_tuning_hybrid_cls"
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

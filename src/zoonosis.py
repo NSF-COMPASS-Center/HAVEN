@@ -21,6 +21,7 @@ def parse_args():
 def main():
     args = parse_args()
     config = utils.parse_config(args.config)
+    print(config)
     config_type = config["config_type"]
     # transfer-learning
     if config_type == "transfer_learning":

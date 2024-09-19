@@ -66,6 +66,7 @@ class MultiHeadAttention(nn.Module):
         self.W_K = nn.Linear(d, d)
         self.W_V = nn.Linear(d, d)
         self.W_O = nn.Linear(d, d)
+
         self.self_attn = None
 
     def forward(self, Q_, K_, V_, mask=None):
@@ -91,6 +92,7 @@ class MultiHeadAttention(nn.Module):
         del Q # mark for deletion
         del K # mark for deletion
         del V # mark for deletion
+        torch.cuda.empty_cache()
         gc.collect() # garbage collection to free up memory
 
         # 4. Apply final output linear transformation

@@ -41,7 +41,7 @@ def execute(config):
     n_iters = fine_tune_settings["n_iterations"]
 
     sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
-    # pre_train_encoder_settings["max_seq_len"] += 1  # adding 1 for the CLS token
+    pre_train_encoder_settings["max_seq_len"] += 1  # adding 1 for the CLS token
 
     tasks = fine_tune_settings["task_settings"]
     id_col = sequence_settings["id_col"]
@@ -187,7 +187,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
 
     # START: Model training with early stopping using validation
     # freeze the pretrained model for the first n_epochs_freeze
-    nn_utils.set_model_grad(model.pre_trained_model, grad_value=False)
+    nn_utils.set_model_grad(model.module.pre_trained_model, grad_value=False)
 
     # train for n_epochs_freeze
     for e in range(n_epochs_freeze):
@@ -199,7 +199,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
             break
 
     # unfreeze the pretrained model for the next n_epochs_unfreeze
-    nn_utils.set_model_grad(model.pre_trained_model, grad_value=True)
+    nn_utils.set_model_grad(model.module.pre_trained_model, grad_value=True)
 
     # reset early stopper
     early_stopper.reset()
