@@ -46,6 +46,12 @@ class FewShotLearningEpisode:
         for label in idx_label_map.keys():
             label_indices_map[label] = torch.nonzero(labels == label)
 
+        # in the next step we select the first n_shot samples for the support set
+        # to induce stochasticity, shuffle the indices for each label so that different samples are chosen as support sequences in each batch
+        for key, val in label_indices_map.items():
+            shuffled_idx = torch.randperm(val.nelement()) # val is a [n, 1] 2D tensor where n is the number indices (samples) for the corresponding label in key
+            label_indices_map[key] = val.view(-1)[shuffled_idx].view(val.shape) # flatten val, shuffle the tensore, reshape back to original size
+
         # for each label, select the first n_shot samples for support set
         support_indices = torch.cat([val[: self.n_shot] for val in label_indices_map.values()]).flatten()
 

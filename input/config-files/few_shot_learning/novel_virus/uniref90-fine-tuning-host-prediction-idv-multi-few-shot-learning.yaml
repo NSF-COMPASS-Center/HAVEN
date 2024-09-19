@@ -34,7 +34,7 @@ few_shot_learn_settings:
   test_proportion: 0.2
   classification_type: "multi"
   save_model: True
-  n_epochs: 100
+  n_epochs: 1
   batch_size: 32
   max_lr: 1e-4
   pct_start: 0.10
@@ -60,10 +60,10 @@ few_shot_learn_settings:
 
   meta_test_settings:
     n_way_type: "fixed"
-    n_way: 5 # default = if n_way is not configured, n_way is set to the , total number of labels in the dataset
+    n_way:  # default = None. if n_way is not configured, n_way is set to the total number of labels in the dataset
     n_shot: 5
     n_query: -1 # -1 to test on all remaining samples of the test class
-    n_task: 100
+    n_task: 10
 
 
 pre_trained_models:
@@ -128,4 +128,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "uniref90_embl_vertebrates_idv/20240909/host_multi/few_shot_learning"
-  prefix: "fsl_tr_w5s5q10_te_w5s5q-1_e100b32_split70-10-20" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "fsl_tr_w5s5q10_te_w5s5q-1_tsk10e1b32_split70-10-20" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
