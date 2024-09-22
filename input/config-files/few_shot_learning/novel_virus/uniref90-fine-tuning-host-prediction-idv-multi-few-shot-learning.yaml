@@ -127,5 +127,5 @@ pre_trained_models:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_idv_unseen_hosts/20240922/host_multi/few_shot_learning"
+  sub_dir: "uniref90_embl_vertebrates_idv_unseen_hosts/20240921/host_multi/few_shot_learning"
   prefix: "fsl_tr_w5s5q10_te_w5s5q-1_tsk10e1b32_split70-10-20" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
