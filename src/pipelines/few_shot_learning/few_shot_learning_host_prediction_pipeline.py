@@ -307,7 +307,7 @@ def meta_test_model(model, test_dataset_loader, batch_size):
             output = output.to(nn_utils.get_device())
 
             # to get probabilities of the output
-            output = F.softmax(output, dim=-1)
+            #output = F.softmax(output, dim=-1)
             result_df = pd.DataFrame(output.cpu().numpy())
             result_df["y_true"] = query_labels.cpu().numpy()
 
