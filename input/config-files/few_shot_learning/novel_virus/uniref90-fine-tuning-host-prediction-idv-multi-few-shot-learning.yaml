@@ -128,4 +128,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "uniref90_embl_vertebrates_idv_unseen_hosts/20240924/host_multi/few_shot_learning"
-  prefix: "fsl_tr_w3s3q10_te_w3s3q-1_tsk30e1b32_split70-10-20" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "fsl_tr_w3s3q10_te_w3s3q-1_tsk30e1b32_split70-10-20-gpu2" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
