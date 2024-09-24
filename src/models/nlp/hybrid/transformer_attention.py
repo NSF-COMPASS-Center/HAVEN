@@ -82,24 +82,26 @@ class TransformerAttention(nn.Module):
 
         # pool the embeddings of all segments in the input sequence using mean to generate a vector embedding for each sequence
         X = X.mean(dim=1)  # b x input_dim
-
-        # input linear layer
-        X = F.relu(self.linear_ip(X))
-        if batch_size > 1: # batch_norm is applicable only when batch_size is > 1
-            X = self.batch_norm_ip(X)
-        # hidden
-        for i, linear_layer in enumerate(self.linear_hidden_n):
-            X = F.relu(linear_layer(X))
-            if batch_size > 1: # batch_norm is applicable only when batch_size is > 1
-                X = self.batch_norm_hidden_n[i](X)
         return X
 
     def forward(self, X, embedding_only=False):
         X = self.get_embedding(X)
+
+        # input linear layer
+        X = F.relu(self.linear_ip(X))
+        if batch_size > 1:  # batch_norm is applicable only when batch_size is > 1
+            X = self.batch_norm_ip(X)
+        # hidden
+        for i, linear_layer in enumerate(self.linear_hidden_n):
+            X = F.relu(linear_layer(X))
+            if batch_size > 1:  # batch_norm is applicable only when batch_size is > 1
+                X = self.batch_norm_hidden_n[i](X)
+
         if embedding_only:
             # used in Few Shot Learning
             # Hack to use DataParallel and run on multiple GPUs since we can only call __call__() --> forward() using DataParallel
             return X
+
         y = self.linear_op(X)
         return y
 
