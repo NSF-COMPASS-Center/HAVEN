@@ -85,6 +85,7 @@ class TransformerAttention(nn.Module):
         return X
 
     def forward(self, X, embedding_only=False):
+        batch_size = X.shape[0]  # batch_size
         X = self.get_embedding(X)
 
         # input linear layer
