@@ -60,10 +60,10 @@ few_shot_learn_settings:
 
   meta_test_settings:
     n_way_type: "fixed"
-    n_way:  3 # default = None. if n_way is not configured, n_way is set to the total number of labels in the dataset
-    n_shot: 3
+    n_way:  # default = None. if n_way is not configured, n_way is set to the total number of labels in the dataset
+    n_shot: 4
     n_query: -1 # -1 to test on all remaining samples of the test class
-    n_task: 30
+    n_task: 10
 
 
 pre_trained_models:
@@ -128,4 +128,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "uniref90_embl_vertebrates_idv_unseen_hosts/20240924/host_multi/few_shot_learning"
-  prefix: "fsl_tr_w3s3q10_te_w3s3q-1_tsk30e1b32_split70-10-20-gpu2" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "fsl_tr_w3s3q10_te_walls4q-1_tsk10e1b32_split70-10-20-gpu2" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
