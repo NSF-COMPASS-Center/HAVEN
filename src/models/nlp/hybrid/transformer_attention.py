@@ -87,6 +87,10 @@ class TransformerAttention(nn.Module):
     def forward(self, X, embedding_only=False):
         batch_size = X.shape[0]  # batch_size
         X = self.get_embedding(X)
+        if embedding_only:
+            # used in Few Shot Learning
+            # Hack to use DataParallel and run on multiple GPUs since we can only call __call__() --> forward() using DataParallel
+            return X
 
         # input linear layer
         X = F.relu(self.linear_ip(X))
@@ -97,11 +101,6 @@ class TransformerAttention(nn.Module):
             X = F.relu(linear_layer(X))
             if batch_size > 1:  # batch_norm is applicable only when batch_size is > 1
                 X = self.batch_norm_hidden_n[i](X)
-
-        if embedding_only:
-            # used in Few Shot Learning
-            # Hack to use DataParallel and run on multiple GPUs since we can only call __call__() --> forward() using DataParallel
-            return X
 
         y = self.linear_op(X)
         return y
