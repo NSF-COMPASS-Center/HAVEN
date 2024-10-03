@@ -14,11 +14,12 @@ class FewShotLearningEpisode:
             - # query_sequences: n_way * n_query
             - # query_labels: n_way * n_query
     """
-    def __init__(self, n_shot, n_query, max_seq_length):
+    def __init__(self, n_shot, n_query, max_seq_length, shuffle=True):
         self.n_shot = n_shot
         self.n_query = n_query
         self.pad_value = constants.PAD_TOKEN_VAL
         self.max_seq_length = max_seq_length
+        self.shuffle = shuffle
 
     def __call__(self, batch):
         sequences, labels = zip(*batch)
@@ -47,10 +48,18 @@ class FewShotLearningEpisode:
             label_indices_map[label] = torch.nonzero(labels == label)
 
         # in the next step we select the first n_shot samples for the support set
+
         # to induce stochasticity, shuffle the indices for each label so that different samples are chosen as support sequences in each batch
-        for key, val in label_indices_map.items():
-            shuffled_idx = torch.randperm(val.nelement()) # val is a [n, 1] 2D tensor where n is the number indices (samples) for the corresponding label in key
-            label_indices_map[key] = val.view(-1)[shuffled_idx].view(val.shape) # flatten val, shuffle the tensore, reshape back to original size
+        # default shuffle setting is True
+        # only for few shot evaluation, the suffle is set to False because the first n_shot support sequences are from a different exclusive support dataset
+            ## not always True
+            ## For example: unseen hosts in an unseen virus
+            ## In such cases, the support sequences will also be picked from the query dataset
+        # and the query sequences are from another query dataset
+        if self.shuffle:
+            for key, val in label_indices_map.items():
+                shuffled_idx = torch.randperm(val.nelement()) # val is a [n, 1] 2D tensor where n is the number indices (samples) for the corresponding label in key
+                label_indices_map[key] = val.view(-1)[shuffled_idx].view(val.shape) # flatten val, shuffle the tensore, reshape back to original size
 
         # for each label, select the first n_shot samples for support set
         support_indices = torch.cat([val[: self.n_shot] for val in label_indices_map.values()]).flatten()
