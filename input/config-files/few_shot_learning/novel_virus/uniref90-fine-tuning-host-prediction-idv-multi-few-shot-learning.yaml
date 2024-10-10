@@ -11,7 +11,7 @@ input_settings:
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   # file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv_seen_hosts_w_non_idv_wo_human_seqlen_lte_99prcntile.csv" ]
   # file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv_unseen_hosts_w_non_idv_seqlen_lte_99prcntile.csv" ]
-  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv_unseen_hosts.csv" ]
+  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv_seen_hosts.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -72,7 +72,7 @@ few_shot_learn_settings:
     n_way:  # default = None. if n_way is not configured, n_way is set to the total number of labels in the dataset
     n_shot: 5
     n_query: -1 # -1 to test on all remaining samples of the test class
-    n_task: 10
+    n_task: 1
     shot_dataset_filepath: "input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_gte_0.05_prcnt_prevalence_seqlen_lte_99prcntile.csv"
     query_dataset_filepath: "input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv_seen_hosts.csv"
 
@@ -118,7 +118,7 @@ pre_trained_models:
 
   - name: "hybrid-attention_sl256st64vs30_ae_bn_fnn_2l_d1024_lr1e-4"
     active: True
-    mode: "test"
+    mode: "evaluate"
     path: "output/raw/uniref90_embl_vertebrates_non_idv/20240928/host_multi/few_shot_learning/fsl_tr_w3s5q10_te_w3s5q-1_e100b32_split70-10-20_hybrid-attention_sl256st64vs30cls_fnn_2l_d1024_lr1e-4_itr4.pth"
     model_settings:
       n_heads: 8
@@ -137,5 +137,5 @@ pre_trained_models:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_idv_unseen_hosts/20241010/host_multi/few_shot_learning"
-  prefix: "fsl_tr_w5s3q10_te_walls3q-1_tsk1e1b32itr10_split70-10-20-gpu2" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref90_embl_vertebrates_idv_seen_hosts/20241010/host_multi/few_shot_learning"
+  prefix: "fsl_tr_w3s5q10_ev_walls5q-1_tsk1e1b16itr5_split70-10-20-gpu2" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
