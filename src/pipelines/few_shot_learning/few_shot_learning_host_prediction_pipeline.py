@@ -82,9 +82,6 @@ def execute(config):
             train_dataset_loader = dataset_utils.get_episodic_dataset_loader(train_df, sequence_settings, label_col, meta_train_settings)
             val_dataset_loader = dataset_utils.get_episodic_dataset_loader(val_df, sequence_settings, label_col, meta_validate_settings)
             test_dataset_loader = dataset_utils.get_episodic_dataset_loader(test_df, sequence_settings, label_col, meta_test_settings)
-        else:
-            # used in zero shot evaluation, where split_input=False in classification_settings and mode=test in model
-            test_dataset_loader = dataset_utils.get_episodic_dataset_loader(df, sequence_settings, label_col, meta_test_settings)
 
         prediction_model = None
         few_shot_classifier = None
@@ -171,13 +168,29 @@ def execute(config):
                                       meta_train_settings, meta_validate_settings, meta_test_settings, model_name)
             elif mode == "test":
                 # mode=test used for cross-domain few-shot evaluation: prediction of hosts in novel virus (hosts may or may not be novel)
+                test_dataset_loader = dataset_utils.get_episodic_dataset_loader(df, sequence_settings, label_col,
+                                                                                meta_test_settings)
+
                 few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=prediction_model)
 
                 # load the pre-trained few-shot classifier
                 few_shot_classifier.load_state_dict(torch.load(prediction_model_path, map_location=nn_utils.get_device()))
                 result_df, auprc_df = meta_test_model(few_shot_classifier, test_dataset_loader, batch_size=few_shot_learn_settings["batch_size"])
+
+            elif mode == "evaluate":
+                meta_evaluate_settings = few_shot_learn_settings["meta_evaluate_settings"]
+                # used in few shot evaluation, where split_input=False in classification_settings and mode=evaluate in model
+                evaluate_dataset_loader = dataset_utils.get_evaluation_episodic_dataset_loader(sequence_settings,
+                                                                                    label_col, meta_evaluate_settings)
+                # mode=evaluate used for cross-domain few-shot evaluation: prediction of hosts in novel virus (hosts may or may not be novel)
+                few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=prediction_model)
+
+                # load the pre-trained few-shot classifier
+                few_shot_classifier.load_state_dict(torch.load(prediction_model_path, map_location=nn_utils.get_device()))
+                result_df, auprc_df = meta_test_model(few_shot_classifier, evaluate_dataset_loader,
+                                                      batch_size=few_shot_learn_settings["batch_size"])
             else:
-                print(f"ERROR: Unsupported mode '{mode}'. Supported values are ['train', 'test'].")
+                print(f"ERROR: Unsupported mode '{mode}'. Supported values are ['train', 'test', 'evaluate'].")
                 exit(1)
 
             result_df["itr"] = iter

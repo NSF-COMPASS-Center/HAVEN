@@ -78,5 +78,3 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
         # return only the features for the mini_batch from the first GPU
         # add a batch dimension, i.e. dimension at axis=0 with value=1
         return query_features[0].unsqueeze(0)
-
-
