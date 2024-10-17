@@ -10,7 +10,7 @@ import tqdm
 import wandb
 
 from models.nlp.transformer import transformer
-from transfer_learning.fine_tuning import host_prediction
+from transfer_learning.fine_tuning import host_prediction_sequence
 from models.nlp import cnn1d, rnn, lstm, fnn
 from models.nlp.hybrid import transformer_attention
 from training.early_stopping import EarlyStopping
@@ -126,7 +126,7 @@ def execute(config):
                 # this is different from the what we call "pre_trained" in the context of few-shot-learning,
                 # i.e., model pre-trained for Host prediction.
                 model_settings["pre_trained_model"] = mlm_encoder_model
-                prediction_model = host_prediction.get_host_prediction_model(model_settings)
+                prediction_model = host_prediction_sequence.get_host_prediction_model(model_settings)
 
             elif "hybrid" in model_name:
                 print(f"Executing Hybrid Attention Model (pre-trained and fine tuned model).")
