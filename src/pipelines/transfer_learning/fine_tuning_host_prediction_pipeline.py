@@ -116,7 +116,7 @@ def execute(config):
                 print(f"Executing Host Prediction Sequence fine tuning in {mode} mode")
                 fine_tune_model = host_prediction_sequence.get_host_prediction_model(task)
 
-            if "host_prediction_segment" in task_name:
+            elif "host_prediction_segment" in task_name:
                 print(f"Executing Host Prediction Segment fine tuning in {mode} mode")
                 # add maximum sequence length of pretrained model as the segment size from the sequence_settings
                 # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
