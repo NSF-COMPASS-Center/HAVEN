@@ -74,7 +74,7 @@ few_shot_learn_settings:
     n_query: -1 # -1 to test on all remaining samples of the test class
     n_task: 1
     shot_dataset_filepath: "input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_gte_0.05_prcnt_prevalence_seqlen_lte_99prcntile.csv"
-    query_dataset_filepath: "input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv_seen_hosts.csv"
+    query_dataset_filepath: "input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv.csv"
 
 pre_trained_models:
 #  - name: "fnn-l_10-d_1024-lr1e-3"
@@ -137,5 +137,5 @@ pre_trained_models:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_idv_seen_hosts/20241010/host_multi/few_shot_learning"
+  sub_dir: "uniref90_embl_vertebrates_idv_all_hosts/20241022/host_multi/few_shot_learning"
   prefix: "fsl_tr_w3s5q10_ev_walls5q-1_tsk1e1b16itr5_split70-10-20-gpu2" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
