@@ -10,7 +10,7 @@ import wandb
 
 from utils import utils, dataset_utils, nn_utils, constants
 from training.early_stopping import EarlyStopping
-from transfer_learning.fine_tuning import host_prediction
+from transfer_learning.fine_tuning import host_prediction_sequence, host_prediction_segment
 from models.nlp.transformer import transformer
 from models.nlp.hybrid import transformer_attention
 
@@ -91,11 +91,11 @@ def execute(config):
 
         # load pre-trained encoder model
         pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
-        pre_trained_encoder_model.load_state_dict(
-            torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
+        # pre_trained_encoder_model.load_state_dict(
+        #     torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
 
         # HACK to load models from checkpoints. CAUTION: Use only under dire circumstances
-        # pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model, pre_train_settings["model_path"])
+        pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model, pre_train_settings["model_path"])
 
         fine_tune_model = None
         for task in tasks:
@@ -112,9 +112,16 @@ def execute(config):
                 # first iteration
                 results[task_name] = []
 
-            if "host_prediction" in task_name:
-                print(f"Executing Host Prediction fine tuning in {mode} mode")
-                fine_tune_model = host_prediction.get_host_prediction_model(task)
+            if "host_prediction_sequence" in task_name:
+                print(f"Executing Host Prediction Sequence fine tuning in {mode} mode")
+                fine_tune_model = host_prediction_sequence.get_host_prediction_model(task)
+
+            elif "host_prediction_segment" in task_name:
+                print(f"Executing Host Prediction Segment fine tuning in {mode} mode")
+                # add maximum sequence length of pretrained model as the segment size from the sequence_settings
+                # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
+                task["segment_len"] = sequence_settings["max_sequence_length"]
+                fine_tune_model = host_prediction_segment.get_host_prediction_model(task)
 
             elif "hybrid_attention" in task_name:
                 print(f"Executing Hybrid Attention fine tuning in {mode} mode")
@@ -187,7 +194,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
 
     # START: Model training with early stopping using validation
     # freeze the pretrained model for the first n_epochs_freeze
-    nn_utils.set_model_grad(model.module.pre_trained_model, grad_value=False)
+    nn_utils.set_model_grad(model.pre_trained_model, grad_value=False)
 
     # train for n_epochs_freeze
     for e in range(n_epochs_freeze):
@@ -199,7 +206,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
             break
 
     # unfreeze the pretrained model for the next n_epochs_unfreeze
-    nn_utils.set_model_grad(model.module.pre_trained_model, grad_value=True)
+    nn_utils.set_model_grad(model.pre_trained_model, grad_value=True)
 
     # reset early stopper
     early_stopper.reset()

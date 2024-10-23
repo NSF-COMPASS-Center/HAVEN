@@ -10,7 +10,7 @@ from models.nlp.transformer import transformer
 from models.nlp.hybrid import transformer_attention
 from models.nlp import cnn1d, rnn, lstm, fnn
 from models.cv import cnn2d, cnn2d_pool
-from transfer_learning.fine_tuning import host_prediction
+from transfer_learning.fine_tuning import host_prediction_sequence
 
 
 def execute(config):
@@ -58,7 +58,7 @@ def execute(config):
 
         if "transfer_learning" in model_name:
             print(f"Executing Transfer Learning (Pre-trained and fine tuned model) in {mode} mode")
-            prediction_model = host_prediction.get_host_prediction_model(model)
+            prediction_model = host_prediction_sequence.get_host_prediction_model(model)
 
         elif "hybrid_attention" in model_name:
             print(f"Executing Hybrid Attention fine tuning in {mode} mode")
