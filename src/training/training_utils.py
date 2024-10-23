@@ -12,7 +12,7 @@ from utils import nn_utils
 
 
 def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion,
-              optimizer, lr_scheduler, early_stopper, model_name, epoch):
+              optimizer, lr_scheduler, early_stopper, model_id, epoch):
     # training
     model.train()
     for _, record in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
@@ -37,15 +37,15 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion,
             "training-loss": float(train_loss)
         })
         pbar.set_description(
-            f"{model_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
+            f"{model_id}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
 
     # validation
-    val_loss = validate_model(model, val_dataset_loader, criterion, model_name, epoch)
+    val_loss = validate_model(model, val_dataset_loader, criterion, model_id, epoch)
     early_stopper(model, val_loss)
     return model
 
 
-def validate_model(model, dataset_loader, criterion, model_name, epoch):
+def validate_model(model, dataset_loader, criterion, model_id, epoch):
     with torch.no_grad():
         model.eval()
 
@@ -65,7 +65,7 @@ def validate_model(model, dataset_loader, criterion, model_name, epoch):
                 "validation-loss": float(curr_val_loss)
             })
             pbar.set_description(
-                f"{model_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.val_iter}, epoch={epoch + 1}")
+                f"{model_id}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.val_iter}, epoch={epoch + 1}")
             val_loss.append(curr_val_loss)
 
     return mean(val_loss)

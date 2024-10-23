@@ -63,30 +63,35 @@ fine_tune_settings:
       "Red junglefowl": [ "Gallus gallus" ]
 
   task_settings:
-    - name: "host_prediction_sequence_msl2048cls_bn_fnn_2l_d1024_lr1e-4"
+    - id: "host_prediction_sequence_msl2048cls_bn_fnn_2l_d1024_lr1e-4"
+      name: "BERT"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       cls_token: True
       loss: "FocalLoss"
-      depth: 2
+      n_mlp_layers: 2
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
+      data_parallel: False
 
-    - name: "host_prediction_segment_msl256s64cls_bn_fnn_2l_d1024_lr1e-4"
+    - id: "host_prediction_segment_msl256s64cls_bn_fnn_2l_d1024_lr1e-4"
+      name: "VirProBERT_wo_Hierarchical_Attention"
       active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       cls_token: True
       stride: 64
       loss: "FocalLoss"
-      depth: 2
+      n_mlp_layers: 2
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
+      data_parallel: False
 
-    - name: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5"
+    - id: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5"
+      name: "VirProBERT"
       active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
@@ -94,10 +99,11 @@ fine_tune_settings:
       cls_token: True
       n_heads: 8
       loss: "FocalLoss"
-      depth: 2
+      n_mlp_layers: 2
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
+      data_parallel: False
 
 output_settings:
   output_dir: "output"

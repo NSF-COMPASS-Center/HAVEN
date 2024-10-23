@@ -59,7 +59,7 @@ def execute(config):
     }
 
     # fine_tune_model store filepath
-    fine_tune_model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{task_name}_itr{itr}.pth")
+    fine_tune_model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{task_id}_itr{itr}.pth")
     Path(os.path.dirname(fine_tune_model_filepath)).mkdir(parents=True, exist_ok=True)
 
     for iter in range(n_iters):
@@ -99,6 +99,7 @@ def execute(config):
 
         fine_tune_model = None
         for task in tasks:
+            task_id = task["id"] # unique identifier
             task_name = task["name"]
             mode = task["mode"]
             # set the pre_trained model_params within the task config
@@ -119,9 +120,9 @@ def execute(config):
                 print(f"ERROR: Unknown model {task_name}.")
                 continue
 
-            if task_name not in results:
+            if task_id not in results:
                 # first iteration
-                results[task_name] = []
+                results[task_id] = []
 
             # Initialize Weights & Biases for each run
             wandb_config["hidden_dim"] = task["hidden_dim"]
@@ -129,13 +130,13 @@ def execute(config):
             wandb.init(project="zoonosis-host-prediction",
                        config=wandb_config,
                        group=fine_tune_settings["experiment"],
-                       job_type=task_name,
+                       job_type=task_id,
                        name=f"iter_{iter}")
 
             if mode == "train":
                 # retraining the model_params for the fine_tuning task
                 result_df, fine_tune_model = run_task(fine_tune_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
-                                                   task["loss"], training_settings, task_name)
+                                                   task["loss"], training_settings, task_id)
             elif mode == "test":
                 # used for zero-shot evaluation
                 # load the pre-trained and fine_tuned model_params
@@ -149,11 +150,11 @@ def execute(config):
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = iter
-            results[task_name].append(result_df)
+            results[task_id].append(result_df)
 
             if fine_tune_settings["save_model"]:
                 # save the fine_tuned model_params
-                model_filepath = fine_tune_model_filepath.format(output_prefix=output_prefix, task_name=task_name, itr=iter)
+                model_filepath = fine_tune_model_filepath.format(output_prefix=output_prefix, task_id=task_id, itr=iter)
                 torch.save(fine_tune_model.state_dict(), model_filepath)
                 print(f"Model output written to {model_filepath}")
 
@@ -164,7 +165,7 @@ def execute(config):
     utils.write_output(results, output_results_dir, output_prefix, "output")
 
 
-def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, task_name):
+def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, task_id):
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -190,7 +191,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     # train for n_epochs_freeze
     for e in range(n_epochs_freeze):
         model = training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
-                          lr_scheduler, early_stopper, task_name, e)
+                          lr_scheduler, early_stopper, task_id, e)
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
             print("Breaking off frozen training loop due to early stop")
@@ -204,7 +205,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
 
     for e in range(n_epochs_unfreeze):
         model = training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
-                          lr_scheduler, early_stopper, task_name, e)
+                          lr_scheduler, early_stopper, task_id, e)
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
             print("Breaking off unfrozen training loop due to early stop")

@@ -17,7 +17,7 @@ input_settings:
 
 classification_settings:
   experiment: "host_prediction"
-  model_type: "nlp"
+  model_type: "dl"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
@@ -51,60 +51,74 @@ classification_settings:
     final_div_factor: 10000.0
 
   models:
-    - name: "fnn-l_10-d_1024-lr1e-3"
+    - id: "fnn-l_10-d_1024-lr1e-3"
+      name: "FNN"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
-      depth: 10
+      n_mlp_layers: 10
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole number
+      data_parallel: False
 
-    - name: "cnn-l_4-d_1024-k3s1-lr1e-3"
+    - id: "cnn-l_4-d_1024-k3s1-lr1e-3"
+      name: "CNN"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
-      depth: 4
+      n_layers: 4
+      n_mlp_layers: 2
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       kernel_size: 3
       stride: 1
       manual_seed:  # whole numbers
+      data_parallel: False
 
-    - name: "rnn-l_6-d_1024-lr1e-5"
+    - id: "rnn-l_6-d_1024-lr1e-5"
+      name: "RNN"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
-      depth: 6 # number of rnn layers
+      n_layers: 6 # number of rnn layers
+      n_mlp_layers: 2
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
+      data_parallel: False
 
-    - name: "lstm-l_2-d_1024-lr1e-3"
+    - id: "lstm-l_2-d_1024-lr1e-3"
+      name: "LSTM"
       active: True
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
-      depth: 2
+      n_layers: 2
+      n_mlp_layers: 2
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
+      data_parallel: False
 
-    - name: "transformer-l_6-h_8-d_1024-msl2048-lr1e-4"
+    - id: "transformer-l_6-h_8-d_1024-msl2048-lr1e-4"
+      name: "Transformer_Encoder"
       active: False
       mode: "train" # supported values: train, test
       loss: "FocalLoss"
       with_convolution: False
       max_seq_len: 3036 # this is needed only for the positional encoding initialization
       n_heads: 8
-      depth: 6
+      n_layers: 6
+      n_mlp_layers: 2
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       manual_seed:  # whole numbers
+      data_parallel: False
 
 output_settings:
   output_dir: "output"

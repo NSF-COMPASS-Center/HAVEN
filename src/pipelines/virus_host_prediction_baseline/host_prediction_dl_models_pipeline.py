@@ -43,7 +43,7 @@ def execute(input_settings, output_settings, classification_settings):
     }
 
     # model_params store filepath
-    model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{model_name}_itr{itr}.pth")
+    model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{model_id}_itr{itr}.pth")
     Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
 
     for iter in range(n_iters):
@@ -78,6 +78,7 @@ def execute(input_settings, output_settings, classification_settings):
 
         dl_model = None
         for model in models:
+            model_id = model["id"] # unique identifier
             model_name = model["name"]
             # Set necessary values within model_params object for cleaner code and to avoid passing multiple arguments.
             model["vocab_size"] = constants.VOCAB_SIZE
@@ -94,22 +95,22 @@ def execute(input_settings, output_settings, classification_settings):
                 print(f"ERROR: Unknown model {model_name}.")
                 continue
 
-            if model_name not in results:
+            if model_id not in results:
                 # first iteration
-                results[model_name] = []
+                results[model_id] = []
 
             # Initialize Weights & Biases for each run
             wandb_config["hidden_dim"] = model["hidden_dim"]
             wandb.init(project="zoonosis-host-prediction",
                        config=wandb_config,
                        group=classification_settings["experiment"],
-                       job_type=model_name,
+                       job_type=model_id,
                        name=f"iter_{iter}")
 
             if mode == "train":
                 # train the model_params
                 result_df, dl_model = run_model(dl_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
-                                                 model["loss"], training_settings, model_name)
+                                                 model["loss"], training_settings, model_id)
             elif mode == "test":
                 # used for zero-shot evaluation
                 # load the pre-trained model_params
@@ -123,11 +124,11 @@ def execute(input_settings, output_settings, classification_settings):
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = iter
-            results[model_name].append(result_df)
+            results[model_id].append(result_df)
 
             if classification_settings["save_model"]:
                 # save the trained model_params
-                model_filepath = model_store_filepath.format(output_prefix=output_prefix, model_name=model_name, itr=iter)
+                model_filepath = model_store_filepath.format(output_prefix=output_prefix, model_id=model_id, itr=iter)
                 torch.save(dl_model.state_dict(), model_filepath)
                 print(f"Model output written to {model_filepath}")
 
@@ -137,7 +138,7 @@ def execute(input_settings, output_settings, classification_settings):
     utils.write_output(results, output_results_dir, output_prefix, "output")
 
 
-def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, model_name):
+def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, model_id):
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -158,7 +159,7 @@ def run_model(model, train_dataset_loader, val_dataset_loader, test_dataset_load
     # START: Model training with early stopping using validation
     for e in range(n_epochs):
         model = training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
-                                         lr_scheduler, early_stopper, model_name, e)
+                                         lr_scheduler, early_stopper, model_id, e)
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
             print("Breaking off training loop due to early stop")
