@@ -1,4 +1,4 @@
-from pipelines.host_prediction import host_prediction_nlp_models_pipeline, host_prediction_baseline_models_pipeline
+from pipelines.virus_host_prediction_baseline import host_prediction_std_ml_models_pipeline, host_prediction_dl_models_pipeline
 
 
 def execute(config):
@@ -12,7 +12,7 @@ def execute(config):
     classification_settings = config["classification_settings"]
     type = classification_settings["model_type"]
 
-    if type == "baseline":
+    if type == "std_ml": # standard machine learning models
         host_prediction_baseline_models_pipeline.execute(input_settings, output_settings, classification_settings)
-    elif type == "nlp":
+    elif type == "dl": # deep learning models
         host_prediction_nlp_models_pipeline.execute(input_settings, output_settings, classification_settings)

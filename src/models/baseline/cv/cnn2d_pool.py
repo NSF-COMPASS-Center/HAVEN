@@ -39,7 +39,7 @@ class CNN_2D_MaxPool_Model(nn.Module):
 
 def get_cnn_model(model):
     cnn_model = CNN_2D_MaxPool_Model(n_classes=model["n_classes"],
-                                     N=model["depth"],
+                                     N=model["n_mlp_layers"],
                                      n_filters=model["n_filters"],
                                      kernel_size=model["kernel_size"],
                                      stride=model["stride"],

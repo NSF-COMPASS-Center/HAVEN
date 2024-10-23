@@ -1,12 +1,12 @@
 #!/usr/src/env python
 import argparse
 
-from pipelines.host_prediction import host_prediction_pipeline
+from pipelines.virus_host_prediction_baseline import host_prediction_pipeline
 from pipelines.transfer_learning import masked_language_modeling_pipleine, fine_tuning_host_prediction_pipeline
 from pipelines.interpretability import host_prediction_perturbation_analysis_prediction_pipeline
 from pipelines.few_shot_learning import few_shot_learning_host_prediction_pipeline
 from evaluation import evaluation
-from models.baseline import feature_importance
+from models.baseline.std_ml import feature_importance
 from utils import utils
 
 

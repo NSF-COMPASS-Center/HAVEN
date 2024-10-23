@@ -40,7 +40,7 @@ def scaled_dot_product_attention(Q, K, V, mask=None):
 class MultiHeadAttention(nn.Module):
     """
     number of heads = $h = 8$
-    $d$: dimension of the embeddings in the model
+    $d$: dimension of the embeddings in the model_params
     query $Q' \in \mathbb{R}^{n \times d}$,
     key $K' \in \mathbb{R}^{n \times d}$,
     value  $V'\in \mathbb{R}^{n \times d}$

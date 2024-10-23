@@ -11,14 +11,14 @@ class EarlyStopping:
         self.min_delta = min_delta
         self.patience_counter = 0
         self.current_best_loss = math.inf  # infinity
-        self.current_best_model = None # to store the model with lowest validation loss
+        self.current_best_model = None # to store the model_params with lowest validation loss
         self.early_stop = False
 
     def __call__(self, model, val_loss):
         if self.current_best_loss - val_loss > self.min_delta:
             # validation loss decreased more than the threshold. There is improvement.
             # Reset the current_best_loss to the new val loss
-            # Store the model as the current_best_model
+            # Store the model_params as the current_best_model
             # Reset the patience_counter
             self.current_best_loss = val_loss
             self.current_best_model = model

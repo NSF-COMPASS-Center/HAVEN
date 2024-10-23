@@ -70,7 +70,7 @@ class MultiClassEvaluation(EvaluationBase):
 
     def plot_visualizations(self):
         super().plot_visualizations()
-        # for multiclass evaluation, we will plot the curves for one iteration (selected randomly) for each model.
+        # for multiclass evaluation, we will plot the curves for one iteration (selected randomly) for each model_params.
         itr_selected = sample(list(self.evaluation_metrics_df[self.itr_col].values), 1).pop()
         if self.evaluation_settings["auroc"]:
             visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auroc",

@@ -5,7 +5,7 @@ from pathlib import Path
 from sklearn.preprocessing import MinMaxScaler
 
 from utils import utils, dataset_utils, kmer_utils, visualization_utils
-from models.baseline import logistic_regression, random_forest, svm
+from models.baseline.std_ml import svm, random_forest, logistic_regression
 
 
 def execute(input_settings, output_settings, classification_settings):
@@ -81,7 +81,7 @@ def execute(input_settings, output_settings, classification_settings):
                 feature_importance[model_name] = []
                 validation_scores[model_name] = []
 
-            # Set necessary values within model object for cleaner code and to avoid passing multiple arguments.
+            # Set necessary values within model_params object for cleaner code and to avoid passing multiple arguments.
             model["label_col"] = label_col
             model["classification_type"] = classification_type
 
@@ -109,14 +109,14 @@ def execute(input_settings, output_settings, classification_settings):
             results[model_name].append(result_df)
             validation_scores[model_name].append(validation_scores_df)
 
-            # If model returns feature importance:
+            # If model_params returns feature importance:
             # Remap the class indices to original input labels
             if feature_importance_df is not None:
                 feature_importance_df.rename(index=index_label_map, inplace=True)
                 feature_importance_df["itr"] = iter
                 feature_importance[model_name].append(feature_importance_df)
 
-            # write the classification model
+            # write the classification model_params
             utils.write_output_model(classifier, output_results_dir, f"{output_filename_prefix}_itr{iter}", model_name)
 
     # write the raw results in csv files
@@ -144,8 +144,8 @@ def get_standardized_datasets(train_df, test_df, label_col):
     min_max_scaler_fit = min_max_scaler.fit(X_train)
     feature_names = min_max_scaler_fit.get_feature_names_out()
 
-    # creating a pandas df with column headers = feature names so that the prediction model can also have the same order of feature names
-    # this is needed while getting the feature_importances from the model and mapping it back to the feature names.
+    # creating a pandas df with column headers = feature names so that the prediction model_params can also have the same order of feature names
+    # this is needed while getting the feature_importances from the model_params and mapping it back to the feature names.
     X_train = pd.DataFrame(min_max_scaler_fit.transform(X_train), columns=feature_names)
     X_test = pd.DataFrame(min_max_scaler_fit.transform(X_test), columns=feature_names)
 

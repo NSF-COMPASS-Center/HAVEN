@@ -1,29 +1,21 @@
 from torch import nn
 import torch.nn.functional as F
-from torch.nn import BatchNorm1d
 from utils import nn_utils, constants
 import torch
+from models.virus_host_prediction_base import VirusHostPredictionBase
 
 
-class HostPredictionSegment(nn.Module):
-    def __init__(self, pre_trained_model, segment_len, cls_token, input_dim, hidden_dim, stride=1, depth=2, n_classes=1):
-        super(HostPredictionSegment, self).__init__()
+class VirProBERT_wo_HierAttn(VirusHostPredictionBase):
+    def __init__(self, pre_trained_model, segment_len, cls_token, input_dim, hidden_dim, stride=1, n_mlp_layers=2, n_classes=1):
+        super(VirProBERT_wo_HierAttn, self).__init__(input_dim, hidden_dim,
+                                                     n_mlp_layers=n_mlp_layers,
+                                                     n_classes=n_classes,
+                                                     batch_norm=False)
         self.pre_trained_model = pre_trained_model
         self.segment_len = segment_len
         self.cls_token = cls_token
         self.stride = stride
         self.input_dim = input_dim
-
-        # first linear layer: input_dim --> hidden_dim
-        self.linear_ip = nn.Linear(input_dim, hidden_dim)
-        self.batch_norm_ip = BatchNorm1d(hidden_dim)
-        self.linear_hidden = nn.Linear(hidden_dim, hidden_dim)
-        self.batch_norm_hidden = BatchNorm1d(hidden_dim)
-        # intermediate hidden layers (number = N): hidden_dim --> hidden_dim
-        self.linear_hidden_n = nn_utils.create_clones(self.linear_hidden, depth)
-        self.batch_norm_hidden_n = nn_utils.create_clones(self.batch_norm_hidden, depth)
-        # last linear layer: hidden_dim--> n_classes
-        self.linear_op = nn.Linear(hidden_dim, n_classes)
 
     def get_embedding(self, X):
         # X: b x n where n is the maximum sequence length in the batch
@@ -71,36 +63,18 @@ class HostPredictionSegment(nn.Module):
 
         return X
 
-    def forward(self, X, embedding_only=False):
-        batch_size = X.shape[0]  # batch_size
-        X = self.get_embedding(X)
-        if embedding_only:
-            return X
+    # def forward() : use the template implementation in VirusHostPredictionBase
 
-        # input linear layer
-        X = F.relu(self.linear_ip(X))
-        if batch_size > 1:  # batch_norm is applicable only when batch_size is > 1
-            X = self.batch_norm_ip(X)
+    def get_model(model_params) -> VirProBERT_wo_HierAttn:
+        model = VirProBERT_wo_HierAttn(pre_trained_model=model_params["pre_trained_model"],
+                                       input_dim=model_params["input_dim"],
+                                       cls_token=model_params["cls_token"],
+                                       stride=model_params["stride"],
+                                       segment_len=model_params["segment_len"],
+                                       hidden_dim=model_params["hidden_dim"],
+                                       depth=model_params["n_mlp_layers"],
+                                       n_classes=model_params["n_classes"])
+        print(model)
+        print("VirProBERT_wo_HierAttn: Number of parameters = ", sum(p.numel() for p in host_prediction_model.parameters() if p.requires_grad))
 
-        # hidden
-        for i, linear_layer in enumerate(self.linear_hidden_n):
-            X = F.relu(linear_layer(X))
-            if batch_size > 1:  # batch_norm is applicable only when batch_size is > 1
-                X = self.batch_norm_hidden_n[i](X)
-
-        y = self.linear_op(X)
-        return y
-
-
-def get_host_prediction_model(task):
-    host_prediction_model = HostPredictionSegment(pre_trained_model=task["pre_trained_model"],
-                                                  input_dim=task["input_dim"],
-                                                  cls_token=task["cls_token"],
-                                                  stride=task["stride"],
-                                                  segment_len=task["segment_len"],
-                                                  hidden_dim=task["hidden_dim"],
-                                                  depth=task["depth"],
-                                                  n_classes=task["n_classes"])
-    print(host_prediction_model)
-    print("Number of parameters = ", sum(p.numel() for p in host_prediction_model.parameters() if p.requires_grad))
-    return host_prediction_model.to(nn_utils.get_device())
+        return VirusHostPredictionBase.return_model(model, model_params["data_parallel"])

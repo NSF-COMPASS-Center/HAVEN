@@ -26,7 +26,7 @@ class ProteinSequenceCGRDataset(Dataset):
     def get_image(self, id):
         image_filepath = os.path.join(self.img_dir, f"{id}.png")
         # mode 1: 1-bit pixels, black and white, stored with one pixel per byte
-        # mode L: 8-bit pixels, grayscale. But this option considers the depth (brightness) of each pixel and will have a value in the range 0-1
+        # mode L: 8-bit pixels, grayscale. But this option considers the n_mlp_layers (brightness) of each pixel and will have a value in the range 0-1
         # in our case, we only have points and it is binary - presence or absence of a point, hence mode=1
         # the other modes have multiple channels (rgb: 3 x img_size x img_size)
         return Image.open(image_filepath)

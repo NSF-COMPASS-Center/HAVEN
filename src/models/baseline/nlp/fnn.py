@@ -1,25 +1,15 @@
 import torch.nn as nn
 import torch.nn.functional as F
 from models.nlp.embedding.embedding import EmbeddingLayer
+from models.virus_host_prediction_base import VirusHostPredictionBase
 from utils import nn_utils, constants
 
 
-class FNN_Model(nn.Module):
-    def __init__(self, vocab_size, n_classes, N, input_dim, hidden_dim):
-        super(FNN_Model, self).__init__()
-        self.hidden_dim = hidden_dim
-        self.N = N
+class FNN_VirusHostPrediction(VirusHostPredictionBase):
+    def __init__(self, vocab_size, n_classes, n_mlp_layers, input_dim, hidden_dim):
+        super(FNN_VirusHostPrediction, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=False)
+
         self.embedding = nn.Embedding(vocab_size, input_dim, padding_idx=constants.PAD_TOKEN_VAL)
-
-        # first linear layer: input_dim --> hidden_dim
-        self.linear_ip = nn.Linear(input_dim, hidden_dim)
-
-        self.linear_hidden = nn.Linear(hidden_dim, hidden_dim)
-        # intermediate hidden layers (number = N): hidden_dim --> hidden_dim
-        self.linear_hidden_n = nn_utils.create_clones(self.linear_hidden, N)
-
-        # last linear layer: hidden_dim--> n_classes
-        self.linear_op = nn.Linear(hidden_dim, n_classes)
 
     def get_embedding(self, X):
         X = self.embedding(X.long())
@@ -40,7 +30,7 @@ class FNN_Model(nn.Module):
 def get_fnn_model(model):
     fnn_model = FNN_Model(vocab_size=model["vocab_size"],
                           n_classes=model["n_classes"],
-                          N=model["depth"],
+                          N=model["n_mlp_layers"],
                           input_dim=model["input_dim"],
                           hidden_dim=model["hidden_dim"])
 

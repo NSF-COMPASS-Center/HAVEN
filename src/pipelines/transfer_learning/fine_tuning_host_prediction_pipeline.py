@@ -4,14 +4,14 @@ from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
 import torch.nn.functional as F
 import torch
-import tqdm
-from statistics import mean
 import wandb
 
 from utils import utils, dataset_utils, nn_utils, constants
 from training.early_stopping import EarlyStopping
-from transfer_learning.fine_tuning import host_prediction_sequence, host_prediction_segment
-from models.nlp.transformer import transformer
+from training import training_utils
+from transfer_learning.fine_tuning import host_prediction_sequence
+from models import host_prediction_segment
+from models.baseline.nlp.transformer import transformer
 from models.nlp.hybrid import transformer_attention
 
 def execute(config):
@@ -89,7 +89,7 @@ def execute(config):
             # used in zero shot evaluation, where split_input=False in fine_tune_settings and mode=test in task
             test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col)
 
-        # load pre-trained encoder model
+        # load pre-trained encoder model_params
         pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
         # pre_trained_encoder_model.load_state_dict(
         #     torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
@@ -101,40 +101,31 @@ def execute(config):
         for task in tasks:
             task_name = task["name"]
             mode = task["mode"]
-            # set the pre_trained model within the task config
+            # set the pre_trained model_params within the task config
             task["pre_trained_model"] = pre_trained_encoder_model
 
             if task["active"] is False:
                 print(f"Skipping {task_name} ...")
                 continue
 
+            # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
+            # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
+            task["segment_len"] = sequence_settings["max_sequence_length"]
+
+            if task_name in model_map.model_map:
+                print(f"Executing {task_name} in {mode} mode.")
+                fine_tune_model = model_map.model_map[task_name].get_model(model_params=task)
+            else:
+                print(f"ERROR: Unknown model {task_name}.")
+                continue
+
             if task_name not in results:
                 # first iteration
                 results[task_name] = []
 
-            if "host_prediction_sequence" in task_name:
-                print(f"Executing Host Prediction Sequence fine tuning in {mode} mode")
-                fine_tune_model = host_prediction_sequence.get_host_prediction_model(task)
-
-            elif "host_prediction_segment" in task_name:
-                print(f"Executing Host Prediction Segment fine tuning in {mode} mode")
-                # add maximum sequence length of pretrained model as the segment size from the sequence_settings
-                # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
-                task["segment_len"] = sequence_settings["max_sequence_length"]
-                fine_tune_model = host_prediction_segment.get_host_prediction_model(task)
-
-            elif "hybrid_attention" in task_name:
-                print(f"Executing Hybrid Attention fine tuning in {mode} mode")
-                # add maximum sequence length of pretrained model as the segment size from the sequence_settings
-                # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
-                task["segment_len"] = sequence_settings["max_sequence_length"]
-                fine_tune_model = transformer_attention.get_model(task)
-            else:
-                continue
-
             # Initialize Weights & Biases for each run
             wandb_config["hidden_dim"] = task["hidden_dim"]
-            wandb_config["depth"] = task["depth"]
+            wandb_config["n_mlp_layers"] = task["n_mlp_layers"]
             wandb.init(project="zoonosis-host-prediction",
                        config=wandb_config,
                        group=fine_tune_settings["experiment"],
@@ -142,12 +133,12 @@ def execute(config):
                        name=f"iter_{iter}")
 
             if mode == "train":
-                # retraining the model for the fine_tuning task
+                # retraining the model_params for the fine_tuning task
                 result_df, fine_tune_model = run_task(fine_tune_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
                                                    task["loss"], training_settings, task_name)
             elif mode == "test":
                 # used for zero-shot evaluation
-                # load the pre-trained and fine_tuned model
+                # load the pre-trained and fine_tuned model_params
                 fine_tune_model.load_state_dict(torch.load(task["fine_tuned_model_path"]))
                 result_df = test_model(fine_tune_model, test_dataset_loader)
             else:
@@ -161,7 +152,7 @@ def execute(config):
             results[task_name].append(result_df)
 
             if fine_tune_settings["save_model"]:
-                # save the fine_tuned model
+                # save the fine_tuned model_params
                 model_filepath = fine_tune_model_filepath.format(output_prefix=output_prefix, task_name=task_name, itr=iter)
                 torch.save(fine_tune_model.state_dict(), model_filepath)
                 print(f"Model output written to {model_filepath}")
@@ -193,26 +184,26 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     model.val_iter = 0
 
     # START: Model training with early stopping using validation
-    # freeze the pretrained model for the first n_epochs_freeze
+    # freeze the pretrained model_params for the first n_epochs_freeze
     nn_utils.set_model_grad(model.pre_trained_model, grad_value=False)
 
     # train for n_epochs_freeze
     for e in range(n_epochs_freeze):
-        model = run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+        model = training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
                           lr_scheduler, early_stopper, task_name, e)
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
             print("Breaking off frozen training loop due to early stop")
             break
 
-    # unfreeze the pretrained model for the next n_epochs_unfreeze
+    # unfreeze the pretrained model_params for the next n_epochs_unfreeze
     nn_utils.set_model_grad(model.pre_trained_model, grad_value=True)
 
     # reset early stopper
     early_stopper.reset()
 
     for e in range(n_epochs_unfreeze):
-        model = run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+        model = training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
                           lr_scheduler, early_stopper, task_name, e)
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
@@ -220,91 +211,10 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
             break
     # END: Model training with early stopping using validation
 
-    # choose the model with the lowest validation loss from the early stopper
+    # choose the model_params with the lowest validation loss from the early stopper
     best_performing_model = early_stopper.get_current_best_model()
 
-    # test the model
-    result_df = test_model(best_performing_model, test_dataset_loader)
+    # test the model_params
+    result_df = training_utils.test_model(best_performing_model, test_dataset_loader)
 
     return result_df, best_performing_model
-
-
-def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer, lr_scheduler, early_stopper, task_name,
-              epoch):
-    # training
-    model.train()
-    for _, record in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
-        input, label = record
-
-        optimizer.zero_grad()
-
-        output = model(input)
-        output = output.to(nn_utils.get_device())
-
-        loss = criterion(output, label.long())
-        loss.backward()
-
-        optimizer.step()
-        lr_scheduler.step()
-
-        model.train_iter += 1
-        curr_lr = lr_scheduler.get_last_lr()[0]
-        train_loss = loss.item()
-
-        # log training loss
-        wandb.log({
-            "learning-rate": float(curr_lr),
-            "training-loss": float(train_loss)
-        })
-        pbar.set_description(
-            f"{task_name}/training-loss = {float(train_loss)}, model.n_iter={model.train_iter}, epoch={epoch + 1}")
-
-    # validation
-    val_loss = validate_model(model, val_dataset_loader, criterion, task_name, epoch)
-    early_stopper(model, val_loss)
-    return model
-
-
-def validate_model(model, dataset_loader, criterion, task_name, epoch):
-    with torch.no_grad():
-        model.eval()
-
-        val_loss = []
-        for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
-            input, label = record
-
-            output = model(input)  # b x n_classes
-            output = output.to(nn_utils.get_device())
-
-            loss = criterion(output, label.long())
-            curr_val_loss = loss.item()
-            model.val_iter += 1
-
-            # log validation loss
-            wandb.log({
-                "validation-loss": float(curr_val_loss)
-            })
-            pbar.set_description(
-                f"{task_name}/validation-loss = {float(curr_val_loss)}, model.n_iter={model.val_iter}, epoch={epoch + 1}")
-            val_loss.append(curr_val_loss)
-
-    return mean(val_loss)
-
-
-def test_model(model, dataset_loader):
-    with torch.no_grad():
-        model.eval()
-
-        results = []
-        for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
-            input, label = record
-
-            output = model(input)  # b x n_classes
-            output = output.to(nn_utils.get_device())
-
-            # to get probabilities of the output
-            output = F.softmax(output, dim=-1)
-            result_df = pd.DataFrame(output.cpu().numpy())
-            result_df["y_true"] = label.cpu().numpy()
-            results.append(result_df)
-    return pd.concat(results, ignore_index=True)

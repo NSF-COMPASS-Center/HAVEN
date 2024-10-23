@@ -24,14 +24,14 @@ def run(X_train, X_test, y_train, rf_settings):
     # TODO: should we use StratifiedShuffleSplit instead? What is the difference?
     kfold_cv_model = StratifiedKFold(n_splits=5, shuffle=True, random_state=random.randint(0, 10000))
 
-    # refit=True : retrain the best model on the full training dataset
+    # refit=True : retrain the best model_params on the full training dataset
     cv_model = GridSearchCV(estimator=rf_model, param_grid=tuning_parameters, scoring=scoring_param,
                             cv=kfold_cv_model, verbose=2, return_train_score=False, refit=True)
     cv_model.fit(X_train, y_train)
 
     # The best values chosen by KFold-cross-validation
-    print("Best parameters in trained model = ", cv_model.best_params_)
-    print("Best score in trained model = ", cv_model.best_score_)
+    print("Best parameters in trained model_params = ", cv_model.best_params_)
+    print("Best score in trained model_params = ", cv_model.best_score_)
     classifier = cv_model.best_estimator_
     # K-Fold Cross Validation: END #
 

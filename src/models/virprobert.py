@@ -1,16 +1,15 @@
 import torch.nn as nn
-from models.nlp.transformer.multi_head_attention import MultiHeadAttention
-from models.nlp.transformer.feed_forward_layer import FeedForwardLayer
+from models.baseline.nlp.transformer import MultiHeadAttention
+from models.baseline.nlp.transformer import FeedForwardLayer
 from utils import nn_utils, constants
 import torch
 import torch.nn.functional as F
-from torch.nn import BatchNorm1d
+from models.virus_host_prediction_base import VirusHostPredictionBase
 
 
-# only encoder
-class TransformerAttention(nn.Module):
-    def __init__(self, pre_trained_model, segment_len, cls_token, h=8, input_dim=512, hidden_dim=2048, stride=1, depth=2, n_classes=1):
-        super(TransformerAttention, self).__init__()
+class VirProBERT(VirusHostPredictionBase):
+    def __init__(self, pre_trained_model, segment_len, cls_token, h=8, input_dim=512, hidden_dim=2048, stride=1, n_mlp_layers=2, n_classes=1):
+        super(VirProBERT, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=True)
         self.pre_trained_model = pre_trained_model
         self.input_dim = input_dim
         self.self_attn = MultiHeadAttention(h, input_dim)
@@ -18,19 +17,6 @@ class TransformerAttention(nn.Module):
         self.segment_len = segment_len
         self.cls_token = cls_token
         self.stride = stride
-
-        # Classification block
-        # first linear layer: input_dim --> hidden_dim
-        self.linear_ip = nn.Linear(input_dim, hidden_dim)
-        self.batch_norm_ip = BatchNorm1d(hidden_dim)
-        self.linear_hidden = nn.Linear(hidden_dim, hidden_dim)
-        self.batch_norm_hidden = BatchNorm1d(hidden_dim)
-        # intermediate hidden layers (number = N): hidden_dim --> hidden_dim
-        self.linear_hidden_n = nn_utils.create_clones(self.linear_hidden, depth)
-        self.batch_norm_hidden_n = nn_utils.create_clones(self.batch_norm_hidden, depth)
-
-        # last linear layer: hidden_dim--> n_classes
-        self.linear_op = nn.Linear(hidden_dim, n_classes)
 
     def get_embedding(self, X):
         # X: b x n where n is the maximum sequence length in the batch
@@ -83,40 +69,20 @@ class TransformerAttention(nn.Module):
         X = X.mean(dim=1)  # b x input_dim
         return X
 
-    def forward(self, X, embedding_only=False):
-        batch_size = X.shape[0]  # batch_size
-        X = self.get_embedding(X)
-        if embedding_only:
-            # used in Few Shot Learning
-            # Hack to use DataParallel and run on multiple GPUs since we can only call __call__() --> forward() using DataParallel
-            return X
+    # def forward() : use the template implementation in VirusHostPredictionBase
 
-        # input linear layer
-        X = F.relu(self.linear_ip(X))
-        if batch_size > 1:  # batch_norm is applicable only when batch_size is > 1
-            X = self.batch_norm_ip(X)
-        # hidden
-        for i, linear_layer in enumerate(self.linear_hidden_n):
-            X = F.relu(linear_layer(X))
-            if batch_size > 1:  # batch_norm is applicable only when batch_size is > 1
-                X = self.batch_norm_hidden_n[i](X)
+    def get_model(model_params) -> VirProBERT:
+        model = VirProBERT(pre_trained_model=model_params["pre_trained_model"],
+                           segment_len=model_params["segment_len"],
+                           cls_token = model_params["cls_token"],
+                           h = model_params["n_heads"],
+                           input_dim=model_params["input_dim"],
+                           hidden_dim=model_params["hidden_dim"],
+                           n_mlp_layers=model_params["n_mlp_layers"],
+                           stride=model_params["stride"],
+                           n_classes=model_params["n_classes"])
+        print(model)
+        print("VirProBERT: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
 
-        y = self.linear_op(X)
-        return y
+        return VirusHostPredictionBase.return_model(model, model_params["data_parallel"])
 
-
-def get_model(model):
-    model = TransformerAttention(pre_trained_model=model["pre_trained_model"],
-                                 segment_len=model["segment_len"],
-                                 cls_token = model["cls_token"],
-                                 h = model["n_heads"],
-                                 input_dim=model["input_dim"],
-                                 hidden_dim=model["hidden_dim"],
-                                 depth=model["depth"],
-                                 stride=model["stride"],
-                                 n_classes=model["n_classes"])
-    print(model)
-    print("Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
-    # Capability to distribute data for parallelization
-    return model.to(nn_utils.get_device())
-    # return nn.DataParallel(model.to(nn_utils.get_device()))

@@ -6,10 +6,8 @@ import torch
 import tqdm
 
 from utils import utils, dataset_utils, nn_utils, constants
-from models.nlp.transformer import transformer
+from models.baseline.nlp.transformer import transformer
 from models.nlp.hybrid import transformer_attention
-from models.nlp import cnn1d, rnn, lstm, fnn
-from models.cv import cnn2d, cnn2d_pool
 from transfer_learning.fine_tuning import host_prediction_sequence
 
 
@@ -52,7 +50,7 @@ def execute(config):
         pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
         pre_train_encoder_settings["max_seq_len"] += 1 # adding 1 for the CLS token
 
-        # load pre-trained encoder model
+        # load pre-trained encoder model_params
         pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
         model["pre_trained_model"] = pre_trained_encoder_model
 
@@ -62,7 +60,7 @@ def execute(config):
 
         elif "hybrid_attention" in model_name:
             print(f"Executing Hybrid Attention fine tuning in {mode} mode")
-            # add maximum sequence length of pretrained model as the segment_len size
+            # add maximum sequence length of pretrained model_params as the segment_len size
             model["segment_len"] = sequence_settings["max_sequence_length"]
             prediction_model = transformer_attention.get_model(model)
 

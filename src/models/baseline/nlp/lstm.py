@@ -3,21 +3,23 @@ import torch.nn as nn
 from models.nlp.embedding.embedding import EmbeddingLayer
 from torch.nn import LSTM
 from utils import nn_utils, constants
+from models.virus_host_prediction_base import VirusHostPredictionBase
 
 
-class LSTM_Model(nn.Module):
-    def __init__(self, vocab_size, n_classes, N, input_dim, hidden_dim):
-        super(LSTM_Model, self).__init__()
-        # assuming hidden state dimension = cell state dimension = hidden_dim
-        self.hidden_dim = hidden_dim
-        self.N = N
+class LSTM_VirusHostPrediction(VirusHostPredictionBase):
+    def __init__(self, vocab_size, n_classes, n_layers, input_dim, hidden_dim, n_mlp_layers):
+        super(LSTM_VirusHostPrediction, self).__init__(input_dim, hidden_dim,
+                                                       n_mlp_layers=n_mlp_layers,
+                                                       n_classes=n_classes,
+                                                       batch_norm=False)
+
         self.embedding = nn.Embedding(vocab_size, input_dim, padding_idx=constants.PAD_TOKEN_VAL)
+
         # assuming hidden state dimension = cell state dimension = output_dimension = hidden_dim and projection_size=0
         self.lstm = LSTM(input_size=input_dim,
                          hidden_size=hidden_dim,
-                         num_layers=N,
+                         num_layers=n_layers,
                          batch_first=True)
-        self.linear = nn.Linear(hidden_dim, n_classes)
 
     def get_embedding(self, X):
         X = self.embedding(X.long())
@@ -34,23 +36,22 @@ class LSTM_Model(nn.Module):
         # mean of the representations of all tokens
         return output.mean(dim=1)
 
-    def forward(self, X):
-        self.input_embedding = self.get_embedding(X)
-        y = self.linear(self.input_embedding)
-        return y
+    # def forward() : use the template implementation in VirusHostPredictionBase
 
     def init_zeros(self, batch_size):
         # dimensions: N (num of lstm layers) X batch_size X hidden_layer_dimension
         return torch.zeros(self.N, batch_size, self.hidden_dim).to(nn_utils.get_device())
 
 
-def get_lstm_model(model):
-    lstm_model = LSTM_Model(vocab_size=model["vocab_size"],
-                            n_classes=model["n_classes"],
-                            N=model["depth"],
-                            input_dim=model["input_dim"],
-                            hidden_dim=model["hidden_dim"])
+    def get_model(model_params):
+        model = LSTM_VirusHostPrediction(vocab_size=model_params["vocab_size"],
+                                         n_classes=model_params["n_classes"],
+                                         n_layers=model_params["n_layers"],
+                                         input_dim=model_params["input_dim"],
+                                         hidden_dim=model_params["hidden_dim"],
+                                         n_mlp_layers=model_params["n_mlp_layers"])
 
-    print(lstm_model)
-    print("Number of parameters = ", sum(p.numel() for p in lstm_model.parameters() if p.requires_grad))
-    return lstm_model.to(nn_utils.get_device())
+        print(model)
+        print("LSTM_VirusHostPredictionN; umber of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
+
+        return VirusHostPredictionBase.return_model(model, model_params["data_parallel"])

@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch
-from models.nlp.transformer.transformer import TransformerEncoder
+from models.baseline.nlp.transformer import TransformerEncoder
 from utils import nn_utils, constants
 
 
