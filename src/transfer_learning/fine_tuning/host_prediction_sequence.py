@@ -44,7 +44,7 @@ class HostPredictionSequence(nn.Module):
             X = self.batch_norm_ip(X)
 
         # hidden
-        for linear_layer in self.linear_hidden_n:
+        for i, linear_layer in enumerate(self.linear_hidden_n):
             X = F.relu(linear_layer(X))
             if batch_size > 1:  # batch_norm is applicable only when batch_size is > 1
                 X = self.batch_norm_hidden_n[i](X)
