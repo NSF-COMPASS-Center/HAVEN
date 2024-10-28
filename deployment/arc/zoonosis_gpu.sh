@@ -2,7 +2,7 @@
 
 #SBATCH -J zoonosis-nlp
 #SBATCH --account=seqevol
-#SBATCH --partition=a100_normal_q
+#SBATCH --partition=dgx_normal_q
 
 #SBATCH --mem=400G
 #SBATCH --nodes=1
