@@ -1,8 +1,8 @@
 from utils import nn_utils
-from models.baseline.nlp.transformer import MultiHeadAttention
-from models.baseline.nlp.transformer import FeedForwardLayer
-from models.baseline.nlp.transformer import LayerNormalization
-from models.baseline.nlp.transformer import ResidualConnectionLayer
+from models.baseline.nlp.transformer.multi_head_attention import MultiHeadAttention
+from models.baseline.nlp.transformer.feed_forward_layer import FeedForwardLayer
+from models.baseline.nlp.transformer.layer_normalization import LayerNormalization
+from models.baseline.nlp.transformer.residual_connection import ResidualConnectionLayer
 import torch.nn as nn
 
 

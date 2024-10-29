@@ -1,6 +1,6 @@
 from models.protein_sequence_classification import ProteinSequenceClassification
-from models.nlp.embedding.embedding import EmbeddingLayer
-from models.baseline.nlp.transformer import EncoderLayer, Encoder
+from models.baseline.nlp.embedding.embedding import EmbeddingLayer
+from models.baseline.nlp.transformer.encoder import EncoderLayer, Encoder
 
 class TransformerEncoderVirusHostPrediction(ProteinSequenceClassification):
     def __init__(self, vocab_size, max_seq_len, n_layers=6, input_dim=512, hidden_dim=1024, h=8, n_mlp_layers=2, n_classes=1):
@@ -21,7 +21,7 @@ class TransformerEncoderVirusHostPrediction(ProteinSequenceClassification):
 
     # def forward() : use the template implementation in ProteinSequenceClassification
 
-    def get_model(model_params) -> TransformerEncoderVirusHostPrediction:
+    def get_model(model_params) -> ProteinSequenceClassification:
         model = TransformerEncoderVirusHostPrediction(vocab_size=model_params["vocab_size"],
                                                       max_seq_len=model_params["max_seq_len"],
                                                       n_layers=model_params["n_layers"],
@@ -33,4 +33,4 @@ class TransformerEncoderVirusHostPrediction(ProteinSequenceClassification):
         print(model)
         print("TransformerEncoderVirusHostPrediction: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
 
-        return VirusHostPredictionBase.return_model(model, model_params["data_parallel"])
+        return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])

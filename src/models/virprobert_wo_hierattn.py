@@ -65,7 +65,7 @@ class VirProBERT_wo_HierAttn(ProteinSequenceClassification):
 
     # def forward() : use the template implementation in ProteinSequenceClassification
 
-    def get_model(model_params) -> VirProBERT_wo_HierAttn:
+    def get_model(model_params) -> ProteinSequenceClassification:
         model = VirProBERT_wo_HierAttn(pre_trained_model=model_params["pre_trained_model"],
                                        input_dim=model_params["input_dim"],
                                        cls_token=model_params["cls_token"],
@@ -77,4 +77,4 @@ class VirProBERT_wo_HierAttn(ProteinSequenceClassification):
         print(model)
         print("VirProBERT_wo_HierAttn: Number of parameters = ", sum(p.numel() for p in host_prediction_model.parameters() if p.requires_grad))
 
-        return VirusHostPredictionBase.return_model(model, model_params["data_parallel"])
+        return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])

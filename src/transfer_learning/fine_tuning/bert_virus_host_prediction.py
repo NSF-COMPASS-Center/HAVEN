@@ -28,7 +28,7 @@ class BERT_VirusHostPrediction(ProteinSequenceClassification):
     # def forward() : use the template implementation in ProteinSequenceClassification
 
 
-    def get_host_prediction_model(model_params, data_parallel) -> BERT_VirusHostPrediction:
+    def get_host_prediction_model(model_params, data_parallel) -> ProteinSequenceClassification:
         model = BERT_VirusHostPrediction(pre_trained_model=model_params["pre_trained_model"],
                                          input_dim=model_params["input_dim"],
                                          cls_token=model_params["cls_token"],
@@ -37,4 +37,4 @@ class BERT_VirusHostPrediction(ProteinSequenceClassification):
                                          n_classes=model_params["n_classes"])
         print(model)
         print("BERT_VirusHostPrediction: Number of parameters = ", sum(p.numel() for p in host_prediction_model.parameters() if p.requires_grad))
-        return VirusHostPredictionBase.return_model(model, data_parallel)
+        return ProteinSequenceClassification.return_model(model, data_parallel)

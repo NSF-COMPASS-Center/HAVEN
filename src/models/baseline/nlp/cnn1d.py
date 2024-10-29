@@ -1,11 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from models.nlp.embedding.embedding import EmbeddingLayer
+from models.baseline.nlp.embedding.embedding import EmbeddingLayer
 from torch.nn import Conv1d
 from models.protein_sequence_classification import ProteinSequenceClassification
 from utils import nn_utils, constants
-
 
 class CNN_1D_VirusHostPrediction(ProteinSequenceClassification):
     def __init__(self, vocab_size, n_classes, n_layers, n_mlp_layers, input_dim, hidden_dim, kernel_size, stride):
@@ -46,7 +45,8 @@ class CNN_1D_VirusHostPrediction(ProteinSequenceClassification):
 
     # def forward() : use the template implementation in ProteinSequenceClassification
 
-    def get_model(model_params) -> CNN_1D_VirusHostPrediction:
+    @staticmethod
+    def get_model(model_params) -> ProteinSequenceClassification:
         model = CNN_1D_VirusHostPrediction(vocab_size=model_params["vocab_size"],
                                            n_classes=model_params["n_classes"],
                                            n_layers = model_params["n_layers"],
@@ -59,4 +59,4 @@ class CNN_1D_VirusHostPrediction(ProteinSequenceClassification):
         print(model)
         print("CNN_1D_VirusHostPrediction: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
 
-        return VirusHostPredictionBase.return_model(model, model_params["data_parallel"])
+        return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])

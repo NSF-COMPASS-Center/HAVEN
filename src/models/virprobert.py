@@ -1,6 +1,6 @@
 import torch.nn as nn
-from models.baseline.nlp.transformer import MultiHeadAttention
-from models.baseline.nlp.transformer import FeedForwardLayer
+from models.baseline.nlp.transformer.multi_head_attention import MultiHeadAttention
+from models.baseline.nlp.transformer.feed_forward_layer import FeedForwardLayer
 from utils import nn_utils, constants
 import torch
 import torch.nn.functional as F
@@ -71,7 +71,7 @@ class VirProBERT(ProteinSequenceClassification):
 
     # def forward() : use the template implementation in ProteinSequenceClassification
 
-    def get_model(model_params) -> VirProBERT:
+    def get_model(model_params) -> ProteinSequenceClassification:
         model = VirProBERT(pre_trained_model=model_params["pre_trained_model"],
                            segment_len=model_params["segment_len"],
                            cls_token = model_params["cls_token"],
@@ -84,5 +84,5 @@ class VirProBERT(ProteinSequenceClassification):
         print(model)
         print("VirProBERT: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
 
-        return VirusHostPredictionBase.return_model(model, model_params["data_parallel"])
+        return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])
 

@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from models.nlp.embedding.embedding import EmbeddingLayer
+from models.baseline.nlp.embedding.embedding import EmbeddingLayer
 from torch.nn import LSTM
 from utils import nn_utils, constants
 from models.protein_sequence_classification import ProteinSequenceClassification
@@ -43,7 +43,7 @@ class LSTM_VirusHostPrediction(ProteinSequenceClassification):
         return torch.zeros(self.N, batch_size, self.hidden_dim).to(nn_utils.get_device())
 
 
-    def get_model(model_params):
+    def get_model(model_params) -> ProteinSequenceClassification:
         model = LSTM_VirusHostPrediction(vocab_size=model_params["vocab_size"],
                                          n_classes=model_params["n_classes"],
                                          n_layers=model_params["n_layers"],
@@ -54,4 +54,4 @@ class LSTM_VirusHostPrediction(ProteinSequenceClassification):
         print(model)
         print("LSTM_VirusHostPredictionN; umber of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
 
-        return VirusHostPredictionBase.return_model(model, model_params["data_parallel"])
+        return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])

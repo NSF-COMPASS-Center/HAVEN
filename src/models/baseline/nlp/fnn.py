@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from models.nlp.embedding.embedding import EmbeddingLayer
+from models.baseline.nlp.embedding.embedding import EmbeddingLayer
 from models.protein_sequence_classification import ProteinSequenceClassification
 from utils import nn_utils, constants
 
@@ -36,7 +36,7 @@ class FNN_VirusHostPrediction(ProteinSequenceClassification):
         return y
 
 
-    def get_fnn_model(model_params) -> FNN_VirusHostPrediction:
+    def get_fnn_model(model_params) -> ProteinSequenceClassification:
         model = FNN_Model(vocab_size=model_params["vocab_size"],
                               n_classes=model_params["n_classes"],
                               n_mlp_layers=model_params["n_mlp_layers"],
@@ -46,4 +46,4 @@ class FNN_VirusHostPrediction(ProteinSequenceClassification):
         print(model)
         print("FNN_VirusHostPrediction: Number of parameters = ", sum(p.numel() for p in fnn_model.parameters() if p.requires_grad))
 
-        return VirusHostPredictionBase.return_model(model, model_params["data_parallel"])
+        return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])

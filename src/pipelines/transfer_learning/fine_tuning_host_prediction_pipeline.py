@@ -9,10 +9,7 @@ import wandb
 from utils import utils, dataset_utils, nn_utils, constants
 from training.early_stopping import EarlyStopping
 from training import training_utils
-from transfer_learning.fine_tuning import host_prediction_sequence
-from models import host_prediction_segment
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
-from models.nlp.hybrid import transformer_attention
 
 def execute(config):
     # input settings

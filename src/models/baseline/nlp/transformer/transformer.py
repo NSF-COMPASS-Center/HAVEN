@@ -1,7 +1,7 @@
 import torch.nn as nn
-from models.nlp.embedding.embedding import EmbeddingLayer, ConvolutionEmbeddingLayer
-from models.baseline.nlp.transformer import EncoderLayer, Encoder
-from models.baseline.nlp.transformer import DecoderLayer, Decoder
+from models.baseline.nlp.embedding.embedding import EmbeddingLayer, ConvolutionEmbeddingLayer
+from models.baseline.nlp.transformer.encoder import EncoderLayer, Encoder
+from models.baseline.nlp.transformer.decoder import DecoderLayer, Decoder
 from utils import nn_utils
 
 
