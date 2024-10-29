@@ -6,14 +6,14 @@ import torch.nn.functional as F
 from torch.nn import BatchNorm1d
 
 
-class VirusHostPredictionBase(nn.Module):
+class ProteinSequenceClassification(nn.Module):
     """
     Template base for a virus host classification model_params based on deep learning methods
     Contains the MLP block for the multiclass classification
     """
 
     def __init__(self, input_dim=512, hidden_dim=2048, n_mlp_layers=2, n_classes=1, batch_norm=False):
-        super(VirusHostPredictionBase, self).__init__()
+        super(ProteinSequenceClassification, self).__init__()
         self.batch_norm = batch_norm
 
         ## Multiclass classification block

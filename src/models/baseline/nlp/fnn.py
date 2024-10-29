@@ -1,16 +1,16 @@
 import torch.nn as nn
 import torch.nn.functional as F
 from models.nlp.embedding.embedding import EmbeddingLayer
-from models.virus_host_prediction_base import VirusHostPredictionBase
+from models.protein_sequence_classification import ProteinSequenceClassification
 from utils import nn_utils, constants
 
 
-class FNN_VirusHostPrediction(VirusHostPredictionBase):
+class FNN_VirusHostPrediction(ProteinSequenceClassification):
     def __init__(self, vocab_size, n_classes, n_mlp_layers, input_dim, hidden_dim):
         super(FNN_VirusHostPrediction, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=False)
 
         self.embedding = nn.Embedding(vocab_size, input_dim, padding_idx=constants.PAD_TOKEN_VAL)
-        # all the mlp layers are instantiated in VirusHostPredictionBase as part of the multiclass classification block.
+        # all the mlp layers are instantiated in ProteinSequenceClassification as part of the multiclass classification block.
         # For FNN classifier, there is no separate classification block.
         # It is embedded in the model architecture itself.
         # Hence, the forward() is overridden in this class.

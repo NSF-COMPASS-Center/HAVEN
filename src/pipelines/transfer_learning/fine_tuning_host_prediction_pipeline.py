@@ -11,7 +11,7 @@ from training.early_stopping import EarlyStopping
 from training import training_utils
 from transfer_learning.fine_tuning import host_prediction_sequence
 from models import host_prediction_segment
-from models.baseline.nlp.transformer import transformer
+from models.baseline.nlp.transformer.transformer import TransformerEncoder
 from models.nlp.hybrid import transformer_attention
 
 def execute(config):
@@ -41,7 +41,6 @@ def execute(config):
     n_iters = fine_tune_settings["n_iterations"]
 
     sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
-    pre_train_encoder_settings["max_seq_len"] += 1  # adding 1 for the CLS token
 
     tasks = fine_tune_settings["task_settings"]
     id_col = sequence_settings["id_col"]
@@ -89,14 +88,6 @@ def execute(config):
             # used in zero shot evaluation, where split_input=False in fine_tune_settings and mode=test in task
             test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col)
 
-        # load pre-trained encoder model_params
-        pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
-        # pre_trained_encoder_model.load_state_dict(
-        #     torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
-
-        # HACK to load models from checkpoints. CAUTION: Use only under dire circumstances
-        pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model, pre_train_settings["model_path"])
-
         fine_tune_model = None
         for task in tasks:
             task_id = task["id"] # unique identifier
@@ -108,6 +99,15 @@ def execute(config):
             if task["active"] is False:
                 print(f"Skipping {task_name} ...")
                 continue
+
+            # load pre-trained encoder model_params
+            pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train_encoder_settings, task["cls_token"])
+            # pre_trained_encoder_model.load_state_dict(
+            #     torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
+
+            # HACK to load models from checkpoints. CAUTION: Use only under dire circumstances
+            pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model,
+                                                                            pre_train_settings["model_path"])
 
             # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
             # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token

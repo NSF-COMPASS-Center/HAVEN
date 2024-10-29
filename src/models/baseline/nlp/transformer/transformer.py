@@ -41,9 +41,10 @@ class TransformerEncoder(nn.Module):
         return X
 
     @staticmethod
-    def get_transformer_encoder(model):
+    def get_transformer_encoder(model, cls_token=False):
         tf_model = TransformerEncoder(vocab_size=model["vocab_size"],
-                                      max_seq_len=model["max_seq_len"],
+                                      # adding 1 for CLS token if needed
+                                      max_seq_len=model["max_seq_len"] + 1 if cls_token else model["max_seq_len"],
                                       N=model["n_mlp_layers"],
                                       input_dim=model["input_dim"],
                                       hidden_dim=model["hidden_dim"],

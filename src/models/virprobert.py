@@ -4,10 +4,10 @@ from models.baseline.nlp.transformer import FeedForwardLayer
 from utils import nn_utils, constants
 import torch
 import torch.nn.functional as F
-from models.virus_host_prediction_base import VirusHostPredictionBase
+from models.protein_sequence_classification import ProteinSequenceClassification
 
 
-class VirProBERT(VirusHostPredictionBase):
+class VirProBERT(ProteinSequenceClassification):
     def __init__(self, pre_trained_model, segment_len, cls_token, h=8, input_dim=512, hidden_dim=2048, stride=1, n_mlp_layers=2, n_classes=1):
         super(VirProBERT, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=True)
         self.pre_trained_model = pre_trained_model
@@ -69,7 +69,7 @@ class VirProBERT(VirusHostPredictionBase):
         X = X.mean(dim=1)  # b x input_dim
         return X
 
-    # def forward() : use the template implementation in VirusHostPredictionBase
+    # def forward() : use the template implementation in ProteinSequenceClassification
 
     def get_model(model_params) -> VirProBERT:
         model = VirProBERT(pre_trained_model=model_params["pre_trained_model"],

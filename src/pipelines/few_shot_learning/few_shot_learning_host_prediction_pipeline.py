@@ -9,7 +9,7 @@ from statistics import mean
 import tqdm
 import wandb
 
-from models.baseline.nlp.transformer import transformer
+from models.baseline.nlp.transformer.transformer import TransformerEncoder
 from transfer_learning.fine_tuning import host_prediction_sequence
 from models.nlp import cnn1d, rnn, lstm, fnn
 from models.nlp.hybrid import transformer_attention
@@ -89,11 +89,12 @@ def execute(config):
         prediction_models = config["pre_trained_models"]
 
         for model in prediction_models:
+            model_id = model["id"]
             model_name = model["name"]
             prediction_model_path = model["path"]
             mode = model["mode"]
-            # when mode == 'train', pre_trained_model_path points to a pre-trained host prediction classifier
-            # when mode = 'test', pre_trained_model_path points to a pre-trained few shot classifier
+            # when mode == 'train', pre_trained_model_path points to a pre-trained protein sequence classifier
+            # when mode = 'test' or 'evaluate', pre_trained_model_path points to a pre-trained few shot classifier
 
             # Set necessary values within model_settings object for cleaner code and to avoid passing multiple arguments.
             model_settings = model["model_settings"]
@@ -102,56 +103,31 @@ def execute(config):
                 print(f"Skipping {model_name} ...")
                 continue
 
+            # if the classifier includes a pre-trained model transformer encoder, load it.
+            if "encoder_settings" in model_settings:
+                mlm_encoder_settings = model_settings["encoder_settings"].copy()
+                mlm_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
+                # add max_sequence_length to pre_train_encoder_settings
+                mlm_encoder_settings["max_seq_len"] = max_sequence_length
+                # get the transformer encoder model pretrained using mlm
+                mlm_encoder_model = transformer.get_transformer_encoder(mlm_encoder_settings, model_settings["cls_token"])
+
+                # NOTE: this pre_trained_model is the MLM pre-trained model_params
+                # this is different from the what we call "pre_trained" in the context of few-shot-learning,
+                # i.e., model_params pre-trained using few-dhot learning for the rare-class classification task.
+                model_settings["pre_trained_model"] = mlm_encoder_model
+
+            if model_name in model_map.model_map:
+                print(f"Executing {model_name} in {mode} mode.")
+                prediction_model = model_map.model_map[model_name].get_model(model_params=model_settings)
+            else:
+                print(f"ERROR: Unknown model {model_name}.")
+                continue
+
             if model_name not in results:
                 # first iteration
                 results[model_name] = []
                 evaluation_metrics[model_name] = []
-
-            if "transformer" in model_name:
-                print(f"Executing Transformer")
-                prediction_model = transformer.get_transformer_encoder_classifier(model_settings)
-
-            elif "virprobert" in model_name:
-                print(f"Executing VirProBERT (pre-trained and fine tuned model).")
-                # Load the pre-trained Transformer Encoder in the pre-trained (MLM) and fine-tuned (Host prediction) VirProBERT
-                mlm_encoder_settings = model_settings["encoder_settings"].copy()
-                mlm_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
-                # add max_sequence_length to pre_train_encoder_settings
-                mlm_encoder_settings["max_seq_len"] = max_sequence_length
-                # load pre-trained encoder model_params
-                mlm_encoder_model = transformer.get_transformer_encoder(mlm_encoder_settings)
-
-                # Set the pre_trained model_params within the virprobert model_params config
-                # NOTE: this pre_trained_model is the MLM pre-trained model_params
-                # this is different from the what we call "pre_trained" in the context of few-shot-learning,
-                # i.e., model_params pre-trained for Host prediction.
-                model_settings["pre_trained_model"] = mlm_encoder_model
-                prediction_model = host_prediction_sequence.get_host_prediction_model(model_settings)
-
-            elif "hybrid" in model_name:
-                print(f"Executing Hybrid Attention Model (pre-trained and fine tuned model).")
-                model_settings["encoder_settings"]["max_seq_len"] = sequence_settings["max_sequence_length"]
-                mlm_encoder_settings = model_settings["encoder_settings"].copy()
-                mlm_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
-                # add max_sequence_length to pre_train_encoder_settings
-                mlm_encoder_settings["max_seq_len"] = max_sequence_length
-                if model_settings["cls_token"]:
-                    mlm_encoder_settings["max_seq_len"] += 1
-                # load pre-trained encoder model_params
-                mlm_encoder_model = transformer.get_transformer_encoder(mlm_encoder_settings)
-                # Set the pre_trained model_params within the hybrid attn model_params config
-                # NOTE: this pre_trained_model is the MLM pre-trained model_params
-                # this is different from the what we call "pre_trained" in the context of few-shot-learning,
-                # i.e., model_params pre-trained for Host prediction.
-                model_settings["pre_trained_model"] = mlm_encoder_model
-                # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
-                # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token, if needed
-                model_settings["segment_len"] = max_sequence_length
-                prediction_model = transformer_attention.get_model(model_settings)
-
-            else:
-                print(f"ERROR: Unrecognized model '{model_name}'.")
-                continue
 
             # Initialize Weights & Biases for each run
             wandb.init(project="zoonosis-host-prediction",

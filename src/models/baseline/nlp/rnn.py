@@ -3,10 +3,10 @@ import torch.nn as nn
 from models.nlp.embedding.embedding import EmbeddingLayer
 from torch.nn import RNN
 from utils import nn_utils, constants
-from models.virus_host_prediction_base import VirusHostPredictionBase
+from models.protein_sequence_classification import ProteinSequenceClassification
 
 
-class RNN_VirusHostPrediction(VirusHostPredictionBase):
+class RNN_VirusHostPrediction(ProteinSequenceClassification):
     def __init__(self, vocab_size, n_classes, n_layers, input_dim, hidden_dim, n_mlp_layers):
         super(RNN_VirusHostPrediction, self).__init__(input_dim, hidden_dim,
                                                       n_mlp_layers=n_mlp_layers,
@@ -34,7 +34,7 @@ class RNN_VirusHostPrediction(VirusHostPredictionBase):
         # pool the model_params embeddings of all tokens in the input sequence using mean
         return output.mean(dim=1)
 
-    # def forward() : use the template implementation in VirusHostPredictionBase
+    # def forward() : use the template implementation in ProteinSequenceClassification
 
     def init_hidden(self, batch_size):
         # dimensions: N (num of rnn layers) X batch_size X hidden_layer_dimension

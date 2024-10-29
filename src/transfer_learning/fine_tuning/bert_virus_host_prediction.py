@@ -2,14 +2,14 @@ from torch import nn
 import torch.nn.functional as F
 from torch.nn import BatchNorm1d
 from utils import nn_utils
-from models.virus_host_prediction_base import VirusHostPredictionBase
+from models.protein_sequence_classification import ProteinSequenceClassification
 
-class BERT_VirusHostPrediction(VirusHostPredictionBase):
+class BERT_VirusHostPrediction(ProteinSequenceClassification):
     """
     Fine-tune a vanilla pre-trained BERT model using the whole sequence as input.
     """
     def __init__(self, pre_trained_model, cls_token, input_dim, hidden_dim, n_mlp_layers, n_classes):
-        super(BERT_VirusHostPrediction, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=True)
+        super(ProteinSequenceClassification, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=True)
         self.pre_trained_model = pre_trained_model
         self.cls_token = cls_token
 
@@ -25,7 +25,7 @@ class BERT_VirusHostPrediction(VirusHostPredictionBase):
             X = X.mean(dim=1)
         return X
 
-    # def forward() : use the template implementation in VirusHostPredictionBase
+    # def forward() : use the template implementation in ProteinSequenceClassification
 
 
     def get_host_prediction_model(model_params, data_parallel) -> BERT_VirusHostPrediction:

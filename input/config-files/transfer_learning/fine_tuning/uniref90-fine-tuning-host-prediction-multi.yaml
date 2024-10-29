@@ -95,6 +95,7 @@ fine_tune_settings:
       active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
+      segment_len: 256
       stride: 64
       cls_token: True
       n_heads: 8

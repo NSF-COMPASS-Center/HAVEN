@@ -2,10 +2,10 @@ from torch import nn
 import torch.nn.functional as F
 from utils import nn_utils, constants
 import torch
-from models.virus_host_prediction_base import VirusHostPredictionBase
+from models.protein_sequence_classification import ProteinSequenceClassification
 
 
-class VirProBERT_wo_HierAttn(VirusHostPredictionBase):
+class VirProBERT_wo_HierAttn(ProteinSequenceClassification):
     def __init__(self, pre_trained_model, segment_len, cls_token, input_dim, hidden_dim, stride=1, n_mlp_layers=2, n_classes=1):
         super(VirProBERT_wo_HierAttn, self).__init__(input_dim, hidden_dim,
                                                      n_mlp_layers=n_mlp_layers,
@@ -63,7 +63,7 @@ class VirProBERT_wo_HierAttn(VirusHostPredictionBase):
 
         return X
 
-    # def forward() : use the template implementation in VirusHostPredictionBase
+    # def forward() : use the template implementation in ProteinSequenceClassification
 
     def get_model(model_params) -> VirProBERT_wo_HierAttn:
         model = VirProBERT_wo_HierAttn(pre_trained_model=model_params["pre_trained_model"],
