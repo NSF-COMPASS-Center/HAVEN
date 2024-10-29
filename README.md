@@ -52,6 +52,16 @@ pip install -r requirements.txt
 pip install pyyaml
 conda install pandas
 ```
+### Create required folders
+Create a directory for logs using - 
+```shell
+mkdir -p output/logs
+```
+### Setup Weights & Biases
+1. Create an account in [Weights & Biases](https://wandb.ai/site/).
+2. Create a new project in Weights and Biases named `zoonosis-host-prediction`.
+3. Setup the `wandb` library by completing [Step 1 in the Quickstart](https://wandb.ai/quickstart?utm_source=app-resource-center&utm_medium=app&utm_term=quickstart).
+    - Note: Do not forget to log in to Weights and Biases (`wandb login`) in the server where you intend to execute the experiment.
 ---
 ## Usage
 ### General usage:
@@ -82,6 +92,33 @@ sbatch deployment/arc/zoonosis_gpu.sh . <path-to-script-to-executed> <arguments-
 ```shell
 sbatch deployment/arc/misc_gpu.sh . src/utils/scripts/perturbation_dataset_generator.py -if input/data/coronaviridae/20240313/sarscov2/uniprot/coronaviridae_s_uniprot_sars_cov_2.csv -od input/data/coronaviridae/20240313/sarscov2/uniprot/perturbation_dataset/multi -st protein
 ```
+---
+## Fine tuning VirProBERT for virus host multiclass classification
+1. Create a config file for fine-tuning based on the example config in [uniref90-fine-tuning-host-prediction-multi.yaml](input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-multi.yaml)
+   1. Ensure that config type and subtypes are set as follows
+    ```yaml
+      config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation, transfer_learning
+      config_sub_type: "host_prediction"
+    ```
+2. Configure a suitable experiment name to be used to reference the execution using the `experiment` parameter in the config.
+3. Set the relative path to the input file(s) within `input_settings` using `input_dir` and `file_names` parameters.
+4. Set the following sequence related parameters in `sequence_settings` with respect to the input data file -
+   1. `id_col`: identifier column name
+   2. `sequence_col`: Sequence column name
+   3. `truncate`: Boolean (default: False) - should the sequence be truncated with respect to the configured maximum sequence length?
+   4. `split_sequence`: Boolean (default: False) - should the sequence be *explicitly* segmented with respect to the configured maximum sequence length?
+5. Set the path to the transformer-encoder pre-trained using masked language modeling and all related parameters in `pre_train_settings`
+    1. Configure the transformer-encoder related parameters in `pre_train_settings.encoder_settings`
+6. Configure the parameters related to fine-tuning the pre-trained model in `fine_tune_settings`
+7. Configure the common names of the virus hosts species and other label related settings in `fine_tune_settings.label_settings`
+8. The different types fine-tuning models can be configured in `task_settings` and each model can be activated using its `active` flag.
+    1. `data_parallel`: Enable parallel execution on multiple GPUs if available.
+9. Configure the output directory and the prefix to be used while naming the output file in `output_settings`
+10. Execute the fine-tuning experiment using
+    ```shell
+        python src/zoonosis.py --config <path-to-the-config-file>
+    ```
+    For ARC execution see section on [ARC Deployment](#arc-deployment).
 ---
 ## Adding a pre-trained protein language model to the Virus Host Prediction Pipeline
 

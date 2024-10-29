@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import torch
 import wandb
 
-from utils import utils, dataset_utils, nn_utils, constants
+from utils import utils, dataset_utils, nn_utils, constants, model_map
 from training.early_stopping import EarlyStopping
 from training import training_utils
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
@@ -90,8 +90,6 @@ def execute(config):
             task_id = task["id"] # unique identifier
             task_name = task["name"]
             mode = task["mode"]
-            # set the pre_trained model_params within the task config
-            task["pre_trained_model"] = pre_trained_encoder_model
 
             if task["active"] is False:
                 print(f"Skipping {task_name} ...")
@@ -99,12 +97,15 @@ def execute(config):
 
             # load pre-trained encoder model_params
             pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train_encoder_settings, task["cls_token"])
-            # pre_trained_encoder_model.load_state_dict(
-            #     torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
+            pre_trained_encoder_model.load_state_dict(
+                torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
 
             # HACK to load models from checkpoints. CAUTION: Use only under dire circumstances
-            pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model,
-                                                                            pre_train_settings["model_path"])
+            # pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model,
+            #                                                                pre_train_settings["model_path"])
+
+            # set the pre_trained model_params within the task config
+            task["pre_trained_model"] = pre_trained_encoder_model
 
             # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
             # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
@@ -124,6 +125,7 @@ def execute(config):
             # Initialize Weights & Biases for each run
             wandb_config["hidden_dim"] = task["hidden_dim"]
             wandb_config["n_mlp_layers"] = task["n_mlp_layers"]
+
             wandb.init(project="zoonosis-host-prediction",
                        config=wandb_config,
                        group=fine_tune_settings["experiment"],

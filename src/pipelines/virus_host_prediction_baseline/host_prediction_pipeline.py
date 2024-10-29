@@ -13,6 +13,6 @@ def execute(config):
     type = classification_settings["model_type"]
 
     if type == "std_ml": # standard machine learning models
-        host_prediction_baseline_models_pipeline.execute(input_settings, output_settings, classification_settings)
+        host_prediction_std_ml_models_pipeline.execute(input_settings, output_settings, classification_settings)
     elif type == "dl": # deep learning models
-        host_prediction_nlp_models_pipeline.execute(input_settings, output_settings, classification_settings)
+        host_prediction_dl_models_pipeline.execute(input_settings, output_settings, classification_settings)

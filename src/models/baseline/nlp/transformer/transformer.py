@@ -45,7 +45,7 @@ class TransformerEncoder(nn.Module):
         tf_model = TransformerEncoder(vocab_size=model["vocab_size"],
                                       # adding 1 for CLS token if needed
                                       max_seq_len=model["max_seq_len"] + 1 if cls_token else model["max_seq_len"],
-                                      N=model["n_mlp_layers"],
+                                      N=model["depth"],
                                       input_dim=model["input_dim"],
                                       hidden_dim=model["hidden_dim"],
                                       h=model["n_heads"])

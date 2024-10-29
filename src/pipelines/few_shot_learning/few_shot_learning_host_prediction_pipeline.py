@@ -10,11 +10,8 @@ import tqdm
 import wandb
 
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
-from transfer_learning.fine_tuning import host_prediction_sequence
-from models.nlp import cnn1d, rnn, lstm, fnn
-from models.nlp.hybrid import transformer_attention
 from training.early_stopping import EarlyStopping
-from utils import utils, dataset_utils, nn_utils, evaluation_utils, constants
+from utils import utils, dataset_utils, nn_utils, evaluation_utils, constants, model_map
 from few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
 
@@ -128,6 +125,7 @@ def execute(config):
                 # first iteration
                 results[model_name] = []
                 evaluation_metrics[model_name] = []
+
 
             # Initialize Weights & Biases for each run
             wandb.init(project="zoonosis-host-prediction",
