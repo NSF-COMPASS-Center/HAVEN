@@ -123,7 +123,7 @@ sbatch deployment/arc/misc_gpu.sh . src/utils/scripts/perturbation_dataset_gener
 ## Adding a pre-trained protein language model to the Virus Host Prediction Pipeline
 
 1. Create a child class of [ProteinSequenceClassification](src/models/protein_sequence_classification.py) within [models](src/models)
-2. Implement the `get_embedding()` method that will generate the embeddings for a given batch of protein sequences
+2. Implement the `get_embedding()` method that will generate the embeddings for a given batch of protein sequences.
 3. The default implementation of `forward()` in [ProteinSequenceClassification](src/models/protein_sequence_classification.py) will do the following - 
-   - call the `get_embedding()` method
-   - 
+   - call the `get_embedding()` method.
+   - fine_tune for host prediction using a multi-layer perceptron neural network.
