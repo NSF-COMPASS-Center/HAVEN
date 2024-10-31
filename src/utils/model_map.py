@@ -8,6 +8,7 @@ from models.virprobert import VirProBERT
 from models.virprobert_wo_hierattn import VirProBERT_wo_HierAttn
 
 from transfer_learning.fine_tuning.bert_virus_host_prediction import BERT_VirusHostPrediction
+from models.external.prost5_host_prediction import ProstT5_VirusHostPrediction
 
 # mappings of all classes
 model_map = {
@@ -19,5 +20,8 @@ model_map = {
     "Transformer_Encoder": TransformerEncoderVirusHostPrediction,
     "BERT": BERT_VirusHostPrediction,
     "VirProBERT_wo_Hierarchical_Attention": VirProBERT_wo_HierAttn,
-    "VirProBERT": VirProBERT
+    "VirProBERT": VirProBERT,
+
+    "ProstT5": ProstT5_VirusHostPrediction
+
 }

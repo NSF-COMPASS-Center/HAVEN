@@ -50,6 +50,6 @@ class RNN_VirusHostPrediction(ProteinSequenceClassification):
                                         n_mlp_layers = model_params["n_mlp_layers"])
 
         print(model)
-        print("RNN_VirusHostPrediction: Number of parameters = ", sum(p.numel() for p in rnn_model.parameters() if p.requires_grad))
+        print("RNN_VirusHostPrediction: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
 
         return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])

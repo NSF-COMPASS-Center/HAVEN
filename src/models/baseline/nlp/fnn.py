@@ -44,6 +44,6 @@ class FNN_VirusHostPrediction(ProteinSequenceClassification):
                               hidden_dim=model_params["hidden_dim"])
 
         print(model)
-        print("FNN_VirusHostPrediction: Number of parameters = ", sum(p.numel() for p in fnn_model.parameters() if p.requires_grad))
+        print("FNN_VirusHostPrediction: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
 
         return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])

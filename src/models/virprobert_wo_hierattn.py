@@ -75,6 +75,6 @@ class VirProBERT_wo_HierAttn(ProteinSequenceClassification):
                                        depth=model_params["n_mlp_layers"],
                                        n_classes=model_params["n_classes"])
         print(model)
-        print("VirProBERT_wo_HierAttn: Number of parameters = ", sum(p.numel() for p in host_prediction_model.parameters() if p.requires_grad))
+        print("VirProBERT_wo_HierAttn: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
 
         return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])
