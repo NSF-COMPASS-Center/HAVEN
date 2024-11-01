@@ -2,7 +2,7 @@
 import argparse
 
 from pipelines.virus_host_prediction_baseline import host_prediction_pipeline
-from pipelines.transfer_learning import masked_language_modeling_pipleine, fine_tuning_host_prediction_pipeline
+from pipelines.transfer_learning import masked_language_modeling_pipleine, fine_tuning_host_prediction_pipeline, fine_tuning_external_host_prediction_pipeline
 from pipelines.interpretability import host_prediction_perturbation_analysis_prediction_pipeline
 from pipelines.few_shot_learning import few_shot_learning_host_prediction_pipeline
 from evaluation import evaluation
@@ -32,6 +32,8 @@ def main():
         # transfer-learning: fine-tuning
         elif config_sub_type == "host_prediction":
             fine_tuning_host_prediction_pipeline.execute(config)
+        elif config_sub_type == "host_prediction_external":
+            fine_tuning_external_host_prediction_pipeline.execute(config)
         else:
             print(f"ERROR: Unsupported config_sub_type '{config_sub_type}' for config_type '{config_type}'.\nSupported values=masked_langage_modeling",
                   "host_prediction")

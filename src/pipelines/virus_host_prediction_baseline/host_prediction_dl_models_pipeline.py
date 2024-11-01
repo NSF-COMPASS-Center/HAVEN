@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import torch
 import wandb
 
-from utils import utils, dataset_utils, nn_utils, constants, model_map
+from utils import utils, dataset_utils, nn_utils, constants, mapper
 from training.early_stopping import EarlyStopping
 from training import training_utils
 
@@ -88,9 +88,9 @@ def execute(input_settings, output_settings, classification_settings):
                 print(f"Skipping {model_name} ...")
                 continue
 
-            if model_name in model_map.model_map:
+            if model_name in mapper.model_map:
                 print(f"Executing {model_name} in {mode} mode.")
-                dl_model = model_map.model_map[model_name].get_model(model_params=model)
+                dl_model = mapper.model_map[model_name].get_model(model_params=model)
             else:
                 print(f"ERROR: Unknown model {model_name}.")
                 continue

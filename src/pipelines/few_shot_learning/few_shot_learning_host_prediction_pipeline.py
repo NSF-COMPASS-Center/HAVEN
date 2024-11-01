@@ -11,7 +11,7 @@ import wandb
 
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
 from training.early_stopping import EarlyStopping
-from utils import utils, dataset_utils, nn_utils, evaluation_utils, constants, model_map
+from utils import utils, dataset_utils, nn_utils, evaluation_utils, constants, mapper
 from few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
 
@@ -114,9 +114,9 @@ def execute(config):
                 # i.e., model_params pre-trained using few-dhot learning for the rare-class classification task.
                 model_settings["pre_trained_model"] = mlm_encoder_model
 
-            if model_name in model_map.model_map:
+            if model_name in mapper.model_map:
                 print(f"Executing {model_name} in {mode} mode.")
-                prediction_model = model_map.model_map[model_name].get_model(model_params=model_settings)
+                prediction_model = mapper.model_map[model_name].get_model(model_params=model_settings)
             else:
                 print(f"ERROR: Unknown model {model_name}.")
                 continue

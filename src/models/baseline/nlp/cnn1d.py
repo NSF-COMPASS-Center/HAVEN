@@ -45,7 +45,6 @@ class CNN_1D_VirusHostPrediction(ProteinSequenceClassification):
 
     # def forward() : use the template implementation in ProteinSequenceClassification
 
-    @staticmethod
     def get_model(model_params) -> ProteinSequenceClassification:
         model = CNN_1D_VirusHostPrediction(vocab_size=model_params["vocab_size"],
                                            n_classes=model_params["n_classes"],
