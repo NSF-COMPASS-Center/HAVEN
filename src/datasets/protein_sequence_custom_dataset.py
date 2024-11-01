@@ -21,4 +21,6 @@ class ProteinSequenceProstT5Dataset(ProteinSequenceDataset):
         # AAs to 3Di (or if you want to embed AAs): prepend "<AA2fold>"
         sequence = "<AA2fold>" + " " + sequence
 
-        return sequence, label
+        label_vector = np.array([label])
+
+        return sequence, torch.tensor(label_vector, device=nn_utils.get_device())

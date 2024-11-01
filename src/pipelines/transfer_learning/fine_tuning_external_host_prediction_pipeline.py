@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import torch
 import wandb
 
-from utils import utils, dataset_utils, nn_utils, constants, model_map
+from utils import utils, dataset_utils, nn_utils, constants, mapper
 from training.early_stopping import EarlyStopping
 from training import training_utils
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
@@ -72,12 +72,9 @@ def execute(config):
             # split testing set into validation and testing datasets in equal proportion
             # so 80:20 will now be 80:10:10
             val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
-            train_dataset_loader = dataset_utils.get_external_dataset_loader(train_df, sequence_settings, label_col)
-            val_dataset_loader = dataset_utils.get_external_dataset_loader(val_df, sequence_settings, label_col)
-            test_dataset_loader = dataset_utils.get_external_dataset_loader(test_df, sequence_settings, label_col)
         else:
             # used in zero shot evaluation, where split_input=False in fine_tune_settings and mode=test in task
-            test_dataset_loader = dataset_utils.get_external_dataset_loader(df, sequence_settings, label_col)
+            test_df = df
 
         fine_tune_model = None
         for task in tasks:
@@ -89,12 +86,17 @@ def execute(config):
                 print(f"Skipping {task_name} ...")
                 continue
 
+            # Load the dataset based on the external model
+            train_dataset_loader = dataset_utils.get_external_dataset_loader(train_df, sequence_settings, label_col, task_name)
+            val_dataset_loader = dataset_utils.get_external_dataset_loader(val_df, sequence_settings, label_col, task_name)
+            test_dataset_loader = dataset_utils.get_external_dataset_loader(test_df, sequence_settings, label_col, task_name)
+
             # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
             task["max_seq_length"] = sequence_settings["max_sequence_length"]
 
-            if task_name in model_map.model_map:
+            if task_name in mapper.model_map:
                 print(f"Executing {task_name} in {mode} mode.")
-                fine_tune_model = model_map.model_map[task_name].get_model(model_params=task)
+                fine_tune_model = mapper.model_map[task_name].get_model(model_params=task)
             else:
                 print(f"ERROR: Unknown model {task_name}.")
                 continue

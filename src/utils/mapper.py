@@ -9,7 +9,7 @@ from models.virprobert_wo_hierattn import VirProBERT_wo_HierAttn
 
 from transfer_learning.fine_tuning.bert_virus_host_prediction import BERT_VirusHostPrediction
 from models.external.prost5_host_prediction import ProstT5_VirusHostPrediction
-
+from datasets.protein_sequence_custom_dataset import ProteinSequenceProstT5Dataset
 # mappings of all classes
 model_map = {
 
@@ -24,4 +24,8 @@ model_map = {
 
     "ProstT5": ProstT5_VirusHostPrediction
 
+}
+
+dataset_map = {
+    "ProstT5": ProteinSequenceProstT5Dataset
 }

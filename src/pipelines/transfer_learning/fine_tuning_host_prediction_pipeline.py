@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import torch
 import wandb
 
-from utils import utils, dataset_utils, nn_utils, constants, model_map
+from utils import utils, dataset_utils, nn_utils, constants, mapper
 from training.early_stopping import EarlyStopping
 from training import training_utils
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
@@ -111,9 +111,9 @@ def execute(config):
             # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
             task["segment_len"] = sequence_settings["max_sequence_length"]
 
-            if task_name in model_map.model_map:
+            if task_name in mapper.model_map:
                 print(f"Executing {task_name} in {mode} mode.")
-                fine_tune_model = model_map.model_map[task_name].get_model(model_params=task)
+                fine_tune_model = mapper.model_map[task_name].get_model(model_params=task)
             else:
                 print(f"ERROR: Unknown model {task_name}.")
                 continue

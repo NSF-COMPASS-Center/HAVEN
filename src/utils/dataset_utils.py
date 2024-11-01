@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import pandas as pd
 import os
 
-from utils import utils, kmer_utils, constants
+from utils import utils, kmer_utils, constants, mapper
 from datasets.collations.padding import Padding, PaddingUnlabeled
 from datasets.collations.padding_with_id import PaddingWithID
 from datasets.protein_sequence_dataset import ProteinSequenceDataset
@@ -154,13 +154,13 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
 
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func)
 
-def get_external_dataset_loader(df, sequence_settings, label_col):
+def get_external_dataset_loader(df, sequence_settings, label_col, name):
     sequence_col = sequence_settings["sequence_col"]
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
     truncate = sequence_settings["truncate"]
 
-    dataset = ProteinSequenceProstT5Dataset(df, sequence_col, max_seq_len, truncate, label_col)
+    dataset = mapper.dataset_map[name](df, sequence_col, max_seq_len, truncate, label_col)
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
 
 def get_token_with_id_dataset_loader(df, sequence_settings, label_col):

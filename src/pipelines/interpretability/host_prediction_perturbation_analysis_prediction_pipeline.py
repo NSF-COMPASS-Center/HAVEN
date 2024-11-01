@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import torch
 import tqdm
 
-from utils import utils, dataset_utils, nn_utils, constants, model_map
+from utils import utils, dataset_utils, nn_utils, constants, mapper
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
 
 
@@ -56,9 +56,9 @@ def execute(config):
         # it will be used if the model requires it, else it will be ignored
         model["segment_len"] = sequence_settings["max_sequence_length"]
 
-        if model_name in model_map.model_map:
+        if model_name in mapper.model_map:
             print(f"Executing {model_name} in {mode} mode.")
-            prediction_model = model_map.model_map[model_name].get_model(model_params=model)
+            prediction_model = mapper.model_map[model_name].get_model(model_params=model)
         else:
             print(f"ERROR: Unknown model {model_name}.")
             continue

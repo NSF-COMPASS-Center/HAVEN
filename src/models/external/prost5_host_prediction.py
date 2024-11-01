@@ -12,7 +12,7 @@ class ProstT5_VirusHostPrediction(ProteinSequenceClassification):
                                                             batch_norm=True)
         self.max_seq_length = max_seq_length
         self.tokenizer, self.pre_trained_model = self.initialize_pre_trained_model(pre_trained_model_link, hugging_face_cache_dir)
-
+        self.pre_trained_model.eval()
 
 
     def initialize_pre_trained_model(self, pre_trained_model_link, hugging_face_cache_dir):
@@ -27,9 +27,10 @@ class ProstT5_VirusHostPrediction(ProteinSequenceClassification):
         token_encoding = self.tokenizer.batch_encode_plus(X, add_special_tokens=True, padding="longest")
         input_ids = torch.tensor(token_encoding["input_ids"]).to(nn_utils.get_device())
         attention_mask = torch.tensor(token_encoding["attention_mask"]).to(nn_utils.get_device())
-
+        print(f"input_ids siz e= {input_ids.shape}")
         embedding_representation = self.pre_trained_model(input_ids, attention_mask=attention_mask)
-        embedding = embedding_representation.last_hidden_state[:]
+        print(f"embedding_representation.last_hidden_state shape = {embedding_representation.last_hidden_state.shape}")
+        embedding = embedding_representation.last_hidden_state
 
         return embedding.mean(dim=1)
 
