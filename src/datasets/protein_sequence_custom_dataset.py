@@ -19,8 +19,6 @@ class ProteinSequenceProstT5Dataset(ProteinSequenceDataset):
         # Add spaces between each amino acid for PT5 to correctly use them
         sequence = " ".join(sequence)
         # AAs to 3Di (or if you want to embed AAs): prepend "<AA2fold>"
-        sequence = "<AA2fold>" + " " + sequence
+        # sequence = "<AA2fold>" + " " + sequence
 
-        label_vector = np.array([label])
-
-        return sequence, torch.tensor(label_vector, device=nn_utils.get_device())
+        return sequence, torch.tensor(label, device=nn_utils.get_device())
