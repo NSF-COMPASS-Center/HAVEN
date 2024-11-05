@@ -127,3 +127,5 @@ sbatch deployment/arc/misc_gpu.sh . src/utils/scripts/perturbation_dataset_gener
 3. The default implementation of `forward()` in [ProteinSequenceClassification](src/models/protein_sequence_classification.py) will do the following - 
    - call the `get_embedding()` method.
    - fine_tune for host prediction using a multi-layer perceptron neural network.
+4. Create a Dataset class in [protein_sequence_custom_dataset.py](src/datasets/protein_sequence_custom_dataset.py) that will pre-process the protein sequences as per the requirement of the external model.
+5. Add entries in the `model_map` and `dataset_map` in [mapper.py](src/utils/mapper.py)

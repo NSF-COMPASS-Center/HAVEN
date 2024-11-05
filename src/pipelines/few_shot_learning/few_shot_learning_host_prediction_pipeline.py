@@ -107,7 +107,7 @@ def execute(config):
                 # add max_sequence_length to pre_train_encoder_settings
                 mlm_encoder_settings["max_seq_len"] = max_sequence_length
                 # get the transformer encoder model pretrained using mlm
-                mlm_encoder_model = transformer.get_transformer_encoder(mlm_encoder_settings, model_settings["cls_token"])
+                mlm_encoder_model = TransformerEncoder.get_transformer_encoder(mlm_encoder_settings, model_settings["cls_token"])
 
                 # NOTE: this pre_trained_model is the MLM pre-trained model_params
                 # this is different from the what we call "pre_trained" in the context of few-shot-learning,
