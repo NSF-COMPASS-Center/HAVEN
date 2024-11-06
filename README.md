@@ -122,8 +122,20 @@ sbatch deployment/arc/misc_gpu.sh . src/utils/scripts/perturbation_dataset_gener
 ---
 ## Adding a pre-trained protein language model to the Virus Host Prediction Pipeline
 
-1. Create a child class of [ProteinSequenceClassification](src/models/protein_sequence_classification.py) within [models](src/models)
+1. Create a child class of [ProteinSequenceClassification](src/models/protein_sequence_classification.py) within [models/external](src/models/external)
 2. Implement the `get_embedding()` method that will generate the embeddings for a given batch of protein sequences.
-3. The default implementation of `forward()` in [ProteinSequenceClassification](src/models/protein_sequence_classification.py) will do the following - 
+3. Implement the `forward()` method ONLY if needed.The default implementation of `forward()` in [ProteinSequenceClassification](src/models/protein_sequence_classification.py) will do the following - 
    - call the `get_embedding()` method.
    - fine_tune for host prediction using a multi-layer perceptron neural network.
+4. Create a Dataset class in [protein_sequence_custom_dataset.py](src/datasets/protein_sequence_custom_dataset.py) that will pre-process the protein sequences as per the requirement of the external model.
+5. Add entries in the `model_map` and `dataset_map` in [mapper.py](src/utils/mapper.py) mapping the implementations of the model and dataset classes respectively.
+6. Add entry for the model in `task_settings` in [uniref90-fine-tuning-host-prediction-external-multi.yaml](input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-external-multi.yaml).
+    Note: the value of `name` parameter should match the key used in the mapping in the previous stop.
+7. Execute the fine-tuning experiment using
+    ```shell
+        python src/zoonosis.py --config [input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-external-multi.yaml](input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-external-multi.yaml)
+    ```
+    For ARC execution see section on [ARC Deployment](#arc-deployment).
+    
+    Example implemenation of an external PLM: ProstT5 ([ProstT5_VirusHostPrediction](src/models/external/prost5_host_prediction.py), [ProteinSequenceProstT5Dataset](src/datasets/protein_sequence_custom_dataset.py))
+---

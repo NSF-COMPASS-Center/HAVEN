@@ -87,8 +87,9 @@ def execute(config):
                 continue
 
             # Load the dataset based on the external model
-            train_dataset_loader = dataset_utils.get_external_dataset_loader(train_df, sequence_settings, label_col, task_name)
-            val_dataset_loader = dataset_utils.get_external_dataset_loader(val_df, sequence_settings, label_col, task_name)
+            if fine_tune_settings["split_input"]:
+                train_dataset_loader = dataset_utils.get_external_dataset_loader(train_df, sequence_settings, label_col, task_name)
+                val_dataset_loader = dataset_utils.get_external_dataset_loader(val_df, sequence_settings, label_col, task_name)
             test_dataset_loader = dataset_utils.get_external_dataset_loader(test_df, sequence_settings, label_col, task_name)
 
             # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
@@ -123,7 +124,7 @@ def execute(config):
                 # used for zero-shot evaluation
                 # load the pre-trained and fine_tuned model_params
                 fine_tune_model.load_state_dict(torch.load(task["fine_tuned_model_path"]))
-                result_df = test_model(fine_tune_model, test_dataset_loader)
+                result_df = training_utils.test_model(fine_tune_model, test_dataset_loader)
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values: 'train', 'test'.")
                 exit(1)
