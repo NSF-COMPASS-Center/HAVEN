@@ -1,0 +1,50 @@
+config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw"
+
+  file_names:
+    "Transformer-Encoder": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/nlp_no_msl_transformer-l_6-h_8-d_1024-msl2048-lr1e-4_output.csv"
+    "Pretrained Transformer-Encoder MSL2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20241021/host_multi/ablation_study/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
+    "Pretrained Transformer-Encoder SL256": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20241017/host_multi/ablation_study/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_host_prediction_segment_msl256s64cls_bn_fnn_2l_d1024_lr1e-4_output.csv"
+    "VirProBERT": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hybrid_attention_msl256s64ae_bn_fnn_2l_d1024_lr1e-4_output.csv"
+
+
+evaluation_settings:
+  type: "multi"
+  # metrics
+  auroc: True
+  auprc: True
+  f1: False
+  accuracy: False
+  prediction_distribution: False
+
+label_mappings:
+  "Homo sapiens": "Human"
+  "Sus scrofa": "Pig"
+  "Hydrochoerus hydrochaeris": "Capybara"
+  "Marmota himalayana": "Himalayan marmot"
+  "Gallus gallus": "Red junglefowl"
+#  "Mus musculus": "House mouse"
+#  "Macaca mulatta": "Indochinese rhesus macaque"
+#  "Gallus gallus": "Red junglefowl"
+#  "Chlorocebus pygerythrus": "Vervet monkey"
+#  "Rattus norvegicus": "Brown rat"
+#  "Equus caballus": "Horse"
+#  "Phacochoerus africanus": "Common warthog"
+#  "Cercopithecus hamlyni": "Hamlyn monkey"
+#  "Felis catus": "Cat"
+#  "Capra hircus": "Goat"
+#  "Ovis aries": "Sheep"
+
+
+output_settings:
+  output_dir: "output"
+  evaluation_dir: "evaluation"
+  visualization_dir: "visualization"
+  dataset_dir: "uniref90/20241103/host_multi"
+  prefix: "host_multi_ablation_study"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv

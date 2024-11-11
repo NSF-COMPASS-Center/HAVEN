@@ -9,12 +9,9 @@ from statistics import mean
 import tqdm
 import wandb
 
-from models.nlp.transformer import transformer
-from transfer_learning.fine_tuning import host_prediction_sequence
-from models.nlp import cnn1d, rnn, lstm, fnn
-from models.nlp.hybrid import transformer_attention
+from models.baseline.nlp.transformer.transformer import TransformerEncoder
 from training.early_stopping import EarlyStopping
-from utils import utils, dataset_utils, nn_utils, evaluation_utils, constants
+from utils import utils, dataset_utils, nn_utils, evaluation_utils, constants, mapper
 from few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
 
@@ -53,7 +50,7 @@ def execute(config):
         "outout_prefix": output_prefix
     }
 
-    # model store filepath
+    # model_params store filepath
     model_store_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{model_name}_itr{itr}.pth")
     Path(os.path.dirname(model_store_filepath)).mkdir(parents=True, exist_ok=True)
 
@@ -89,11 +86,12 @@ def execute(config):
         prediction_models = config["pre_trained_models"]
 
         for model in prediction_models:
+            model_id = model["id"]
             model_name = model["name"]
             prediction_model_path = model["path"]
             mode = model["mode"]
-            # when mode == 'train', pre_trained_model_path points to a pre-trained host prediction classifier
-            # when mode = 'test', pre_trained_model_path points to a pre-trained few shot classifier
+            # when mode == 'train', pre_trained_model_path points to a pre-trained protein sequence classifier
+            # when mode = 'test' or 'evaluate', pre_trained_model_path points to a pre-trained few shot classifier
 
             # Set necessary values within model_settings object for cleaner code and to avoid passing multiple arguments.
             model_settings = model["model_settings"]
@@ -102,56 +100,32 @@ def execute(config):
                 print(f"Skipping {model_name} ...")
                 continue
 
+            # if the classifier includes a pre-trained model transformer encoder, load it.
+            if "encoder_settings" in model_settings:
+                mlm_encoder_settings = model_settings["encoder_settings"].copy()
+                mlm_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
+                # add max_sequence_length to pre_train_encoder_settings
+                mlm_encoder_settings["max_seq_len"] = max_sequence_length
+                # get the transformer encoder model pretrained using mlm
+                mlm_encoder_model = TransformerEncoder.get_transformer_encoder(mlm_encoder_settings, model_settings["cls_token"])
+
+                # NOTE: this pre_trained_model is the MLM pre-trained model_params
+                # this is different from the what we call "pre_trained" in the context of few-shot-learning,
+                # i.e., model_params pre-trained using few-dhot learning for the rare-class classification task.
+                model_settings["pre_trained_model"] = mlm_encoder_model
+
+            if model_name in mapper.model_map:
+                print(f"Executing {model_name} in {mode} mode.")
+                prediction_model = mapper.model_map[model_name].get_model(model_params=model_settings)
+            else:
+                print(f"ERROR: Unknown model {model_name}.")
+                continue
+
             if model_name not in results:
                 # first iteration
                 results[model_name] = []
                 evaluation_metrics[model_name] = []
 
-            if "transformer" in model_name:
-                print(f"Executing Transformer")
-                prediction_model = transformer.get_transformer_encoder_classifier(model_settings)
-
-            elif "virprobert" in model_name:
-                print(f"Executing VirProBERT (pre-trained and fine tuned model).")
-                # Load the pre-trained Transformer Encoder in the pre-trained (MLM) and fine-tuned (Host prediction) VirProBERT
-                mlm_encoder_settings = model_settings["encoder_settings"].copy()
-                mlm_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
-                # add max_sequence_length to pre_train_encoder_settings
-                mlm_encoder_settings["max_seq_len"] = max_sequence_length
-                # load pre-trained encoder model
-                mlm_encoder_model = transformer.get_transformer_encoder(mlm_encoder_settings)
-
-                # Set the pre_trained model within the virprobert model config
-                # NOTE: this pre_trained_model is the MLM pre-trained model
-                # this is different from the what we call "pre_trained" in the context of few-shot-learning,
-                # i.e., model pre-trained for Host prediction.
-                model_settings["pre_trained_model"] = mlm_encoder_model
-                prediction_model = host_prediction_sequence.get_host_prediction_model(model_settings)
-
-            elif "hybrid" in model_name:
-                print(f"Executing Hybrid Attention Model (pre-trained and fine tuned model).")
-                model_settings["encoder_settings"]["max_seq_len"] = sequence_settings["max_sequence_length"]
-                mlm_encoder_settings = model_settings["encoder_settings"].copy()
-                mlm_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
-                # add max_sequence_length to pre_train_encoder_settings
-                mlm_encoder_settings["max_seq_len"] = max_sequence_length
-                if model_settings["cls_token"]:
-                    mlm_encoder_settings["max_seq_len"] += 1
-                # load pre-trained encoder model
-                mlm_encoder_model = transformer.get_transformer_encoder(mlm_encoder_settings)
-                # Set the pre_trained model within the hybrid attn model config
-                # NOTE: this pre_trained_model is the MLM pre-trained model
-                # this is different from the what we call "pre_trained" in the context of few-shot-learning,
-                # i.e., model pre-trained for Host prediction.
-                model_settings["pre_trained_model"] = mlm_encoder_model
-                # add maximum sequence length of pretrained model as the segment size from the sequence_settings
-                # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token, if needed
-                model_settings["segment_len"] = max_sequence_length
-                prediction_model = transformer_attention.get_model(model_settings)
-
-            else:
-                print(f"ERROR: Unrecognized model '{model_name}'.")
-                continue
 
             # Initialize Weights & Biases for each run
             wandb.init(project="zoonosis-host-prediction",
@@ -161,7 +135,7 @@ def execute(config):
                        name=f"iter_{iter}")
 
             if mode == "train":
-                # Load the pre-trained host prediction model
+                # Load the pre-trained host prediction model_params
                 prediction_model.load_state_dict(torch.load(prediction_model_path, map_location=nn_utils.get_device()))
                 few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=prediction_model)
                 result_df, auprc_df, few_shot_classifier = run_few_shot_learning(few_shot_classifier, train_dataset_loader, val_dataset_loader, test_dataset_loader, few_shot_learn_settings,
@@ -179,7 +153,7 @@ def execute(config):
 
             elif mode == "evaluate":
                 meta_evaluate_settings = few_shot_learn_settings["meta_evaluate_settings"]
-                # used in few shot evaluation, where split_input=False in classification_settings and mode=evaluate in model
+                # used in few shot evaluation, where split_input=False in classification_settings and mode=evaluate in model_params
                 evaluate_dataset_loader = dataset_utils.get_evaluation_episodic_dataset_loader(sequence_settings,
                                                                                     label_col, meta_evaluate_settings)
                 # mode=evaluate used for cross-domain few-shot evaluation: prediction of hosts in novel virus (hosts may or may not be novel)
@@ -199,7 +173,7 @@ def execute(config):
             evaluation_metrics[model_name].append(auprc_df)
 
             if few_shot_learn_settings["save_model"]:
-                # save the trained model
+                # save the trained model_params
                 model_filepath = model_store_filepath.format(output_prefix=output_prefix, model_name=model_name, itr=iter)
                 torch.save(few_shot_classifier.state_dict(), model_filepath)
                 print(f"Model output written to {model_filepath}")
@@ -245,7 +219,7 @@ def run_few_shot_learning(model, train_dataset_loader, val_dataset_loader, test_
             print("Breaking off training loop due to early stop.")
             break
 
-    # choose the model with the lowest validation loss from the early stopper
+    # choose the model_params with the lowest validation loss from the early stopper
     best_performing_model = early_stopper.get_current_best_model()
 
     # meta testing

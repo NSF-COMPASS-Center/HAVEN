@@ -1,9 +1,11 @@
 import torch
 import torch.nn as nn
 import gc
+from models.protein_sequence_classification import ProteinSequenceClassification
+
 
 class PrototypicalNetworkFewShotClassifier(nn.Module):
-    def __init__(self, pre_trained_model):
+    def __init__(self, pre_trained_model: ProteinSequenceClassification):
         super(PrototypicalNetworkFewShotClassifier, self).__init__()
         self.pre_trained_model = nn.DataParallel(pre_trained_model)
 

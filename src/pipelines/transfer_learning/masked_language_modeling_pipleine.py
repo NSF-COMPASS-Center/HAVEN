@@ -10,7 +10,7 @@ import wandb
 
 from utils import dataset_utils, nn_utils, evaluation_utils, constants
 from training.early_stopping import EarlyStopping
-from models.nlp.transformer import transformer
+from models.baseline.nlp.transformer import transformer
 from transfer_learning.pre_training import pre_training_masked_language_modeling
 
 
@@ -57,7 +57,7 @@ def execute(config):
         "output_prefix": output_prefix
     }
 
-    # Path to store the pre-trained encoder model
+    # Path to store the pre-trained encoder model_params
     encoder_model_name = encoder_settings["model_name"]
     encoder_model_filepath = os.path.join(output_dir, results_dir, sub_dir, f"{encoder_model_name}_{output_prefix}" + "_itr{itr}.pth")
     mlm_checkpoint_filepath = os.path.join(output_dir, results_dir, sub_dir, "checkpoints", f"{encoder_model_name}_{output_prefix}" + "_itr{itr}_checkpt{checkpt}.pth")
@@ -70,7 +70,7 @@ def execute(config):
         print(f"Iteration {iter}")
         # Initialize Weights & Biases for each run
         wandb_config["hidden_dim"] = encoder_settings["hidden_dim"]
-        wandb_config["depth"] = encoder_settings["depth"]
+        wandb_config["n_mlp_layers"] = encoder_settings["n_mlp_layers"]
         wandb.init(project="zoonosis-host-prediction",
                    config=wandb_config,
                    group=training_settings["experiment"],
@@ -90,10 +90,10 @@ def execute(config):
         train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, exclude_label=True)
         val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, exclude_label=True)
 
-        # 3. instantiate the encoder model
+        # 3. instantiate the encoder model_params
         encoder_model = transformer.get_transformer_encoder(encoder_settings)
 
-        # 4. instantiate the mlm model
+        # 4. instantiate the mlm model_params
         mlm_model = pre_training_masked_language_modeling.get_mlm_model(encoder_model=encoder_model,
                                                                         mlm_model=mlm_settings)
 
@@ -142,7 +142,7 @@ def run(model, train_dataset_loader, val_dataset_loader, training_settings,
                                  e, mlm_checkpoint_filepath)
 
     # no need to evaluate on a test dataset as this is self-supervised learning
-    # return the current best model, i.e. the model with the lowest validation loss
+    # return the current best model_params, i.e. the model_params with the lowest validation loss
     return early_stopper.get_current_best_model()
 
 

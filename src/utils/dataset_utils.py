@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import pandas as pd
 import os
 
-from utils import utils, kmer_utils, constants
+from utils import utils, kmer_utils, constants, mapper
 from datasets.collations.padding import Padding, PaddingUnlabeled
 from datasets.collations.padding_with_id import PaddingWithID
 from datasets.protein_sequence_dataset import ProteinSequenceDataset
@@ -16,6 +16,7 @@ from datasets.protein_sequence_unlabeled_dataset import ProteinSequenceUnlabeled
 from datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWithID
 from datasets.protein_sequence_kmer_dataset import ProteinSequenceKmerDataset
 from datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
+from datasets.protein_sequence_custom_dataset import ProteinSequenceProstT5Dataset
 from datasets.collations.fsl_episode import FewShotLearningEpisode
 from datasets.samplers.fsl_fixed_task_sampler import FewShotLearningFixedTaskSampler
 from datasets.samplers.fsl_varying_task_sampler import FewShotLearningVaryingTaskSampler
@@ -153,6 +154,14 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
 
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func)
 
+def get_external_dataset_loader(df, sequence_settings, label_col, name):
+    sequence_col = sequence_settings["sequence_col"]
+    batch_size = sequence_settings["batch_size"]
+    max_seq_len = sequence_settings["max_sequence_length"]
+    truncate = sequence_settings["truncate"]
+
+    dataset = mapper.dataset_map[name](df, sequence_col, max_seq_len, truncate, label_col)
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
 
 def get_token_with_id_dataset_loader(df, sequence_settings, label_col):
     seq_col = sequence_settings["sequence_col"]

@@ -1,4 +1,4 @@
-from models.nlp.transformer import transformer
+from models.baseline.nlp.transformer import transformer
 from models.nlp import cnn1d, rnn, lstm, fnn
 from utils import nn_utils
 import joblib

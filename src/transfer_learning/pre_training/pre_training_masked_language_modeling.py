@@ -1,10 +1,9 @@
 import torch.nn as nn
 import torch
-from models.nlp.transformer.transformer import TransformerEncoder
 from utils import nn_utils, constants
 
 
-# only encoder
+# masked langauge modeling (BERT)
 class MaskedLanguageModel(nn.Module):
     def __init__(self, encoder_model, encoder_dim, mask_prob=0.15, random_mask_prob=0.1, no_change_mask_prob=0.1):
         super(MaskedLanguageModel, self).__init__()
