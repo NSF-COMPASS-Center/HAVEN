@@ -24,6 +24,7 @@ sequence_settings:
     max_sequence_length: 2048
     split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
+    collate_fn: "name_seq_collate_fn" # for ESM2
 
 fine_tune_settings:
   experiment: "ProstT5"
@@ -53,7 +54,7 @@ fine_tune_settings:
   task_settings:
     - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr1e-4"
       name: "ProstT5"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       pre_trained_model_link: "Rostlab/ProstT5"
@@ -62,6 +63,19 @@ fine_tune_settings:
       n_mlp_layers: 2
       n_classes: 5
       input_dim: 1024 # input embedding dimension
+      hidden_dim: 1024
+      data_parallel: False
+
+    - id: "esm2_msl2048_bn_fnn_2l_d1024_lr1e-4"
+      name: "ESM2"
+      active: True
+      mode: "train" # supported values: train, test
+      fine_tuned_model_name: "esm2_t6_8M_UR50D" # "esm2_t48_15B_UR50D"
+      repr_layer: 6 # 48
+      input_dim: 320 # 5120 # input embedding dimension
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 5
       hidden_dim: 1024
       data_parallel: False
 
