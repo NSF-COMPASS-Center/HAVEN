@@ -17,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 4
+    batch_size: 16
     id_col: "uniref90_id"
     sequence_col: "seq"
     truncate: False
@@ -70,9 +70,9 @@ fine_tune_settings:
       name: "ESM2"
       active: True
       mode: "train" # supported values: train, test
-      fine_tuned_model_name: "esm2_t6_8M_UR50D" # "esm2_t48_15B_UR50D"
-      repr_layer: 6 # 48
-      input_dim: 320 # 5120 # input embedding dimension
+      fine_tuned_model_name: "esm2_t33_650M_UR50D" # "esm2_t48_15B_UR50D"
+      repr_layer: 33 # 48
+      input_dim: 1280 # 5120 # input embedding dimension
       loss: "FocalLoss"
       n_mlp_layers: 2
       n_classes: 5
@@ -83,5 +83,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv/20241031/host_multi"
+  sub_dir: "uniref90_embl_vertebrates_non_idv/20241111/host_multi"
   prefix: "uniref90viridae" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

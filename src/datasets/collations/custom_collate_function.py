@@ -1,3 +1,4 @@
+import torch
 
 class ESM2CollateFunction:
 

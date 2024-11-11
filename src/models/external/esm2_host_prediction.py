@@ -24,7 +24,7 @@ class ESM2_VirusHostPrediction(ProteinSequenceClassification):
 
     def get_embedding(self, X):
         # tokenization
-        batch_labels, batch_strs, batch_tokens = self.tokenizer(X)
+        _, _, batch_tokens = self.tokenizer(X)
         batch_tokens = batch_tokens.to(nn_utils.get_device())
 
         batch_seq_lengths = (batch_tokens != self.alphabet.padding_idx).sum(1) # equal to lengths of sequences

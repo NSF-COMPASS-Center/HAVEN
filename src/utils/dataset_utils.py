@@ -169,7 +169,7 @@ def get_external_dataset_loader(df, sequence_settings, label_col, name):
 
     # get the custom collate function if it is defined in the collate_function_map (mapper.py).
     # if no collate function is defined, then the default is None
-    collate_fn = mapper.collate_function_map.get(name)
+    collate_fn = mapper.collate_function_map.get(name)()
 
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 
