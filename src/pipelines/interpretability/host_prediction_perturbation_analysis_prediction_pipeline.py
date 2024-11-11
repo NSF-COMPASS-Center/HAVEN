@@ -5,12 +5,8 @@ import torch.nn.functional as F
 import torch
 import tqdm
 
-from utils import utils, dataset_utils, nn_utils, constants
-from models.nlp.transformer import transformer
-from models.nlp.hybrid import transformer_attention
-from models.nlp import cnn1d, rnn, lstm, fnn
-from models.cv import cnn2d, cnn2d_pool
-from transfer_learning.fine_tuning import host_prediction_sequence
+from utils import utils, dataset_utils, nn_utils, constants, mapper
+from models.baseline.nlp.transformer.transformer import TransformerEncoder
 
 
 def execute(config):
@@ -39,6 +35,7 @@ def execute(config):
     prediction_model = None
 
     for model in models:
+        model_id = model["id"]  # unique identifier
         model_name = model["name"]
         mode = model["mode"]
 
@@ -47,26 +44,23 @@ def execute(config):
             continue
 
         pre_train_encoder_settings = model["pre_train_settings"]
-        sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
-
         pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
-        pre_train_encoder_settings["max_seq_len"] += 1 # adding 1 for the CLS token
 
-        # load pre-trained encoder model
-        pre_trained_encoder_model = transformer.get_transformer_encoder(pre_train_encoder_settings)
+        # load pre-trained encoder model_params
+        pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train_encoder_settings,
+                                                                               model["cls_token"])
         model["pre_trained_model"] = pre_trained_encoder_model
 
-        if "transfer_learning" in model_name:
-            print(f"Executing Transfer Learning (Pre-trained and fine tuned model) in {mode} mode")
-            prediction_model = host_prediction_sequence.get_host_prediction_model(model)
+        # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
+        # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
+        # it will be used if the model requires it, else it will be ignored
+        model["segment_len"] = sequence_settings["max_sequence_length"]
 
-        elif "hybrid_attention" in model_name:
-            print(f"Executing Hybrid Attention fine tuning in {mode} mode")
-            # add maximum sequence length of pretrained model as the segment_len size
-            model["segment_len"] = sequence_settings["max_sequence_length"]
-            prediction_model = transformer_attention.get_model(model)
-
+        if model_name in mapper.model_map:
+            print(f"Executing {model_name} in {mode} mode.")
+            prediction_model = mapper.model_map[model_name].get_model(model_params=model)
         else:
+            print(f"ERROR: Unknown model {model_name}.")
             continue
 
         prediction_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
