@@ -25,19 +25,19 @@ class ESM2_VirusHostPrediction(ProteinSequenceClassification):
     def get_embedding(self, X):
         # tokenization
         batch_labels, batch_strs, batch_tokens = self.tokenizer(X)
-        batch_tokens = batch_tokens.to("cuda" if torch.cuda.is_available() else "cpu")
+        batch_tokens = batch_tokens.to(nn_utils.get_device())
 
-        batch_lens = (batch_tokens != self.alphabet.padding_idx).sum(1) # equal to lengths of sequences
+        batch_seq_lengths = (batch_tokens != self.alphabet.padding_idx).sum(1) # equal to lengths of sequences
 
         # get pre-residue embedding
         with torch.no_grad():
             output = self.pre_trained_model(batch_tokens, repr_layers=[self.repr_layer])
         token_embeddings = output["representations"][self.repr_layer]
 
-        # get per-sequence embedding via averaging (excluding padding, start and end tokens)
+        # get per-sequence embedding via averaging (excluding padding, start, and end tokens)
         sequence_embeddings = []
-        for i, tokens_len in enumerate(batch_lens):
-            sequence_embedding = token_embeddings[i, 1: tokens_len - 1].mean(0)
+        for i, seq_length in enumerate(batch_seq_lengths):
+            sequence_embedding = token_embeddings[i, 1: seq_length - 1].mean(0)
             sequence_embeddings.append(sequence_embedding)
 
         return torch.stack(sequence_embeddings)
@@ -50,13 +50,8 @@ class ESM2_VirusHostPrediction(ProteinSequenceClassification):
                                          n_classes=model_params["n_classes"],
                                          max_seq_length=model_params["max_seq_length"],
                                          model_name=model_params["fine_tuned_model_name"],
-                                         repr_layer=model_params["repr_layer"]
-                                         )
+                                         repr_layer=model_params["repr_layer"])
         print(model)
         print("ESM2_VirusHostPrediction: Number of parameters = ",
               sum(p.numel() for p in model.parameters() if p.requires_grad))
-
-        if nn_utils.get_device() == "cpu":
-            print("Casting model to full precision for running on CPU.")
-            model.to(torch.float32)
         return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])

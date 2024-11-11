@@ -156,13 +156,6 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func)
 
 
-def name_seq_collate_fn(batch):
-    # batch is a list of ((name, sequence), label) tuples
-    names_sequences = [(item[0][0], item[0][1]) for item in batch]  #(name, sequence)
-    labels = torch.stack([item[1] for item in batch])  #labels
-
-    return names_sequences, labels
-
 def get_external_dataset_loader(df, sequence_settings, label_col, name):
     sequence_col = sequence_settings["sequence_col"]
     batch_size = sequence_settings["batch_size"]
@@ -170,12 +163,16 @@ def get_external_dataset_loader(df, sequence_settings, label_col, name):
     truncate = sequence_settings["truncate"]
     id_col = sequence_settings["id_col"]
 
-    dataset = mapper.dataset_map[name](df, sequence_col, max_seq_len, truncate, label_col, id_col)
+    dataset = mapper.dataset_map[name](df=df, sequence_col=sequence_col,
+                                       max_seq_len=max_seq_len, truncate=truncate,
+                                       label_col=label_col, id_col=id_col)
 
-    if sequence_settings.get("collate_fn") == "name_seq_collate_fn":
-        return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=name_seq_collate_fn)
-    else:
-        return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
+    # get the custom collate function if it is defined in the collate_function_map (mapper.py).
+    # if no collate function is defined, then the default is None
+    collate_fn = mapper.collate_function_map.get(name, default=None)
+
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
+
 
 def get_token_with_id_dataset_loader(df, sequence_settings, label_col):
     seq_col = sequence_settings["sequence_col"]

@@ -14,6 +14,8 @@ from models.external.esm2_host_prediction import ESM2_VirusHostPrediction
 from datasets.protein_sequence_custom_dataset import ProteinSequenceProstT5Dataset
 from datasets.protein_sequence_custom_dataset import ProteinSequenceESM2Dataset
 
+from datasets.collations.custom_collate_function import ESM2CollateFunction
+
 # mappings of all classes
 model_map = {
     "FNN": FNN_VirusHostPrediction,
@@ -31,4 +33,8 @@ model_map = {
 dataset_map = {
     "ProstT5": ProteinSequenceProstT5Dataset,
     "ESM2": ProteinSequenceESM2Dataset
+}
+
+collate_function_map = {
+    "ESM2": ESM2CollateFunction
 }
