@@ -7,10 +7,9 @@ class ProstT5_VirusHostPrediction(ProteinSequenceClassification):
     """
     Fine tuning ProstT5 (https://github.com/mheinzinger/ProstT5) for Virus Host Prediction
     """
-    def __init__(self, input_dim, hidden_dim, n_mlp_layers, n_classes, max_seq_length, pre_trained_model_link, hugging_face_cache_dir):
+    def __init__(self, input_dim, hidden_dim, n_mlp_layers, n_classes, pre_trained_model_link, hugging_face_cache_dir):
         super(ProstT5_VirusHostPrediction, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes,
                                                             batch_norm=True)
-        self.max_seq_length = max_seq_length
         self.tokenizer, self.pre_trained_model = self.initialize_pre_trained_model(pre_trained_model_link, hugging_face_cache_dir)
         self.pre_trained_model.eval()
 
@@ -39,7 +38,6 @@ class ProstT5_VirusHostPrediction(ProteinSequenceClassification):
                                          hidden_dim=model_params["hidden_dim"],
                                          n_mlp_layers=model_params["n_mlp_layers"],
                                          n_classes=model_params["n_classes"],
-                                         max_seq_length=model_params["max_seq_length"],
                                          pre_trained_model_link=model_params["pre_trained_model_link"],
                                          hugging_face_cache_dir=model_params["hugging_face_cache_dir"])
         print(model)
