@@ -7,7 +7,10 @@ import torch
 
 
 class ProteinSequenceDataset(Dataset):
-    def __init__(self, df, sequence_col, label_col, truncate, max_seq_len):
+    # using **kwargs to tackle the passing of id_col for certain custom datasets
+    # TODO: cleaner way to handle this is to pass the entire sequence_settings map as a single parameter
+    #  and pick whatever is required in the respective datasets.
+    def __init__(self, df, sequence_col, label_col, truncate, max_seq_len, **kwargs):
         super(ProteinSequenceDataset, self).__init__()
         self.sequence_col = sequence_col
         self.label_col = label_col

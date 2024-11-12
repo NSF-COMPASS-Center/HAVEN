@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 
 import pandas as pd
 import os
+import torch
 
 from utils import utils, kmer_utils, constants, mapper
 from datasets.collations.padding import Padding, PaddingUnlabeled
@@ -37,12 +38,14 @@ def read_dataset(input_dir, input_file_names, cols):
     print(f"Size of input dataset = {df.shape}")
     return df
 
+
 def split_dataset(df, seed, train_proportion):
     print(f"Splitting dataset with seed={seed}, train_proportion={train_proportion}")
     train_df, test_df = train_test_split(df, train_size=train_proportion, random_state=seed)
     print(f"Size of train_dataset = {train_df.shape}")
     print(f"Size of test_dataset = {test_df.shape}")
     return train_df, test_df
+
 
 def split_dataset_stratified(df, seed, train_proportion, stratify_col=None):
     print(f"Splitting dataset with seed={seed}, train_proportion={train_proportion}, stratify_col={stratify_col}")
@@ -120,6 +123,7 @@ def load_kmer_dataset(input_dir, input_file_names, seed, train_proportion,
     print(f"kmer_df size after join with split on id = {kmer_df.shape}")
     return index_label_map, kmer_df
 
+
 def get_dataset_loader(df, sequence_settings, label_col=None, include_id_col=False, exclude_label=False):
     feature_type = sequence_settings["feature_type"]
     # supported values: kmer, cgr, token
@@ -154,14 +158,24 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
 
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func)
 
+
 def get_external_dataset_loader(df, sequence_settings, label_col, name):
     sequence_col = sequence_settings["sequence_col"]
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
     truncate = sequence_settings["truncate"]
+    id_col = sequence_settings["id_col"]
 
-    dataset = mapper.dataset_map[name](df, sequence_col, max_seq_len, truncate, label_col)
-    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
+    dataset = mapper.dataset_map[name](df=df, sequence_col=sequence_col,
+                                       max_seq_len=max_seq_len, truncate=truncate,
+                                       label_col=label_col, id_col=id_col)
+
+    # get the custom collate function if it is defined in the collate_function_map (mapper.py).
+    # if no collate function is defined, then the default is None
+    collate_fn = mapper.collate_function_map.get(name)()
+
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
+
 
 def get_token_with_id_dataset_loader(df, sequence_settings, label_col):
     seq_col = sequence_settings["sequence_col"]
