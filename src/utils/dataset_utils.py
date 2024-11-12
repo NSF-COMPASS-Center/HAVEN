@@ -38,12 +38,14 @@ def read_dataset(input_dir, input_file_names, cols):
     print(f"Size of input dataset = {df.shape}")
     return df
 
+
 def split_dataset(df, seed, train_proportion):
     print(f"Splitting dataset with seed={seed}, train_proportion={train_proportion}")
     train_df, test_df = train_test_split(df, train_size=train_proportion, random_state=seed)
     print(f"Size of train_dataset = {train_df.shape}")
     print(f"Size of test_dataset = {test_df.shape}")
     return train_df, test_df
+
 
 def split_dataset_stratified(df, seed, train_proportion, stratify_col=None):
     print(f"Splitting dataset with seed={seed}, train_proportion={train_proportion}, stratify_col={stratify_col}")
@@ -120,6 +122,7 @@ def load_kmer_dataset(input_dir, input_file_names, seed, train_proportion,
     kmer_df = kmer_df.join(df["split"], on=id_col, how="left")
     print(f"kmer_df size after join with split on id = {kmer_df.shape}")
     return index_label_map, kmer_df
+
 
 def get_dataset_loader(df, sequence_settings, label_col=None, include_id_col=False, exclude_label=False):
     feature_type = sequence_settings["feature_type"]
