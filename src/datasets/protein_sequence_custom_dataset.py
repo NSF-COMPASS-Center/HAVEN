@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 class ProteinSequenceProstT5Dataset(ProteinSequenceDataset):
-    def __init__(self, df, sequence_col, max_seq_len, truncate, label_col):
+    def __init__(self, df, sequence_col, max_seq_len, truncate, label_col, id_col=None):
         super(ProteinSequenceProstT5Dataset, self).__init__(df, sequence_col, label_col, truncate, max_seq_len)
 
     def __getitem__(self, idx: int):
@@ -36,3 +36,13 @@ class ProteinSequenceESM2Dataset(ProteinSequenceDatasetWithID):
         formatted_sequence = (record[self.id_col], record[self.sequence_col])
 
         return formatted_sequence, torch.tensor(record[self.label_col], device=nn_utils.get_device())
+
+class ProteinSequenceESM3Dataset(ProteinSequenceDataset):
+    def __init__(self, df, sequence_col, max_seq_len, truncate, label_col, id_col=None):
+        super(ProteinSequenceESM3Dataset, self).__init__(df, sequence_col, label_col, truncate, max_seq_len)
+
+    def __getitem__(self, idx: int):
+        # loc selects based on index in df
+        # iloc selects based on integer location (0, 1, 2, ...)
+        record = self.data.iloc[idx, :]
+        return record[self.sequence_col], torch.tensor(record[self.label_col], device=nn_utils.get_device())

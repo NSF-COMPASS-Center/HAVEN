@@ -27,7 +27,7 @@ class ESM2_VirusHostPrediction(ProteinSequenceClassification):
         _, _, batch_tokens = self.tokenizer(X)
         batch_tokens = batch_tokens.to(nn_utils.get_device())
 
-        batch_seq_lengths = (batch_tokens != self.alphabet.padding_idx).sum(1) # equal to lengths of sequences
+        batch_token_lengths = (batch_tokens != self.alphabet.padding_idx).sum(1) # equal to lengths of sequences + 2
 
         # get pre-residue embedding
         with torch.no_grad():
@@ -36,8 +36,8 @@ class ESM2_VirusHostPrediction(ProteinSequenceClassification):
 
         # get per-sequence embedding via averaging (excluding padding, start, and end tokens)
         sequence_embeddings = []
-        for i, seq_length in enumerate(batch_seq_lengths):
-            sequence_embedding = token_embeddings[i, 1: seq_length - 1].mean(0)
+        for i, token_length in enumerate(batch_token_lengths):
+            sequence_embedding = token_embeddings[i, 1: token_length - 1].mean(0)
             sequence_embeddings.append(sequence_embedding)
 
         return torch.stack(sequence_embeddings)
