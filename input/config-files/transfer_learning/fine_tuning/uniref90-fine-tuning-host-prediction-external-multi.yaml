@@ -17,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 16
+    batch_size: 8
     id_col: "uniref90_id"
     sequence_col: "seq"
     truncate: False
@@ -26,7 +26,7 @@ sequence_settings:
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 fine_tune_settings:
-  experiment: "ProstT5"
+  experiment: "external"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
@@ -35,7 +35,7 @@ fine_tune_settings:
 
   training_settings:
     n_epochs: 50
-    max_lr: 1e-4
+    max_lr: 3e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -51,9 +51,9 @@ fine_tune_settings:
       "Red junglefowl": [ "Gallus gallus" ]
 
   task_settings:
-    - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr1e-4"
+    - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       pre_trained_model_link: "Rostlab/ProstT5"

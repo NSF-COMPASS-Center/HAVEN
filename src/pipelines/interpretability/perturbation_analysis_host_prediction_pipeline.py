@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import torch
 import tqdm
 
-from utils import utils, dataset_utils, nn_utils, constants, mapper
+from utils import utils, dataset_utils, nn_utils, constants, mapper, perturbation_analysis_utils
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
 
 
@@ -75,7 +75,7 @@ def execute(config):
     print(f"Number of input files = {len(input_files)}")
     for input_file in input_files:
         # check if the input file has already been processed
-        if is_input_file_processed(input_file, preexisting_output_files):
+        if perturbation_analysis_utils.is_input_file_processed(input_file, preexisting_output_files):
             print(f"Skipping preprocessed input: {input_file}")
             continue
         print(input_file)
@@ -91,7 +91,7 @@ def execute(config):
         test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col, include_id_col=True)
 
         # 4. Generate predictions
-        result_df = evaluate_model(prediction_model, test_dataset_loader, id_col)
+        result_df = perturbation_analysis_utils.evaluate_model(prediction_model, test_dataset_loader, id_col)
 
         # 5. Create the result dataframe and remap the class indices to original input labels
         result_df.rename(columns=index_label_map, inplace=True)
@@ -99,47 +99,7 @@ def execute(config):
 
         # 6. Write the raw results in csv files
         output_prefix_curr = output_prefix + "_" + Path(input_file).stem
-        write_output(result_df, output_results_dir, output_prefix_curr, output_type="output")
+        perturbation_analysis_utils.write_output(result_df, output_results_dir, output_prefix_curr, output_type="output")
 
         # 7. clear memory
         del df, test_dataset_loader, result_df
-
-
-def evaluate_model(model, dataset_loader, id_col):
-    with torch.no_grad():
-        model.eval()
-
-        results = []
-        val_loss = []
-        for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
-            id, input, label = record
-
-            output = model(input)  # b x n_classes
-            output = output.to(nn_utils.get_device())
-
-            # to get probabilities of the output
-            output = F.softmax(output, dim=-1)
-            result_df = pd.DataFrame(output.cpu().numpy())
-            result_df[id_col] = id
-            result_df["y_true"] = label.cpu().numpy()
-            results.append(result_df)
-    return pd.concat(results, ignore_index=True)
-
-
-def write_output(df, output_dir, output_prefix, output_type):
-    output_file_name = f"{output_prefix}.csv"
-    output_file_path = os.path.join(output_dir, output_file_name)
-    # 5. Write the classification output
-    print(f"Writing {output_type} to {output_file_path}: {df.shape}")
-    df.to_csv(output_file_path, index=False)
-
-
-def is_input_file_processed(input_file, preexisting_output_files):
-    is_present = False
-
-    for f in preexisting_output_files:
-        if input_file in f:
-            is_present = True
-            break
-
-    return is_present

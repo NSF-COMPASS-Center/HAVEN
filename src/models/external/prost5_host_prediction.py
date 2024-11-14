@@ -7,10 +7,9 @@ class ProstT5_VirusHostPrediction(ProteinSequenceClassification):
     """
     Fine tuning ProstT5 (https://github.com/mheinzinger/ProstT5) for Virus Host Prediction
     """
-    def __init__(self, input_dim, hidden_dim, n_mlp_layers, n_classes, max_seq_length, pre_trained_model_link, hugging_face_cache_dir):
+    def __init__(self, input_dim, hidden_dim, n_mlp_layers, n_classes, pre_trained_model_link, hugging_face_cache_dir):
         super(ProstT5_VirusHostPrediction, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes,
                                                             batch_norm=True)
-        self.max_seq_length = max_seq_length
         self.tokenizer, self.pre_trained_model = self.initialize_pre_trained_model(pre_trained_model_link, hugging_face_cache_dir)
         self.pre_trained_model.eval()
 
@@ -24,22 +23,26 @@ class ProstT5_VirusHostPrediction(ProteinSequenceClassification):
 
 
     def get_embedding(self, X):
-        token_encoding = self.tokenizer.batch_encode_plus(X, add_special_tokens=True, padding="longest")
+        sequences, sequence_lengths = X
+        token_encoding = self.tokenizer.batch_encode_plus(sequences, add_special_tokens=True, padding="longest")
         input_ids = torch.tensor(token_encoding["input_ids"]).to(nn_utils.get_device())
         attention_mask = torch.tensor(token_encoding["attention_mask"]).to(nn_utils.get_device())
 
         embedding_representation = self.pre_trained_model(input_ids, attention_mask=attention_mask)
-        embedding = embedding_representation.last_hidden_state
 
-        return embedding.mean(dim=1)
+        # get per-sequence embedding by averaging the embedding of only the amino acid tokens (excluding padding and start[<AA2fold>] and end tokens)
+        sequence_embeddings = []
+        for i, seq_length in enumerate(sequence_lengths):
+            sequence_embedding = embedding_representation.last_hidden_state[i, 1: seq_length + 1].mean(0)
+            sequence_embeddings.append(sequence_embedding)
 
+        return torch.stack(sequence_embeddings)
 
     def get_model(model_params) -> ProteinSequenceClassification:
         model = ProstT5_VirusHostPrediction(input_dim=model_params["input_dim"],
                                          hidden_dim=model_params["hidden_dim"],
                                          n_mlp_layers=model_params["n_mlp_layers"],
                                          n_classes=model_params["n_classes"],
-                                         max_seq_length=model_params["max_seq_length"],
                                          pre_trained_model_link=model_params["pre_trained_model_link"],
                                          hugging_face_cache_dir=model_params["hugging_face_cache_dir"])
         print(model)

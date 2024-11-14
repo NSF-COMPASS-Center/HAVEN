@@ -8,7 +8,7 @@ class ESM2_VirusHostPrediction(ProteinSequenceClassification):
     """
      Using ESM2 (https://github.com/facebookresearch/esm) for Virus Host Prediction
     """
-    def __init__(self, input_dim, hidden_dim, n_mlp_layers, n_classes, max_seq_length, model_name, repr_layer):
+    def __init__(self, input_dim, hidden_dim, n_mlp_layers, n_classes, model_name, repr_layer):
         super(ESM2_VirusHostPrediction, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes,
                                                             batch_norm=True)
         self.repr_layer = repr_layer
@@ -27,7 +27,7 @@ class ESM2_VirusHostPrediction(ProteinSequenceClassification):
         _, _, batch_tokens = self.tokenizer(X)
         batch_tokens = batch_tokens.to(nn_utils.get_device())
 
-        batch_token_lengths = (batch_tokens != self.alphabet.padding_idx).sum(1) # equal to lengths of sequences + 2
+        batch_seq_lengths = (batch_tokens != self.alphabet.padding_idx).sum(1) # equal to lengths of sequences + 2 (+ 2 to account for start and end tokens)
 
         # get pre-residue embedding
         with torch.no_grad():
@@ -48,7 +48,6 @@ class ESM2_VirusHostPrediction(ProteinSequenceClassification):
                                          hidden_dim=model_params["hidden_dim"],
                                          n_mlp_layers=model_params["n_mlp_layers"],
                                          n_classes=model_params["n_classes"],
-                                         max_seq_length=model_params["max_seq_length"],
                                          model_name=model_params["fine_tuned_model_name"],
                                          repr_layer=model_params["repr_layer"])
         print(model)

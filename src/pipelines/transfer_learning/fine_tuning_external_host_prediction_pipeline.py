@@ -92,9 +92,6 @@ def execute(config):
                 val_dataset_loader = dataset_utils.get_external_dataset_loader(val_df, sequence_settings, label_col, task_name)
             test_dataset_loader = dataset_utils.get_external_dataset_loader(test_df, sequence_settings, label_col, task_name)
 
-            # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
-            task["max_seq_length"] = sequence_settings["max_sequence_length"]
-
             if task_name in mapper.model_map:
                 print(f"Executing {task_name} in {mode} mode.")
                 fine_tune_model = mapper.model_map[task_name].get_model(model_params=task)

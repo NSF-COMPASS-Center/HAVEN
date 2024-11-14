@@ -159,7 +159,7 @@ def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func)
 
 
-def get_external_dataset_loader(df, sequence_settings, label_col, name):
+def get_external_dataset_loader(df, sequence_settings, label_col, name, include_id_col=False):
     sequence_col = sequence_settings["sequence_col"]
     batch_size = sequence_settings["batch_size"]
     max_seq_len = sequence_settings["max_sequence_length"]
@@ -168,14 +168,15 @@ def get_external_dataset_loader(df, sequence_settings, label_col, name):
 
     dataset = mapper.dataset_map[name](df=df, sequence_col=sequence_col,
                                        max_seq_len=max_seq_len, truncate=truncate,
-                                       label_col=label_col, id_col=id_col)
+                                       label_col=label_col, id_col=id_col, include_id_col=include_id_col)
 
     # get the custom collate function if it is defined in the collate_function_map (mapper.py).
     # if no collate function is defined, then the default is None
     collate_fn = mapper.collate_function_map.get(name)
 
-    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
-                      collate_fn=collate_fn() if collate_fn is not None else None)
+    if collate_fn:
+        collate_fn = collate_fn()
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 
 
 def get_token_with_id_dataset_loader(df, sequence_settings, label_col):
