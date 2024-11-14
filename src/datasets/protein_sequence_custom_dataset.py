@@ -50,9 +50,10 @@ class ProteinSequenceESM2Dataset(ProteinSequenceDatasetWithID):
             return formatted_sequence, torch.tensor(record[self.label_col], device=nn_utils.get_device())
 
 
-class ProteinSequenceESM3Dataset(ProteinSequenceDataset):
-    def __init__(self, df, sequence_col, max_seq_len, truncate, label_col, id_col=None):
-        super(ProteinSequenceESM3Dataset, self).__init__(df, sequence_col, label_col, truncate, max_seq_len)
+class ProteinSequenceESM3Dataset(ProteinSequenceDatasetWithID):
+    def __init__(self, df, sequence_col, max_seq_len, truncate, label_col, id_col, include_id_col):
+        super(ProteinSequenceESM3Dataset, self).__init__(df, id_col, sequence_col, max_seq_len, truncate, label_col)
+        self.include_id_col = include_id_col
 
     def __getitem__(self, idx: int):
         # loc selects based on index in df
