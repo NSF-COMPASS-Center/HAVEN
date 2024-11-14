@@ -23,15 +23,20 @@ class ProstT5_VirusHostPrediction(ProteinSequenceClassification):
 
 
     def get_embedding(self, X):
-        token_encoding = self.tokenizer.batch_encode_plus(X, add_special_tokens=True, padding="longest")
+        sequences, sequence_lengths = X
+        token_encoding = self.tokenizer.batch_encode_plus(sequences, add_special_tokens=True, padding="longest")
         input_ids = torch.tensor(token_encoding["input_ids"]).to(nn_utils.get_device())
         attention_mask = torch.tensor(token_encoding["attention_mask"]).to(nn_utils.get_device())
 
         embedding_representation = self.pre_trained_model(input_ids, attention_mask=attention_mask)
-        embedding = embedding_representation.last_hidden_state
 
-        return embedding.mean(dim=1)
+        # get per-sequence embedding by averaging the embedding of only the amino acid tokens (excluding padding and start[<AA2fold>] and end tokens)
+        sequence_embeddings = []
+        for i, seq_length in enumerate(sequence_lengths):
+            sequence_embedding = embedding_representation.last_hidden_state[i, 1: seq_length + 1].mean(0)
+            sequence_embeddings.append(sequence_embedding)
 
+        return torch.stack(sequence_embeddings)
 
     def get_model(model_params) -> ProteinSequenceClassification:
         model = ProstT5_VirusHostPrediction(input_dim=model_params["input_dim"],

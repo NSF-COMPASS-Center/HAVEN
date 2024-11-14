@@ -17,16 +17,16 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 4
+    batch_size: 8
     id_col: "uniref90_id"
     sequence_col: "seq"
     truncate: False
-    max_sequence_length: 4096
+    max_sequence_length: 2048
     split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 fine_tune_settings:
-  experiment: "ProstT5"
+  experiment: "external"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
@@ -35,7 +35,7 @@ fine_tune_settings:
 
   training_settings:
     n_epochs: 50
-    max_lr: 1e-4
+    max_lr: 3e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -54,7 +54,7 @@ fine_tune_settings:
       "Chinese rufous horseshoe bat": [ "rhinolophus sinicus" ]
 
   task_settings:
-    - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr1e-4"
+    - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
       active: True
       mode: "train" # supported values: train, test
@@ -72,5 +72,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241104/host_multi/fine_tuning_hybrid"
+  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241114/host_multi/external"
   prefix: "uniref90coronaviridae" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

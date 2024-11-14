@@ -15,16 +15,20 @@ class ProteinSequenceProstT5Dataset(ProteinSequenceDatasetWithID):
         # iloc selects based on integer location (0, 1, 2, ...)
         record = self.data.iloc[idx, :]
         sequence = record[self.sequence_col]
+        sequence_length = len(sequence)
 
         sequence = sequence.replace("U", "X").replace("Z", "X").replace("O", "X")
         # Add spaces between each amino acid for PT5 to correctly use them
         sequence = " ".join(sequence)
         # AAs to 3Di (or if you want to embed AAs): prepend "<AA2fold>"
-        # sequence = "<AA2fold>" + " " + sequence
+        sequence = "<AA2fold>" + " " + sequence
+
+        # return a tuple of (sequence, sequence_length) as the sequence length will be used in the get_embedding() method to retrieve the embeddings of
+        # only the amino acid tokens while excluding the padding, start, and end special tokens.
         if self.include_id_col:
-            return record[self.id_col], sequence, torch.tensor(record[self.label_col], device=nn_utils.get_device())
+            return record[self.id_col], (sequence, sequence_length), torch.tensor(record[self.label_col], device=nn_utils.get_device()), sequence_length
         else:
-            return sequence, torch.tensor(record[self.label_col], device=nn_utils.get_device())
+            return (sequence, sequence_length), torch.tensor(record[self.label_col], device=nn_utils.get_device())
 
 class ProteinSequenceESM2Dataset(ProteinSequenceDatasetWithID):
     def __init__(self, df, sequence_col, max_seq_len, truncate, label_col, id_col, include_id_col):
