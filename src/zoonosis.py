@@ -3,7 +3,7 @@ import argparse
 
 from pipelines.virus_host_prediction_baseline import host_prediction_pipeline
 from pipelines.transfer_learning import masked_language_modeling_pipleine, fine_tuning_host_prediction_pipeline, fine_tuning_external_host_prediction_pipeline
-from pipelines.interpretability import host_prediction_perturbation_analysis_prediction_pipeline
+from pipelines.interpretability import perturbation_analysis_host_prediction_pipeline, perturbation_analysis_external_host_prediction_pipeline
 from pipelines.few_shot_learning import few_shot_learning_host_prediction_pipeline
 from evaluation import evaluation
 from models.baseline.std_ml import feature_importance
@@ -23,9 +23,9 @@ def main():
     config = utils.parse_config(args.config)
     print(config)
     config_type = config["config_type"]
+    config_sub_type = config.get("config_sub_type")
     # transfer-learning
     if config_type == "transfer_learning":
-        config_sub_type = config["config_sub_type"]
         # transfer-learning: pre-training
         if config_sub_type == "masked_language_modeling":
             masked_language_modeling_pipleine.execute(config)
@@ -45,9 +45,12 @@ def main():
     # evaluation
     elif config_type == "evaluation":
         evaluation.execute(config)
-    # evaluation
+    # perturbation analysis
     elif config_type == "host_prediction_perturbation":
-        host_prediction_perturbation_analysis_prediction_pipeline.execute(config)
+        if config_sub_type == "external":
+            perturbation_analysis_external_host_prediction_pipeline.execute(config)
+        else:
+            perturbation_analysis_host_prediction_pipeline.execute(config)
 
     # feature_importance for baseline models
     # TODO: >>>> DEPRECATED <<<< (Remove all corresponding code)
