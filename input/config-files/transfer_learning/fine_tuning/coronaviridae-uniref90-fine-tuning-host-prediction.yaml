@@ -17,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 64
+    batch_size: 16
     id_col: "uniref90_id"
     sequence_col: "seq"
     truncate: False
@@ -36,7 +36,7 @@ pre_train_settings:
     max_seq_len: 256
 
 fine_tune_settings:
-  experiment: "fine_tuning_hybrid_allemb_batchnorm_coronaviridae_s_prot_uniref90"
+  experiment: "virprobert_coronaviridae_s_prot_uniref90"
   n_iterations: 5
   split_input: True
   train_proportion: 0.8
@@ -46,7 +46,7 @@ fine_tune_settings:
   training_settings:
     n_epochs_freeze: 20
     n_epochs_unfreeze: 30
-    max_lr: 1e-5
+    max_lr: 3e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -68,31 +68,24 @@ fine_tune_settings:
 
 
   task_settings:
-    - name: "host_prediction_fnn_2l_d1024_lr1e-4"
-      active: False
-      mode: "train" # supported values: train, test
-      fine_tuned_model_path: ""
-      loss: "FocalLoss"
-      depth: 2
-      n_classes: 8
-      input_dim: 512 # input embedding dimension
-      hidden_dim: 1024
-
-    - name: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5"
+    - id: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4"
+      name: "VirProBERT"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
+      segment_len: 256
       stride: 64
       cls_token: True
       n_heads: 8
       loss: "FocalLoss"
-      depth: 2
+      n_mlp_layers: 2
       n_classes: 8
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
+      data_parallel: False
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240909/host_multi/fine_tuning_hybrid_cls"
+  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241117/host_multi/virprobert"
   prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
