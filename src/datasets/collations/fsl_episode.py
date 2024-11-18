@@ -51,7 +51,7 @@ class FewShotLearningEpisode:
 
         # to induce stochasticity, shuffle the indices for each label so that different samples are chosen as support sequences in each batch
         # default shuffle setting is True
-        # only for few shot evaluation, the suffle is set to False because the first n_shot support sequences are from a different exclusive support dataset
+        # only for few shot evaluation, the shuffle is set to False because the first n_shot support sequences are from a different exclusive support dataset
             ## not always True
             ## For example: unseen hosts in an unseen virus
             ## In such cases, the support sequences will also be picked from the query dataset
