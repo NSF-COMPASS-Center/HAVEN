@@ -11,7 +11,7 @@ classification_settings:
   model_type: "perturbed_dataset_prediction"  # options: baseline, nlp, perturbed_dataset_prediction
   type: "multi"
   sequence_settings:
-    batch_size: 32
+    batch_size: 16
     id_col: "id"
     sequence_col: "seq"
     max_sequence_length: 4096
@@ -38,7 +38,7 @@ classification_settings:
       "Chinese rufous horseshoe bat": ["rhinolophus sinicus"]
 
   models:
-    - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
+    - id: "prostt5_bn_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
       active: True
       mode: "test" # supported values: train, test
