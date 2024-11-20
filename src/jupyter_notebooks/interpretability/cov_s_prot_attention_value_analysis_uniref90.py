@@ -55,26 +55,39 @@ pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train
 # VirProBERT model
 virprobert_settings = {
     "n_mlp_layers": 2,
-    "n_classes": 5,
+    "n_classes": 8,
     "input_dim": 512, # input embedding dimension,
     "hidden_dim": 1024,
     "n_heads": 8,
     "stride": 64,
     "cls_token": True,
     "segment_len": pre_train_encoder_settings["max_seq_len"],
-    "data_parallel": True,
+    "data_parallel": False,
     "pre_trained_model": pre_trained_encoder_model
 }
 
 virprobert_model = VirProBERT.get_model(virprobert_settings)
 
-model_path = os.path.join(os.getcwd(), "..","..", "..", "output/raw/coronaviridae_s_prot_uniprot_embl_vertebrates_t0.01_c8/20240909/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_itr4.pth")
+model_path = os.path.join(os.getcwd(), "..","..", "..", "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240828/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_ae_bn_vs30cls_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr4.pth")
 virprobert_model.load_state_dict(torch.load(model_path, map_location=nn_utils.get_device()))
+# -
+
+# ProstT5 model
+prostT5_settings = {
+    "pre_trained_model_link": "Rostlab/ProstT5"
+      "hugging_face_cache_dir": "output/cache_dir"
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 8
+      input_dim: 1024 # input embedding dimension
+      hidden_dim: 1024
+      data_parallel: False
+}
 
 # +
 # Load dataset
 sequence_settings = {
-    "batch_size": 2,
+    "batch_size": 16,
     "id_col": "id",
     "sequence_col": "seq",
     "truncate": False,
@@ -86,16 +99,49 @@ label_settings = {
     "label_col": "virus_host_name",
     "exclude_labels": [ "nan"],
     "label_groupings": {
-      "Pig": [ "sus scrofa" ],
+      "Chicken": [ "gallus gallus" ],
       "Human": [ "homo sapiens" ],
       "Cat": [ "felis catus" ],
-      "Dromedary camel": [ "camelus dromedarius" ],
-      "Cattle": ["bos taurus"],
-      "Chicken": [ "gallus gallus" ],
+      "Pig": [ "sus scrofa" ],
       "Gray wolf": [ "canis lupus" ],
-      "Yak": [ "bos grunniens" ]
+      "Horshoe bat": ["rhinolophus sp."],
+      "Ferret": ["mustela putorius"],
+      "Chinese rufous horseshoe bat": ["rhinolophus sinicus"],
     }
 }
+input_df, index_label_map = utils.transform_labels(input_df, label_settings, classification_type="multi")
+
+dataset = ProteinSequenceDatasetWithID(input_df, 
+                                       id_col=sequence_settings["id_col"], 
+                                       sequence_col=sequence_settings["sequence_col"], 
+                                       max_seq_len=pre_train_encoder_settings["max_seq_len"], 
+                                       truncate=sequence_settings["truncate"], 
+                                       label_col=label_settings["label_col"])
+    
+dataset_loader = DataLoader(dataset=dataset, 
+                            batch_size=sequence_settings["batch_size"], 
+                            shuffle=True,
+                            collate_fn=PaddingWithID(pre_train_encoder_settings["max_seq_len"]))
+# -
+
+virprobert_model.eval()
+seq_id, seq, label = next(iter(dataset_loader))
+
+print(f"seq_id = {seq_id}")
+print(f"seq = {seq}, seq_len = {seq.shape}")
+print(f"label = {label}")
+
+output = virprobert_model(seq)
+
+output
+
+output_prob = F.softmax(output, dim=-1)
+result_df = pd.DataFrame(output_prob.detach().cpu().numpy())
+result_df["id"] = seq_id
+result_df["y_true"] = label.detach().cpu().numpy()
+result_df
+
+# +
 wiv04_input_df, index_label_map = utils.transform_labels(wiv04_input_df, label_settings, classification_type="multi")
 
 dataset = ProteinSequenceDatasetWithID(wiv04_input_df, 
@@ -119,8 +165,13 @@ print(f"seq = {seq}, seq_len = {seq.shape}")
 print(f"label = {label}")
 
 output = virprobert_model(seq)
+output
 
-F.softmax(output)
+output_prob = F.softmax(output, dim=-1)
+result_df = pd.DataFrame(output_prob.detach().cpu().numpy())
+result_df["id"] = seq_id
+result_df["y_true"] = label.detach().cpu().numpy()
+result_df
 
 
 def get_mean_attention_values(tf_model):
