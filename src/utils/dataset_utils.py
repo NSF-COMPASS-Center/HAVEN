@@ -174,7 +174,7 @@ def get_external_dataset_loader(df, sequence_settings, label_col, name, include_
     # if no collate function is defined, then the default is None
     collate_fn = mapper.collate_function_map.get(name)
     if collate_fn:
-        collate_fn = collate_fn()
+        collate_fn = collate_fn(include_id_col=include_id_col)
     return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 
 
