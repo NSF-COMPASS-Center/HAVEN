@@ -55,5 +55,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_variants/20241118/sars-cov-2/uniref90/prostT5"
+  sub_dir: "coronaviridae_s_prot_variants/20241119/sars-cov-2/uniref90/prostT5"
   prefix: "prostT5_lr3e-4_tl_tf_multi" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
