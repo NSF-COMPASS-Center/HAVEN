@@ -97,8 +97,10 @@ def execute(config):
 
             # load pre-trained encoder model_params
             pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train_encoder_settings, task["cls_token"])
-            pre_trained_encoder_model.load_state_dict(
-                torch.load(pre_train_settings["model_path"], map_location=nn_utils.get_device()))
+            pre_trained_model_path = pre_train_settings["model_path"]
+            if pre_trained_model_path:
+                pre_trained_encoder_model.load_state_dict(
+                    torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
 
             # HACK to load models from checkpoints. CAUTION: Use only under dire circumstances
             # pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model,
