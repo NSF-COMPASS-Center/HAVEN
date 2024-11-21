@@ -72,7 +72,7 @@ class VirProBERT_wo_HierAttn(ProteinSequenceClassification):
                                        stride=model_params["stride"],
                                        segment_len=model_params["segment_len"],
                                        hidden_dim=model_params["hidden_dim"],
-                                       depth=model_params["n_mlp_layers"],
+                                       n_mlp_layers=model_params["n_mlp_layers"],
                                        n_classes=model_params["n_classes"])
         print(model)
         print("VirProBERT_wo_HierAttn: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
