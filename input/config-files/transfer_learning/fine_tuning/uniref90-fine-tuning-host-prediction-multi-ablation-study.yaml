@@ -77,7 +77,7 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
-    - id: "host_prediction_segment_msl256s64_no_pretrain_bn_fnn_2l_d1024_lr1e-4"
+    - id: "segment_msl256s64_no_pretrain_fnn_2l_d1024_lr1e-4"
       name: "VirProBERT_wo_Hierarchical_Attention"
       active: False
       mode: "train" # supported values: train, test
@@ -91,7 +91,7 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
-    - id: "hybrid_attention_msl256s64ae_no_pretrain_bn_fnn_2l_d1024_lr1e-4"
+    - id: "hybd_attention_msl256s64ae_no_pretrain_fnn_2l_d1024_lr1e-4"
       name: "VirProBERT"
       active: True
       mode: "train" # supported values: train, test
