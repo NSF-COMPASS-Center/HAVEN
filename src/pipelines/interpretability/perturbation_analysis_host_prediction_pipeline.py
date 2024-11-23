@@ -50,11 +50,8 @@ def execute(config):
         pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train_encoder_settings,
                                                                                model["cls_token"])
         model["pre_trained_model"] = pre_trained_encoder_model
-
-        # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
-        # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
-        # it will be used if the model requires it, else it will be ignored
-        model["segment_len"] = sequence_settings["max_sequence_length"]
+        model["segment_len"] = pre_train_encoder_settings["max_seq_len"]
+        sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
 
         if model_name in mapper.model_map:
             print(f"Executing {model_name} in {mode} mode.")

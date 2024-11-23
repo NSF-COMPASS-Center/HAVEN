@@ -10,7 +10,7 @@ classification_settings:
   model_type: "perturbed_dataset_prediction"  # options: baseline, nlp, perturbed_dataset_prediction
   type: "multi"
   sequence_settings:
-    batch_size: 32
+    batch_size: 1
     id_col: "id"
     sequence_col: "seq"
     truncate: True
