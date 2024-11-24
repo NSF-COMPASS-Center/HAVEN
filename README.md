@@ -130,10 +130,10 @@ sbatch deployment/arc/misc_gpu.sh . src/utils/scripts/perturbation_dataset_gener
 4. Create a Dataset class in [protein_sequence_custom_dataset.py](src/datasets/protein_sequence_custom_dataset.py) that will pre-process the protein sequences as per the requirement of the external model.
 5. Add entries in the `model_map` and `dataset_map` in [mapper.py](src/utils/mapper.py) mapping the implementations of the model and dataset classes respectively.
 6. Add entry for the model in `task_settings` in [uniref90-fine-tuning-host-prediction-external-multi.yaml](input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-external-multi.yaml).
-    Note: the value of `name` parameter should match the key used in the mapping in the previous stop.
+    Note: the value of `name` parameter should match the key used in the mapping in the previous step.
 7. Execute the fine-tuning experiment using
     ```shell
-        python src/zoonosis.py --config [input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-external-multi.yaml](input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-external-multi.yaml)
+        python src/zoonosis.py --config input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-external-multi.yaml
     ```
     For ARC execution see section on [ARC Deployment](#arc-deployment).
     

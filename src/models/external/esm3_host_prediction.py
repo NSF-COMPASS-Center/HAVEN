@@ -36,7 +36,7 @@ class ESM3_VirusHostPrediction(ProteinSequenceClassification):
             )
 
             # get per-sequence embedding via averaging (excluding start, and end tokens)
-            sequence_embedding = output.per_residue_embedding[1:seq_length+1].mean(dim=0)
+            sequence_embedding = output.per_residue_embedding[1: seq_length + 1].mean(dim=0)
             sequence_embeddings.append(sequence_embedding)
 
         return torch.stack(sequence_embeddings)
