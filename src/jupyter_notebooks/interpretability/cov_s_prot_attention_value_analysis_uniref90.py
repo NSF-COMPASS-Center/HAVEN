@@ -70,24 +70,11 @@ virprobert_model = VirProBERT.get_model(virprobert_settings)
 
 model_path = os.path.join(os.getcwd(), "..","..", "..", "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240828/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_ae_bn_vs30cls_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr4.pth")
 virprobert_model.load_state_dict(torch.load(model_path, map_location=nn_utils.get_device()))
-# -
-
-# ProstT5 model
-prostT5_settings = {
-    "pre_trained_model_link": "Rostlab/ProstT5"
-      "hugging_face_cache_dir": "output/cache_dir"
-      loss: "FocalLoss"
-      n_mlp_layers: 2
-      n_classes: 8
-      input_dim: 1024 # input embedding dimension
-      hidden_dim: 1024
-      data_parallel: False
-}
 
 # +
 # Load dataset
 sequence_settings = {
-    "batch_size": 16,
+    "batch_size": 1,
     "id_col": "id",
     "sequence_col": "seq",
     "truncate": False,
@@ -109,6 +96,8 @@ label_settings = {
       "Chinese rufous horseshoe bat": ["rhinolophus sinicus"],
     }
 }
+
+# +
 input_df, index_label_map = utils.transform_labels(input_df, label_settings, classification_type="multi")
 
 dataset = ProteinSequenceDatasetWithID(input_df, 
@@ -140,6 +129,57 @@ result_df = pd.DataFrame(output_prob.detach().cpu().numpy())
 result_df["id"] = seq_id
 result_df["y_true"] = label.detach().cpu().numpy()
 result_df
+
+virprobert_model.self_attn.self_attn.shape
+
+WIV04_idx = 0
+inter_seg_attn = virprobert_model.self_attn.self_attn[WIV04_idx, :, :, :]
+
+inter_seg_attn.shape
+
+pos_mapping = {}
+j = 0
+for i in range(0, len(wiv04_input_df["seq"][0])+1, 64):
+    start = i+1
+    # end = seq_len if i+127 > seq_len else i+127
+    end = i + 256
+    pos_mapping[j] = f"{j}: {start}-{end}"
+    j += 1
+
+pos_mapping
+
+# +
+plt.clf()
+plt.rcParams["xtick.labelsize"] = 40
+plt.rcParams["ytick.labelsize"] = 40
+plt.rcParams.update({'font.size': 40})
+fig, axs = plt.subplots(4, 2, figsize=(80, 100), sharex=False, sharey=True)
+
+c = 0
+for i in range(4):
+    for j in range(2):
+        df = pd.DataFrame(inter_seg_attn[c].squeeze().detach().cpu().numpy())
+        df.rename(columns=pos_mapping, inplace=True)
+        df.rename(index=pos_mapping, inplace=True)
+        sns.heatmap(df, ax=axs[i, j], linewidth=.1)
+        axs[i, j].set_title(f"Head {c}")
+        c += 1
+
+plt.tight_layout(pad=.1)
+plt.show()
+# -
+
+inter_seg_attn.mean(dim=0).shape
+
+plt.clf()
+plt.figure(figsize=(8, 8))
+sns.set_theme()
+sns.set_style("whitegrid")
+plt.rcParams["xtick.labelsize"] = 12
+plt.rcParams["ytick.labelsize"] = 12
+plt.rcParams.update({'font.size': 12})
+sns.heatmap(inter_seg_attn.mean(dim=0).detach().cpu().numpy(), linewidth=.1, cmap="crest")
+plt.show()
 
 # +
 wiv04_input_df, index_label_map = utils.transform_labels(wiv04_input_df, label_settings, classification_type="multi")
@@ -174,75 +214,3 @@ result_df["y_true"] = label.detach().cpu().numpy()
 result_df
 
 
-def get_mean_attention_values(tf_model):
-    # attention values of the last encoder layer
-    attn_values = tf_model.encoder.layers[5].self_attn.self_attn.squeeze()
-    return torch.mean(attn_values, dim=0)
-
-# analyze the attention values of all sequences in a dataset
-def analyze_dataset_attention_values(tf_model, dataset_loader, seq_max_length):
-    attn_dfs = []
-    for _, record in enumerate(dataset_loader):
-        seq, label = record
-
-        # compute actual (unpadded) length of sequence
-        seq_len = torch.count_nonzero(seq).item()
-        if seq_len < seq_max_length:
-            continue
-
-        tf_model(seq)
-        mean_attn_values = get_mean_attention_values(tf_model)
-        mean_of_mean_attn_values = torch.mean(mean_attn_values, dim=0, keepdim=True)
-        attn_dfs.append(mean_of_mean_attn_values.cpu().detach().numpy())
-
-    attn_df = np.concatenate(attn_dfs, axis=0)
-    visualization_utils.heat_map(attn_df)
-    return attn_df
-
-def analyze_sequence_attention_values(tf_model, sample_seq, sample_label, seq_max_length, idx_amino_acid_map):
-    seq_len = torch.count_nonzero(sample_seq)
-    print(sample_seq.shape)
-    print(f"Sequence length = {seq_len}")
-
-    sample_pred = torch.argmax(F.softmax(tf_model(sample_seq), dim=1), dim=1)
-    print(f"Label = {index_label_map[sample_label_label.item()]}")
-    print(f"Prediction = {index_label_map[sample_pred.item()]}")
-    mean_attn_values = get_mean_attention_values(tf_model)
-
-    plot_mean_attention_values(mean_attn_values, seq=sample_seq, seq_len=seq_len)
-    plot_mean_of_mean_attention_values(mean_attn_values, seq=sample_seq,
-                                       seq_len=seq_len, seq_max_length=seq_max_length,
-                                       idx_amino_acid_map=idx_amino_acid_map)
-
-
-def plot_mean_attention_values(x, seq=None, seq_len=None, idx_amino_acid_map=None):
-    ticklabels = seq.cpu().detach().numpy().squeeze()[:seq_len]
-    ticklabels_mapped = [idx_amino_acid_map[x] for x in ticklabels]
-
-    plt.rcParams['xtick.labelsize'] = 5
-    plt.rcParams['ytick.labelsize'] = 5
-    plt.figure(figsize=(12, 12))
-    data = x.cpu().detach().numpy()
-
-    sns.heatmap(data=data[:seq_len, :seq_len], xticklabels=ticklabels_mapped, yticklabels=ticklabels_mapped)
-    plt.show()
-
-
-def plot_mean_of_mean_attention_values(x, seq=None, seq_len=None, seq_max_length=None):
-    tokens = seq.cpu().detach().numpy().squeeze()
-
-    x = torch.mean(x, dim=0)
-    df = pd.DataFrame({"tokens": tokens, "attn_vals": x.cpu().detach().numpy(), "pos": range(seq_max_length)})
-    df["tokens"] = df["tokens"].map(idx_amino_acid_map)
-    df = df.dropna()
-
-    # Top 10 positions with highest attention values
-    sorted_df = df.sort_values(by="attn_vals", ascending=False).head(10)
-    print("Top 10 tokens + positions with highest attention values for the whole sequence")
-    print(sorted_df.head(10))
-
-    plt.rcParams['xtick.labelsize'] = 8
-    plt.rcParams['ytick.labelsize'] = 8
-    plt.figure(figsize=(12, 6))
-    sns.scatterplot(data=df, x="pos", y="attn_vals", hue="tokens")
-    plt.show()
