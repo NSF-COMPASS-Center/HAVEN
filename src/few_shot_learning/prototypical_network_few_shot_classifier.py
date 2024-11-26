@@ -17,7 +17,7 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
         for label in torch.unique(support_labels):
             # assuming n_shot is within the server memory constraints
             # i.e, n_shot <= batch_size
-            label_support_features = self.pre_trained_model(
+            label_support_features, _ = self.pre_trained_model(
                 torch.index_select(support_sequences, dim=0,
                                    index=torch.nonzero(support_labels == label).squeeze()),  # torch.nonzero gives the indices with non-zero elements but it adds a dimension as [n, 1] hence we use squeeze to remove the added extra dimension
                 embedding_only=True
@@ -56,7 +56,7 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
             if mini_batch.shape[0] < n_gpus:
                 query_features = self.compute_query_features_with_repetition(mini_batch, n_gpus)
             else:
-                query_features = self.pre_trained_model(mini_batch, embedding_only=True)
+                query_features, _ = self.pre_trained_model(mini_batch, embedding_only=True)
 
             output.append(-torch.cdist(query_features, prototypes))
 
@@ -76,7 +76,7 @@ class PrototypicalNetworkFewShotClassifier(nn.Module):
         # 1 indicates not changing the size in that dimension
         # i.e, number of times times for repitition = 1 (technically zero), so no repitition along the columns(second dimension)
         mini_batch = mini_batch.repeat(n_gpus, 1)
-        query_features = self.pre_trained_model(mini_batch, embedding_only=True)
+        query_features, _ = self.pre_trained_model(mini_batch, embedding_only=True)
         # return only the features for the mini_batch from the first GPU
         # add a batch dimension, i.e. dimension at axis=0 with value=1
         return query_features[0].unsqueeze(0)
