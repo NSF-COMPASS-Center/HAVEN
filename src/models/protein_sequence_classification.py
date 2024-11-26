@@ -68,7 +68,7 @@ class ProteinSequenceClassification(nn.Module):
         if embedding_only:
             # used in Few Shot Learning
             # Hack to use DataParallel and run on multiple GPUs since we can only call __call__() --> forward() using DataParallel
-            return self.input_embedding
+            return self.input_embedding, self.get_classification_block_embedding(self.input_embedding)
 
         return self.forward_classification_block(self.input_embedding)
 
@@ -95,6 +95,28 @@ class ProteinSequenceClassification(nn.Module):
 
         y = self.linear_op(X)
         return y
+
+    def get_classification_block_embedding(self, X):
+        """
+        Method to do the forward pass through the multiclass classification block with the embeddings passed as input.
+
+        Args:
+            X: embeddings of input batch of sequences
+        Return:
+            output logits for n_classes
+        """
+        batch_size = X.shape[0]  # batch_size
+
+        # input linear layer
+        X = F.relu(self.linear_ip(X))
+        if self.batch_norm: #and batch_size > 1:  # batch_norm is applicable only when batch_size is > 1
+            X = self.batch_norm_ip(X)
+        # hidden
+        for i, linear_layer in enumerate(self.linear_hidden_n):
+            X = F.relu(linear_layer(X))
+            if self.batch_norm: #and batch_size > 1:  # batch_norm is applicable only when batch_size is > 1
+                X = self.batch_norm_hidden_n[i](X)
+        return X
 
     @staticmethod
     @abstractmethod

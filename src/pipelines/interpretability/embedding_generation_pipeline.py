@@ -117,7 +117,7 @@ def evaluate_model(model, dataset_loader, id_col):
         embeddings = []
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
             id, input, label = record
-            embedding = model(input, embedding_only=True)
+            _, embedding = model(input, embedding_only=True)
             embedding_df = pd.DataFrame(embedding.cpu().numpy())
             embedding_df[id_col] = id
             embedding_df["y_true"] = label.cpu().numpy()
