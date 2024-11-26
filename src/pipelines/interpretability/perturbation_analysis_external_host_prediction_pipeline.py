@@ -7,7 +7,6 @@ import tqdm
 
 from utils import utils, dataset_utils, nn_utils, constants, mapper, perturbation_analysis_utils
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
-from few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
 
 def execute(config):
