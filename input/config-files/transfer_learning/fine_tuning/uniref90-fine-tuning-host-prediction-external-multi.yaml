@@ -14,7 +14,7 @@ input_settings:
   file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ 12612648, 31062180] #, 48918293, 55631155, 79221635 ]
+  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
     batch_size: 8
@@ -27,7 +27,7 @@ sequence_settings:
 
 fine_tune_settings:
   experiment: "external"
-  n_iterations: 2
+  n_iterations: 5
   split_input: True
   train_proportion: 0.8
   classification_type: "multi"
@@ -53,7 +53,7 @@ fine_tune_settings:
   task_settings:
     - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       pre_trained_model_link: "Rostlab/ProstT5"
@@ -63,7 +63,7 @@ fine_tune_settings:
       n_classes: 5
       input_dim: 1024 # input embedding dimension
       hidden_dim: 1024
-      data_parallel: False
+      data_parallel: True
 
     - id: "esm2_msl2048_bn_fnn_2l_d1024_lr1e-4"
       name: "ESM2"
@@ -76,11 +76,11 @@ fine_tune_settings:
       n_mlp_layers: 2
       n_classes: 5
       hidden_dim: 1024
-      data_parallel: False
+      data_parallel: True
 
     - id: "esm3_msl2048_bn_fnn_2l_d1024_lr1e-4"
       name: "ESM3"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_name: "esm3-open"
       input_dim: 1536
@@ -94,5 +94,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv/20241125/host_multi/external/prostT5itr_0_1"
+  sub_dir: "uniref90_embl_vertebrates_non_idv/20241124/host_multi/external"
   prefix: "uniref90viridae" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

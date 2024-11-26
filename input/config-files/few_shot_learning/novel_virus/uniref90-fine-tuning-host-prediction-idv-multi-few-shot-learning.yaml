@@ -1,4 +1,4 @@
-config_type: "few_shot_learning" # options: data_preprocessor, host_prediction, evaluation, transfer_learning, few_shot_learning
+config_type: "embedding_generation" # options: data_preprocessor, host_prediction, evaluation, transfer_learning, few_shot_learning
 
 # Input Settings:
   ## initialize base input folder name
@@ -29,13 +29,7 @@ label_settings:
 
 few_shot_learn_settings:
   experiment: "few_shot_learning_novel_virus"
-  n_iterations: 5
-  split_input: False
-  train_proportion: 0.7
-  val_proportion: 0.1
-  test_proportion: 0.2
   classification_type: "multi"
-  save_model: True
   n_epochs: 1
   batch_size: 16
   max_lr: 1e-4
