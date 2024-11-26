@@ -46,7 +46,7 @@ def execute(config):
         # Case: Host prediction using fine-tuning where there is dataset split and label groupings
         iter = 0 # choose only one iteration (first)
         # 1. Transform labels
-        df, index_label_map = utils.transform_labels(df, label_settings,
+        df, idx_label_map = utils.transform_labels(df, label_settings,
                                                      classification_type=fine_tune_settings["classification_type"])
 
 
