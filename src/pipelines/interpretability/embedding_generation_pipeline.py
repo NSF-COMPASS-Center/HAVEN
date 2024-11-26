@@ -36,18 +36,37 @@ def execute(config):
     sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
 
     tasks = fine_tune_settings["task_settings"]
+    label_settings = fine_tune_settings["label_settings"]
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
-    label_col = sequence_settings["label_col"]
+    label_col = label_settings["label_col"]
     results = {}
-
     df = dataset_utils.read_dataset(input_dir, input_file_names, cols=[id_col, sequence_col, label_col])
+    if fine_tune_settings["split_input"]:
+        # Case: Host prediction using fine-tuning where there is dataset split and label groupings
+        # 1. Transform labels
+        df, index_label_map = utils.transform_labels(df, label_settings,
+                                                     classification_type=fine_tune_settings["classification_type"])
 
-    label_idx_map, idx_label_map = utils.get_label_vocabulary(df[label_col].unique())
-    print(f"label_idx_map={label_idx_map}\nidx_label_map={idx_label_map}")
-    df[label_col] = df[label_col].transform(lambda x: label_idx_map[x] if x in label_idx_map else 0)
 
-    test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col, include_id_col=True)
+        test_dataset_loader = None
+        # 2. Split dataset
+        # full df into training and testing datasets in the ratio configured in the config file
+        train_df, test_df = dataset_utils.split_dataset_stratified(df, input_settings["split_seeds"][iter],
+                                                                   fine_tune_settings["train_proportion"],
+                                                                   stratify_col=label_col)
+        # split testing set into validation and testing datasets in equal proportion
+        # so 80:20 will now be 80:10:10
+        val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5,
+                                                                 stratify_col=label_col)
+    else:
+        # Case: Few shot learning where there is no dataset split and no label groupings
+        label_idx_map, idx_label_map = utils.get_label_vocabulary(test_df[label_col].unique())
+        print(f"label_idx_map={label_idx_map}\nidx_label_map={idx_label_map}")
+        df[label_col] = df[label_col].transform(lambda x: label_idx_map[x] if x in label_idx_map else 0)
+        test_df = df
+
+    test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col, include_id_col=True)
     fine_tune_model = None
     for task in tasks:
         task_id = task["id"] # unique identifier
