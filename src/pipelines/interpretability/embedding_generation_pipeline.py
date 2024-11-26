@@ -8,6 +8,7 @@ from statistics import mean
 
 from utils import utils, dataset_utils, nn_utils, constants, mapper
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
+from few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
 def execute(config):
     # input settings
@@ -71,7 +72,14 @@ def execute(config):
             print(f"ERROR: Unknown model {task_name}.")
             continue
 
-        fine_tune_model.load_state_dict(torch.load(task["fine_tuned_model_path"], map_location=nn_utils.get_device()))
+        if task["few_shot_classifier"]:
+
+            few_shot_classifier = PrototypicalNetworkFewShotClassifier(pre_trained_model=fine_tune_model)
+            # load the pre-trained few-shot classifier
+            few_shot_classifier.load_state_dict(torch.load(task["fine_tuned_model_path"], map_location=nn_utils.get_device()))
+            fine_tune_model = few_shot_classifier.pre_trained_model
+        else:
+            fine_tune_model.load_state_dict(torch.load(task["fine_tuned_model_path"], map_location=nn_utils.get_device()))
         embedding_df = evaluate_model(fine_tune_model, test_dataset_loader, id_col)
 
         #  remap the class indices to original input labels
