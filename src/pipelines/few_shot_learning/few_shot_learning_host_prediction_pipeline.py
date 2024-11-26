@@ -99,7 +99,7 @@ def execute(config):
             if model["active"] is False:
                 print(f"Skipping {model_name} ...")
                 continue
-
+            model_settings["segment_len"] = max_sequence_length
             # if the classifier includes a pre-trained model transformer encoder, load it.
             if "encoder_settings" in model_settings:
                 mlm_encoder_settings = model_settings["encoder_settings"].copy()

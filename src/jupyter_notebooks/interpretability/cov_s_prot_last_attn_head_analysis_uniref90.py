@@ -262,9 +262,9 @@ plt.clf()
 plt.rcParams["xtick.labelsize"] = 20
 plt.rcParams["ytick.labelsize"] = 20
 plt.rcParams.update({'font.size': 20})
-fig, axs = plt.subplots(1, 1, figsize=(30, 5), sharex=False, sharey=False)
+fig, axs = plt.subplots(1, 1, figsize=(40, 5), sharex=False, sharey=False)
 
-sns.scatterplot(pos_attn_mean_vals, ax=axs)
+sns.scatterplot(pos_attn_mean_vals, ax=axs, s=100)
 axs.set_xticks(range(0, len(pos_attn_mean_vals), 10)) 
 plt.xticks(rotation=90)
 plt.show()
