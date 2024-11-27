@@ -26,7 +26,7 @@ class ProteinSequenceProstT5Dataset(ProteinSequenceDatasetWithID):
         # return a tuple of (sequence, sequence_length) as the sequence length will be used in the get_embedding() method to retrieve the embeddings of
         # only the amino acid tokens while excluding the padding, start, and end special tokens.
         if self.include_id_col:
-            return record[self.id_col], (sequence, sequence_length), torch.tensor(record[self.label_col], device=nn_utils.get_device()), sequence_length
+            return record[self.id_col], (sequence, sequence_length), torch.tensor(record[self.label_col], device=nn_utils.get_device())
         else:
             return (sequence, sequence_length), torch.tensor(record[self.label_col], device=nn_utils.get_device())
 

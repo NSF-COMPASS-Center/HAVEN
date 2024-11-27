@@ -12,7 +12,6 @@ def evaluate_model(model, dataset_loader, id_col):
         model.eval()
 
         results = []
-        val_loss = []
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
             id, input, label = record
 

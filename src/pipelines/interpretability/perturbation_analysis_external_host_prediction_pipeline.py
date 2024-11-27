@@ -58,7 +58,7 @@ def execute(config):
             print(f"ERROR: Unknown model {model_name}.")
             continue
 
-        #prediction_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
+        prediction_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
 
         print(f"Number of input files = {len(input_files)}")
         for input_file in input_files:
