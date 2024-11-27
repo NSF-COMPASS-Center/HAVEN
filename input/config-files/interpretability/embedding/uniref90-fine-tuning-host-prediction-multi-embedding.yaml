@@ -5,12 +5,11 @@ config_type: "embedding_generation" # options: data_preprocessor, host_predictio
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/coronaviridae/20240313/uniref"
+  input_dir: "input/data/uniref90/20240131"
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   # file_names: [ "uniref90_final_msl1114.csv" ]
-  # file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv" ]
-  file_names: [ "coronaviridae_s_uniref90_embl_hosts_pruned_metadata_corrected_species_virus_host_vertebrates_w_seq_t0.01_c8.csv"]
+  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -42,14 +41,11 @@ fine_tune_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan" ]
     label_groupings:
-      "Chicken": [ "gallus gallus" ]
-      "Human": [ "homo sapiens" ]
-      "Cat": [ "felis catus" ]
-      "Pig": [ "sus scrofa" ]
-      "Gray wolf": [ "canis lupus" ]
-      "Horshoe bat": [ "rhinolophus sp." ]
-      "Ferret": [ "mustela putorius" ]
-      "Chinese rufous horseshoe bat": [ "rhinolophus sinicus" ]
+      "Human": [ "Homo sapiens" ]
+      "Pig": [ "Sus scrofa" ]
+      "Capybara": [ "Hydrochoerus hydrochaeris" ]
+      "Himalayan marmot": [ "Marmota himalayana" ]
+      "Red junglefowl": [ "Gallus gallus" ]
 
   task_settings:
     - id: "hybd_attn_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-4"
@@ -62,7 +58,7 @@ fine_tune_settings:
       cls_token: True
       n_heads: 8
       n_mlp_layers: 2
-      n_classes: 8
+      n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       data_parallel: False
@@ -86,5 +82,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241125/host_multi/mlp_embedding"
+  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20241125/host_multi/mlp_embedding"
   prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
