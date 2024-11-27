@@ -14,7 +14,7 @@ input_settings:
   file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ] # [ 12612648 ] #
+  split_seeds: [ 12612648 ] # [ 12612648, 31062180, 48918293, 55631155, 79221635 ] #
 
 sequence_settings:
     batch_size: 8
@@ -27,7 +27,7 @@ sequence_settings:
 
 fine_tune_settings:
   experiment: "external"
-  n_iterations: 5
+  n_iterations: 1
   split_input: True
   train_proportion: 0.8
   classification_type: "multi"
@@ -51,7 +51,7 @@ fine_tune_settings:
       "Red junglefowl": [ "Gallus gallus" ]
 
   task_settings:
-    - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
+    - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4_itr0"
       name: "ProstT5"
       active: True
       mode: "train" # supported values: train, test
