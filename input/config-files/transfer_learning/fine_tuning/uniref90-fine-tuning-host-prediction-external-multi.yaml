@@ -14,10 +14,10 @@ input_settings:
   file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ 12612648 ] # [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
+  split_seeds: [ 31062180 ] # [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 8
+    batch_size: 16
     id_col: "uniref90_id"
     sequence_col: "seq"
     truncate: False
@@ -65,11 +65,11 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: True
 
-    - id: "esm2_msl2048_bn_fnn_2l_d1024_lr1e-4-itr0"
+    - id: "esm2_msl2048_bn_fnn_2l_d1024_lr1e-4-itr4"
       name: "ESM2"
       active: True
       mode: "test" # supported values: train, test
-      fine_tuned_model_path: "output/raw/uniref90_embl_vertebrates_non_idv/20241120/host_multi/uniref90viridae_esm2_msl2048_bn_fnn_2l_d1024_lr1e-4_itr0.pth"
+      fine_tuned_model_path: "output/raw/uniref90_embl_vertebrates_non_idv/20241120/host_multi/uniref90viridae_esm2_msl2048_bn_fnn_2l_d1024_lr1e-4_itr4.pth"
       fine_tuned_model_name: "esm2_t33_650M_UR50D" # "esm2_t48_15B_UR50D"
       repr_layer: 33 # 48
       input_dim: 1280 # 5120 # input embedding dimension
@@ -77,11 +77,11 @@ fine_tune_settings:
       n_mlp_layers: 2
       n_classes: 5
       hidden_dim: 1024
-      data_parallel: True
+      data_parallel: False
 
-    - id: "esm3_msl2048_bn_fnn_2l_d1024_lr1e-4"
+    - id: "esm3_msl2048_bn_fnn_2l_d1024_lr1e-4-itr1"
       name: "ESM3"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_name: "esm3-open"
       input_dim: 1536
