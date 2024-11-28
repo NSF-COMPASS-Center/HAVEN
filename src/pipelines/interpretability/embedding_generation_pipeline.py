@@ -62,7 +62,7 @@ def execute(config):
                                                                  stratify_col=label_col)
     else:
         # Case: Few shot learning where there is no dataset split and no label groupings
-        label_idx_map, idx_label_map = utils.get_label_vocabulary(test_df[label_col].unique())
+        label_idx_map, idx_label_map = utils.get_label_vocabulary(df[label_col].unique())
         print(f"label_idx_map={label_idx_map}\nidx_label_map={idx_label_map}")
         df[label_col] = df[label_col].transform(lambda x: label_idx_map[x] if x in label_idx_map else 0)
         test_df = df
