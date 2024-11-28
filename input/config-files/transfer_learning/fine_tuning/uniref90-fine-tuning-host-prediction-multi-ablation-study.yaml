@@ -79,7 +79,7 @@ fine_tune_settings:
 
     - id: "segment_msl256s64_no_pretrain_fnn_2l_d1024_lr1e-4"
       name: "VirProBERT_wo_Hierarchical_Attention"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       cls_token: False
@@ -93,7 +93,7 @@ fine_tune_settings:
 
     - id: "hybd_attention_msl256s64ae_no_pretrain_fnn_2l_d1024_lr1e-4"
       name: "VirProBERT"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       segment_len: 256
