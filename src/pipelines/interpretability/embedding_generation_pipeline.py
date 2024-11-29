@@ -44,7 +44,7 @@ def execute(config):
     df = dataset_utils.read_dataset(input_dir, input_file_names, cols=[id_col, sequence_col, label_col])
     if fine_tune_settings["split_input"]:
         # Case: Host prediction using fine-tuning where there is dataset split and label groupings
-        iter = 0 # choose only one iteration (first)
+        iter = 4 # choose only one iteration (first)
         # 1. Transform labels
         df, idx_label_map = utils.transform_labels(df, label_settings,
                                                      classification_type=fine_tune_settings["classification_type"])
