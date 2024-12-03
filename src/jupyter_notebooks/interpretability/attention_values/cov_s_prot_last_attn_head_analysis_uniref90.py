@@ -30,7 +30,7 @@ from src.datasets.protein_sequence_with_id_dataset import ProteinSequenceDataset
 from src.datasets.collations.padding_with_id import PaddingWithID
 
 
-input_file_path = os.path.join(os.getcwd(), "..","..", "..", "input/data/coronaviridae/20240313/sarscov2/uniprot/variants/sarscov2_variants_s.csv")
+input_file_path = os.path.join(os.getcwd(), "..","..", "..", "..", "input/data/coronaviridae/20240313/sarscov2/uniprot/variants/sarscov2_variants_s.csv")
 input_df = pd.read_csv(input_file_path)
 input_df
 
@@ -71,7 +71,7 @@ virprobert_settings = {
 
 virprobert_model = VirProBERT.get_model(virprobert_settings)
 
-model_path = os.path.join(os.getcwd(), "..","..", "..", "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240828/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_ae_bn_vs30cls_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr4.pth")
+model_path = os.path.join(os.getcwd(), "..","..", "..", "..",  "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240828/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_ae_bn_vs30cls_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_itr4.pth")
 virprobert_model.load_state_dict(torch.load(model_path, map_location=nn_utils.get_device()))
 
 # +
@@ -176,9 +176,9 @@ def compute_cumulative_attention(seq, virprobert_model, WIV04_idx):
     inter_seg_attn = virprobert_model.self_attn.self_attn[WIV04_idx, :, :, :]
     print(f"inter_seg_attn shape = {inter_seg_attn.shape}")
     
-    inter_seg_attn_last_layer = inter_seg_attn[-1]
-    print(f"inter_seg_attn_last_layer shape = {inter_seg_attn_last_layer.shape}")
-    n_segments = inter_seg_attn_last_layer.shape[0]
+    mean_inter_seg_attn = inter_seg_attn.mean(dim=0)
+    print(f"mean_inter_seg_attn shape = {mean_inter_seg_attn.shape}")
+    n_segments = mean_inter_seg_attn.shape[0]
     print(f"n_segments = {n_segments}")
     
     
@@ -189,11 +189,11 @@ def compute_cumulative_attention(seq, virprobert_model, WIV04_idx):
     inter_seg_attn_regen, intra_seg_attn_last_enc_layer = compute_virprobert_embedding(X, WIV04_idx)
     print(f"inter_seg attention value equality check = {torch.equal(inter_seg_attn, inter_seg_attn_regen)}")
     
-    return inter_seg_attn_regen, inter_seg_attn_last_layer, intra_seg_attn_last_enc_layer
+    return inter_seg_attn_regen, mean_inter_seg_attn, intra_seg_attn_last_enc_layer
 # -
 
 WIV04_idx = 0
-inter_seg_attn_regen, inter_seg_attn_last_layer, intra_seg_attn_last_enc_layer = compute_cumulative_attention(seq, virprobert_model, WIV04_idx)
+inter_seg_attn_regen, mean_inter_seg_attn, intra_seg_attn_last_enc_layer = compute_cumulative_attention(seq, virprobert_model, WIV04_idx)
 
 # +
 plt.clf()
@@ -214,19 +214,34 @@ for i in range(4):
 
 plt.tight_layout(pad=.1)
 plt.show()
+
+# +
+plt.clf()
+plt.rcParams["xtick.labelsize"] = 10
+plt.rcParams["ytick.labelsize"] = 10
+plt.rcParams.update({'font.size': 10})
+fig, axs = plt.subplots(1, 1, figsize=(8, 8), sharex=False, sharey=True)
+
+df = pd.DataFrame(mean_inter_seg_attn.detach().cpu().numpy())
+df.rename(columns=pos_mapping, inplace=True)
+df.rename(index=pos_mapping, inplace=True)
+sns.heatmap(df, ax=axs, linewidth=.1, cmap="crest")
+axs.set_title(f"Mean across all Heads")
+
+plt.show()
 # -
 
 intra_seg_attn_last_enc_layer.shape
 
-# last attention layer
-intra_seg_attn_last_enc_layer_last_attn_layer = intra_seg_attn_last_enc_layer[:, -1, :, :].squeeze()
-intra_seg_attn_last_enc_layer_last_attn_layer.shape
+# mean across all attention heads
+intra_seg_attn_last_enc_layer_mean_attn = intra_seg_attn_last_enc_layer.mean(dim=1)
+intra_seg_attn_last_enc_layer_mean_attn.shape
 
-# remove the attention values for the class tokens
-intra_seg_attn_last_enc_layer_last_attn_layer_wo_cls_tkn = intra_seg_attn_last_enc_layer_last_attn_layer[:, 1:, 1:]
-intra_seg_attn_last_enc_layer_last_attn_layer_wo_cls_tkn.shape
+# attention values of the class token for all other tokens
+intra_seg_attn_last_enc_layer_mean_attn_cls_token = intra_seg_attn_last_enc_layer_mean_attn[:, 0, 1:]
+intra_seg_attn_last_enc_layer_mean_attn_cls_token.shape
 
-inter_seg_attn_mean = inter_seg_attn_last_layer.mean(dim=0)
+inter_seg_attn_mean = mean_inter_seg_attn.mean(dim=0)
 inter_seg_attn_mean
 
 pos_mapping_range
@@ -244,7 +259,7 @@ for i in range(seq_len):
             
             intra_seg_idx = range(segment[0], segment[1]).index(i)
             # print(f"intra_seg_idx = {intra_seg_idx}")
-            intra_seg_attn_mean_val = intra_seg_attn_last_enc_layer_last_attn_layer_wo_cls_tkn[segment_idx].mean(dim=0)[intra_seg_idx]
+            intra_seg_attn_mean_val = intra_seg_attn_last_enc_layer_mean_attn_cls_token[segment_idx][intra_seg_idx]
             
             # print(f"intra_seg_attn_mean_val = {intra_seg_attn_mean_val}")
             pos_attn_val = inter_seg_attn_mean_val.item() * intra_seg_attn_mean_val.item()
@@ -271,7 +286,7 @@ plt.show()
 # -
 
 # write the mean attention values
-output_file_path = os.path.join(os.getcwd(), "..","..", "..", "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240828/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_ae_bn_vs30cls_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_wiv04_mean_attn_vals_last_layer.txt")
+output_file_path = os.path.join(os.getcwd(), "..","..", "..", "..", "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240828/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_ae_bn_vs30cls_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_wiv04_mean_attn_vals_last_layer.txt")
 np.savetxt(output_file_path, np.array(pos_attn_mean_vals))
 
 
