@@ -14,10 +14,10 @@ input_settings:
   file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ 12612648 ] # [ 12612648, 31062180, 48918293, 55631155, 79221635 ] #
+  split_seeds: [ 55631155 ] # [ 12612648, 31062180, 48918293, 55631155, 79221635 ] #
 
 sequence_settings:
-    batch_size: 8
+    batch_size: 16
     id_col: "uniref90_id"
     sequence_col: "seq"
     truncate: False
@@ -65,14 +65,14 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
-    - id: "esm2_t48_15B_UR50D_bn_fnn_2l_d1024_lr1e-4_itr0"
+    - id: "esm2_t36_3B_UR50D_bn_fnn_2l_d1024_lr1e-4_itr3"
       name: "ESM2"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
-      fine_tuned_model_name: "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"
-      repr_layer: 48 # 33
-      input_dim: 5120 # 1280 # input embedding dimension
+      fine_tuned_model_name: "esm2_t36_3B_UR50D" # "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"
+      repr_layer: 36 # 48 # 33
+      input_dim: 2560 # 5120 # 1280 # input embedding dimension
       loss: "FocalLoss"
       n_mlp_layers: 2
       n_classes: 5
