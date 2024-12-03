@@ -142,7 +142,7 @@ def execute(config):
                 # used for zero-shot evaluation
                 # load the pre-trained and fine_tuned model_params
                 fine_tune_model.load_state_dict(torch.load(task["fine_tuned_model_path"]))
-                result_df = test_model(fine_tune_model, test_dataset_loader)
+                result_df = training_utils.test_model(fine_tune_model, test_dataset_loader)
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values: 'train', 'test'.")
                 exit(1)
