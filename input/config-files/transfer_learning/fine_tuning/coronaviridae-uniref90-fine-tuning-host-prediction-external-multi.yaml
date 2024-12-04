@@ -17,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 8
+    batch_size: 16
     id_col: "uniref90_id"
     sequence_col: "seq"
     truncate: False
@@ -81,20 +81,20 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
-    - id: "esm3_msl2048_bn_fnn_2l_d1024_lr1e-4"
-        name: "ESM3"
-        active: True
-        mode: "train" # supported values: train, test
-        fine_tuned_model_name: "esm3-open"
-        input_dim: 1536
-        loss: "FocalLoss"
-        n_mlp_layers: 2
-        n_classes: 8
-        hidden_dim: 1024
-        data_parallel: False
+    - id: "esm3_bn_fnn_2l_d1024_lr1e-4"
+      name: "ESM3"
+      active: True
+      mode: "train" # supported values: train, test
+      fine_tuned_model_name: "esm3-open"
+      input_dim: 1536
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 8
+      hidden_dim: 1024
+      data_parallel: False
 
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241125/host_multi/external"
+  sub_dir: "coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241204/host_multi/external"
   prefix: "uniref90coronaviridae" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
