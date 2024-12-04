@@ -82,7 +82,7 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
-    - id: "esm3_msl2048_bn_fnn_2l_d1024_lr1e-4"
+    - id: "esm3_bn_fnn_2l_d1024_lr1e-4"
       name: "ESM3"
       active: False
       mode: "train" # supported values: train, test
