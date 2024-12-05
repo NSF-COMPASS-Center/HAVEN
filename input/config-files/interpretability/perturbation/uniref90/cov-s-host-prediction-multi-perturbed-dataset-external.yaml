@@ -66,8 +66,21 @@ classification_settings:
       hidden_dim: 1024
       data_parallel: False
 
+    - id: "esm3_bn_fnn_2l_d1024_lr1e-4"
+      name: "ESM3"
+      active: True
+      mode: "test" # supported values: train, test
+      model_path: ""
+      fine_tuned_model_name: "esm3-open"
+      input_dim: 1536
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 8
+      hidden_dim: 1024
+      data_parallel: False
+
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_variants/20241120/sars-cov-2/uniref90/esm2"
-  prefix: "esm2_lr1e-4_tl_tf_multi" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "coronaviridae_s_prot_variants/20241205/sars-cov-2/uniref90/esm3"
+  prefix: "esm3_lr1e-4_tl_tf_multi" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
