@@ -289,4 +289,24 @@ plt.show()
 output_file_path = os.path.join(os.getcwd(), "..","..", "..", "..", "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240828/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_ae_bn_vs30cls_s64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_wiv04_mean_attn_vals_last_layer.txt")
 np.savetxt(output_file_path, np.array(pos_attn_mean_vals))
 
+# ! pip install logomaker
+
+import logomaker as lm
+
+seq_aligned_df = pd.read_csv(os.path.join(os.getcwd(), "..","..", "..", "..", "input/data/coronaviridae/20240313/wiv04/sarscov2_variants_s_aligned.csv"))
+sequences = list(seq_aligned_df["seq"].values)
+sequences
+
+seqs_counts_df = lm.alignment_to_matrix(sequences=sequences, to_type="probability", characters_to_ignore=".-X")
+seqs_counts_df.shape
+
+step = 50
+for i in range(0, seqs_counts_df.shape[0], step):
+    start = i
+    end = i + step
+    positions = list(range(start, end))
+    x = seqs_counts_df.reset_index()
+    x = x[x["pos"].isin(positions)].set_index("pos")
+    lm.Logo(x, stack_order='small_on_top')
+
 

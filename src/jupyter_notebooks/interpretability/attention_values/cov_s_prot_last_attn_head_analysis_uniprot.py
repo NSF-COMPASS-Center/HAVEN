@@ -273,7 +273,12 @@ for _, attn_vals in pos_attn_vals.items():
     pos_attn_mean_vals.append(statistics.mean(attn_vals))
 print(f"pos_attn_mean_vals len = {len(pos_attn_mean_vals)}")
 
+pos_attn_mean_vals_df = pd.DataFrame([{"pos": idx + 1, "mean_attn_val": val} for idx, val in enumerate(pos_attn_mean_vals)])
+pos_attn_mean_vals_df_top20 = pos_attn_mean_vals_df.sort_values(by="mean_attn_val", ascending=False).head(20)
+pos_attn_mean_vals_df_top20
+
 # +
+import textalloc as ta
 plt.clf()
 plt.rcParams["xtick.labelsize"] = 20
 plt.rcParams["ytick.labelsize"] = 20
@@ -281,13 +286,27 @@ plt.rcParams.update({'font.size': 20})
 fig, axs = plt.subplots(1, 1, figsize=(40, 5), sharex=False, sharey=False)
 
 sns.scatterplot(pos_attn_mean_vals, ax=axs, s=100)
+
+
+text_list = list(pos_attn_mean_vals_df_top20["pos"].values)
+x = []
+y = []
+for _, row in pos_attn_mean_vals_df_top20.iterrows():
+    x.append(row["pos"])
+    y.append(row["mean_attn_val"])
+
+ta.allocate(axs, x, y, text_list, 
+            x_scatter=pos_attn_mean_vals_df["pos"].values, 
+            y_scatter=pos_attn_mean_vals_df["mean_attn_val"].values, textsize=30)
+
+
 axs.set_xticks(range(0, len(pos_attn_mean_vals), 10)) 
 plt.xticks(rotation=90)
 plt.show()
 # -
 
-pos_attn_mean_vals_df = pd.DataFrame([{"pos": idx + 1, "mean_attn_val": val} for idx, val in enumerate(pos_attn_mean_vals)])
-pos_attn_mean_vals_df.sort_values(by="mean_attn_val", ascending=False).head(20)
+selected_pos = list(pos_attn_mean_vals_df.sort_values(by="mean_attn_val", ascending=False).head(20)["pos"].sort_values().values)
+selected_pos
 
 # ! pip install logomaker
 
@@ -301,6 +320,9 @@ seqs_counts_df = lm.alignment_to_matrix(sequences=sequences, to_type="probabilit
 seqs_counts_df.shape
 
 lm.Logo(seqs_counts_df, stack_order='small_on_top', fade_probabilities=True,)
+
+x = seqs_counts_df.reset_index()
+lm.Logo(x[x["pos"].isin(selected_pos)].set_index("pos"), stack_order='small_on_top', fade_probabilities=False,)
 
 step = 50
 for i in range(0, seqs_counts_df.shape[0], step):
