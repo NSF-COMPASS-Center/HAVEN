@@ -333,8 +333,25 @@ for i in range(0, seqs_counts_df.shape[0], step):
     x = x[x["pos"].isin(positions)].set_index("pos")
     lm.Logo(x, stack_order='small_on_top')
 
+# +
 # write the mean attention values
-output_file_path = os.path.join(os.getcwd(), "..","..", "..", "..", "output/raw/coronaviridae_s_prot_uniprot_embl_vertebrates_t0.01_c8/20240909/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_wiv04_mean_attn_vals_last_layer.txt")
+
 np.savetxt(output_file_path, np.array(pos_attn_mean_vals))
+# -
+
+pos_attn_mean_vals_df
+
+wiv04_seq = wiv04_input_df["seq"].values[0]
+wiv04_seq
+
+#pos_attn_mean_vals_df["aa"] = pos_attn_mean_vals_df["pos"].apply(lambda x: wiv04_seq[x-1])
+pos_attn_mean_vals_df = pos_attn_mean_vals_df.rename(columns={"pos": "site", "aa": "wildtype"})
+pos_attn_mean_vals_df["mutant"] = pos_attn_mean_vals_df["wildtype"]
+pos_attn_mean_vals_df
+
+output_file_path = os.path.join(os.getcwd(), "..","..", "..", "..", "output/raw/coronaviridae_s_prot_uniprot_embl_vertebrates_t0.01_c8/20240909/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_wiv04_mean_attn_vals.csv")
+pos_attn_mean_vals_df.to_csv(output_file_path)
+
+pd.read_csv(output_file_path, index_col=0)
 
 
