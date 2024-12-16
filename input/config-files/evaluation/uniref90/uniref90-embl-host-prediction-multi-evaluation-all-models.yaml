@@ -60,6 +60,7 @@ input_settings:
     # "Pretrain-TF-d1024-lr1e-5-ModFL": "20240302/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_0l_d512_lr1e-5-modfl_p-1_output.csv"
     # "Pretrain-TF-d1024-lr1e-5-RL": "20240302/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_0l_d512_lr1e-5-modrl_p-1_output.csv"
     "ESM2-t33_650M_UR50D": "uniref90_embl_vertebrates_non_idv/20241124/host_multi/external/uniref90viridae_esm2_msl2048_bn_fnn_2l_d1024_lr1e-4_output.csv"
+    "ESM2-t36_3B_UR50D" : "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20241127/host_multi/external/uniref90viridae_esm2_t36_3B_UR50D_bn_fnn_2l_d1024_lr1e-4_output.csv"
     #"VirProBERT 1e-5": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240909/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
     #"VirProBERT 3e-4": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20241117/host_multi/virprobert/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_output.csv "
     "ESM3": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20241127/host_multi/external/uniref90viridae_esm3_bn_fnn_2l_d1024_lr1e-4_output.csv"
@@ -79,22 +80,11 @@ label_mappings:
   "Hydrochoerus hydrochaeris": "Capybara"
   "Marmota himalayana": "Himalayan marmot"
   "Gallus gallus": "Red junglefowl"
-#  "Mus musculus": "House mouse"
-#  "Macaca mulatta": "Indochinese rhesus macaque"
-#  "Gallus gallus": "Red junglefowl"
-#  "Chlorocebus pygerythrus": "Vervet monkey"
-#  "Rattus norvegicus": "Brown rat"
-#  "Equus caballus": "Horse"
-#  "Phacochoerus africanus": "Common warthog"
-#  "Cercopithecus hamlyni": "Hamlyn monkey"
-#  "Felis catus": "Cat"
-#  "Capra hircus": "Goat"
-#  "Ovis aries": "Sheep"
 
 
 output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20241202/host_multi"
+  dataset_dir: "uniref90/20241216/host_multi"
   prefix: "host_multi_all_models"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
