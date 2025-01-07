@@ -24,7 +24,7 @@ classification_settings:
       img_size: 8
       img_dir: "input/data/coronaviridae/cgr_images"
 
-  host:
+  label_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan"]
     label_groupings:
