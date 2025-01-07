@@ -14,6 +14,7 @@ classification_settings:
     batch_size: 1
     id_col: "accession_id"
     sequence_col: "seq"
+    max_sequence_length: 4096
     metadata_cols: ["pangolin_lineage", "geo_location", "seq_length"]
     truncate: False
     split: False
