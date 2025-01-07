@@ -5,7 +5,7 @@ from pipelines.virus_host_prediction_baseline import host_prediction_pipeline
 from pipelines.transfer_learning import masked_language_modeling_pipleine, fine_tuning_host_prediction_pipeline, fine_tuning_external_host_prediction_pipeline
 from pipelines.interpretability import perturbation_analysis_host_prediction_pipeline, perturbation_analysis_external_host_prediction_pipeline
 from pipelines.few_shot_learning import few_shot_learning_host_prediction_pipeline
-from pipelines.interpretability import embedding_generation_pipeline
+from pipelines.interpretability import embedding_generation_pipeline, host_prediction_runtime_analysis_pipeline, host_prediction_runtime_analysis_external_pipeline
 from evaluation import evaluation
 from models.baseline.std_ml import feature_importance
 from utils import utils
@@ -54,6 +54,11 @@ def main():
             perturbation_analysis_host_prediction_pipeline.execute(config)
     elif config_type == "embedding_generation":
         embedding_generation_pipeline.execute(config)
+    elif config_type == "host_prediction_runtime":
+        if config_sub_type == "external":
+            host_prediction_runtime_analysis_external_pipeline.execute(config)
+        else:
+            host_prediction_runtime_analysis_pipeline.execute(config)
     # feature_importance for baseline models
     # TODO: >>>> DEPRECATED <<<< (Remove all corresponding code)
     elif config_type == "feature_importance":

@@ -1,0 +1,61 @@
+config_type: "host_prediction_runtime" # options: data_preprocessor, host_prediction, evaluation, host_prediction_runtime
+config_sub_type:
+
+# Input Settings:
+input_settings:
+  input_dir: "input/data/coronaviridae/20240313/sarscov2"
+  input_file_name: "sarscov2_variants_spike_seqences_ncbivirus_20250106_downsampled.csv"
+
+classification_settings:
+  type: "multi"
+  sequence_settings:
+    batch_size: 1
+    id_col: "accession_id"
+    sequence_col: "seq"
+    metadata_cols: ["pangolin_lineage", "geo_location", "seq_length"]
+    truncate: False
+    split: False
+    feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
+    kmer_settings:
+      k: 3
+    cgr_settings:
+      img_size: 8
+      img_dir: "input/data/coronaviridae/cgr_images"
+
+  label_settings:
+    label_col: "virus_host_name"
+    exclude_labels: [ "nan"]
+    label_groupings:
+      "Pig": [ "sus scrofa" ]
+      "Human": [ "homo sapiens" ]
+      "Cat": [ "felis catus" ]
+      "Dromedary camel": [ "camelus dromedarius" ]
+      "Cattle": ["bos taurus"]
+      "Chicken": [ "gallus gallus" ]
+      "Gray wolf": [ "canis lupus" ]
+      "Yak": [ "bos grunniens" ]
+
+  models:
+    - name: "hybrid_attention_msl256ae_bn_vs30cls_s64_fnn_2l_d1024_lr1e-5"
+      active: True
+      mode: "test"
+      model_path: "output/raw/coronaviridae_s_prot_uniprot_embl_vertebrates_t0.01_c8/20240909/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_itr4.pth"
+      depth: 2
+      n_classes: 8
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+      n_heads: 8
+      stride: 64
+      cls_token: True
+      pre_train_settings:
+        n_heads: 8
+        depth: 6
+        input_dim: 512 # input embedding dimension
+        hidden_dim: 1024
+        max_seq_len: 256
+
+output_settings:
+  output_dir: "output"
+  results_dir: "raw"
+  sub_dir: "sarscov2_s_prot_variants/20250107/uniprot/cov-S-multi-transfer_learning_mlm_hybrid_attn_fnn_2l_lr1e-5"
+  prefix: "msl256ae_bn_vs30cls_s64" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
