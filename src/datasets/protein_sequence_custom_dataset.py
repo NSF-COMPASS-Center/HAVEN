@@ -40,9 +40,11 @@ class ProteinSequenceESM2Dataset(ProteinSequenceDatasetWithID):
         # loc selects based on index in df
         # iloc selects based on integer location (0, 1, 2, ...)
         record = self.data.iloc[idx, :]
+        sequence = record[self.sequence_col]
+        sequence = sequence.replace("J", "X") # replacing J (leucine or isoleucine) with X (unknown or atypical AA)
 
         # format the sequence as a tuple with the id as the identifier
-        formatted_sequence = (record[self.id_col], record[self.sequence_col])
+        formatted_sequence = (record[self.id_col], sequence)
 
         if self.include_id_col:
             return record[self.id_col], formatted_sequence, torch.tensor(record[self.label_col], device=nn_utils.get_device())
