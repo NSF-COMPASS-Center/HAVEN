@@ -53,14 +53,14 @@ classification_settings:
       hidden_dim: 1024
       data_parallel: False
 
-    - id: "esm2_t36_3B_UR50D_lr1e-4"
+    - id: "esm2_t12_35M_UR50D_lr1e-4"
       name: "ESM2"
       active: True
       mode: "test" # supported values: train, test
-      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241204/host_multi/external/uniref90coronaviridae_esm2_t36_3B_UR50D_bn_fnn_2l_d1024_lr1e-4_itr4.pth"
-      fine_tuned_model_name: "esm2_t36_3B_UR50D" # "esm2_t36_3B_UR50D" # "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"
-      repr_layer: 36 # 12 # 36 # 48 # 33
-      input_dim: 2560 # 480 # 2560 # 5120 # 1280 # input embedding dimension
+      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241216/host_multi/external/uniref90coronaviridae_esm2_t12_35M_UR50D_bn_fnn_2l_d1024_lr1e-4_itr4.pth"
+      fine_tuned_model_name: "esm2_t12_35M_UR50D" # "esm2_t36_3B_UR50D" # "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"
+      repr_layer: 12 # 12 # 36 # 48 # 33
+      input_dim: 480 # 480 # 2560 # 5120 # 1280 # input embedding dimension
       loss: "FocalLoss"
       n_mlp_layers: 2
       n_classes: 8
@@ -72,4 +72,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "sarscov2_s_prot_variants/20250107/uniref90/external"
-  prefix: "esm2_t36_3B_UR50D_lr1e-4" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "esm2_t12_35M_UR50D_lr1e-4" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
