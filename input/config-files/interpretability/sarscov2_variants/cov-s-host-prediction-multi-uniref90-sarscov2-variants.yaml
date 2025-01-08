@@ -11,7 +11,7 @@ input_settings:
 classification_settings:
   type: "multi"
   sequence_settings:
-    batch_size: 1
+    batch_size: 16
     id_col: "accession_id"
     sequence_col: "seq"
     metadata_cols: ["pangolin_lineage", "geo_location", "seq_length"]
