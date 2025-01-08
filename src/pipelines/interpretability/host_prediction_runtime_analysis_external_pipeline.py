@@ -77,7 +77,7 @@ def execute(config):
         result_df["y_true"] = result_df["y_true"].map(index_label_map)
 
         # 6. Add the metadata from the input file
-        result_df = result_df.set_index(id_col).join(df[metadata_cols  + id_col].set_index(id_col), how="left").reset_index()
+        result_df = result_df.set_index(id_col).join(df[metadata_cols  + [id_col]].set_index(id_col), how="left").reset_index()
 
         # 7. Write the raw results in csv files
         perturbation_analysis_utils.write_output(result_df, output_results_dir, output_prefix, output_type="output")
