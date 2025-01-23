@@ -6,7 +6,7 @@ config_sub_type: "external"
   ## provide path to dataset folder
 input_settings:
   input_dir: "input/data/coronaviridae/20240313/sarscov2"
-  input_file_name: "sarscov2_variants_spike_seqences_ncbivirus_20250106_downsampled.csv"
+  input_file_name: "sarscov2_variants_spike_seqences_ncbivirus_20250106_who_variants_downsampled.csv"
 
 classification_settings:
   type: "multi"
@@ -70,5 +70,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "sarscov2_s_prot_variants/20250107/uniprot/external"
+  sub_dir: "sarscov2_s_prot_variants/20250123/uniprot/external"
   prefix: "esm2_t12_35M_UR50D_lr1e-4" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
