@@ -5,6 +5,7 @@ from datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWith
 import numpy as np
 import torch
 
+
 class ProteinSequenceProstT5Dataset(ProteinSequenceDatasetWithID):
     def __init__(self, df, sequence_col, max_seq_len, truncate, label_col, id_col, include_id_col):
         super(ProteinSequenceProstT5Dataset, self).__init__(df, id_col, sequence_col, max_seq_len, truncate, label_col)

@@ -4,6 +4,7 @@ from datasets.protein_sequence_dataset import ProteinSequenceDataset
 import numpy as np
 import torch
 
+
 class ProteinSequenceWithLabelDataset(ProteinSequenceDataset):
     def __init__(self, df, sequence_col, max_seq_len, truncate, label_col):
         super(ProteinSequenceWithLabelDataset, self).__init__(df, sequence_col, label_col, truncate, max_seq_len)
