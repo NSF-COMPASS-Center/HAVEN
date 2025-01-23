@@ -41,7 +41,7 @@ classification_settings:
   models:
     - id: "prostt5_bn_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
-      active: False
+      active: True
       mode: "test" # supported values: train, test
       model_path: "output/raw/coronaviridae_s_prot_uniprot_embl_vertebrates_t0.01_c8/20241114/host_multi/external/uniprot_coronaviridae_prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4_itr4.pth"
       pre_trained_model_link: "Rostlab/ProstT5"
@@ -55,7 +55,7 @@ classification_settings:
 
     - id: "esm2_t33_650M_UR50D_lr1e-4"
       name: "ESM2"
-      active: True
+      active: False
       mode: "test" # supported values: train, test
       model_path: "output/raw/coronaviridae_s_prot_uniprot_embl_vertebrates_t0.01_c8/20241118/host_multi/external/uniprot_coronaviridae_esm2_msl2048_bn_fnn_2l_d1024_lr1e-4_itr4.pth"
       fine_tuned_model_name: "esm2_t33_650M_UR50D" # "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"
@@ -71,4 +71,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "sarscov2_s_prot_variants/20250123/uniprot/external"
-  prefix: "esm2_t33_650M_UR50D_lr1e-4" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "prostt5_lr1e-4" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
