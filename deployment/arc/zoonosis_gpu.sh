@@ -18,7 +18,7 @@ module load
 
 module load Anaconda3
 #Load CUDA
-module load cuda11.2/toolkit
+module load cuda11.8/toolkit
 
 # Load conda environment
 source activate ~/.conda/envs/zoonosis
