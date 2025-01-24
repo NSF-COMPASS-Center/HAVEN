@@ -82,7 +82,7 @@ fine_tune_settings:
 
     - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       pre_trained_model_link: "Rostlab/ProstT5"
