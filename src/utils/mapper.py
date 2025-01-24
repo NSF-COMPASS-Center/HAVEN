@@ -9,14 +9,14 @@ from models.virprobert_wo_hierattn import VirProBERT_wo_HierAttn
 
 from transfer_learning.fine_tuning.bert_virus_host_prediction import BERT_VirusHostPrediction
 from models.external.prost5_host_prediction import ProstT5_VirusHostPrediction
-from models.external.esm2_host_prediction import ESM2_VirusHostPrediction
+#from models.external.esm2_host_prediction import ESM2_VirusHostPrediction
 #from models.external.esm3_host_prediction import ESM3_VirusHostPrediction
 
 from datasets.protein_sequence_custom_dataset import ProteinSequenceProstT5Dataset
 from datasets.protein_sequence_custom_dataset import ProteinSequenceESM2Dataset
 from datasets.protein_sequence_custom_dataset import ProteinSequenceESM3Dataset
 
-from datasets.collations.custom_collate_function import ESM2CollateFunction
+#from datasets.collations.custom_collate_function import ESM2CollateFunction
 
 # mappings of all classes
 model_map = {
@@ -35,10 +35,10 @@ model_map = {
 
 dataset_map = {
     "ProstT5": ProteinSequenceProstT5Dataset,
-    "ESM2": ProteinSequenceESM2Dataset,
+#    "ESM2": ProteinSequenceESM2Dataset,
 #    "ESM3": ProteinSequenceESM3Dataset
 }
 
 collate_function_map = {
-    "ESM2": ESM2CollateFunction
+#    "ESM2": ESM2CollateFunction
 }
