@@ -16,7 +16,7 @@ from datasets.protein_sequence_with_label_dataset import ProteinSequenceWithLabe
 from datasets.protein_sequence_unlabeled_dataset import ProteinSequenceUnlabeledDataset
 from datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWithID
 from datasets.protein_sequence_kmer_dataset import ProteinSequenceKmerDataset
-from datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
+#from datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
 from datasets.protein_sequence_custom_dataset import ProteinSequenceProstT5Dataset
 from datasets.collations.fsl_episode import FewShotLearningEpisode
 from datasets.samplers.fsl_fixed_task_sampler import FewShotLearningFixedTaskSampler
@@ -202,12 +202,13 @@ def get_kmer_dataset_loader(df, sequence_settings, label_col):
 
 
 def get_cgr_dataset_loader(df, sequence_settings, label_col):
-    dataset = ProteinSequenceCGRDataset(df,
-                                        id_col=sequence_settings["id_col"],
-                                        label_col=label_col,
-                                        img_dir=sequence_settings["cgr_settings"]["img_dir"],
-                                        img_size=sequence_settings["cgr_settings"]["img_size"])
-    return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
+ #   dataset = ProteinSequenceCGRDataset(df,
+ #                                       id_col=sequence_settings["id_col"],
+ #                                       label_col=label_col,
+ #                                       img_dir=sequence_settings["cgr_settings"]["img_dir"],
+ #                                       img_size=sequence_settings["cgr_settings"]["img_size"])
+ #   return DataLoader(dataset=dataset, batch_size=sequence_settings["batch_size"], shuffle=True)
+    pass
 
 
 def get_few_shot_learning_task_sampler(dataset, few_shot_learn_settings):
