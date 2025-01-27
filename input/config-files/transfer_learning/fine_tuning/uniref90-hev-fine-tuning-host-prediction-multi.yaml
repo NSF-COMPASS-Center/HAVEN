@@ -57,9 +57,6 @@ fine_tune_settings:
     label_groupings:
       "Human": [ "Homo sapiens" ]
       "Pig": [ "Sus scrofa" ]
-      "Capybara": [ "Hydrochoerus hydrochaeris" ]
-      "Himalayan marmot": [ "Marmota himalayana" ]
-      "Red junglefowl": [ "Gallus gallus" ]
       "Brown rat" : ['Rattus norvegicus']
       "Common vole": ['Microtus arvalis']
 
