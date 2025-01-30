@@ -68,9 +68,23 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
+    - id: "prot_t5_xl_half_uniref50_enc_fnn_2l_d1024_lr3e-4"
+      name: "ProstT5" # this is the ProtT5 model but the fine-tuning pipeline is the same as prostT5 (Pro'S'tT5)
+      active: True
+      mode: "train" # supported values: train, test
+      fine_tuned_model_path: ""
+      pre_trained_model_link: "Rostlab/prot_t5_xl_half_uniref50-enc"
+      hugging_face_cache_dir: "output/cache_dir"
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 5
+      input_dim: 1024 # input embedding dimension
+      hidden_dim: 1024
+      data_parallel: False
+
     - id: "esm2_t12_35M_UR50D_bn_fnn_2l_d1024_lr1e-4"
       name: "ESM2"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       fine_tuned_model_name: "esm2_t12_35M_UR50D" # "esm2_t36_3B_UR50D" # "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"

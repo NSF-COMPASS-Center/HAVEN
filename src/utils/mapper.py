@@ -8,7 +8,7 @@ from models.virprobert import VirProBERT
 from models.virprobert_wo_hierattn import VirProBERT_wo_HierAttn
 
 from transfer_learning.fine_tuning.bert_virus_host_prediction import BERT_VirusHostPrediction
-from models.external.prost5_host_prediction import ProstT5_VirusHostPrediction
+from models.external.prostt5_host_prediction import ProstT5_VirusHostPrediction
 from models.external.esm2_host_prediction import ESM2_VirusHostPrediction
 #from models.external.esm3_host_prediction import ESM3_VirusHostPrediction
 

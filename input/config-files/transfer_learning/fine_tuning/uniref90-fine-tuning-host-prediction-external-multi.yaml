@@ -35,7 +35,7 @@ fine_tune_settings:
 
   training_settings:
     n_epochs: 50
-    max_lr: 1e-4
+    max_lr: 3e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -65,9 +65,23 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
+    - id: "prot_t5_xl_half_uniref50_enc_fnn_2l_d1024_lr3e-4"
+      name: "ProstT5" # this is the ProtT5 model but the fine-tuning pipeline is the same as prostT5 (Pro'S'tT5)
+      active: True
+      mode: "train" # supported values: train, test
+      fine_tuned_model_path: ""
+      pre_trained_model_link: "Rostlab/prot_t5_xl_half_uniref50-enc"
+      hugging_face_cache_dir: "output/cache_dir"
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 5
+      input_dim: 1024 # input embedding dimension
+      hidden_dim: 1024
+      data_parallel: False
+
     - id: "esm2_t12_35M_UR50D_bn_fnn_2l_d1024_lr1e-4_itr0"
       name: "ESM2"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       fine_tuned_model_name: "esm2_t12_35M_UR50D" # "esm2_t36_3B_UR50D" # "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"
@@ -94,5 +108,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20241216/host_multi/external"
+  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240130/host_multi/external"
   prefix: "uniref90viridae" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
