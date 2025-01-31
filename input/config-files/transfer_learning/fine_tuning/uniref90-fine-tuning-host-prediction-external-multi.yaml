@@ -20,7 +20,7 @@ sequence_settings:
     batch_size: 8
     id_col: "uniref90_id"
     sequence_col: "seq"
-    truncate: False
+    truncate: True
     max_sequence_length: 2048
     split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
@@ -51,7 +51,7 @@ fine_tune_settings:
       "Red junglefowl": [ "Gallus gallus" ]
 
   task_settings:
-    - id: "prostt5_fnn_2l_d1024_lr3e-4_itr4"
+    - id: "prostt5_msl2048_fnn_2l_d1024_lr3e-4_itr4"
       name: "ProstT5"
       active: True
       mode: "train" # supported values: train, test
