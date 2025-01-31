@@ -17,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 16
+    batch_size: 8
     id_col: "uniprot_id"
     sequence_col: "seq"
     truncate: False
@@ -35,7 +35,7 @@ fine_tune_settings:
 
   training_settings:
     n_epochs: 50
-    max_lr: 1e-4
+    max_lr: 3e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -54,9 +54,9 @@ fine_tune_settings:
       "Yak": [ "bos grunniens" ]
 
   task_settings:
-    - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
+    - id: "prostt5_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       pre_trained_model_link: "Rostlab/ProstT5"
@@ -68,9 +68,23 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
+    - id: "prot_t5_xl_half_uniref50_enc_fnn_2l_d1024_lr3e-4"
+      name: "ProtT5"
+      active: False
+      mode: "train" # supported values: train, test
+      fine_tuned_model_path: ""
+      pre_trained_model_link: "Rostlab/prot_t5_xl_half_uniref50-enc"
+      hugging_face_cache_dir: "output/cache_dir"
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 5
+      input_dim: 1024 # input embedding dimension
+      hidden_dim: 1024
+      data_parallel: False
+
     - id: "esm2_t12_35M_UR50D_bn_fnn_2l_d1024_lr1e-4"
       name: "ESM2"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       fine_tuned_model_name: "esm2_t12_35M_UR50D" # "esm2_t36_3B_UR50D" # "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"
@@ -86,5 +100,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_uniprot_embl_vertebrates_t0.01_c8/20241216/host_multi/external"
+  sub_dir: "coronaviridae_s_prot_uniprot_embl_vertebrates_t0.01_c8/20250131/host_multi/external"
   prefix: "uniprot_coronaviridae" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
