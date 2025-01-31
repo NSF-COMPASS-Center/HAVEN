@@ -2,6 +2,7 @@ from utils import nn_utils
 from models.protein_sequence_classification import ProteinSequenceClassification
 from transformers import T5Tokenizer, T5EncoderModel
 import torch
+import gc
 
 class ProstT5_VirusHostPrediction(ProteinSequenceClassification):
     """
@@ -39,7 +40,7 @@ class ProstT5_VirusHostPrediction(ProteinSequenceClassification):
         del embedding_representation
         torch.cuda.empty_cache()
         gc.collect()  # garbage collection to free up memory
-        
+
         return torch.stack(sequence_embeddings)
 
     def get_model(model_params) -> ProteinSequenceClassification:
