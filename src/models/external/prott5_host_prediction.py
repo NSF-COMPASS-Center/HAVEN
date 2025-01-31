@@ -44,7 +44,7 @@ class ProtT5_VirusHostPrediction(ProteinSequenceClassification):
 
     def get_model(model_params) -> ProteinSequenceClassification:
         # explicitly set the default dtype to float16
-        torch.set_default_dtype(torch.float16)
+        #t orch.set_default_dtype(torch.float16)
 
         model = ProtT5_VirusHostPrediction(input_dim=model_params["input_dim"],
                                            hidden_dim=model_params["hidden_dim"],
