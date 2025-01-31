@@ -22,8 +22,7 @@ class ProtT5_VirusHostPrediction(ProteinSequenceClassification):
 
         # explicitly set the model to float16 otherwise the generated embeddings will be full precision
         pre_trained_model = T5EncoderModel.from_pretrained(pre_trained_model_link,
-                                                           cache_dir=hugging_face_cache_dir,
-                                                           torch_dtype=torch.float16)
+                                                           cache_dir=hugging_face_cache_dir)
         return tokenizer, pre_trained_model.to(nn_utils.get_device())
 
     def get_embedding(self, X):
@@ -44,7 +43,7 @@ class ProtT5_VirusHostPrediction(ProteinSequenceClassification):
 
     def get_model(model_params) -> ProteinSequenceClassification:
         # explicitly set the default dtype to float16
-        #t orch.set_default_dtype(torch.float16)
+        # torch.set_default_dtype(torch.float16)
 
         model = ProtT5_VirusHostPrediction(input_dim=model_params["input_dim"],
                                            hidden_dim=model_params["hidden_dim"],
