@@ -139,3 +139,20 @@ sbatch deployment/arc/misc_gpu.sh . src/utils/scripts/perturbation_dataset_gener
     
     Example implemenation of an external PLM: ProstT5 ([ProstT5_VirusHostPrediction](src/models/external/prost5_host_prediction.py), [ProteinSequenceProstT5Dataset](src/datasets/protein_sequence_custom_dataset.py))
 ---
+## Troubleshooting
+- Check the output/logs file(s) to track the error
+- Ensure cuda, PyTorch, and Python compatibility
+  - Run conda list to see versions 
+  - Compare version compatibility on [Pytorch's website](https://github.com/pytorch/pytorch/blob/main/RELEASE.md)
+  - Change versions as necessary
+- Check these installations:
+  - torch
+  - run requirements.txt again 
+  - transformers
+  - sentencepiece
+  - torchvision
+  - wandb 
+- If error is CUDA out of memory,
+  - try decreasing batch size 
+  - running 
+---
