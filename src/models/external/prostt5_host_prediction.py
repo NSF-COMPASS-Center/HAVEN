@@ -36,6 +36,10 @@ class ProstT5_VirusHostPrediction(ProteinSequenceClassification):
             sequence_embedding = embedding_representation.last_hidden_state[i, 1: seq_length + 1].mean(0)
             sequence_embeddings.append(sequence_embedding)
 
+        del embedding_representation
+        torch.cuda.empty_cache()
+        gc.collect()  # garbage collection to free up memory
+        
         return torch.stack(sequence_embeddings)
 
     def get_model(model_params) -> ProteinSequenceClassification:
