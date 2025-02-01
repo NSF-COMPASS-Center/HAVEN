@@ -53,7 +53,7 @@ fine_tune_settings:
   task_settings:
     - id: "prostt5_msl2048_fnn_2l_d1024_lr3e-4_itr4"
       name: "ProstT5"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       pre_trained_model_link: "Rostlab/ProstT5"
@@ -65,12 +65,12 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
-    - id: "prot_t5_xl_half_uniref50_enc_fnn_2l_d1024_lr3e-4_itr4"
+    - id: "prot_t5_xl_uniref50_msl2048_fnn_2l_d1024_lr3e-4_itr4"
       name: "ProtT5" # IMP: note the difference between ProstT5 and ProtT5
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
-      pre_trained_model_link: "Rostlab/prot_t5_xl_half_uniref50-enc"
+      pre_trained_model_link: "Rostlab/prot_t5_xl_uniref50"
       hugging_face_cache_dir: "output/cache_dir"
       loss: "FocalLoss"
       n_mlp_layers: 2
