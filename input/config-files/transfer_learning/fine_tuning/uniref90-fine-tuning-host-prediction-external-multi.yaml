@@ -14,7 +14,7 @@ input_settings:
   file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ 48918293 ] # [ 12612648, 31062180, 48918293, 55631155, 79221635 ] #
+  split_seeds: [ 31062180 ] # [ 12612648, 31062180, 48918293, 55631155, 79221635 ] #
 
 sequence_settings:
     batch_size: 8
@@ -65,7 +65,7 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
-    - id: "prot_t5_xl_uniref50_msl2048_fnn_2l_d1024_lr3e-4_itr2"
+    - id: "prot_t5_xl_uniref50_msl2048_fnn_2l_d1024_lr3e-4_itr1"
       name: "ProtT5" # IMP: note the difference between ProstT5 and ProtT5
       active: True
       mode: "train" # supported values: train, test
