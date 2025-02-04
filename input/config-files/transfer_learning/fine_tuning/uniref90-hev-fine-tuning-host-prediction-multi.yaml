@@ -79,15 +79,15 @@ fine_tune_settings:
 
     - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       pre_trained_model_link: "Rostlab/ProstT5"
       hugging_face_cache_dir: "output/cache_dir"
       loss: "FocalLoss"
       n_mlp_layers: 2
-      n_classes: 8
-      input_dim: 1024 # input embedding dimension
+      n_classes: 4
+      input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       data_parallel: False
 
@@ -95,4 +95,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi"
-  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs31" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
