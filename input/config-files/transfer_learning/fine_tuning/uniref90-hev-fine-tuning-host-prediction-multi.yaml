@@ -82,7 +82,7 @@ fine_tune_settings:
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
-      cls_token: True #added
+#      cls_token: True #added
       pre_trained_model_link: "Rostlab/ProstT5"
       hugging_face_cache_dir: "output/cache_dir"
       loss: "FocalLoss"
