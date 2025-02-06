@@ -63,7 +63,7 @@ fine_tune_settings:
   task_settings:
     - id: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5"
       name: "VirProBERT"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       segment_len: 256
@@ -82,7 +82,6 @@ fine_tune_settings:
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
-#      cls_token: True #added
       pre_trained_model_link: "Rostlab/ProstT5"
       hugging_face_cache_dir: "output/cache_dir"
       loss: "FocalLoss"
