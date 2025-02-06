@@ -25,16 +25,16 @@ sequence_settings:
     split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
-pre_train_settings:
-  model_name: "masked_language_modeling"
-  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240821/transformer_encoder-l_6-h_8-lr1e-4_msl256_b512_splitseq_mlm_vs30cls_allemb_itr0.pth"
-  encoder_settings:
-    model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
-    n_heads: 8
-    depth: 6
-    input_dim: 512 # input embedding dimension
-    hidden_dim: 1024
-    max_seq_len: 256
+#pre_train_settings:
+#  model_name: "masked_language_modeling"
+#  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240821/transformer_encoder-l_6-h_8-lr1e-4_msl256_b512_splitseq_mlm_vs30cls_allemb_itr0.pth"
+#  encoder_settings:
+#    model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
+#    n_heads: 8
+#    depth: 6
+#    input_dim: 512 # input embedding dimension
+#    hidden_dim: 1024
+#    max_seq_len: 256
 
 fine_tune_settings:
   experiment: "ablation_study"
@@ -45,8 +45,8 @@ fine_tune_settings:
   save_model: True
 
   training_settings:
-    n_epochs_freeze: 20
-    n_epochs_unfreeze: 30
+#    n_epochs_freeze: 20
+#    n_epochs_unfreeze: 30
     n_epochs: 50
     max_lr: 1e-4
     pct_start: 0.10
