@@ -1,5 +1,5 @@
 config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation, transfer_learning
-config_sub_type: "host_prediction"
+config_sub_type: "host_prediction_external"
 
 # Input Settings:
   ## initialize base input folder name
