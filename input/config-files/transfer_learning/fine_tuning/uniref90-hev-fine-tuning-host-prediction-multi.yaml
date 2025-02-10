@@ -47,8 +47,9 @@ fine_tune_settings:
   save_model: True
 
   training_settings:
-#    n_epochs_freeze: 20
-#    n_epochs_unfreeze: 30
+    # Comment out the next two if running external models
+    n_epochs_freeze: 20
+    n_epochs_unfreeze: 30
     n_epochs: 50
     max_lr: 1e-4
     pct_start: 0.10
