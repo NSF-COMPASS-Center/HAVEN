@@ -1,6 +1,6 @@
 config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation, transfer_learning
-#config_sub_type: "host_prediction_external"
-config_sub_type: "host_prediction"
+config_sub_type: "host_prediction_external"
+#config_sub_type: "host_prediction"
 
 # Input Settings:
   ## initialize base input folder name
@@ -27,16 +27,16 @@ sequence_settings:
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 # Turn off pre_train_settings for external models
-pre_train_settings:
-  model_name: "masked_language_modeling"
-  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240821/transformer_encoder-l_6-h_8-lr1e-4_msl256_b512_splitseq_mlm_vs30cls_allemb_itr0.pth"
-  encoder_settings:
-    model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
-    n_heads: 8
-    depth: 6
-    input_dim: 512 # input embedding dimension
-    hidden_dim: 1024
-    max_seq_len: 256
+#pre_train_settings:
+#  model_name: "masked_language_modeling"
+#  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240821/transformer_encoder-l_6-h_8-lr1e-4_msl256_b512_splitseq_mlm_vs30cls_allemb_itr0.pth"
+#  encoder_settings:
+#    model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
+#    n_heads: 8
+#    depth: 6
+#    input_dim: 512 # input embedding dimension
+#    hidden_dim: 1024
+#    max_seq_len: 256
 
 fine_tune_settings:
   experiment: "ablation_study"
@@ -48,8 +48,8 @@ fine_tune_settings:
 
   training_settings:
     # Comment out the next two if running external models
-    n_epochs_freeze: 20
-    n_epochs_unfreeze: 30
+#    n_epochs_freeze: 20
+#    n_epochs_unfreeze: 30
     n_epochs: 50
     max_lr: 1e-4
     pct_start: 0.10
@@ -68,7 +68,7 @@ fine_tune_settings:
   task_settings:
     - id: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5"
       name: "VirProBERT"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       segment_len: 256
@@ -84,7 +84,7 @@ fine_tune_settings:
 
     - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       pre_trained_model_link: "Rostlab/ProstT5"
@@ -100,4 +100,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi"
-  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hev_virprobert" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hev_prost5" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
