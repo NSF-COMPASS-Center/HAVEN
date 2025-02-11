@@ -91,7 +91,7 @@ fine_tune_settings:
       hugging_face_cache_dir: "output/cache_dir"
       loss: "FocalLoss"
       n_mlp_layers: 2
-      n_classes: 4
+      n_classes: 3
       input_dim: 1024 # input embedding dimension
       hidden_dim: 1024
       data_parallel: False
