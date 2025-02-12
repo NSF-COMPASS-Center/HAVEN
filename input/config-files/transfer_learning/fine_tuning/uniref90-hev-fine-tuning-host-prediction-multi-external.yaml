@@ -1,6 +1,5 @@
 config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation, transfer_learning
 config_sub_type: "host_prediction_external"
-#config_sub_type: "host_prediction"
 
 # Input Settings:
   ## initialize base input folder name
@@ -18,7 +17,7 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 8 #12 #Originally 16
+    batch_size: 16
     id_col: "uniref90_id"
     sequence_col: "seq"
     truncate: False
@@ -26,17 +25,6 @@ sequence_settings:
     split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
-# Turn off pre_train_settings for external models
-#pre_train_settings:
-#  model_name: "masked_language_modeling"
-#  model_path: "output/raw/uniref90-viridae/pre-training/mlm/20240821/transformer_encoder-l_6-h_8-lr1e-4_msl256_b512_splitseq_mlm_vs30cls_allemb_itr0.pth"
-#  encoder_settings:
-#    model_name: "transformer_encoder-l_6-h_8-lr1e-4-mlm"
-#    n_heads: 8
-#    depth: 6
-#    input_dim: 512 # input embedding dimension
-#    hidden_dim: 1024
-#    max_seq_len: 256
 
 fine_tune_settings:
   experiment: "ablation_study"
@@ -47,9 +35,6 @@ fine_tune_settings:
   save_model: True
 
   training_settings:
-    # Comment out the next two if running external models
-#    n_epochs_freeze: 20
-#    n_epochs_unfreeze: 30
     n_epochs: 50
     max_lr: 1e-4
     pct_start: 0.10
@@ -77,6 +62,19 @@ fine_tune_settings:
       n_mlp_layers: 2
       n_classes: 3
       input_dim: 1024 # input embedding dimension
+      hidden_dim: 1024
+      data_parallel: False
+
+    - id: "esm2_msl2048_bn_fnn_2l_d1024_lr1e-4"
+      name: "ESM2"
+      active: False
+      mode: "train" # supported values: train, test
+      fine_tuned_model_name: "esm2_t33_650M_UR50D" # "esm2_t48_15B_UR50D"
+      repr_layer: 33 # 48
+      input_dim: 1280 # 5120 # input embedding dimension
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 3
       hidden_dim: 1024
       data_parallel: False
 
