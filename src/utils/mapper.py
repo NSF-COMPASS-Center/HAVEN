@@ -9,11 +9,11 @@ from models.virprobert_wo_hierattn import VirProBERT_wo_HierAttn
 
 from transfer_learning.fine_tuning.bert_virus_host_prediction import BERT_VirusHostPrediction
 from models.external.prost5_host_prediction import ProstT5_VirusHostPrediction
-from models.external.esm2_host_prediction import ESM2_VirusHostPrediction
+# from models.external.esm2_host_prediction import ESM2_VirusHostPrediction
 #from models.external.esm3_host_prediction import ESM3_VirusHostPrediction
 
 from datasets.protein_sequence_custom_dataset import ProteinSequenceProstT5Dataset
-from datasets.protein_sequence_custom_dataset import ProteinSequenceESM2Dataset
+# from datasets.protein_sequence_custom_dataset import ProteinSequenceESM2Dataset
 #from datasets.protein_sequence_custom_dataset import ProteinSequenceESM3Dataset
 
 from datasets.collations.custom_collate_function import ESM2CollateFunction
@@ -29,16 +29,16 @@ model_map = {
     "VirProBERT_wo_Hierarchical_Attention": VirProBERT_wo_HierAttn,
     "VirProBERT": VirProBERT,
     "ProstT5": ProstT5_VirusHostPrediction,
-   "ESM2": ESM2_VirusHostPrediction,
+   # "ESM2": ESM2_VirusHostPrediction,
 #    "ESM3": ESM3_VirusHostPrediction
 }
 
 dataset_map = {
     "ProstT5": ProteinSequenceProstT5Dataset,
-   "ESM2": ProteinSequenceESM2Dataset,
+   # "ESM2": ProteinSequenceESM2Dataset,
 #    "ESM3": ProteinSequenceESM3Dataset
 }
 
 collate_function_map = {
-   "ESM2": ESM2CollateFunction
+   # "ESM2": ESM2CollateFunction
 }
