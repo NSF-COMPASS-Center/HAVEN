@@ -29,7 +29,7 @@ model_map = {
     "VirProBERT_wo_Hierarchical_Attention": VirProBERT_wo_HierAttn,
     "VirProBERT": VirProBERT,
     "ProstT5": ProstT5_VirusHostPrediction,
-   "ESM2": ESM2_VirusHostPrediction,
+   # "ESM2": ESM2_VirusHostPrediction,
 #    "ESM3": ESM3_VirusHostPrediction
 }
 
