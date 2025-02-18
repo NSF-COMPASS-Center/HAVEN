@@ -51,7 +51,9 @@ input_settings:
     #"Hybd-sl256st64-vs30-AE-BN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hybrid_attention_msl256s64ae_bn_fnn_2l_d1024_lr1e-4_output.csv"
     #"Hybd-sl256st128-CLS-vs30": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b1024_s128_hybrid_attention_s128_fnn_2l_d1024_lr1e-4_output.csv"
     #"Hybd-sl256st64-CLS-vs30-AE-BN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hybrid_attention_msl256s64ae_bn_fnn_2l_d1024_lr1e-4_output.csv"
-    "VirProBERT": "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi/small_batch_size/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
+#    "VirProBERT": "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi/small_batch_size/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
+    "VirProBERT_1%": "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hev1%_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
+    "VirProBERT_2%": "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hev2%_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
     #"Hybd-sl256st64-CLS-vs103": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
     #"Hybd-sl512st128-CLS-vs103": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl512b512_s128_hybrid_attention_s128_fnn_2l_d1024_lr1e-4_output.csv"
     #"Hybd-sl512st128-CLS-vs30": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240723/host_multi/fine_tuning_hybrid_cls_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl512b512_cls_vs30_hybrid_attention_s128_fnn_2l_d1024_lr1e-4_output.csv"
@@ -95,5 +97,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/20241029/host_multi"
+  dataset_dir: "uniref90/20250218/host_multi"
   prefix: "host_multi_all_models"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
