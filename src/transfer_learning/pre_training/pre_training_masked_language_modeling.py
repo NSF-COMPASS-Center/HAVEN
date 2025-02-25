@@ -11,7 +11,7 @@ class MaskedLanguageModel(nn.Module):
         self.pad_token_val = constants.PAD_TOKEN_VAL
         self.mask_token_val = constants.MASK_TOKEN_VAL
         self.no_mask_token_vals = [constants.PAD_TOKEN_VAL, constants.CLS_TOKEN_VAL]
-        self.n_tokens = len(constants.AMINO_ACID_VOCABULARY) + 1 # n_tokens = size of amino_acid vocab + 1 (for the pad_token)
+        self.n_tokens = len(constants.AMINO_ACID_VOCABULARY) + 1  # n_tokens = size of amino_acid vocab + 1 (for the pad_token)
         self.mask_prob = mask_prob
         self.random_mask_prob = random_mask_prob
         self.no_change_mask_prob = no_change_mask_prob

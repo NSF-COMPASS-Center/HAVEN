@@ -1,7 +1,9 @@
 from models.baseline.nlp.transformer import transformer
-from models.nlp import cnn1d, rnn, lstm, fnn
+from models.baseline.nlp import cnn1d, rnn, lstm, fnn
 from utils import nn_utils
 import joblib
+import torch
+
 
 def get_loaded_model(model_file_path, model_config, model_type):
     model = None
@@ -25,5 +27,5 @@ def get_loaded_model(model_file_path, model_config, model_type):
         return
 
     model.load_state_dict(torch.load(model_file_path))
-    model = nlp_model.to(nn_utils.get_device())
+    model = model.to(nn_utils.get_device())
     return model

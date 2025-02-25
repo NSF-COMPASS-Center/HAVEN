@@ -103,6 +103,7 @@ def execute(config):
         torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
         wandb.finish()
 
+
 def run(model, train_dataset_loader, val_dataset_loader, training_settings,
         encoder_model_name, mlm_checkpoint_filepath):
     criterion = nn.CrossEntropyLoss(ignore_index=constants.PAD_TOKEN_VAL) # all non masked positions are replaced with pad_token_val in the label

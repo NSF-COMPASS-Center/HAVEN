@@ -4,6 +4,7 @@ from torch.nn import BatchNorm1d
 from utils import nn_utils
 from models.protein_sequence_classification import ProteinSequenceClassification
 
+
 class BERT_VirusHostPrediction(ProteinSequenceClassification):
     """
     Fine-tune a vanilla pre-trained BERT model using the whole sequence as input.
@@ -12,7 +13,6 @@ class BERT_VirusHostPrediction(ProteinSequenceClassification):
         super(ProteinSequenceClassification, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=True)
         self.pre_trained_model = pre_trained_model
         self.cls_token = cls_token
-
 
     def get_embedding(self, X):
         X = self.pre_trained_model(X, mask=None)
@@ -26,7 +26,6 @@ class BERT_VirusHostPrediction(ProteinSequenceClassification):
         return X
 
     # def forward() : use the template implementation in ProteinSequenceClassification
-
 
     def get_model(model_params, data_parallel) -> ProteinSequenceClassification:
         model = BERT_VirusHostPrediction(pre_trained_model=model_params["pre_trained_model"],

@@ -5,9 +5,9 @@ from models.baseline.nlp.lstm import LSTM_VirusHostPrediction
 from models.baseline.nlp.transformer_encoder import TransformerEncoderVirusHostPrediction
 
 from models.virprobert import VirProBERT
-from models.virprobert_wo_hierattn import VirProBERT_wo_HierAttn
+from models.virprobert.ablation.virprobert_wo_hierattn import VirProBERT_wo_HierAttn
 
-from transfer_learning.fine_tuning.bert_virus_host_prediction import BERT_VirusHostPrediction
+from models.virprobert.ablation.bert_virus_host_prediction import BERT_VirusHostPrediction
 from models.external.prostt5_host_prediction import ProstT5_VirusHostPrediction
 from models.external.prott5_host_prediction import ProtT5_VirusHostPrediction
 from models.external.esm2_host_prediction import ESM2_VirusHostPrediction
@@ -16,7 +16,6 @@ from models.external.esm2_host_prediction import ESM2_VirusHostPrediction
 from datasets.protein_sequence_custom_dataset import ProteinSequenceProstT5Dataset
 from datasets.protein_sequence_custom_dataset import ProteinSequenceProtT5Dataset
 from datasets.protein_sequence_custom_dataset import ProteinSequenceESM2Dataset
-from datasets.protein_sequence_custom_dataset import ProteinSequenceESM3Dataset
 
 from datasets.collations.custom_collate_function import ESM2CollateFunction
 
