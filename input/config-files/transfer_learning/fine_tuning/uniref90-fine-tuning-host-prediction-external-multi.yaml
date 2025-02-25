@@ -14,13 +14,13 @@ input_settings:
   file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ 31062180 ] # [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
+  split_seeds: [ 12612648 ] # [ 12612648, 31062180, 48918293, 55631155, 79221635 ] #
 
 sequence_settings:
-    batch_size: 16
+    batch_size: 8
     id_col: "uniref90_id"
     sequence_col: "seq"
-    truncate: False
+    truncate: True
     max_sequence_length: 2048
     split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
@@ -35,7 +35,7 @@ fine_tune_settings:
 
   training_settings:
     n_epochs: 50
-    max_lr: 1e-4
+    max_lr: 3e-4
     pct_start: 0.10
     div_factor: 25.0
     final_div_factor: 10000.0
@@ -51,7 +51,7 @@ fine_tune_settings:
       "Red junglefowl": [ "Gallus gallus" ]
 
   task_settings:
-    - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
+    - id: "prostt5_msl2048_fnn_2l_d1024_lr3e-4_itr0"
       name: "ProstT5"
       active: False
       mode: "train" # supported values: train, test
@@ -63,16 +63,30 @@ fine_tune_settings:
       n_classes: 5
       input_dim: 1024 # input embedding dimension
       hidden_dim: 1024
-      data_parallel: True
+      data_parallel: False
 
-    - id: "esm2_msl2048_bn_fnn_2l_d1024_lr1e-4-itr4"
-      name: "ESM2"
+    - id: "prot_t5_xl_uniref50_msl2048_fnn_2l_d1024_lr3e-4_itr0"
+      name: "ProtT5" # IMP: note the difference between ProstT5 and ProtT5
       active: True
-      mode: "test" # supported values: train, test
-      fine_tuned_model_path: "output/raw/uniref90_embl_vertebrates_non_idv/20241120/host_multi/uniref90viridae_esm2_msl2048_bn_fnn_2l_d1024_lr1e-4_itr4.pth"
-      fine_tuned_model_name: "esm2_t33_650M_UR50D" # "esm2_t48_15B_UR50D"
-      repr_layer: 33 # 48
-      input_dim: 1280 # 5120 # input embedding dimension
+      mode: "train" # supported values: train, test
+      fine_tuned_model_path: ""
+      pre_trained_model_link: "Rostlab/prot_t5_xl_uniref50"
+      hugging_face_cache_dir: "output/cache_dir"
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 5
+      input_dim: 1024 # input embedding dimension
+      hidden_dim: 1024
+      data_parallel: False
+
+    - id: "esm2_t12_35M_UR50D_bn_fnn_2l_d1024_lr1e-4_itr0"
+      name: "ESM2"
+      active: False
+      mode: "train" # supported values: train, test
+      fine_tuned_model_path: ""
+      fine_tuned_model_name: "esm2_t12_35M_UR50D" # "esm2_t36_3B_UR50D" # "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"
+      repr_layer: 12 # 36 # 48 # 33
+      input_dim: 480 # 2560 # 5120 # 1280 # input embedding dimension
       loss: "FocalLoss"
       n_mlp_layers: 2
       n_classes: 5
@@ -81,7 +95,7 @@ fine_tune_settings:
 
     - id: "esm3_msl2048_bn_fnn_2l_d1024_lr1e-4-itr1"
       name: "ESM3"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_name: "esm3-open"
       input_dim: 1536
@@ -91,9 +105,8 @@ fine_tune_settings:
       hidden_dim: 1024
       data_parallel: False
 
-
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref90_embl_vertebrates_non_idv/20241124/host_multi/external"
+  sub_dir: "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240131/host_multi/external"
   prefix: "uniref90viridae" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

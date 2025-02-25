@@ -36,7 +36,7 @@ Input protein sequence data used for all virus host prediction experiments are l
 - Instantiate conda environment
 ```shell
 bash
-conda create -n zoonosis
+conda create -n zoonosis python
 ```
 - Access input data files and pre-trained models
 ```shell

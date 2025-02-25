@@ -2,12 +2,12 @@
 
 #SBATCH -J zoonosis-nlp
 #SBATCH --account=seqevol
-#SBATCH --partition=dgx_normal_q
+#SBATCH --partition=l40s_normal_q
 
-#SBATCH --mem=300G
+#SBATCH --mem=450G
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
-#SBATCH -t 144:00:00 # wall-time required (# 144hrs = 6 days)
+#SBATCH -t 96:00:00 # wall-time required (# 144hrs = 6 days)
 
 
 # Load modules

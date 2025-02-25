@@ -14,15 +14,13 @@ class ProteinSequenceDatasetWithID(ProteinSequenceDataset):
         # loc selects based on index in df
         # iloc selects based on integer location (0, 1, 2, ...)
         record = self.data.iloc[idx, :]
-        id = record[self.id_col]
         sequence = record[self.sequence_col]
         label = record[self.label_col]
 
-        id_vector = np.array([id])
         sequence_vector = np.array([self.amino_acid_map[a] for a in sequence])
         label_vector = np.array([label])
 
-        return id_vector, \
+        return  record[self.id_col], \
                torch.tensor(sequence_vector, device=nn_utils.get_device(), dtype=torch.float64), \
                torch.tensor(label_vector, device=nn_utils.get_device())
 

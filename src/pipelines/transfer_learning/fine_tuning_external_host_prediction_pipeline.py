@@ -1,15 +1,13 @@
 import os
-import pandas as pd
 from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
-import torch.nn.functional as F
 import torch
 import wandb
 
 from utils import utils, dataset_utils, nn_utils, constants, mapper
 from training.early_stopping import EarlyStopping
 from training import training_utils
-from models.baseline.nlp.transformer.transformer import TransformerEncoder
+
 
 def execute(config):
     # input settings
