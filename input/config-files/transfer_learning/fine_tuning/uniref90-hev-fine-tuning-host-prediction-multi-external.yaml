@@ -11,7 +11,7 @@ input_settings:
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   # file_names: [ "uniref90_final_msl1114.csv" ]
-  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_hev2.csv" ]
+  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_hev.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -48,7 +48,7 @@ fine_tune_settings:
       "Human": [ "Homo sapiens" ]
       "Pig": [ "Sus scrofa" ]
       "Brown rat" : ['Rattus norvegicus']
-#      "Common vole": ['Microtus arvalis']
+      "Common vole": ['Microtus arvalis']
 
   task_settings:
     - id: "prostt5_msl2048_bn_fnn_2l_d1024_lr3e-4"
@@ -67,7 +67,7 @@ fine_tune_settings:
 
     - id: "esm2_msl2048_bn_fnn_2l_d1024_lr1e-4"
       name: "ESM2"
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_name: "esm2_t33_650M_UR50D" # "esm2_t48_15B_UR50D"
       repr_layer: 33 # 48
@@ -80,7 +80,7 @@ fine_tune_settings:
 
     - id: "esm3_msl2048_bn_fnn_2l_d1024_lr1e-4"
       name: "ESM3"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_name: "esm3_t33_650M_UR50D" # "esm2_t48_15B_UR50D"
       repr_layer: 33 # 48
@@ -95,4 +95,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi/external"
-  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hev2%" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hev1%" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
