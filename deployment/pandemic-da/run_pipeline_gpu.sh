@@ -5,7 +5,7 @@ conda info
 
 
 # Execute python script
-SCRIPT_LOCATION=./src/zoonosis.py
+SCRIPT_LOCATION=./src/run.py
 CONFIG_FILE=$1
 GPU_DEVICE=$2
 
@@ -19,10 +19,10 @@ echo "Log File: $LOG_FILE"
 export CUDA_VISIBLE_DEVICES=$GPU_DEVICE
 echo "GPU check"
 python -c "import torch; print(f'GPU available: {torch.cuda.is_available()}\n Available GPU devices: {torch.cuda.device_count()}')"
-echo "Zoonosis NLP models START"
+echo "Pipeline START"
 date
 python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
-echo "Zoonosis NLP models END"
+echo "Pipeline END"
 date
 
 

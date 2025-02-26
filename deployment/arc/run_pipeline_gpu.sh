@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -J zoonosis-nlp
+#SBATCH -J virprobert
 #SBATCH --account=seqevol
 #SBATCH --partition=l40s_normal_q
 
@@ -31,17 +31,15 @@ LOGS_DIR=$PROJECT_DIR/output/logs
 echo "Project directory: $PROJECT_DIR"
 
 # Execute python script
-SCRIPT_LOCATION=$PROJECT_DIR/src/zoonosis.py
+SCRIPT_LOCATION=$PROJECT_DIR/src/run.py
 CONFIG_FILE=$2
 LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
 echo "GPU check"
-~/anaconda3/envs/zoonosis/bin/python -c "import torch; print(f'GPU available: {torch.cuda.is_available()}. Available GPU devices: {torch.cuda.device_count()}')"
-echo "Zoonosis NLP models START"
+python -c "import torch; print(f'GPU available: {torch.cuda.is_available()}. Available GPU devices: {torch.cuda.device_count()}')"
+echo "Pipeline START"
 date
-~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
-echo "Zoonosis NLP models END"
+python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
+echo "Pipeline END"
 date
-
-

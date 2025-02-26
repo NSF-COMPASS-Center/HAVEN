@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -J zoonosis-uniref90-baseline
+#SBATCH -J virprobert
 #SBATCH --account=seqevol
 #SBATCH --partition=normal_q
 
@@ -26,16 +26,16 @@ LOGS_DIR=$PROJECT_DIR/output/logs
 echo "Project directory: $PROJECT_DIR"
 
 # Execute python script
-SCRIPT_LOCATION=$PROJECT_DIR/src/zoonosis.py
+SCRIPT_LOCATION=$PROJECT_DIR/src/run.py
 CONFIG_FILE=$2
 LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
 
-echo "Zoonosis baseline model START"
+echo "Pipeline START"
 date
-~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
-echo "Zoonosis baseline model END"
+python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
+echo "Pipeline END"
 date
 
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -J zoonosis-nlp
+#SBATCH -J virprobert
 #SBATCH --account=seqevol
 #SBATCH --partition=a100_normal_q
 
@@ -37,10 +37,10 @@ ARGS="$@" # all the remaining args
 
 LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Log File: $LOG_FILE"
-echo "Zoonosis Miscellaneous Script START"
+echo "Script START"
 date
-~/anaconda3/envs/zoonosis/bin/python $SCRIPT_LOCATION $ARGS > $LOG_FILE 2>&1
-echo "Zoonosis Miscellaneous Script END"
+python $SCRIPT_LOCATION $ARGS > $LOG_FILE 2>&1
+echo "Script END"
 date
 
 

@@ -1,15 +1,16 @@
 # VirProBERT: Language Model for Virus Host Prediction
 
-![VirProBERT](figures/virus_host_prediction_modified.pdf)
+![VirProBERT](figures/virus_host_prediction.png)
 
 ## Repository Organization
 - **deployment**
   - arc: shell scripts for deployments in arc
+  - pandemic-da: shell scripts for deployments in pandemic-da
 - **input**: 
     - config-files: yaml config files for data-preprocessing, prediction, and evaluation tasks.
     - data: raw fasta files of protein sequences and five independent splits with training and testing files
       - HEV virus protein sequences downloaded from
-      - all mammlian and aves virus protein sequences download from UniRef90.
+      - all mammalian and aves virus protein sequences download from UniRef90.
   raw: Folder containing raw protein sequences in fasta format. 
     - processed: Folder containing all preprocessed protein sequences with labels to be supplied as input to classification models.
 - **output**: 
@@ -25,21 +26,6 @@ Input protein sequence data used for all virus host prediction experiments are l
 - [UniRef90](input/data/uniref90/20240131)
 - [Coronaviridae Spike protein sequences](input/data/coronaviridae/20240313)
 ---
-## Prerequisites:
-### ARC Setup
-- Request Dr. T. M. Murali to add you to the `seqevol` project in ARC.
-- SSH into `tinkercliffs1.arc.vt.edu`.
-- Clone the GitHub repository at the desired location.
-- Instantiate conda environment
-```shell
-bash
-conda create -n zoonosis python
-```
-- Access input data files and pre-trained models
-```shell
-<Insert path to project folder>
-```
-
 ### Install Dependencies
 Install python dependencies via 
 ```shell 
@@ -61,7 +47,6 @@ mkdir -p output/logs
     - Note: Do not forget to log in to Weights and Biases (`wandb login`) in the server where you intend to execute the experiment.
 ---
 ## Usage
-### General usage:
 ```shell
 python src/zoonosis.py -c <path-to-config-file>
 ```
@@ -69,26 +54,36 @@ Example
 ```shell
 python src/zoonosis.py -c 
 ```
+---
+## Pipelines
+The supported pipeline and their corresponding config type and sub-types are as follows -
 
+| Pipeline                                           | Config Type                  | Config Sub-Type          | Example config                                                                                                                                                                                         |
+|:---------------------------------------------------|:-----------------------------|:-------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Masked Language Modeling                           | transfer_learning            | transfer_learning        | [uniref90-mlm-msl256.yaml](input/config-files/transfer_learning/masked_language_modeling/uniref90-mlm-msl256.yaml)                                                                                     |
+| Virus Host Prediction - VirProBERT                 | transfer_learning            | host_prediction          | [uniref90-fine-tuning-host-prediction-multi.yaml](input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-multi.yaml)                                                    |
+| Virus Host Prediction - external pLMs              | transfer_learning            | host_prediction_external | [uniref90-fine-tuning-host-prediction-external-multi.yaml](input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-external-multi.yaml)                                  |
+| Virus Host Prediction - baseline models            | host_prediction              | -                        | [host-prediction-all-models.yaml](input/config-files/host_prediction/uniref90/embl/host-prediction-all-models.yaml)                                                                                    |
+| Virus Host Prediction - kmer feature-based models  | host_prediction              | -                        | [engg-features-kmer-baseline.yaml](input/config-files/host_prediction/uniref90/embl/engg-features-kmer-baseline.yaml)                                                                                  |
+| Virus Host Prediction - runtime                    | host_prediction_runtime      | -                        | [cov-s-host-prediction-multi-uniref90-sarscov2-variants.yaml](input/config-files/interpretability/sarscov2_variants/cov-s-host-prediction-multi-uniref90-sarscov2-variants.yaml)                       |
+| Virus Host Prediction - runtime with external pLMs | host_prediction_runtime      | external                 | [cov-s-host-prediction-multi-uniref90-sarscov2-variants-external.yaml](input/config-files/interpretability/sarscov2_variants/cov-s-host-prediction-multi-uniref90-sarscov2-variants-external.yaml)     |
+| Few Shot Learning - unseen and rare hosts          | few_shot_learning            | -                        | [uniref90-fine-tuning-host-prediction-non-idv-multi-few-shot-learning.yaml](input/config-files/few_shot_learning/novel_host/uniref90-fine-tuning-host-prediction-non-idv-multi-few-shot-learning.yaml) |
+| Few Shot Learning - unseen viruses                 | few_shot_learning            | -                        | [uniref90-fine-tuning-host-prediction-idv-multi-few-shot-learning.yaml](input/config-files/few_shot_learning/novel_virus/uniref90-fine-tuning-host-prediction-idv-multi-few-shot-learning.yaml)        |
+| Embedding generation - VirProBERT                  | embedding_generation         | -                        | [uniref90-fine-tuning-host-prediction-multi-embedding.yaml](input/config-files/interpretability/embedding/uniref90-fine-tuning-host-prediction-multi-embedding.yaml)                                   |
+| Perturbation Analysis - VirProBERT                 | host_prediction_perturbation | -                        | [cov-s-host-prediction-multi-perturbed_dataset.yaml](input/config-files/interpretability/perturbation/uniref90/cov-s-host-prediction-multi-perturbed_dataset.yaml)                                     |
+| Perturbation Analysis - external pLMs              | host_prediction_perturbation | external                 | [cov-s-host-prediction-multi-perturbed_dataset-external.yaml](input/config-files/interpretability/perturbation/uniref90/cov-s-host-prediction-multi-perturbed_dataset-external.yaml)                   |
+| Evaluation of outputs                              | evaluation                   | -                        | [uniref90-embl-host-prediction-multi-evaluation-all-models.yaml](input/config-files/evaluation/uniref90/uniref90-embl-host-prediction-multi-evaluation-all-models.yaml)                                |
 
-### ARC Deployment
-Choose the deployment script based on the use-case
+## Scripts
+The supported scripts and their respective python files
 
-Examples
-- [zoonosis_gpu](deployment/arc/zoonosis_gpu.sh)
-```shell
-sbatch deployment/arc/zoonosis_gpu.sh . input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-multi.yaml
-```
+| Task                               | Script file                                                                                      |
+|:-----------------------------------|:-------------------------------------------------------------------------------------------------|
+| Dataset preprocessor               | [data_preprocessor.py](src/utils/scripts/data_preprocessor.py)                                   |
+| Datasplit generator                | [data_split_generator.py](src/utils/scripts/data_split_generator.py)                             |
+| Perturbation dataset generator     | [perturbation_dataset_generator.py](src/utils/scripts/perturbation_dataset_generator.py)         |
+| Perturbation output post processor | [perturbation_output_post_processor.py](src/utils/scripts/perturbation_output_post_processor.py) |
 
-- [misc_gpu](deployment/arc/misc_gpu.sh)
-```shell
-sbatch deployment/arc/zoonosis_gpu.sh . <path-to-script-to-executed> <arguments-required-by-the-script>
-```
-
-- Execute [perturbation_dataset_generator.py](src/utils/scripts/perturbation_dataset_generator.py) using [misc_gpu](deployment/arc/misc_gpu.sh)
-```shell
-sbatch deployment/arc/misc_gpu.sh . src/utils/scripts/perturbation_dataset_generator.py -if input/data/coronaviridae/20240313/sarscov2/uniprot/coronaviridae_s_uniprot_sars_cov_2.csv -od input/data/coronaviridae/20240313/sarscov2/uniprot/perturbation_dataset/multi -st protein
-```
 ---
 ## Fine tuning VirProBERT for virus host multiclass classification
 1. Create a config file for fine-tuning based on the example config in [uniref90-fine-tuning-host-prediction-multi.yaml](input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-multi.yaml)
@@ -115,9 +110,8 @@ sbatch deployment/arc/misc_gpu.sh . src/utils/scripts/perturbation_dataset_gener
     ```shell
         python src/zoonosis.py --config <path-to-the-config-file>
     ```
-    For ARC execution see section on [ARC Deployment](#arc-deployment).
 ---
-## Adding a pre-trained protein language model to the Virus Host Prediction Pipeline
+## Adding a pre-trained protein language model (pLM) to the Virus Host Prediction Pipeline
 
 1. Create a child class of [ProteinSequenceClassification](src/models/protein_sequence_classification.py) within [models/external](src/models/external)
 2. Implement the `get_embedding()` method that will generate the embeddings for a given batch of protein sequences.
@@ -131,8 +125,6 @@ sbatch deployment/arc/misc_gpu.sh . src/utils/scripts/perturbation_dataset_gener
 7. Execute the fine-tuning experiment using
     ```shell
         python src/zoonosis.py --config input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-external-multi.yaml
-    ```
-    For ARC execution see section on [ARC Deployment](#arc-deployment).
-    
-    Example implemenation of an external PLM: ProstT5 ([ProstT5_VirusHostPrediction](src/models/external/prost5_host_prediction.py), [ProteinSequenceProstT5Dataset](src/datasets/protein_sequence_custom_dataset.py))
+    ``` 
+    Example implementation of an external pLM: ProstT5 ([ProstT5_VirusHostPrediction](src/models/external/prost5_host_prediction.py), [ProteinSequenceProstT5Dataset](src/datasets/protein_sequence_custom_dataset.py))
 ---
