@@ -1,11 +1,8 @@
 import os
-import pandas as pd
 from pathlib import Path
-import torch.nn.functional as F
 import torch
-import tqdm
 
-from utils import utils, dataset_utils, nn_utils, constants, mapper, training_utils
+from utils import utils, dataset_utils, nn_utils, constants, mapper, training_utils, perturbation_analysis_utils
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
 
 
@@ -33,7 +30,7 @@ def execute(config):
     label_col = label_settings["label_col"]
 
     prediction_model = None
-
+    model_id = None
     for model in models:
         model_id = model["id"]  # unique identifier
         model_name = model["name"]
@@ -62,7 +59,7 @@ def execute(config):
 
         prediction_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
 
-    output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
+    output_results_dir = os.path.join(output_dir, results_dir, sub_dir, model_id)
     # create any missing parent directories
     Path(output_results_dir).mkdir(parents=True, exist_ok=True)
 

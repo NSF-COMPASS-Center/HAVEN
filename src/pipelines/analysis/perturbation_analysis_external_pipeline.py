@@ -2,8 +2,7 @@ import os
 from pathlib import Path
 import torch
 
-from utils import utils, dataset_utils, nn_utils, constants, mapper, training_utils
-from models.baseline.nlp.transformer.transformer import TransformerEncoder
+from utils import utils, dataset_utils, nn_utils, mapper, training_utils, perturbation_analysis_utils
 
 
 def execute(config):
@@ -29,15 +28,8 @@ def execute(config):
     sequence_col = sequence_settings["sequence_col"]
     label_col = label_settings["label_col"]
 
-    # create output directories
-    output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
-    # create any missing parent directories
-    Path(output_results_dir).mkdir(parents=True, exist_ok=True)
-
-    # already present output files
-    preexisting_output_files = os.listdir(output_results_dir)
-
     prediction_model = None
+    model_id = None
 
     for model in models:
         model_id = model["id"]  # unique identifier
@@ -56,6 +48,14 @@ def execute(config):
             continue
 
         prediction_model.load_state_dict(torch.load(model["model_path"], map_location=nn_utils.get_device()))
+
+        # create output directories
+        output_results_dir = os.path.join(output_dir, results_dir, sub_dir, model_id)
+        # create any missing parent directories
+        Path(output_results_dir).mkdir(parents=True, exist_ok=True)
+
+        # already present output files
+        preexisting_output_files = os.listdir(output_results_dir)
 
         print(f"Number of input files = {len(input_files)}")
         for input_file in input_files:
@@ -76,14 +76,14 @@ def execute(config):
             test_dataset_loader = dataset_utils.get_external_dataset_loader(df, sequence_settings, label_col, model_name, include_id_col=True)
 
             # 4. Generate predictions
-            result_df = perturbation_analysis_utils.evaluate_model(prediction_model, test_dataset_loader, id_col)
+            result_df = training_utils.test_model_analysis(prediction_model, test_dataset_loader, id_col)
 
             # 5. Create the result dataframe and remap the class indices to original input labels
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
 
             # 6. Write the raw results in csv files
-            output_prefix_curr = output_prefix + "_" + Path(input_file).stem
+            output_prefix_curr = f"{output_prefix}_{Path(input_file).stem}"
             perturbation_analysis_utils.write_output(result_df, output_results_dir, output_prefix_curr, output_type="output")
 
             # 7. clear memory

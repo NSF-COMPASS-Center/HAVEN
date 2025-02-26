@@ -74,8 +74,8 @@ class VirProBERT(ProteinSequenceClassification):
     def get_model(model_params) -> ProteinSequenceClassification:
         model = VirProBERT(pre_trained_model=model_params["pre_trained_model"],
                            segment_len=model_params["segment_len"],
-                           cls_token = model_params["cls_token"],
-                           h = model_params["n_heads"],
+                           cls_token=model_params["cls_token"],
+                           h=model_params["n_heads"],
                            input_dim=model_params["input_dim"],
                            hidden_dim=model_params["hidden_dim"],
                            n_mlp_layers=model_params["n_mlp_layers"],

@@ -48,7 +48,7 @@ sbatch deployment/arc/run_script_gpu.sh . <path-to-script-to-executed> <argument
 sbatch deployment/arc/run_script_gpu.sh . src/utils/scripts/perturbation_dataset_generator.py -if input/data/coronaviridae/20240313/sarscov2/uniprot/coronaviridae_s_uniprot_sars_cov_2.csv -od input/data/coronaviridae/20240313/sarscov2/uniprot/perturbation_dataset/multi -st protein
 ```
 
-## Pandemic-da Server
+## Pandemic-DA Server
 - Email [Blessy Antony](mailto:blessyantony@vt.edu) to get access to the pandemic-da server.
 - SSH into `pandemic-da.cs.vt.edu`. Reset your password after first login.
 - Setup the [Project and Environment](#project-and-environment-setup)
@@ -79,6 +79,7 @@ All users of the server coordinate the usage of the four available GPUs using th
   ```
 
 ## Project and Environment Setup
+### Code and dependencies
 - Clone the GitHub repository at the desired location.
 - Setup conda environment 
     ```shell
@@ -88,3 +89,14 @@ All users of the server coordinate the usage of the four available GPUs using th
     pip install -r requirements.txt
     ```
 - Copy the necessary input dataset files and pre-trained models from the appropriate locations from each server.
+
+### Create required folders
+Create a directory for logs using - 
+```shell
+mkdir -p output/logs
+```
+### Setup Weights & Biases
+1. Create an account in [Weights & Biases](https://wandb.ai/site/).
+2. Create a new project in Weights and Biases named `zoonosis-host-prediction`.
+3. Setup the `wandb` library by completing [Step 1 in the Quickstart](https://wandb.ai/quickstart?utm_source=app-resource-center&utm_medium=app&utm_term=quickstart).
+    - Note: Do not forget to log in to Weights and Biases (`wandb login`) in the server where you intend to execute the experiment.

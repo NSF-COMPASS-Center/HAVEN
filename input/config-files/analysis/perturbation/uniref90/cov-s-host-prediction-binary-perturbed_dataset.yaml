@@ -60,5 +60,5 @@ classification_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "coronaviridae_s_prot_perturbation/20240527/sars-cov-2/uniref90/cov-S-binary-transfer_learning_mlm_fnn_2l_lr1e-4"
+  sub_dir: "coronaviridae_s_prot_perturbation/20240527/sars-cov-2"
   prefix: "tl_tf_binary" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
