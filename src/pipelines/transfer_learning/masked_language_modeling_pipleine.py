@@ -9,7 +9,7 @@ from statistics import mean
 import wandb
 
 from utils import dataset_utils, nn_utils, evaluation_utils, constants
-from training.early_stopping import EarlyStopping
+from training_accessories.early_stopping import EarlyStopping
 from models.baseline.nlp.transformer import transformer
 from transfer_learning.pre_training import pre_training_masked_language_modeling
 

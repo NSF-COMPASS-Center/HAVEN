@@ -1,4 +1,4 @@
-config_type: "host_prediction_perturbation" # options: data_preprocessor, host_prediction, evaluation
+config_type: "perturbation"
 
 # Input Settings:
   ## initialize base input folder name

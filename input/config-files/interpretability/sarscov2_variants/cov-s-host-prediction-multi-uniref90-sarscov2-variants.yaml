@@ -1,5 +1,4 @@
-config_type: "host_prediction_runtime" # options: data_preprocessor, host_prediction, evaluation, host_prediction_runtime
-config_sub_type:
+config_type: "virus_host_prediction_test"
 
 # Input Settings:
   ## initialize base input folder name

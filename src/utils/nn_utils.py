@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 import copy
 
-from training.focal_loss import FocalLoss
+from training_accessories.focal_loss import FocalLoss
 
 
 def create_clones(module, N):
