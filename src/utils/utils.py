@@ -94,6 +94,7 @@ def get_class_weights(datasetloader):
     class_weights = compute_class_weight(class_weight="balanced",
                                 classes=np.unique(labels),
                                 y=labels)
+    class_weights = class_weights * 10
     return torch.tensor(class_weights, dtype=torch.float)
 
 
