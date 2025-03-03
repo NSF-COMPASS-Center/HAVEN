@@ -117,6 +117,14 @@ def write_output_model(model, output_dir, output_filename_prefix, model_name):
     joblib.dump(model, output_file_path)
 
 
+def write_analysis_output(df, output_dir, output_prefix, output_type):
+    output_file_name = f"{output_prefix}.csv"
+    output_file_path = os.path.join(output_dir, output_file_name)
+    # 5. Write the classification output
+    print(f"Writing {output_type} to {output_file_path}: {df.shape}")
+    df.to_csv(output_file_path, index=False)
+
+
 def get_validation_scores(cv_model):
     k = 5
     params = cv_model["params"]

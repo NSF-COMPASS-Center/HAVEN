@@ -93,7 +93,7 @@ def execute(config):
 
         # 6. Write the raw results in csv files
         output_prefix_curr = output_prefix + "_" + Path(input_file).stem
-        perturbation_analysis_utils.write_output(result_df, output_results_dir, output_prefix_curr, output_type="output")
+        utils.write_analysis_output(result_df, output_results_dir, output_prefix_curr, output_type="output")
 
         # 7. clear memory
         del df, test_dataset_loader, result_df
