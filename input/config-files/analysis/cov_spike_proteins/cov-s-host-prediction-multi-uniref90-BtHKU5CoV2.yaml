@@ -13,7 +13,7 @@ classification_settings:
     batch_size: 1
     id_col: "accession_id"
     sequence_col: "seq"
-    metadata_cols: ["protein", "host", "pango_lineage", "who_variant", "first_designation_date"]
+    metadata_cols: ["protein", "pango_lineage", "who_variant", "first_designation_date"]
     truncate: False
     split: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'

@@ -86,7 +86,7 @@ def execute(config):
         result_df = result_df.set_index(id_col).join(df[metadata_cols + [id_col]].set_index(id_col), how="left").reset_index()
 
         # 7. Write the raw results in csv files
-        perturbation_analysis_utils.write_output(result_df, output_results_dir, output_prefix, output_type="output")
+        utils.write_analysis_output(result_df, output_results_dir, output_prefix, output_type="output")
 
         # 8. clear memory
         del df, test_dataset_loader, result_df
