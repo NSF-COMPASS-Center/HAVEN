@@ -1,5 +1,5 @@
 config_type: "transfer_learning" # options: data_preprocessor, host_prediction, evaluation
-config_sub_type: "masked_language_modeling"
+config_sub_type: "transfer_learning"
 
 # Input Settings:
   ## initialize base input folder name

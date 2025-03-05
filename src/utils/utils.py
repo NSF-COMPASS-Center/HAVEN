@@ -12,8 +12,8 @@ import yaml
 from torch.nn.utils.rnn import pad_sequence
 import torch.nn as nn
 
-### functions related to labels, grouping, and label vocabulary
 
+# functions related to labels, grouping, and label vocabulary
 def filter_noise(df, label_settings):
     label_col = label_settings["label_col"]
     # remove rows with labels to be excluded
@@ -77,8 +77,7 @@ def get_label_vocabulary(labels):
     return label_idx_map, idx_label_map
 
 
-### functions related to class distributions
-
+# functions related to class distributions
 def compute_class_distribution(df, label_col, format=False):
     labels_counts = df[label_col].value_counts()
     n = labels_counts.sum()
@@ -97,7 +96,7 @@ def get_class_weights(datasetloader):
     return torch.tensor(class_weights, dtype=torch.float)
 
 
-### functions related to writing outputs
+# functions related to writing outputs
 def write_output(model_dfs, output_dir, output_filename_prefix, output_type):
     for model_name, dfs in model_dfs.items():
         output_file_name = f"{output_filename_prefix}_{model_name}_{output_type}.csv"
@@ -116,6 +115,14 @@ def write_output_model(model, output_dir, output_filename_prefix, model_name):
     Path(os.path.dirname(output_file_path)).mkdir(parents=True, exist_ok=True)
 
     joblib.dump(model, output_file_path)
+
+
+def write_analysis_output(df, output_dir, output_prefix, output_type):
+    output_file_name = f"{output_prefix}.csv"
+    output_file_path = os.path.join(output_dir, output_file_name)
+    # 5. Write the classification output
+    print(f"Writing {output_type} to {output_file_path}: {df.shape}")
+    df.to_csv(output_file_path, index=False)
 
 
 def get_validation_scores(cv_model):
@@ -155,20 +162,20 @@ def parse_config(config_file_path):
         print(f"Error parsing config file: {err}")
     return config
 
+
 # returns a histogram for a given input distribution and the number of bins
 def get_histogram(values, n_bins=12):
     n = len(values)
     freq, bins = np.histogram(values, bins=n_bins)
     hist_map = []
     for i in range(n_bins):
-        hist_map.append({"start": bins[i], "end":bins[i+1], "count": freq[i], "percentage": freq[i]/n*100})
+        hist_map.append({"start": bins[i], "end": bins[i+1], "count": freq[i], "percentage": freq[i]/n*100})
 
     hist_df = pd.DataFrame(hist_map)
     return hist_df
 
 
-### functions related to sequences
-
+# functions related to sequences
 def pad_sequences(sequences, max_seq_length, pad_value):
     # the sequences are padded w.r.t the longest sequence in the batch
     padded_sequences = pad_sequence(sequences, batch_first=True, padding_value=pad_value)

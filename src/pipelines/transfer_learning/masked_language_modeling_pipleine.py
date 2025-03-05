@@ -9,7 +9,7 @@ from statistics import mean
 import wandb
 
 from utils import dataset_utils, nn_utils, evaluation_utils, constants
-from training.early_stopping import EarlyStopping
+from training_accessories.early_stopping import EarlyStopping
 from models.baseline.nlp.transformer import transformer
 from transfer_learning.pre_training import pre_training_masked_language_modeling
 
@@ -102,6 +102,7 @@ def execute(config):
                         mlm_checkpoint_filepath.replace("{itr}", str(iter)))
         torch.save(mlm_model.encoder_model.state_dict(), encoder_model_filepath.format(itr=iter))
         wandb.finish()
+
 
 def run(model, train_dataset_loader, val_dataset_loader, training_settings,
         encoder_model_name, mlm_checkpoint_filepath):

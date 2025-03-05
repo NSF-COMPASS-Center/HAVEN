@@ -1,0 +1,88 @@
+config_type: "virus_host_prediction_test_external"
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  input_dir: "input/data/coronaviridae/20240313/sarscov2"
+  input_file_name: "sarscov2_variants_spike_seqences_ncbivirus_20250106_who_variants_downsampled.csv"
+
+classification_settings:
+  type: "multi"
+  sequence_settings:
+    batch_size: 8
+    id_col: "accession_id"
+    sequence_col: "seq"
+    max_sequence_length: 4096
+    metadata_cols: ["pangolin_lineage", "geo_location", "seq_length"]
+    truncate: False
+    split: False
+    feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
+    kmer_settings:
+      k: 3
+    cgr_settings:
+      img_size: 8
+      img_dir: "input/data/coronaviridae/cgr_images"
+
+  label_settings:
+    label_col: "virus_host_name"
+    exclude_labels: [ "nan"]
+    label_groupings:
+      "Chicken": [ "gallus gallus" ]
+      "Human": [ "homo sapiens" ]
+      "Cat": [ "felis catus" ]
+      "Pig": [ "sus scrofa" ]
+      "Gray wolf": [ "canis lupus" ]
+      "Horshoe bat": ["rhinolophus sp."]
+      "Ferret": ["mustela putorius"]
+      "Chinese rufous horseshoe bat": ["rhinolophus sinicus"]
+
+  models:
+    - id: "prostt5_fnn_2l_d1024_lr3e-4"
+      name: "ProstT5"
+      active: False
+      mode: "test" # supported values: train, test
+      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20250131/host_multi/external/uniref90coronaviridae_prostt5_fnn_2l_d1024_lr3e-4_itr4.pth"
+      pre_trained_model_link: "Rostlab/ProstT5"
+      hugging_face_cache_dir: "output/cache_dir"
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 8
+      input_dim: 1024 # input embedding dimension
+      hidden_dim: 1024
+      data_parallel: False
+
+    - id: "prot_t5_xl_uniref50_fnn_2l_d1024_lr3e-4"
+      name: "ProtT5"
+      active: True
+      mode: "test" # supported values: train, test
+      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20250131/host_multi/external/uniref90coronaviridae_prot_t5_xl_uniref50_fnn_2l_d1024_lr3e-4_itr4.pth"
+      pre_trained_model_link: "Rostlab/prot_t5_xl_uniref50"
+      hugging_face_cache_dir: "output/cache_dir"
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 8
+      input_dim: 1024 # input embedding dimension
+      hidden_dim: 1024
+      data_parallel: False
+
+    - id: "esm2_t12_35M_UR50D_lr1e-4"
+      name: "ESM2"
+      active: False
+      mode: "test" # supported values: train, test
+      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241216/host_multi/external/uniref90coronaviridae_esm2_t12_35M_UR50D_bn_fnn_2l_d1024_lr1e-4_itr4.pth"
+      fine_tuned_model_name: "esm2_t12_35M_UR50D" #"esm2_t12_35M_UR50D" # "esm2_t36_3B_UR50D" # "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"
+      repr_layer: 12 # 12 # 36 # 48 # 33
+      input_dim: 480 # 480 # 2560 # 5120 # 1280 # input embedding dimension
+      loss: "FocalLoss"
+      n_mlp_layers: 2
+      n_classes: 8
+      hidden_dim: 1024
+      data_parallel: False
+
+
+output_settings:
+  output_dir: "output"
+  results_dir: "raw"
+  sub_dir: "sarscov2_s_prot_variants/20250201/uniref90/external"
+  prefix: "prot_t5_xl_uniref50_lr3e-4" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

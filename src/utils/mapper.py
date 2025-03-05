@@ -4,10 +4,10 @@ from models.baseline.nlp.rnn import RNN_VirusHostPrediction
 from models.baseline.nlp.lstm import LSTM_VirusHostPrediction
 from models.baseline.nlp.transformer_encoder import TransformerEncoderVirusHostPrediction
 
-from models.virprobert import VirProBERT
-from models.virprobert_wo_hierattn import VirProBERT_wo_HierAttn
+from models.virprobert.virprobert import VirProBERT
+from models.virprobert.ablation.virprobert_wo_hierattn import VirProBERT_wo_HierAttn
 
-from transfer_learning.fine_tuning.bert_virus_host_prediction import BERT_VirusHostPrediction
+from models.virprobert.ablation.bert_virus_host_prediction import BERT_VirusHostPrediction
 from models.external.prostt5_host_prediction import ProstT5_VirusHostPrediction
 from models.external.prott5_host_prediction import ProtT5_VirusHostPrediction
 from models.external.esm2_host_prediction import ESM2_VirusHostPrediction
@@ -16,9 +16,29 @@ from models.external.esm2_host_prediction import ESM2_VirusHostPrediction
 from datasets.protein_sequence_custom_dataset import ProteinSequenceProstT5Dataset
 from datasets.protein_sequence_custom_dataset import ProteinSequenceProtT5Dataset
 from datasets.protein_sequence_custom_dataset import ProteinSequenceESM2Dataset
-from datasets.protein_sequence_custom_dataset import ProteinSequenceESM3Dataset
 
 from datasets.collations.custom_collate_function import ESM2CollateFunction
+
+from pipelines.virus_host_prediction_training import fine_tuning_pipeline, fine_tuning_external_pipeline, baseline_deep_learning_pipeline, baseline_machine_learning_pipeline
+from pipelines.transfer_learning import masked_language_modeling_pipleine
+from pipelines.analysis import perturbation_analysis_pipeline, perturbation_analysis_external_pipeline, embedding_generation_pipeline, virus_host_prediction_testing_pipeline, virus_host_prediction_testing_external_pipeline
+from pipelines.few_shot_learning import few_shot_learning_host_prediction_pipeline
+from pipelines.evaluation import evaluation_pipeline
+
+pipeline_mapper = {
+    "masked_language_modeling": masked_language_modeling_pipleine,
+    "virus_host_prediction": fine_tuning_pipeline,
+    "virus_host_prediction_external": fine_tuning_external_pipeline,
+    "virus_host_prediction_baseline_deep_learning": baseline_deep_learning_pipeline,
+    "virus_host_prediction_baseline_machine_learning": baseline_machine_learning_pipeline,
+    "virus_host_prediction_test": virus_host_prediction_testing_pipeline,
+    "virus_host_prediction_test_external": virus_host_prediction_testing_external_pipeline,
+    "few_shot_learning": few_shot_learning_host_prediction_pipeline,
+    "evaluation": evaluation_pipeline,
+    "perturbation": perturbation_analysis_pipeline,
+    "perturbation_external": perturbation_analysis_external_pipeline,
+    "embedding_generation": embedding_generation_pipeline,
+}
 
 # mappings of all classes
 model_map = {

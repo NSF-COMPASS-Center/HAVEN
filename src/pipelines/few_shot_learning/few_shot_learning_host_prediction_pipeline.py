@@ -10,7 +10,7 @@ import tqdm
 import wandb
 
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
-from training.early_stopping import EarlyStopping
+from training_accessories.early_stopping import EarlyStopping
 from utils import utils, dataset_utils, nn_utils, evaluation_utils, constants, mapper
 from few_shot_learning.prototypical_network_few_shot_classifier import PrototypicalNetworkFewShotClassifier
 
