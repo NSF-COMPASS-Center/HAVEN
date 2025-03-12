@@ -7,8 +7,10 @@ This readme provides information on how to execute VirProBERT on Virginia Tech s
 Please refer to the [ARC User Documentation](https://www.docs.arc.vt.edu/index.html) to learn about ARC and its usage.
 
 ### Get access
-- Request [Dr. T. M. Murali](mailto:murali@cs.vt.edu) to add you to the `seqevol` project in ARC.
-- Verify your access at https://coldfront.arc.vt.edu/ - "Models of sequence evolution" should be listed in your project allocations.
+- Request [Dr. T. M. Murali](mailto:murali@cs.vt.edu) to add you to the `seqevol` projects for both _compute_ and _project_ allocations.
+- Verify your access at https://coldfront.arc.vt.edu/. 
+  - Home &rarr; "Allocation >>" 
+  - There should be two allocations for "Models of sequence evolution" with "Compute" and "Project" resource names.
 
 ### Setup project
 - SSH into one of the ARC GPU login nodes. As of February 25, 2025, the list of login nodes includes -
@@ -22,7 +24,12 @@ Please refer to the [ARC User Documentation](https://www.docs.arc.vt.edu/index.h
 - Setup the [Project and Environment](#project-and-environment-setup)
 - Input data files and pre-trained models are located at
 ```shell
-<Insert path to project folder>
+/projects/seqevol/zoonosis
+```
+- Create symbolic links to the common input data and output folders.
+```shell
+ln -s /projects/seqevol/zoonosis/input/data input/data
+ln -s /projects/seqevol/zoonosis/output output
 ```
 
 ### Executing experiments using batch jobs
@@ -91,10 +98,11 @@ All users of the server coordinate the usage of the four available GPUs using th
 - Copy the necessary input dataset files and pre-trained models from the appropriate locations from each server.
 
 ### Create required folders
-Create a directory for logs using - 
+Create a directory for logs in the output directory using - 
 ```shell
 mkdir -p output/logs
 ```
+
 ### Setup Weights & Biases
 1. Create an account in [Weights & Biases](https://wandb.ai/site/).
 2. Create a new project in Weights and Biases named `zoonosis-host-prediction`.
