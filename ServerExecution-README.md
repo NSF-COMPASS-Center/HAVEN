@@ -108,3 +108,22 @@ mkdir -p output/logs
 2. Create a new project in Weights and Biases named `zoonosis-host-prediction`.
 3. Setup the `wandb` library by completing [Step 1 in the Quickstart](https://wandb.ai/quickstart?utm_source=app-resource-center&utm_medium=app&utm_term=quickstart).
     - Note: Do not forget to log in to Weights and Biases (`wandb login`) in the server where you intend to execute the experiment.
+
+
+---
+## Troubleshooting
+- Check the output/logs file(s) to track the error
+- Ensure cuda, PyTorch, and Python compatibility
+  - Run conda list to see versions 
+  - Compare version compatibility on [Pytorch's website](https://github.com/pytorch/pytorch/blob/main/RELEASE.md)
+  - Change versions as necessary
+- Check these installations:
+  - torch
+  - run requirements.txt again 
+  - transformers
+  - sentencepiece
+  - torchvision
+  - wandb 
+- If error is CUDA out of memory,
+  - try decreasing batch size 
+  - running 

@@ -1,0 +1,103 @@
+config_type: "evaluation" # options: data_preprocessor, prediction, evaluation
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw"
+
+  file_names:
+    #"LR-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240515/host_multi/kmer_k3_virus_host_name_multi__lr_output.csv"
+#    "LR": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240723/host_multi/kmer_k3_virus_host_name_multi__lr_output.csv"
+    #"RF-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240515/host_multi/kmer_k3_virus_host_name_multi__rf_output.csv"
+#    "RF": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240723/host_multi/kmer_k3_virus_host_name_multi__rf_output.csv"
+    # "LR-maxitr500": "20240516/host_multi/kmer_k3_virus_host_name_multi__lr_output.csv"
+    #"SVM-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240522/host_multi/kmer_k3_virus_host_name_multi__svm_output.csv"
+    #"SVM": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240723/host_multi/kmer_k3_virus_host_name_multi__rf_output.csv"
+    #"FNN-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/emb_sincos-lossfocalce_e50_msl2048_fnn-l_10-d_1024-lr1e-3_output.csv"
+    #"FNN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/nlp_no_msl_fnn-l_10-d_1024-lr1e-3_output.csv"
+    # "CNN-l_4-d_1024-k3s1-lr1e-3": "20240229/host_multi/emb_sincos-lossfocalce_e50_msl1036_cnn-l_4-d_1024-k3s1-lr1e-3_output.csv"
+
+    #"CNN-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/emb_sincos-lossfocalce_e50_msl2048_cnn-l_4-d_1024-k3s1-lr1e-3_output.csv"
+    #"CNN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/nlp_no_msl_cnn-l_4-d_1024-k3s1-lr1e-3_output.csv"
+    #"RNN-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/emb_sincos-lossfocalce_e50_msl2048_rnn-l_6-d_1024-lr1e-5_output.csv"
+    #"RNN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/nlp_no_msl_rnn-l_6-d_1024-lr1e-5_output.csv"
+    # "LSTM-l_2-d_1024-lr1e-3": "20240229/host_multi/emb_sincos-lossfocalce_e50_msl1036_lstm-l_2-d_1024-lr1e-3_output.csv"
+    #"LSTM-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/emb_sincos-lossfocalce_e50_msl2048_lstm-l_2-d_1024-lr1e-3_output.csv"
+    #"LSTM": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240722/host_multi/nlp_no_msl_lstm-l_2-d_1024-lr1e-3_output_mod.csv"
+    # "TF-Enc-msl1036-d1024-lr1e-4": "20240228/host_multi/emb_sincos-d1024-lossfocalce_e50_msl1036_transformer-l_6-h_8-lr1e-4_output.csv"
+    #"TF-Enc-msl2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/emb_sincos-lossfocalce_e50_msl2048_transformer-l_6-h_8-d_1024-lr1e-4_output.csv"
+    #"Transformer-Encoder": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/nlp_no_msl_transformer-l_6-h_8-d_1024-msl2048-lr1e-4_output.csv"
+    # "TF-Enc-msl1336-d1024-lr1e-4": "20240308/host_multi/emb_sincos-lossfocalce_e50_msl1366_transformer-l_6-h_8-d_1024-lr1e-4_output.csv"
+    # "Pretrain-TF-d1024-lr1e-4": "20240307/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    # "Pretrain-TF w/o freeze": "20240307/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    # "Pretrain-TF-d1024-lr1e-5": "20240228/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-5_output.csv"
+    # "Pretrain-TF-d1024-lr1e-4-w_freeze": "20240307/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_fe20_ufe30_output.csv"
+    #"Protein-BERT_old_ds": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240229/protein_bert/prediction_results_20240302_163552_mapped.csv"
+    #"Protein-BERT": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240827/proteinbert_prediction_results_20240827_231839.csv"
+#    "ProstT5": "uniref90_embl_vertebrates_non_idv/20241031/host_multi/uniref90viridae_prostt5_msl2048_bn_fnn_2l_d1024_lr1e-4_output.csv"
+    #"VirPro-BERT-1366": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240307/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-4_fe20_ufe30_output.csv"
+    #"VirPro-BERT-2048": "uniref90_embl_vertebrates_non_idv_t0.01_c5/20240614/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl2048_host_prediction_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl128st64-vs28": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240715/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl128st64-vs30": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240716/host_multi/fine_tuning_hybrid_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl128st64-vs30-BN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240808/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128s64_vs30_batchnorm_output.csv"
+    #"Hybd-sl128st64-vs30-AE-BN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hybrid_attention_msl128s64ae_bn_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl128st64-CLS-vs30": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240715/host_multi/fine_tuning_hybrid_cls_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl128st64-CLS-vs30-AE-BN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hybrid_attention_msl128s64ae_bn_cls_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl128st64-CLS-vs103": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240708/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl128b1024_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl256st64-vs28": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240710/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b64_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl256st64-vs30": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240716/host_multi/fine_tuning_hybrid_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b1024vs30_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl256st64-vs30-AE-BN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hybrid_attention_msl256s64ae_bn_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl256st128-CLS-vs30": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b1024_s128_hybrid_attention_s128_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl256st64-CLS-vs30-AE-BN": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hybrid_attention_msl256s64ae_bn_fnn_2l_d1024_lr1e-4_output.csv"
+#    "VirProBERT": "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi/small_batch_size/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
+#    "VirProBERT_1%": "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hev1%_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
+#    "VirProBERT_2%": "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hev2%_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
+#    "VirProBERT_BrHu": "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hev_brh_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
+    "VirProBERT_PiHu": "uniref90_embl_vertebrates_non_idv_hev/20241029/host_multi/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hev_ph_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
+    #"Hybd-sl256st64-CLS-vs103": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256b512_hybrid_attention_s64_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl512st128-CLS-vs103": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240717/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl512b512_s128_hybrid_attention_s128_fnn_2l_d1024_lr1e-4_output.csv"
+    #"Hybd-sl512st128-CLS-vs30": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240723/host_multi/fine_tuning_hybrid_cls_vs30/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl512b512_cls_vs30_hybrid_attention_s128_fnn_2l_d1024_lr1e-4_output.csv"
+    # "Pretrain-TF-d1024-lr1e-5-w_freeze": "20240306/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_2l_d1024_lr1e-5_output.csv"
+    # "Pretrain-TF-d1024-lr1e-5-ModFL": "20240302/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_0l_d512_lr1e-5-modfl_p-1_output.csv"
+    # "Pretrain-TF-d1024-lr1e-5-RL": "20240302/host_multi/fine_tuning/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl1366_host_prediction_fnn_0l_d512_lr1e-5-modrl_p-1_output.csv"
+#    "ESM2": "uniref90_embl_vertebrates_non_idv/20241124/host_multi/external/uniref90viridae_esm2_msl2048_bn_fnn_2l_d1024_lr1e-4_output.csv"
+    #"VirProBERT 1e-5": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240909/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_output.csv"
+    #"VirProBERT 3e-4": "uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20241117/host_multi/virprobert/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_output.csv "
+
+evaluation_settings:
+  type: "multi"
+  # metrics
+  auroc: True
+  auprc: True
+  f1: False
+  accuracy: False
+  prediction_distribution: False
+
+label_mappings:
+  "Homo sapiens": "Human"
+  "Sus scrofa": "Pig"
+#  "Hydrochoerus hydrochaeris": "Capybara"
+#  "Marmota himalayana": "Himalayan marmot"
+#  "Gallus gallus": "Red junglefowl"
+#  "Mus musculus": "House mouse"
+#  "Macaca mulatta": "Indochinese rhesus macaque"
+#  "Gallus gallus": "Red junglefowl"
+#  "Chlorocebus pygerythrus": "Vervet monkey"
+#  "Rattus norvegicus": "Brown rat"
+#  "Microtus arvalis": "Common vole"
+#  "Equus caballus": "Horse"
+#  "Phacochoerus africanus": "Common warthog"
+#  "Cercopithecus hamlyni": "Hamlyn monkey"
+#  "Felis catus": "Cat"
+#  "Capra hircus": "Goat"
+#  "Ovis aries": "Sheep"
+
+
+output_settings:
+  output_dir: "output"
+  evaluation_dir: "evaluation"
+  visualization_dir: "visualization"
+  dataset_dir: "uniref90/20250218/host_multi"
+  prefix: "host_multi_PiHu_models"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
