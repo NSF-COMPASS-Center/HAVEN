@@ -48,9 +48,9 @@ mkdir -p output/logs
 ---
 ## Getting Started
 1. Decide which of the [Pipelines](#pipelines) to use
-   2. If your data requires pre-processing, review the [Data preprocessor script](#scripts) instead (this might require some modification)
+    - If your data requires pre-processing, review the [Data preprocessor script](#scripts) instead (this might require some modification)
 3. Within /input/config-files, locate the directory that matches the previous step and create a subdirectory as necessary
-4. Create a config file for your experiment (optional: copy/paste from existing config file)
+4. Create a config file for your experiment (optional: copy/paste from a similar existing config file)
 5. Modify parameters based on these [instructions](#config-file-parameters)
 6. When done, try to [run](#usage)
 
