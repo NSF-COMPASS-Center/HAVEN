@@ -24,6 +24,7 @@ from pipelines.transfer_learning import masked_language_modeling_pipleine
 from pipelines.analysis import perturbation_analysis_pipeline, perturbation_analysis_external_pipeline, embedding_generation_pipeline, virus_host_prediction_testing_pipeline, virus_host_prediction_testing_external_pipeline
 from pipelines.few_shot_learning import few_shot_learning_host_prediction_pipeline
 from pipelines.evaluation import evaluation_pipeline
+from pipelines.sequence_clustering import sequence_clustering_pipeline
 
 pipeline_mapper = {
     "masked_language_modeling": masked_language_modeling_pipleine,
@@ -38,6 +39,7 @@ pipeline_mapper = {
     "perturbation": perturbation_analysis_pipeline,
     "perturbation_external": perturbation_analysis_external_pipeline,
     "embedding_generation": embedding_generation_pipeline,
+    "sequence_clustering": sequence_clustering_pipeline,
 }
 
 # mappings of all classes
