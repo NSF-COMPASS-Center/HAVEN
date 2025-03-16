@@ -24,13 +24,28 @@ Please refer to the [ARC User Documentation](https://www.docs.arc.vt.edu/index.h
 - Setup the [Project and Environment](#project-and-environment-setup)
 - Input data files and pre-trained models are located at
 ```shell
-/projects/seqevol/zoonosis
+cd /projects/seqevol
 ```
-- Create symbolic links to the common input data and output folders.
+- Create a folder named your Virginia Tech PID within `/projects/seqevol`
 ```shell
-ln -s /projects/seqevol/zoonosis/input/data input/data
-ln -s /projects/seqevol/zoonosis/output output
+mkdir <vt-pid>
 ```
+- Create input and output folders
+```shell
+cd /projects/seqevol/<vt-pid>
+mkdir -p zoonosis/input/data
+mkdir zoonosis/output
+```
+Upload any newly created dataset files into `/projects/seqevol/<vt-pid>zoonosis/input/data`
+
+- Create symbolic links to these newly created input data and output folders from your zoonosis project.
+```shell
+cd <path-to-your-git-repo>/zoonosis
+ln -s /projects/seqevol/<vt-pid>/zoonosis/input/data input/data
+ln -s /projects/seqevol/<vt-pid>/zoonosis/output output
+```
+
+All the newly created output files will automatically be persisted in `/projects/seqevol/<vt-pid>zoonosis/output/`
 
 ### Executing experiments using batch jobs
 Choose the deployment script based on the use-case
