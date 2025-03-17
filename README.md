@@ -35,7 +35,7 @@ Input protein sequence data used for all virus host prediction experiments are l
     conda activate virprobert
     pip install -r requirements.txt
     ```
-- [Install pytorch](https://pytorch.org/get-started/locally/) based on the CUDA version in the server.
+- [Install pytorch](https://pytorch.org/get-started/locally/) based on the GPU/CPU configuration.
 
 ### Create required folders
 - Create input and output folders
