@@ -45,7 +45,7 @@ ln -s /projects/seqevol/<vt-pid>/zoonosis/input/data input/data
 ln -s /projects/seqevol/<vt-pid>/zoonosis/output output
 ```
 
-All the newly created output files will automatically be persisted in `/projects/seqevol/<vt-pid>zoonosis/output/`
+All the newly created output files will automatically be persisted in `/projects/seqevol/<vt-pid>/zoonosis/output/raw`
 
 ### Executing experiments using batch jobs
 Choose the deployment script based on the use-case
@@ -106,10 +106,11 @@ All users of the server coordinate the usage of the four available GPUs using th
 - Setup conda environment 
     ```shell
     bash
-    conda create -n virprobert python=3.10
+    conda create -n virprobert python=3.11.8
     conda activate virprobert
     pip install -r requirements.txt
     ```
+- [Install pytorch](https://pytorch.org/get-started/locally/) based on the CUDA version in the server.
 - Copy the necessary input dataset files and pre-trained models from the appropriate locations from each server.
 
 ### Create required folders
