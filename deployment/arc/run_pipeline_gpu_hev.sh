@@ -2,7 +2,7 @@
 
 #SBATCH -J virprobert
 #SBATCH --account=seqevol
-#SBATCH --partition=l40s_normal_q
+#SBATCH --partition=dgx_normal_q
 
 #SBATCH --mem=450G
 #SBATCH --nodes=1
