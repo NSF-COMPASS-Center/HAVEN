@@ -5,13 +5,13 @@ config_type: "data_preprocessor" # options: data_preprocessor, classification, e
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data"
+  input_dir: "data"
 
   # Subdirectory of inputs that datasets are placed in
   dataset_dir: "uniprotkb/031925"
 
   # Name of file(s) in subdirectory to be read and processed.
-  file_names: ["uniprotkb_hepeviridae_90.fasta"]
+  file_names: ["uniprotkb_hepeviridae_0.9_clusters.fasta"]
 
 
 processor_settings:
