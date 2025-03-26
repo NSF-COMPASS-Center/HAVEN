@@ -20,12 +20,6 @@
     - logs: Log files generated during experiment executions.
 - **src**: source code
 ---
-## Data
-Input protein sequence data used for all virus host prediction experiments are located at [input/data](input/data)
-
-- [UniRef90](input/data/uniref90/20240131)
-- [Coronaviridae Spike protein sequences](input/data/coronaviridae/20240313)
----
 ## Code and dependencies
 - Clone the GitHub repository at the desired location.
 - Setup conda environment 
