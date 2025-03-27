@@ -86,7 +86,7 @@ mkdir zoonosis/output
 - Create symbolic links to these newly created input data and output folders from your zoonosis project.
 ```shell
 cd <path-to-your-git-repo>/zoonosis
-ln -s /data/<vt-pid>/zoonosis/input/data input/data
+ln -s /data/<vt-pid>/zoonosis/input/data input/
 ln -s /data/<vt-pid>/zoonosis/output output
 ```
 - Copy the necessary input data and output model files for your experiments from the file paths mentioned in [Data](#data)
