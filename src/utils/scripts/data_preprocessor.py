@@ -8,12 +8,12 @@ from utils import external_sources_utils
 # Uniref90 filenames
 UNIREF = "uniref"
 UNIREF90_ID = "uniref90_id"
-UNIREF90_DATA_CSV_FILENAME = "coronaviridae_s_uniref90.csv"
+UNIREF90_DATA_CSV_FILENAME = ""
 
 # Uniprot filenames
 UNIPROT = "uniprot"
 UNIPROT_ID = "uniprot_id"
-UNIPROT_DATA_CSV_FILENAME = "coronaviridae_s_uniprot.csv"
+UNIPROT_DATA_CSV_FILENAME = "hepeviridae_uniprot_cd-hit90.csv"
 
 
 def parse_args():
