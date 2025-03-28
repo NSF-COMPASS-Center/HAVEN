@@ -14,7 +14,7 @@ def parse_uniprot_fasta_file(input_file_path, id_col):
     sequences = []
     i = 0
     no_id_count = 0
-    print("START: Parsing fasta file {input_file_path}")
+    print(f"START: Parsing fasta file {input_file_path}")
     # parse fasta file to extract uniprot_id, tax_id of virus/organism, and protein sequence
     with open(input_file_path) as f:
         for record in SeqIO.parse(f, "fasta"):
@@ -40,7 +40,7 @@ def parse_uniref_fasta_file(input_file_path, id_col):
     sequences = []
     i = 0
     no_id_count = 0
-    print("START: Parsing fasta file {input_file_path}")
+    print(f"START: Parsing fasta file {input_file_path}")
     # parse fasta file to extract uniref90_id, tax_id of virus/organism, and protein sequence
     with open(input_file_path) as f:
         for record in SeqIO.parse(f, "fasta"):
