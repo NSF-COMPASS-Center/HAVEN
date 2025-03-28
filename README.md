@@ -2,6 +2,32 @@
 
 ![VirProBERT](figures/virus_host_prediction.png)
 
+---
+## Getting Started
+1. Begin by creating a new conda environment
+```shell 
+conda create -n "virprobert"
+#Activate your conda environment
+conda activate virprobert
+```
+2. Follow the installation [instructions](#install-dependencies)
+
+### Replicating VirProBERT results
+IP
+
+### General Guidelines
+1. VirProBERT supports many different pipelines. Decide which of the [Pipelines](#pipelines) to use
+   - If your data requires pre-processing, review the [Data preprocessor script](#scripts) first
+2. Within /input/config-files, locate the directory that matches the pipeline from the previous step
+3. Create a config file for your experiment
+   - copy parameters from the [example config file](#pipelines) for your pipeline
+4. Modify parameters based on these [instructions](#config-file-parameters)
+5. Organize data by this [guideline](#data) 
+5. When done, follow the general usage [directions](#usage)
+   - when GPU is needed, either follow Server Execution README (if internal user) or create your own shell script deployment file
+
+---
+
 ## Repository Organization
 - **deployment**
   - arc: shell scripts for deployments in arc
@@ -45,14 +71,6 @@ mkdir -p output/logs
 2. Create a new project in Weights and Biases named `zoonosis-host-prediction`.
 3. Setup the `wandb` library by completing [Step 1 in the Quickstart](https://wandb.ai/quickstart?utm_source=app-resource-center&utm_medium=app&utm_term=quickstart).
     - Note: Do not forget to log in to Weights and Biases (`wandb login`) in the server where you intend to execute the experiment.
----
-## Getting Started
-1. Decide which of the [Pipelines](#pipelines) to use
-   - If your data requires pre-processing, review the [Data preprocessor script](#scripts) instead (this might require some modification)
-2. Within /input/config-files, locate the directory that matches the previous step and create a subdirectory as necessary
-3. Create a config file for your experiment (optional: copy/paste from a similar existing config file)
-4. Modify parameters based on these [instructions](#config-file-parameters)
-5. When done, try to [run](#usage)
 
 ---
 ## Usage
