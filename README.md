@@ -20,26 +20,25 @@
     - logs: Log files generated during experiment executions.
 - **src**: source code
 ---
-## Data
-Input protein sequence data used for all virus host prediction experiments are located at [input/data](input/data)
+## Code and dependencies
+- Clone the GitHub repository at the desired location.
+- Setup conda environment 
+    ```shell
+    bash
+    conda create -n virprobert python=3.11.8
+    conda activate virprobert
+    pip install -r requirements.txt
+    ```
+- [Install pytorch](https://pytorch.org/get-started/locally/) based on the GPU/CPU configuration.
 
-- [UniRef90](input/data/uniref90/20240131)
-- [Coronaviridae Spike protein sequences](input/data/coronaviridae/20240313)
----
-### Install Dependencies
-Install python dependencies via 
-```shell 
-pip install -R ./requirements.txt
-pip install numpy --pre torch --index-url https://download.pytorch.org/whl/cu117
-pip install -r requirements.txt
-pip install pyyaml
-conda install pandas
-```
 ### Create required folders
-Create a directory for logs using - 
+- Create input and output folders
 ```shell
-mkdir -p output/logs
+cd zoonosis
+mkdir -p zoonosis/input/data
+mkdir zoonosis/output
 ```
+
 ### Setup Weights & Biases
 1. Create an account in [Weights & Biases](https://wandb.ai/site/).
 2. Create a new project in Weights and Biases named `zoonosis-host-prediction`.

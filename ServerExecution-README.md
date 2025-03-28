@@ -22,15 +22,29 @@ Please refer to the [ARC User Documentation](https://www.docs.arc.vt.edu/index.h
     falcon2.arc.vt.edu
     ```
 - Setup the [Project and Environment](#project-and-environment-setup)
-- Input data files and pre-trained models are located at
+
+- Create a folder named your Virginia Tech PID within `/projects/seqevol`. This folder will contain the input and output data files for all the experiments.
 ```shell
-/projects/seqevol/zoonosis
+mkdir <vt-pid>
 ```
-- Create symbolic links to the common input data and output folders.
+- Create input and output folders
 ```shell
-ln -s /projects/seqevol/zoonosis/input/data input/data
-ln -s /projects/seqevol/zoonosis/output output
+cd /projects/seqevol/<vt-pid>
+mkdir -p zoonosis/input/data
+mkdir zoonosis/output
 ```
+- Create symbolic links to these newly created input data and output folders from your zoonosis project.
+```shell
+cd <path-to-your-git-repo>/zoonosis
+ln -s /projects/seqevol/<vt-pid>/zoonosis/input/data input/data
+ln -s /projects/seqevol/<vt-pid>/zoonosis/output output
+```
+- Copy the necessary input data and output model files for your experiments from the file paths mentioned in [Data](#data)
+- If you create any new input datasets for your experiments:
+  - Upload the dataset files into `/projects/seqevol/<vt-pid>zoonosis/input/data`
+  - Add entries for those files in the table in [Input data files](#input-data-files) so that they can be used by others. 
+- All the newly created output files will automatically be persisted in `/projects/seqevol/<vt-pid>/zoonosis/output/raw`.
+  - If you execute an experiment that creates a model that will be used by others (for example, pre-trained model), add an entry in the table [Pre-trained and fine-tuned models](#pre-trained-and-fine-tuned-models)
 
 ### Executing experiments using batch jobs
 Choose the deployment script based on the use-case
@@ -59,10 +73,29 @@ sbatch deployment/arc/run_script_gpu.sh . src/utils/scripts/perturbation_dataset
 - Email [Blessy Antony](mailto:blessyantony@vt.edu) to get access to the pandemic-da server.
 - SSH into `pandemic-da.cs.vt.edu`. Reset your password after first login.
 - Setup the [Project and Environment](#project-and-environment-setup)
-- Input data files and pre-trained models are located at
+- Create a folder named your Virginia Tech PID within `/data`. This folder will contain the input and output data files for all the experiments.
 ```shell
-<Insert path to project folder>
+mkdir <vt-pid>
 ```
+- Create input and output folders
+```shell
+cd /data/<vt-pid>
+mkdir -p zoonosis/input/data
+mkdir zoonosis/output
+```
+- Create symbolic links to these newly created input data and output folders from your zoonosis project.
+```shell
+cd <path-to-your-git-repo>/zoonosis
+ln -s /data/<vt-pid>/zoonosis/input/data input/
+ln -s /data/<vt-pid>/zoonosis/output output
+```
+- Copy the necessary input data and output model files for your experiments from the file paths mentioned in [Data](#data)
+- If you create any new input datasets for your experiments:
+  - Upload the dataset files into `/data/<vt-pid>zoonosis/input/data`
+  - Add entries for those files in the table in [Input data files](#input-data-files) so that they can be used by others. 
+- All the newly created output files will automatically be persisted in `/data/<vt-pid>/zoonosis/output/raw`.
+  - If you execute an experiment that creates a model that will be used by others (for example, pre-trained model), add an entry in the table [Pre-trained and fine-tuned models](#pre-trained-and-fine-tuned-models)
+
 ### Executing experiments using batch jobs
 - Request [Dr. Anuj Karpatne](mailto:karpatne@vt.edu) to get you added to the pandemic-da server management Slack channel. 
 All users of the server coordinate the usage of the four available GPUs using this Slack channel.
@@ -84,30 +117,47 @@ All users of the server coordinate the usage of the four available GPUs using th
   
   deployment/pandemic-da/run_pipeline_gpu.sh input/config-files/transfer_learning/fine_tuning/uniref90-fine-tuning-host-prediction-multi.yaml 1,2
   ```
-
+  
 ## Project and Environment Setup
 ### Code and dependencies
 - Clone the GitHub repository at the desired location.
 - Setup conda environment 
     ```shell
     bash
-    conda create -n virprobert python=3.10
+    conda create -n virprobert python=3.11.8
     conda activate virprobert
     pip install -r requirements.txt
     ```
-- Copy the necessary input dataset files and pre-trained models from the appropriate locations from each server.
-
-### Create required folders
-Create a directory for logs in the output directory using - 
-```shell
-mkdir -p output/logs
-```
+- [Install pytorch](https://pytorch.org/get-started/locally/) based on the CUDA version in the server.
 
 ### Setup Weights & Biases
 1. Create an account in [Weights & Biases](https://wandb.ai/site/).
 2. Create a new project in Weights and Biases named `zoonosis-host-prediction`.
 3. Setup the `wandb` library by completing [Step 1 in the Quickstart](https://wandb.ai/quickstart?utm_source=app-resource-center&utm_medium=app&utm_term=quickstart).
     - Note: Do not forget to log in to Weights and Biases (`wandb login`) in the server where you intend to execute the experiment.
+
+## Data
+Input protein sequence data used for all virus host prediction experiments are located at `/projetcs/seqevol`.
+
+### Input data files
+
+| <div style="width:600px">Dataset Description</div>                                                                                                                                    | File Path in ARC                                                                                                                                                                            | File Path in Pandemic-DA                                                                                                                                                        |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Uniref90 viral protein sequences                                                                                                                                                      | `/projects/seqevol/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae.csv`                                                                                                 | `/data/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae.csv`                                                                                                 |
+| Uniref90 viral protein sequences with virus-hosts                                                                                                                                     | `/projects/seqevol/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned.csv`                                                                               | `/data/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned.csv`                                                                               |
+| Uniref90 viral protein sequences with virus-hosts that belong to _vertebrata_ (are vertebrates)                                                                                       | `/projects/seqevol/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates.csv`                                                  | `/data/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates.csv`                                                  |
+| Uniref90 viral protein sequences with vertebrate virus hosts and from non-immunodeficiency viruses                                                                                    | `/projects/seqevol/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv.csv`                                    | `/data/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv.csv`                                    |
+| Uniref90 viral protein sequences with vertebrate virus hosts and from non-immunodeficiency viruses with prevalence $\ge$ 1% (common hosts)                                            | `/projects/seqevol/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5.csv`                           | `/data/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5.csv`                           |
+| Uniref90 viral protein sequences with vertebrate virus hosts and from non-immunodeficiency viruses with prevalence $\ge$ 1% (common hosts) and sequence length within 99.9 percentile | `/projects/seqevol/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv` | `/data/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv` |
+| Uniref90 viral protein sequences with vertebrate virus hosts and from non-immunodeficiency viruses with prevalence $\ge$ 0.05% and $<$ 1% (rare hosts)                                | `/projects/seqevol/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_lt_1_gte_0.05_prcnt_prevalence.csv`     | `/data/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_lt_1_gte_0.05_prcnt_prevalence.csv`     |
+| Uniref90 viral protein sequences with vertebrate virus hosts and from immunodeficiency viruses (unseen virus)                                                                         | `/projects/seqevol/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv.csv`                                        | `/data/blessyantony/zoonosis/input/data/uniref90/20240131/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_idv.csv`                                        | 
+
+### Pre-trained and fine-tuned models
+| <div style="width:600px">Model Description</div>                                                                                                                                                          | File Path in ARC                                                                                                                                                                                                                                                                                        | File Path in Pandemic-DA                                                                                                                                                                                                                                                                    |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| VirProBERT: Pre-trained model(segment length=256)                                                                                                                                                         | `/projects/seqevol/blessyantony/zoonosis/output/raw/uniref90-viridae/pre-training/mlm/20240821/transformer_encoder-l_6-h_8-lr1e-4_msl256_b512_splitseq_mlm_vs30cls_allemb_itr0.pth`                                                                                                                     | `/data/blessyantony/zoonosis/output/raw/uniref90-viridae/pre-training/mlm/20240821/transformer_encoder-l_6-h_8-lr1e-4_msl256_b512_splitseq_mlm_vs30cls_allemb_itr0.pth`                                                                                                                     |
+| VirProBERT: Fine-tuned on Uniref90 non-immunodeficiency virus common classes dataset for virus-host prediction (5 classes)                                                                                | `/projects/seqevol/blessyantony/zoonosis/output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256s64allemb_vs30cls_batchnorm_hybrid_attention_msl256s64ae_fnn_2l_d1024_lr1e-4_itr4.pth` | `/data/blessyantony/zoonosis/output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256s64allemb_vs30cls_batchnorm_hybrid_attention_msl256s64ae_fnn_2l_d1024_lr1e-4_itr4.pth` |
+| VirProBERT: Fine-tuned on Uniref90 non-immunodeficiency virus common classes dataset for virus-host prediction (5 classes) and fine-tuned using Few-shot learning (3-way, 5-shot) to predict rare classes | `/projects/seqevol/blessyantony/zoonosis/output/raw/uniref90_embl_vertebrates_non_idv/20240928/host_multi/few_shot_learning/fsl_tr_w3s5q10_te_w3s5q-1_e100b32_split70-10-20_hybrid-attention_sl256st64vs30cls_fnn_2l_d1024_lr1e-4_itr4.pth`                                                             | `/data/blessyantony/zoonosis/output/raw/uniref90_embl_vertebrates_non_idv/20240928/host_multi/few_shot_learning/fsl_tr_w3s5q10_te_w3s5q-1_e100b32_split70-10-20_hybrid-attention_sl256st64vs30cls_fnn_2l_d1024_lr1e-4_itr4.pth`                                                             |
 
 
 ---

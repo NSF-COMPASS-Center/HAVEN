@@ -1,32 +1,29 @@
 import argparse
 import os
+import sys
+sys.path.append(os.path.join(os.getcwd(), "src"))
 from pathlib import Path
-from data_processing import base_dataset_processor, uniref_dataset_processor, uniprot_dataset_processor
+from data_preprocessing import dataset_parser, dataset_filter
 from utils import external_sources_utils
 
-# names of all intermediary files to be created
-# Uniref90 filenames
 UNIREF = "uniref"
-UNIREF90_ID = "uniref90_id"
-UNIREF90_DATA_CSV_FILENAME = ""
-
-# Uniprot filenames
 UNIPROT = "uniprot"
-UNIPROT_ID = "uniprot_id"
-UNIPROT_DATA_CSV_FILENAME = "hepeviridae_uniprot_cd-hit90.csv"
+
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Preprocess the UniRef90 protein sequences dataset.\nOnly one of the below options can be selected at runtime.')
-    parser.add_argument("-it", "--input_type", required=True,
-                        help="Type of input sequences. Supported values: uniref, uniprot\n")
+    parser.add_argument("-id", "--id_col", required=True,
+                        help="Name of the id column. Example values: uniref50_id, uniref90_id, uniprot_id\n")
     parser.add_argument("-if", "--input_file", required=True,
                         help="Absolute path to input file depending on the option(s) selected.\n")
     parser.add_argument("-od", "--output_dir", required=True,
                         help="Absolute path to output directory where the generated file will be saved.\n")
     parser.add_argument("--fasta_to_csv", action="store_true",
                         help="Convert the input fasta file to csv format.\n")
+    parser.add_argument("-it", "--input_type",
+                        help="Type of input file. Mandatory config option while converting from fasta to csv. Support values = 'uniref', 'uniprot'\n")
     parser.add_argument("--uniprot_metadata", action="store_true",
                         help="Get metadata (hosts and embl reference id) of virus from UniProt.\n")
     parser.add_argument("--host_map_embl", action="store_true",
@@ -61,119 +58,100 @@ def parse_args():
     return args
 
 
-def pre_process(config, id):
+def process(config):
+    id_col = config.id_col
     input_file_path = config.input_file
     output_dir = config.output_dir
-
-    # 2B. Host mapping from EMBL
-    if config.host_map_embl:
-        embl_host_mapping_filepath = os.path.join(output_dir, Path(input_file_path).stem + "_embl_host_mapping.csv")
-        dataset_embl_hosts_mapping_filepath = os.path.join(output_dir, Path(input_file_path).stem + "_embl_hosts.csv")
-        base_dataset_processor.get_virus_hosts_from_embl(input_file_path=input_file_path,
-                                                         embl_mapping_filepath=os.path.join(output_dir,
-                                                                                            embl_host_mapping_filepath),
-                                                         output_file_path=os.path.join(output_dir,
-                                                                                       dataset_embl_hosts_mapping_filepath),
-                                                         id=id)
-    # 3. Remove sequences with no hosts
-    if config.prune_dataset:
-        pruned_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_pruned.csv")
-        base_dataset_processor.remove_sequences_w_no_hosts(input_file_path=input_file_path,
-                                                           output_file_path=pruned_dataset_file_path)
-
-    # 4. Get taxonomy metadata (rank of virus and virus hosts) from NCBI
-    if config.taxon_metadata:
-        metadata_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_metadata.csv")
-        base_dataset_processor.get_virus_metadata(input_file_path=input_file_path,
-                                                  taxon_metadata_dir_path=config.taxon_dir,
-                                                  output_file_path=metadata_dataset_file_path,
-                                                  id=id)
-
-    if config.uprank_host_genus:
-        upranked_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_virus_host_genus.csv")
-        base_dataset_processor.uprank_virus_host_genus(input_file_path=input_file_path,
-                                                       taxon_metadata_dir_path=config.taxon_dir,
-                                                       output_file_path=upranked_dataset_file_path)
-
-    # 5. Filter for virus and virus_hosts at species level
-    if config.filter_species_virus:
-        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species_virus.csv")
-        base_dataset_processor.get_virus_at_species_level(input_file_path=input_file_path,
-                                                          output_file_path=filtered_dataset_file_path)
-
-    # 6. Filter for virus and virus_hosts at species level
-    if config.filter_species_virus_host:
-        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species_virus_host.csv")
-        base_dataset_processor.get_virus_host_at_species_level(input_file_path=input_file_path,
-                                                               output_file_path=filtered_dataset_file_path)
-
-    # 7. Filter for virus_hosts belonging to Vertebrata clade
-    if config.filter_vertebrates:
-        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_vertebrates.csv")
-        base_dataset_processor.get_sequences_from_vertebrata_hosts(input_file_path=input_file_path,
-                                                                   taxon_metadata_dir_path=config.taxon_dir,
-                                                                   output_file_path=filtered_dataset_file_path)
-
-    # 8. Merge the metadata with the sequence data
-    if config.merge_sequence_data:
-        sequence_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_w_seq.csv")
-        base_dataset_processor.join_metadata_with_sequences_data(input_file_path=input_file_path,
-                                                                 sequence_data_file_path=config.merge_sequence_data,
-                                                                 output_file_path=sequence_dataset_file_path,
-                                                                 id=id)
-
-
-def pre_process_uniref90(config):
-    print("START: Preprocess Uniref90 dataset")
-    input_file_path = config.input_file
-    output_dir = config.output_dir
-
-    # 1. Parse the Fasta file
-    if config.fasta_to_csv:
-        uniref_dataset_processor.parse_uniref_fasta_file(input_file_path=input_file_path,
-                                                         output_file_path=os.path.join(output_dir,
-                                                                                       UNIREF90_DATA_CSV_FILENAME))
 
     # 2A. Metadata (host, embl ref id) from UniProt
     if config.uniprot_metadata:
         uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
         print(f"uniprot_metadata_file_path ={uniprot_metadata_file_path}")
-        base_dataset_processor.get_metadata_from_uniprot(input_file_path=input_file_path,
-                                                         output_file_path=uniprot_metadata_file_path,
-                                                         id=UNIREF90_ID,
-                                                         query_uniprot=external_sources_utils.query_uniref)
-    pre_process(config, UNIREF90_ID)
-    print("END: Preprocess Uniref90 dataset")
+        dataset_filter.get_metadata_from_uniprot(input_file_path=input_file_path,
+                                                 output_file_path=uniprot_metadata_file_path,
+                                                 id_col=id_col,
+                                                 query_uniprot=external_sources_utils.query_uniref)
+    # 2B. Host mapping from EMBL
+    if config.host_map_embl:
+        embl_host_mapping_filepath = os.path.join(output_dir, Path(input_file_path).stem + "_embl_host_mapping.csv")
+        dataset_embl_hosts_mapping_filepath = os.path.join(output_dir, Path(input_file_path).stem + "_embl_hosts.csv")
+        dataset_filter.get_virus_hosts_from_embl(input_file_path=input_file_path,
+                                                 embl_mapping_filepath=os.path.join(output_dir,
+                                                                                    embl_host_mapping_filepath),
+                                                 output_file_path=os.path.join(output_dir,
+                                                                               dataset_embl_hosts_mapping_filepath),
+                                                 id_col=id_col)
+    # 3. Remove sequences with no hosts
+    if config.prune_dataset:
+        pruned_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_pruned.csv")
+        dataset_filter.remove_sequences_w_no_hosts(input_file_path=input_file_path,
+                                                   output_file_path=pruned_dataset_file_path)
+
+    # 4. Get taxonomy metadata (rank of virus and virus hosts) from NCBI
+    if config.taxon_metadata:
+        metadata_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_metadata.csv")
+        dataset_filter.get_virus_metadata(input_file_path=input_file_path,
+                                          taxon_metadata_dir_path=config.taxon_dir,
+                                          output_file_path=metadata_dataset_file_path,
+                                          id=id)
+
+    if config.uprank_host_genus:
+        upranked_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_virus_host_genus.csv")
+        dataset_filter.uprank_virus_host_genus(input_file_path=input_file_path,
+                                               taxon_metadata_dir_path=config.taxon_dir,
+                                               output_file_path=upranked_dataset_file_path)
+
+    # 5. Filter for virus at species level
+    if config.filter_species_virus:
+        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species_virus.csv")
+        dataset_filter.get_virus_at_species_level(input_file_path=input_file_path,
+                                                  output_file_path=filtered_dataset_file_path)
+
+    # 6. Filter for virus_hosts at species level
+    if config.filter_species_virus_host:
+        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_species_virus_host.csv")
+        dataset_filter.get_virus_host_at_species_level(input_file_path=input_file_path,
+                                                       output_file_path=filtered_dataset_file_path)
+
+    # 7. Filter for virus_hosts belonging to Vertebrata clade
+    if config.filter_vertebrates:
+        filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_vertebrates.csv")
+        dataset_filter.get_sequences_from_vertebrata_hosts(input_file_path=input_file_path,
+                                                           taxon_metadata_dir_path=config.taxon_dir,
+                                                           output_file_path=filtered_dataset_file_path)
+
+    # 8. Merge the metadata with the sequence data
+    if config.merge_sequence_data:
+        sequence_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_w_seq.csv")
+        dataset_filter.join_metadata_with_sequences_data(input_file_path=input_file_path,
+                                                         sequence_data_file_path=config.merge_sequence_data,
+                                                         output_file_path=sequence_dataset_file_path,
+                                                         id_col=id_col)
 
 
-def pre_process_uniprot(config):
-    print("START: Preprocess Uniprot dataset")
+def pre_process(config):
     input_file_path = config.input_file
     output_dir = config.output_dir
+    id_col = config.id_col
 
+    df = None
     # 1. Parse the Fasta file
     if config.fasta_to_csv:
-        uniprot_dataset_processor.parse_uniprot_fasta_file(input_file_path=input_file_path,
-                                                           output_file_path=os.path.join(output_dir,
-                                                                                         UNIPROT_DATA_CSV_FILENAME))
+        if config.input_type == UNIREF:
+            df = dataset_parser.parse_uniref_fasta_file(input_file_path=input_file_path, id_col=id_col)
+        elif config.input_type == UNIPROT:
+            df = dataset_parser.parse_uniprot_fasta_file(input_file_path=input_file_path, id_col=id_col)
 
-        # 2A. Metadata (host, embl ref id) from UniProt
-    if config.uniprot_metadata:
-        uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
-        base_dataset_processor.get_metadata_from_uniprot(input_file_path=input_file_path,
-                                                         output_file_path=uniprot_metadata_file_path,
-                                                         id=UNIPROT_ID,
-                                                         query_uniprot=external_sources_utils.query_uniprot)
-    pre_process(config, UNIPROT_ID)
-    print("END: Preprocess Uniprot dataset")
+        # write the parsed dataframe to a csv file
+        output_file_path = os.path.join(output_dir, Path(input_file_path).stem + ".csv")
+        print(f"Writing to file {output_file_path}")
+        df.to_csv(output_file_path, index=False)
 
 
 def main():
     config = parse_args()
-    if config.input_type == UNIREF:
-        pre_process_uniref90(config)
-    elif config.input_type == UNIPROT:
-        pre_process_uniprot(config)
+    pre_process(config)
+    process(config)
     return
 
 
