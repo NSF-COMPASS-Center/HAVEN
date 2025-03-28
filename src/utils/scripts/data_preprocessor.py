@@ -10,7 +10,6 @@ UNIREF = "uniref"
 UNIPROT = "uniprot"
 
 
-
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Preprocess the UniRef90 protein sequences dataset.\nOnly one of the below options can be selected at runtime.')
@@ -63,14 +62,6 @@ def process(config):
     input_file_path = config.input_file
     output_dir = config.output_dir
 
-    # 2A. Metadata (host, embl ref id) from UniProt
-    if config.uniprot_metadata:
-        uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
-        print(f"uniprot_metadata_file_path ={uniprot_metadata_file_path}")
-        dataset_filter.get_metadata_from_uniprot(input_file_path=input_file_path,
-                                                 output_file_path=uniprot_metadata_file_path,
-                                                 id_col=id_col,
-                                                 query_uniprot=external_sources_utils.query_uniref)
     # 2B. Host mapping from EMBL
     if config.host_map_embl:
         embl_host_mapping_filepath = os.path.join(output_dir, Path(input_file_path).stem + "_embl_host_mapping.csv")
@@ -146,6 +137,23 @@ def pre_process(config):
         output_file_path = os.path.join(output_dir, Path(input_file_path).stem + ".csv")
         print(f"Writing to file {output_file_path}")
         df.to_csv(output_file_path, index=False)
+
+    # 2A. Metadata (host, embl ref id) from UniProt
+    if config.uniprot_metadata and config.input_type == UNIREF:
+        uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
+        print(f"uniprot_metadata_file_path ={uniprot_metadata_file_path}")
+        dataset_filter.get_metadata_from_uniprot(input_file_path=input_file_path,
+                                                 output_file_path=uniprot_metadata_file_path,
+                                                 id_col=id_col,
+                                                 query_uniprot=external_sources_utils.query_uniref)
+
+    if config.uniprot_metadata and config.input_type == UNIPROT:
+        uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
+        print(f"uniprot_metadata_file_path ={uniprot_metadata_file_path}")
+        dataset_filter.get_metadata_from_uniprot(input_file_path=input_file_path,
+                                                 output_file_path=uniprot_metadata_file_path,
+                                                 id_col=id_col,
+                                                 query_uniprot=external_sources_utils.query_uniprot)
 
 
 def main():

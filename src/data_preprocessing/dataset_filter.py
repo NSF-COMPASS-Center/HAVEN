@@ -154,7 +154,7 @@ def get_uniprot_metadata(df, output_file_path, id_col, query_uniprot):
 def get_virus_hosts_from_embl(input_file_path, embl_mapping_filepath, output_file_path, id_col):
     print("START: Get virus hosts from EMBL")
     # read the input file
-    df = pd.read_csv(input_file_path, on_bad_lines=None, converters={2: literal_eval},
+    df = pd.read_csv(input_file_path, converters={2: literal_eval}, on_bad_lines="warn",
                      names=[id_col, TAX_ID, HOST_TAX_IDS, EMBL_REF_ID])
     print(f"Read dataset size = {df.shape}")
 
