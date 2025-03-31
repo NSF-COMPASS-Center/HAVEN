@@ -2,7 +2,7 @@
 
 #SBATCH -J virprobert
 #SBATCH --account=seqevol
-#SBATCH --partition=dgx_normal_q
+#SBATCH --partition=l40s_normal_q
 
 #SBATCH --mem=450G
 #SBATCH --nodes=1
@@ -16,7 +16,7 @@ module load
 # Load conda
 
 
-module load Anaconda3
+module load Miniconda3
 #Load CUDA
 module load cuda12.4/toolkit
 
