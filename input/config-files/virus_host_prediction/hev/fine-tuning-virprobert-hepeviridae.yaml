@@ -39,7 +39,7 @@ fine_tune_settings:
   experiment: "virus_host_prediction"
   n_iterations: 5
   split_input: True
-  train_proportion: 0.8
+  train_proportion: 0.7
   classification_type: "multi"
   save_model: True
 
