@@ -8,8 +8,9 @@
 *.zip
 *.tab
 **/input/data/**
-
+input
 # output files
+output
 output/
 *.out
 *.swp
