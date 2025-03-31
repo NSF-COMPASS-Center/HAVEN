@@ -15,7 +15,7 @@ def execute(config):
     input_dir = input_settings["input_dir"]
     input_file_names = input_settings["file_names"]
     input_split_seeds = input_settings["split_seeds"]
-    print("TEST")
+
     # output settings
     output_settings = config["output_settings"]
     output_dir = output_settings["output_dir"]
@@ -166,7 +166,6 @@ def execute(config):
 
 def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, task_id):
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
-    print(class_weights)
     criterion = nn_utils.get_criterion(loss, class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     n_epochs_freeze = training_settings["n_epochs_freeze"]

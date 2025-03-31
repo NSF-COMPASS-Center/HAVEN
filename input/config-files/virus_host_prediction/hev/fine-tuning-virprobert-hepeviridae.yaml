@@ -55,11 +55,11 @@ fine_tune_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan" ]
     label_groupings:
-      "Human": [ "Homo sapiens" ]
+      "Human": [ "homo sapiens" ]
       "Pig": [ "swine"]
-      "Brown rat": [ 'Rattus norvegicus' ]
+      "Brown rat": [ 'rattus norvegicus' ]
       "Wild boar": ['wild boar']
-      "Chevrier's field mouse": ['Apodemus chevrieri']
+      "Chevrier's field mouse": ['apodemus chevrieri']
 
   task_settings:
     - id: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5"
