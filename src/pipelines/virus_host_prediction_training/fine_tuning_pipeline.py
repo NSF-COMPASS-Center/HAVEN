@@ -15,7 +15,7 @@ def execute(config):
     input_dir = input_settings["input_dir"]
     input_file_names = input_settings["file_names"]
     input_split_seeds = input_settings["split_seeds"]
-
+    print("TEST")
     # output settings
     output_settings = config["output_settings"]
     output_dir = output_settings["output_dir"]
