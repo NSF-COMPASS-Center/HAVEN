@@ -102,7 +102,7 @@ def get_metadata_from_uniprot(input_file_path, output_file_path, id_col, query_u
 
     # read the existing output file, if it exists, to pick up from where the previous execution left.
     if Path(output_file_path).is_file():
-        df_host = pd.read_csv(output_file_path, on_bad_lines=None, converters={2: literal_eval},
+        df_host = pd.read_csv(output_file_path, on_bad_lines="warn", converters={2: literal_eval},
                               names=[id_col, TAX_ID, HOST_TAX_IDS, EMBL_REF_ID])
         df_host = df_host[[TAX_ID, id_col]]
         print(f"Number of records already processed = {df_host.shape[0]}")
