@@ -5,19 +5,19 @@ config_type: "virus_host_prediction"
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/uniprotkb/033125"
+  input_dir: "input/data/uniref90/20240131"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   # file_names: [ "uniref90_final_msl1114.csv" ]
-  file_names: [ "uniprotkb_hepeviridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5.csv" ]
+  file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_hev.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 16
-    id_col: "uniprot_id"
+    batch_size: 8
+    id_col: "uniref90_id"
     sequence_col: "seq"
     max_sequence_length: 2048
     truncate: False
@@ -56,10 +56,9 @@ fine_tune_settings:
     exclude_labels: [ "nan" ]
     label_groupings:
       "Human": [ "Homo sapiens" ]
-      "Pig": [ "swine"]
+      "Pig": [ "Sus scrofa" ]
       "Brown rat": [ 'Rattus norvegicus' ]
-      "Wild boar": ['wild boar']
-      "Chevrier's field mouse": ['Apodemus chevrieri']
+      "Common vole": [ 'Microtus arvalis' ]
 
   task_settings:
     - id: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5"
@@ -73,7 +72,7 @@ fine_tune_settings:
       n_heads: 8
       loss: "FocalLoss"
       n_mlp_layers: 2
-      n_classes: 5
+      n_classes: 4
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       data_parallel: False
