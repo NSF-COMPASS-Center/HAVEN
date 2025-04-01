@@ -105,13 +105,13 @@ def process(config):
                                                output_file_path=upranked_dataset_file_path)
 
     # For dataset analysis
-    if config.kingdom_taxon:
+    if config.taxon_kingdom:
         kingdom_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_kingdom.csv")
         dataset_filter.get_virus_host_kingdom(input_file_path=input_file_path,
                                               taxon_metadata_dir_path=config.taxon_dir,
                                               output_file_path=kingdom_dataset_file_path)
     # For dataset analysis
-    if config.class_taxon:
+    if config.taxon_class:
         class_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_class.csv")
         dataset_filter.get_virus_host_kingdom(input_file_path=input_file_path,
                                               taxon_metadata_dir_path=config.taxon_dir,
