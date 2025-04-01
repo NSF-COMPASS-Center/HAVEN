@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+
 sys.path.append(os.path.join(os.getcwd(), "src"))
 from pathlib import Path
 from data_preprocessing import dataset_parser, dataset_filter
@@ -113,9 +114,9 @@ def process(config):
     # For dataset analysis
     if config.taxon_class:
         class_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_class.csv")
-        dataset_filter.get_virus_host_kingdom(input_file_path=input_file_path,
-                                              taxon_metadata_dir_path=config.taxon_dir,
-                                              output_file_path=class_dataset_file_path)
+        dataset_filter.get_virus_host_class(input_file_path=input_file_path,
+                                            taxon_metadata_dir_path=config.taxon_dir,
+                                            output_file_path=class_dataset_file_path)
 
     # 5. Filter for virus at species level
     if config.filter_species_virus:
