@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+
 sys.path.append(os.path.join(os.getcwd(), "src"))
 from pathlib import Path
 from data_preprocessing import dataset_parser, dataset_filter
@@ -37,6 +38,10 @@ def parse_args():
                         help="Get taxonomy metadata using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
     parser.add_argument("--uprank_host_genus", action="store_true",
                         help="Uprank the taxonomy of virus hosts to 'genus' level.")
+    parser.add_argument("--taxon_kingdom", action="store_true",
+                        help="Get kingdom taxonomy of virus hosts using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+    parser.add_argument("--taxon_class", action="store_true",
+                        help="Get class taxonomy of virus hosts using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
     parser.add_argument("--filter_species_virus", action="store_true",
                         help="Filter for virus with rank of species.")
     parser.add_argument("--filter_species_virus_host", action="store_true",
@@ -99,6 +104,19 @@ def process(config):
         dataset_filter.uprank_virus_host_genus(input_file_path=input_file_path,
                                                taxon_metadata_dir_path=config.taxon_dir,
                                                output_file_path=upranked_dataset_file_path)
+
+    # For dataset analysis
+    if config.taxon_kingdom:
+        kingdom_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_kingdom.csv")
+        dataset_filter.get_virus_host_kingdom(input_file_path=input_file_path,
+                                              taxon_metadata_dir_path=config.taxon_dir,
+                                              output_file_path=kingdom_dataset_file_path)
+    # For dataset analysis
+    if config.taxon_class:
+        class_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_class.csv")
+        dataset_filter.get_virus_host_class(input_file_path=input_file_path,
+                                            taxon_metadata_dir_path=config.taxon_dir,
+                                            output_file_path=class_dataset_file_path)
 
     # 5. Filter for virus at species level
     if config.filter_species_virus:

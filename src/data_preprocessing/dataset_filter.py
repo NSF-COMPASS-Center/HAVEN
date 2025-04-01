@@ -445,6 +445,50 @@ def uprank_virus_host_genus(input_file_path, taxon_metadata_dir_path, output_fil
     print(f"END: Uprank virus host to 'genus' level taxonomy.")
 
 
+# Dataset Analysis: Get the kingdom of virus_hosts
+def get_virus_host_kingdom(input_file_path, taxon_metadata_dir_path, output_file_path):
+    print(f"START: Get 'kingdom' virus host taxonomy.")
+    # Set TAXONKIT_DB environment variable
+    os.environ[TAXONKIT_DB] = taxon_metadata_dir_path
+
+    df = pd.read_csv(input_file_path)
+    print(f"Dataset size: {df.shape[0]}")
+
+    tax_ids = [int(x) for x in list(df[~df[VIRUS_HOST_TAX_ID].isna()][VIRUS_HOST_TAX_ID].unique())]
+    print(f"Number of unique tax_ids = {len(tax_ids)}")
+
+    tax_id_kingdom_df = external_sources_utils.get_taxonomy_kingdom_from_id(tax_ids)
+    print(f"Size of tax_id - kingdom map = {tax_id_kingdom_df.shape[0]}")
+    df = pd.merge(df, tax_id_kingdom_df, left_on=VIRUS_HOST_TAX_ID, right_on=NCBI_TAX_ID, how="left")
+    df.drop(columns=[NCBI_TAX_ID], inplace=True)
+    print(f"Output dataset size: {df.shape[0]}")
+    df.to_csv(output_file_path, index=False)
+    print(f"Written to file {output_file_path}")
+    print(f"END: Get 'kingdom' virus host taxonomy.")
+
+
+# Dataset Analysis: Get the class of virus_hosts
+def get_virus_host_class(input_file_path, taxon_metadata_dir_path, output_file_path):
+    print(f"START: Get 'class' virus host taxonomy.")
+    # Set TAXONKIT_DB environment variable
+    os.environ[TAXONKIT_DB] = taxon_metadata_dir_path
+
+    df = pd.read_csv(input_file_path)
+    print(f"Dataset size: {df.shape[0]}")
+
+    tax_ids = [int(x) for x in list(df[~df[VIRUS_HOST_TAX_ID].isna()][VIRUS_HOST_TAX_ID].unique())]
+    print(f"Number of unique tax_ids = {len(tax_ids)}")
+
+    tax_id_class_df = external_sources_utils.get_taxonomy_class_from_id(tax_ids)
+    print(f"Size of tax_id - class map = {tax_id_class_df.shape[0]}")
+    df = pd.merge(df, tax_id_class_df, left_on=VIRUS_HOST_TAX_ID, right_on=NCBI_TAX_ID, how="left")
+    df.drop(columns=[NCBI_TAX_ID], inplace=True)
+    print(f"Output dataset size: {df.shape[0]}")
+    df.to_csv(output_file_path, index=False)
+    print(f"Written to file {output_file_path}")
+    print(f"END: Get 'class' virus host taxonomy.")
+
+
 # Filter for records with virus_name at "Species" level
 # Input: Dataset with metadata containing columns = [virus_taxon_rank]
 # Output: Filtered dataset with metadata with the same columns as in the input dataset

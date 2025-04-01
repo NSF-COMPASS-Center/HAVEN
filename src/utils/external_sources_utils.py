@@ -5,7 +5,7 @@
 import random
 
 import requests
-#import pytaxonkit
+import pytaxonkit
 import pandas as pd
 import os
 from Bio import SeqIO
@@ -96,6 +96,31 @@ def get_taxonomy_name_rank_from_id(tax_ids):
     df_w_rank[NCBI_TAX_ID] = pd.to_numeric(df_w_rank[NCBI_TAX_ID], errors="coerce").fillna(0).astype("int64")
     return df_w_rank
 
+
+# Get taxonomy kingdom name from ncbi using pytaxonkit for given list of tax_ids
+# Input: list of tax_ids
+# Output: Dataframe with columns: ["TaxID", "kingdom"]
+def get_taxonomy_kingdom_from_id(tax_ids):
+    df = pytaxonkit.lineage(tax_ids, formatstr="{K}")
+    # default datatype of TaxID column = int32
+    # convert it to int64 for convenience in downstream analysis
+    df[NCBI_TAX_ID] = pd.to_numeric(df[NCBI_TAX_ID], errors="coerce").fillna(0).astype("int64")
+    # rename "Lineage" column to "Kingdom"
+    df.rename(columns={NCBI_Lineage: "kingdom"}, inplace=True)
+    return df
+
+
+# Get taxonomy class name from ncbi using pytaxonkit for given list of tax_ids
+# Input: list of tax_ids
+# Output: Dataframe with columns: ["TaxID", "class"]
+def get_taxonomy_class_from_id(tax_ids):
+    df = pytaxonkit.lineage(tax_ids, formatstr="{c}")[[NCBI_TAX_ID, NCBI_Lineage]]
+    # default datatype of TaxID column = int32
+    # convert it to int64 for convenience in downstream analysis
+    df[NCBI_TAX_ID] = pd.to_numeric(df[NCBI_TAX_ID], errors="coerce").fillna(0).astype("int64")
+    # rename "Lineage" column to "Kingdom"
+    df.rename(columns={NCBI_Lineage: "class"}, inplace=True)
+    return df
 
 # Get taxonomy names and ranks from ncbi using pytaxonkit for given list of tax_names
 # Input: list of names
