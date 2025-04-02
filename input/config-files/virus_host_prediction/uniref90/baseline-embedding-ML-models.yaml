@@ -13,7 +13,8 @@ input_settings:
   file_names: [ "uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
-  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
+#  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
+  split_seeds: [12612648]
 
 sequence_settings:
     batch_size: 16
