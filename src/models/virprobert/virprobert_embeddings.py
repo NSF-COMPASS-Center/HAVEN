@@ -18,8 +18,8 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         self.cls_token = cls_token
         self.stride = stride
 
-    def forward(self, X):
-        return super().forward(X, embedding_only = True)
+    def forward(self, X, embedding_only = True):
+        return super().forward(X, embedding_only = embedding_only)
 
     def get_embedding(self, X):
         # X: b x n where n is the maximum sequence length in the batch
