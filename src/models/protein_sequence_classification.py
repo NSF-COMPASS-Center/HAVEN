@@ -68,6 +68,7 @@ class ProteinSequenceClassification(nn.Module):
         if embedding_only:
             # used in Few Shot Learning
             # Hack to use DataParallel and run on multiple GPUs since we can only call __call__() --> forward() using DataParallel
+            print("TEST - IS IT REACHING EMBEDDING_ONLY IN PSC")
             return self.input_embedding, self.get_classification_block_embedding(self.input_embedding)
 
         return self.forward_classification_block(self.input_embedding)
