@@ -89,6 +89,8 @@ class VirProBERT_Emb(ProteinSequenceClassification):
                            n_classes=model_params["n_classes"])
         print(model)
         print("VirProBERT_Emb: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
+        print("EMBEDDINGS 2.0")
+        print(model.input_embedding)
 
         return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])
 
