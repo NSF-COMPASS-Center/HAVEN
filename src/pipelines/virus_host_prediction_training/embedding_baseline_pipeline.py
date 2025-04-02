@@ -62,8 +62,8 @@ def execute(config):
         df = dataset_utils.read_dataset(input_dir, input_file_names,
                                 cols=[id_col, sequence_col, label_col])
         # 2. Transform labels
-        df, index_label_map = utils.transform_labels(df, label_settings,
-                                                           classification_type=fine_tune_settings["classification_type"])
+        # df, index_label_map = utils.transform_labels(df, label_settings,
+        #                                                    classification_type=fine_tune_settings["classification_type"])
 
         train_dataset_loader = None
         val_dataset_loader = None
