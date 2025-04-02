@@ -51,7 +51,7 @@ model_map = {
     "Transformer_Encoder": TransformerEncoderVirusHostPrediction,
     "BERT": BERT_VirusHostPrediction,
     "VirProBERT_wo_Hierarchical_Attention": VirProBERT_wo_HierAttn,
-    "VirProBERT": VirProBERT,
+    # "VirProBERT": VirProBERT,
     "VirProBERT_Emb": VirProBERT_Emb,
     # "ProstT5": ProstT5_VirusHostPrediction,
     # "ProtT5": ProtT5_VirusHostPrediction,  # IMP: note the difference between ProstT5 and ProtT5
