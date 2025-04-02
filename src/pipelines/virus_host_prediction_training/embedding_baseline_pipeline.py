@@ -116,17 +116,17 @@ def execute(config):
 
             if task_name in mapper.model_map:
                 print(f"Executing {task_name} in {mode} mode.")
-                # embeddings = mapper.model_map[task_name].get_model(model_params=task)
-                model_params = task
-                model = VirProBERT_Emb(pre_trained_model=model_params["pre_trained_model"],
-                           segment_len=model_params["segment_len"],
-                           cls_token=model_params["cls_token"],
-                           h=model_params["n_heads"],
-                           input_dim=model_params["input_dim"],
-                           hidden_dim=model_params["hidden_dim"],
-                           n_mlp_layers=model_params["n_mlp_layers"],
-                           stride=model_params["stride"],
-                           n_classes=model_params["n_classes"])
+                embeddings = mapper.model_map[task_name].get_model(model_params=task)
+                # model_params = task
+                # model = VirProBERT_Emb(pre_trained_model=model_params["pre_trained_model"],
+                #            segment_len=model_params["segment_len"],
+                #            cls_token=model_params["cls_token"],
+                #            h=model_params["n_heads"],
+                #            input_dim=model_params["input_dim"],
+                #            hidden_dim=model_params["hidden_dim"],
+                #            n_mlp_layers=model_params["n_mlp_layers"],
+                #            stride=model_params["stride"],
+                #            n_classes=model_params["n_classes"])
             else:
                 print(f"ERROR: Unknown model {task_name}.")
                 continue
