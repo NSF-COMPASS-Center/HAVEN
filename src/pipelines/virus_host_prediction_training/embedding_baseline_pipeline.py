@@ -119,5 +119,5 @@ def execute(config):
                 print(f"ERROR: Unknown model {task_name}.")
                 continue
             print(embeddings)
-            embeddings = pd.Dataframe(embeddings)
+            embeddings = pd.DataFrame(embeddings)
             embeddings.to_csv(output_filepath, index=False)
