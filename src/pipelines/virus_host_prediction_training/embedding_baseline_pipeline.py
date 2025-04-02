@@ -113,7 +113,7 @@ def execute(config):
 
             if task_name in mapper.model_map:
                 print(f"Executing {task_name} in {mode} mode.")
-                embeddings, _ = mapper.model_map[task_name].get_model(model_params=task)
+                embeddings = mapper.model_map[task_name].get_model(model_params=task)
             else:
                 print(f"ERROR: Unknown model {task_name}.")
                 continue
