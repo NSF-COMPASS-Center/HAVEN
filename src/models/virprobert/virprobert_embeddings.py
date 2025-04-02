@@ -17,11 +17,12 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         self.segment_len = segment_len
         self.cls_token = cls_token
         self.stride = stride
+        self.input_embedding = get_embedding(self, X)
 
-    def forward(self, X, embedding_only = True):
-        self.input_embedding = get_embedding(X)
-        print("TEST  - FORWARD IN VIRPROBERT")
-        return self.input_embedding
+    # def forward(self, X, embedding_only = True):
+    #     self.input_embedding = get_embedding(X)
+    #     print("TEST  - FORWARD IN VIRPROBERT")
+    #     return self.input_embedding
         # return super().forward(X, embedding_only = embedding_only)
 
     def get_embedding(self, X):
