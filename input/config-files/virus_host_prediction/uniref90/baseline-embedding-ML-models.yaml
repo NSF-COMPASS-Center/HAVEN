@@ -51,7 +51,8 @@ fine_tune_settings:
     div_factor: 25.0
     final_div_factor: 10000.0
 
-#  label_settings:
+  label_settings:
+    label_col: ""
 #    label_col: "virus_host_name"
 #    exclude_labels: [ "nan" ]
 #    label_groupings:
