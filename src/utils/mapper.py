@@ -53,9 +53,9 @@ model_map = {
     "VirProBERT_wo_Hierarchical_Attention": VirProBERT_wo_HierAttn,
     "VirProBERT": VirProBERT,
     "VirProBERT_Emb": VirProBERT_Emb,
-    "ProstT5": ProstT5_VirusHostPrediction,
-    "ProtT5": ProtT5_VirusHostPrediction,  # IMP: note the difference between ProstT5 and ProtT5
-    "ESM2": ESM2_VirusHostPrediction,
+    # "ProstT5": ProstT5_VirusHostPrediction,
+    # "ProtT5": ProtT5_VirusHostPrediction,  # IMP: note the difference between ProstT5 and ProtT5
+    # "ESM2": ESM2_VirusHostPrediction,
 #    "ESM3": ESM3_VirusHostPrediction
 }
 
