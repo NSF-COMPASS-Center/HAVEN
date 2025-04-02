@@ -52,9 +52,8 @@ fine_tune_settings:
     final_div_factor: 10000.0
 
   label_settings:
-    label_col: ""
-#    label_col: "virus_host_name"
-#    exclude_labels: [ "nan" ]
+    label_col: "virus_host_name"
+    exclude_labels: [ "nan" ]
 #    label_groupings:
 #      "Human": [ "Homo sapiens" ]
 #      "Pig": [ "Sus scrofa" ]
