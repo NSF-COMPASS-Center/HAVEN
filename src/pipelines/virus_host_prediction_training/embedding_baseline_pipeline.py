@@ -121,5 +121,5 @@ def execute(config):
             print("EMBEDDINGS")
             print(type(embeddings))
             print(embeddings)
-            embeddings = pd.DataFrame(embeddings)
-            embeddings.to_csv(output_filepath, index=False)
+            # embeddings = pd.DataFrame(embeddings)
+            # embeddings.to_csv(output_filepath, index=False)
