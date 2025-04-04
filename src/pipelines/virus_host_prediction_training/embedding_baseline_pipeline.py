@@ -114,14 +114,23 @@ def execute(config):
             # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
             task["segment_len"] = sequence_settings["max_sequence_length"]
 
-            if task_name in mapper.model_map:
-                print(f"Executing {task_name} in {mode} mode.")
-                embeddings = mapper.model_map[task_name].get_model(model_params=task)
+
+            if mode == "train":
+                if task_name in mapper.model_map:
+                    print(f"Executing {task_name} in {mode} mode.")
+                    embeddings = mapper.model_map[task_name].get_model(model_params=task,
+                                                                  dataset_loader=train_dataset_loader)
+                else:
+                    print(f"ERROR: Unknown model {task_name}.")
+                    continue
+            elif mode == "test":
+                if task_name in mapper.model_map:
+                    print(f"Executing {task_name} in {mode} mode.")
+                    embeddings = mapper.model_map[task_name].get_model(model_params=task,
+                                                                  dataset_loader=test_dataset_loader)
+                else:
+                    print(f"ERROR: Unknown model {task_name}.")
+                    continue
             else:
-                print(f"ERROR: Unknown model {task_name}.")
-                continue
-            print("EMBEDDINGS")
-            print(type(embeddings))
-            print(embeddings)
-            # embeddings = pd.DataFrame(embeddings)
-            # embeddings.to_csv(output_filepath, index=False)
+                print(f"ERROR: Unsupported mode '{mode}'. Supported values: 'train', 'test'.")
+                exit(1)

@@ -9,7 +9,7 @@ from models.protein_sequence_classification import ProteinSequenceClassification
 
 class VirProBERT_Emb(ProteinSequenceClassification):
     def __init__(self, pre_trained_model, segment_len, cls_token, h=8, input_dim=512, hidden_dim=2048, stride=1, n_mlp_layers=2, n_classes=1):
-        super(VirProBERT_Emb, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=True)
+        super(VirProBERT_Emb, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, mode, batch_norm=True)
         self.pre_trained_model = pre_trained_model
         self.input_dim = input_dim
         self.self_attn = MultiHeadAttention(h, input_dim)
@@ -17,12 +17,11 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         self.segment_len = segment_len
         self.cls_token = cls_token
         self.stride = stride
-        self.input_embedding = get_embedding(self, X)
 
-    # def forward(self, X, embedding_only = True):
-    #     self.input_embedding = get_embedding(X)
-    #     print("TEST  - FORWARD IN VIRPROBERT")
-    #     return self.input_embedding
+    def forward(self, X, embedding_only = True):
+        self.input_embedding = get_embedding(X)
+        print("TEST  - FORWARD IN VIRPROBERT")
+        return self.input_embedding
         # return super().forward(X, embedding_only = embedding_only)
 
     def get_embedding(self, X):
@@ -77,8 +76,16 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         return X
 
     # def forward() : use the template implementation in ProteinSequenceClassification
+    def return_embeddings(self, dataset_loader):
+        for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
+            input, label = record
+            # optimizer.zero_grad()
+            output = model(input)
+            output = output.to(nn_utils.get_device())
+        print(output)
+        return(output)
 
-    def get_model(model_params) -> ProteinSequenceClassification:
+    def get_model(model_params, dataset_loader) -> ProteinSequenceClassification:
         model = VirProBERT_Emb(pre_trained_model=model_params["pre_trained_model"],
                            segment_len=model_params["segment_len"],
                            cls_token=model_params["cls_token"],
@@ -91,7 +98,7 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         print(model)
         print("VirProBERT_Emb: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
         print("EMBEDDINGS 2.0")
-        print(model.input_embedding)
+        return retrun_embeddings(dataset_loader, model)
 
-        return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])
+        # return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])
 
