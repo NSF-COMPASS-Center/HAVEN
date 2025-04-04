@@ -81,7 +81,9 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         print(type(dataset_loader))
         print("PBAR")
 
-        print(dataset_loader)
+        for batch in dataset_loader:
+            print(batch)
+            break
         # for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
         #     input, label = record
         #     optimizer.zero_grad()
