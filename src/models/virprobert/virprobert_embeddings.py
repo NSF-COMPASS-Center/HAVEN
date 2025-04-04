@@ -9,7 +9,7 @@ from models.protein_sequence_classification import ProteinSequenceClassification
 
 class VirProBERT_Emb(ProteinSequenceClassification):
     def __init__(self, pre_trained_model, segment_len, cls_token, h=8, input_dim=512, hidden_dim=2048, stride=1, n_mlp_layers=2, n_classes=1):
-        super(VirProBERT_Emb, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, mode, batch_norm=True)
+        super(VirProBERT_Emb, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=True)
         self.pre_trained_model = pre_trained_model
         self.input_dim = input_dim
         self.self_attn = MultiHeadAttention(h, input_dim)
