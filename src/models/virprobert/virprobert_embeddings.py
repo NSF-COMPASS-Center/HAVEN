@@ -78,8 +78,8 @@ class VirProBERT_Emb(ProteinSequenceClassification):
 
     def return_embeddings(self, dataset_loader, model):
         embeddings = []
+        print(type(dataset_loader))
         print("PBAR")
-        print(enumerate(pbar := tqdm.tqdm(dataset_loader)))
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
             input, label = record
             optimizer.zero_grad()
@@ -102,6 +102,7 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         print(model)
         print("VirProBERT_Emb: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
         print("EMBEDDINGS 2.0")
+        # print(model.get_embedding(dataset_loader))
         return model.return_embeddings(dataset_loader, model)
 
         # return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])
