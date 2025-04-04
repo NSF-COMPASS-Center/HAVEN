@@ -122,8 +122,8 @@ def execute(config):
                         input, label = record
                         # optimizer.zero_grad()
                         output = model.get_embedding(input)
-                        print(output)
                         output = output.to(nn_utils.get_device())
+                        print(output)
                         # df = pd.DataFrame(output)
                         # df.to_csv(output_filepath, mode="a",
                         #           header=not pd.io.common.file_exists(file_path),
