@@ -14,7 +14,7 @@ UNIPROT = "uniprot"
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Preprocess the UniRef90 protein sequences dataset.\nOnly one of the below options can be selected at runtime.')
-    parser.add_argument("-id", "--id_col", required=True,
+    parser.add_argument("-id", "--id_col", required=False,
                         help="Name of the id column. Example values: uniref50_id, uniref90_id, uniprot_id\n")
     parser.add_argument("-if", "--input_file", required=True,
                         help="Absolute path to input file depending on the option(s) selected.\n")
