@@ -39,7 +39,7 @@ pre_train_settings:
 fine_tune_settings:
   experiment: "embedding"
   n_iterations: 1
-  split_input: False
+  split_input: True
   train_proportion: 0.8
   classification_type: "multi"
   save_model: True
