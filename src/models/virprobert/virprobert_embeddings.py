@@ -75,15 +75,16 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         X = X.mean(dim=1)  # b x input_dim
         return X
 
-    # def forward() : use the template implementation in ProteinSequenceClassification
-    def return_embeddings(self, dataset_loader):
+    def return_embeddings(self, dataset_loader, model):
+        embeddings = []
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
             input, label = record
             # optimizer.zero_grad()
-            output = model(input)
+            output = model.get_embedding(input)
             output = output.to(nn_utils.get_device())
-        print(output)
-        return(output)
+            embeddings.append(output)
+        print("RETURNN EMBEDDINGS")
+        return(embeddings)
 
     def get_model(model_params, dataset_loader) -> ProteinSequenceClassification:
         model = VirProBERT_Emb(pre_trained_model=model_params["pre_trained_model"],
