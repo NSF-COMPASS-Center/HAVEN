@@ -37,10 +37,7 @@ class ProteinSequenceDataset(Dataset):
 
         sequence_vector = np.array([self.amino_acid_map[a] for a in sequence])
         label_vector = np.array([label])
-        print(type(sequence_vector))
-        print(sequence_vector)
-        print(type(label_vector))
-        print(label_vector)
+
         return torch.tensor(sequence_vector, device=nn_utils.get_device(), dtype=torch.float64), torch.tensor(label_vector, device=nn_utils.get_device())
 
 
