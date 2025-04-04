@@ -79,6 +79,7 @@ pre_trained_models:
 #      input_dim: 512 # input embedding dimension
 #      hidden_dim: 1024
 
+<<<<<<< HEAD
   - id: "hybrid-attention_sl256st64vs30_ae_bn_fnn_2l_d1024_lr1e-4"
     name: VirProBERT
     active: True
@@ -95,10 +96,62 @@ pre_trained_models:
       cls_token: True
       data_parallel: False
       encoder_settings:
+=======
+  # - name: "transformer-l_6-h_8-d_1024-lr1e-4"
+  #   active: False
+  #   mode: "train"
+  #   path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5/20240609/host_multi/transformer-l_6-h_8-d_1024-lr1e-4_itr0.pth"
+  #   model_settings:
+  #     n_heads: 8
+  #     depth: 6
+  #     input_dim: 512 # input embedding dimension
+  #     hidden_dim: 1024
+  #     n_tokens: 27
+  #     n_classes: 5
+
+  - name: "VirProBERT"
+    id: "VirProBERT"
+    active: True
+    mode: "train"
+    n_mlp_layers: 2
+    path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5/20240611/host_multi/fine_tuning/host_prediction_fnn_2l_d1024_lr1e-4_itr0.pth"
+    model_settings:
+      depth: 2
+      n_classes: 5
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+      n_heads: 8
+      cls_token: True
+      encoder_settings:
+        embedding: "linear"
+>>>>>>> d74b7d1 (few shot files)
         n_heads: 8
         depth: 6
         input_dim: 512 # input embedding dimension
         hidden_dim: 1024
+<<<<<<< HEAD
+=======
+
+  # - name: "hybrid-attention_sl256st64vs30cls_fnn_2l_d1024_lr1e-4"
+  #   id: "hybrid-attention_sl256st64vs30cls_fnn_2l_d1024_lr1e-4" 
+  #   active: True
+  #   mode: "train"
+  #   path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_hybrid_attention_msl256s64vs30ae_bn_fnn_2l_d1024_lr1e-4_itr4.pth"
+  #   # path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256s64allemb_vs30_batchnorm_hybrid_attention_msl256s64ae_fnn_2l_d1024_lr1e-4_itr4.pth"
+  #   model_settings:
+  #     n_heads: 8
+  #     depth: 2
+  #     n_classes: 5
+  #     input_dim: 512 # input embedding dimension
+  #     hidden_dim: 1024
+  #     stride: 64
+  #     cls_token: True
+  #     encoder_settings:
+  #       n_heads: 8
+  #       depth: 6
+  #       input_dim: 512 # input embedding dimension
+  #       hidden_dim: 1024
+>>>>>>> d74b7d1 (few shot files)
 
 output_settings:
   output_dir: "output"
