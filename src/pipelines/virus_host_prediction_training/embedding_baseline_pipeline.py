@@ -78,9 +78,9 @@ def execute(config):
                                                                        fine_tune_settings["train_proportion"], stratify_col=label_col)
             # split testing set into validation and testing datasets in equal proportion
             # so 80:20 will now be 80:10:10
-            val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
+            # val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
             train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col)
-            val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
+            # val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
             test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
         else:
             # used in zero shot evaluation, where split_input=False in fine_tune_settings and mode=test in task

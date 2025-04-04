@@ -78,6 +78,7 @@ class VirProBERT_Emb(ProteinSequenceClassification):
 
     def return_embeddings(self, dataset_loader, model):
         embeddings = []
+        print("PBAR " , enumerate(pbar := tqdm.tqdm(dataset_loader)))
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
             input, label = record
             # optimizer.zero_grad()
