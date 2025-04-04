@@ -126,9 +126,8 @@ def execute(config):
                         output = output.to(nn_utils.get_device())
                         embeddings.append(output)
                         print("RETURNN EMBEDDINGS")
-                        # return(embeddings)
                     embeddings = pd.DataFrame(embeddings)
-                    # embeddings.to_csv(output_filepath)
+                    embeddings.to_csv(output_filepath)
                 else:
                     print(f"ERROR: Unknown model {task_name}.")
                     continue
@@ -137,6 +136,13 @@ def execute(config):
                     print(f"Executing {task_name} in {mode} mode.")
                     embeddings = mapper.model_map[task_name].get_model(model_params=task,
                                                                   dataset_loader=test_dataset_loader)
+                    for _, record in enumerate(pbar := tqdm.tqdm(test_dataset_loader)):
+                        input, label = record
+                        # optimizer.zero_grad()
+                        output = model.get_embedding(input)
+                        output = output.to(nn_utils.get_device())
+                        embeddings.append(output)
+                        print("RETURNN EMBEDDINGS")
                     embeddings = pd.DataFrame(embeddings)
                     embeddings.to_csv(output_filepath)
                 else:
