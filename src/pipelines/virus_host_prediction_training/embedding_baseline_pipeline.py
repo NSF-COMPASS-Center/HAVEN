@@ -113,6 +113,9 @@ def execute(config):
             # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
             # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
             task["segment_len"] = sequence_settings["max_sequence_length"]
+            for batch in train_dataset_loader:
+                print(batch)
+                break
 
 
             if mode == "train":
