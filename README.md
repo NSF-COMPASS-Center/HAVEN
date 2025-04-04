@@ -132,12 +132,12 @@ Example implementation of an external pLM: ProstT5 ([ProstT5_VirusHostPrediction
 The [data_preprocessor.py](src/utils/scripts/data_preprocessor.py) allows you to process a dataset of viral protein sequences from UniProt or UniRef.
 
 
-### Installing taxonKit and pytaxonkit
+### Installing taxonkit and pytaxonkit
 1. [Install taxonkit](https://bioinf.shenwei.me/taxonkit/download/#installation) using either Method 1 (preferred for Linux) or Method 2 (preferred for macOS)
 2. [Download the taxonkit dataset](https://bioinf.shenwei.me/taxonkit/download/#dataset) and place it in the appropriate location. The absolute path to this directory must be provided using the `taxon_dir` argument where ever required in the below steps. 
 3. [Install pytaxonkit](https://github.com/bioforensics/pytaxonkit).
 
-> [!NOTE]
+> [!WARN]
 > The installation most likely will run into issues if you are using Windows OS. In such cases, switch to ARC.
 
 ### Functions available in [data_preprocessor.py](src/utils/scripts/data_preprocessor.py)
