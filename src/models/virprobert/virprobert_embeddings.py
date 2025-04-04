@@ -82,7 +82,7 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         print("PBAR")
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
             input, label = record
-            optimizer.zero_grad()
+            # optimizer.zero_grad()
             output = model.get_embedding(input)
             # output = output.to(nn_utils.get_device())
             embeddings.append(output)
