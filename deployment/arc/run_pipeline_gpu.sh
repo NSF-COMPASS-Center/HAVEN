@@ -21,7 +21,7 @@ module load Miniconda3
 module load cuda12.4/toolkit
 
 # Load conda environment
-source activate ~/.conda/envs/virprobert
+source activate ~/.conda/envs/zoonosis
 echo "Conda information:"
 conda info
 
