@@ -76,7 +76,7 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         X = X.mean(dim=1)  # b x input_dim
         return X
 
-    def get_model(model_params, dataset_loader) -> ProteinSequenceClassification:
+    def get_model(model_params) -> ProteinSequenceClassification:
         model = VirProBERT_Emb(pre_trained_model=model_params["pre_trained_model"],
                            segment_len=model_params["segment_len"],
                            cls_token=model_params["cls_token"],
