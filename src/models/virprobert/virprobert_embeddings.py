@@ -5,7 +5,6 @@ from utils import nn_utils, constants
 import torch
 import torch.nn.functional as F
 from models.protein_sequence_classification import ProteinSequenceClassification
-import tqdm
 
 
 class VirProBERT_Emb(ProteinSequenceClassification):

@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
 import torch
+import tqdm
 import wandb
 import pandas as pd
 
