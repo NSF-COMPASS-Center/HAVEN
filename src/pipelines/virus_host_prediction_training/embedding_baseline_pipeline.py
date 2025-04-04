@@ -121,7 +121,8 @@ def execute(config):
                     for _, record in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
                         input, label = record
                         # optimizer.zero_grad()
-                        output = model.get_embedding(input)
+                        with torch.no_grad():
+                            output = model.get_embedding(input)
                         output = output.to(nn_utils.get_device())
                         df = pd.DataFrame(output.detach().cpu().numpy())
                         print(df)
