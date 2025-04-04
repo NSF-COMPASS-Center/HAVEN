@@ -113,14 +113,21 @@ def execute(config):
             # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
             # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
             task["segment_len"] = sequence_settings["max_sequence_length"]
-
+            embeddings = []
             if mode == "train":
                 if task_name in mapper.model_map:
                     print(f"Executing {task_name} in {mode} mode.")
-                    embeddings = mapper.model_map[task_name].get_model(model_params=task,
-                                                                  dataset_loader=train_dataset_loader)
+                    model = mapper.model_map[task_name].get_model(model_params=task)
+                    for _, record in enumerate(pbar := tqdm.tqdm(train_dataset_loader)):
+                        input, label = record
+                        # optimizer.zero_grad()
+                        output = model.get_embedding(input)
+                        output = output.to(nn_utils.get_device())
+                        embeddings.append(output)
+                        print("RETURNN EMBEDDINGS")
+                        # return(embeddings)
                     embeddings = pd.DataFrame(embeddings)
-                    embeddings.to_csv(output_filepath)
+                    # embeddings.to_csv(output_filepath)
                 else:
                     print(f"ERROR: Unknown model {task_name}.")
                     continue

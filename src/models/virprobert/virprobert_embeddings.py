@@ -19,11 +19,11 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         self.cls_token = cls_token
         self.stride = stride
 
-    def forward(self, X, embedding_only = True):
-        self.input_embedding = get_embedding(X)
-        print("TEST  - FORWARD IN VIRPROBERT")
-        return self.input_embedding
-        # return super().forward(X, embedding_only = embedding_only)
+    # def forward(self, X, embedding_only = True):
+    #     self.input_embedding = get_embedding(X)
+    #     print("TEST  - FORWARD IN VIRPROBERT")
+    #     return self.input_embedding
+    #     # return super().forward(X, embedding_only = embedding_only)
 
     def get_embedding(self, X):
         # X: b x n where n is the maximum sequence length in the batch
@@ -76,19 +76,6 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         X = X.mean(dim=1)  # b x input_dim
         return X
 
-    def return_embeddings(self, dataset_loader, model):
-        embeddings = []
-        print(type(dataset_loader))
-        print("PBAR")
-        for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
-            input, label = record
-            # optimizer.zero_grad()
-            output = model.get_embedding(input)
-            output = output.to(nn_utils.get_device())
-            embeddings.append(output)
-        print("RETURNN EMBEDDINGS")
-        # return(embeddings)
-
     def get_model(model_params, dataset_loader) -> ProteinSequenceClassification:
         model = VirProBERT_Emb(pre_trained_model=model_params["pre_trained_model"],
                            segment_len=model_params["segment_len"],
@@ -102,8 +89,6 @@ class VirProBERT_Emb(ProteinSequenceClassification):
         print(model)
         print("VirProBERT_Emb: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
         print("EMBEDDINGS 2.0")
-        # print(model.get_embedding(dataset_loader))
-        return model.return_embeddings(dataset_loader, model)
 
-        # return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])
+        return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])
 
