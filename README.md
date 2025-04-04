@@ -137,7 +137,7 @@ The [data_preprocessor.py](src/utils/scripts/data_preprocessor.py) allows you to
 2. [Download the taxonkit dataset](https://bioinf.shenwei.me/taxonkit/download/#dataset) and place it in the appropriate location. The absolute path to this directory must be provided using the `taxon_dir` argument where ever required in the below steps. 
 3. [Install pytaxonkit](https://github.com/bioforensics/pytaxonkit).
 
-> [!WARN]
+> [!WARNING]
 > The installation most likely will run into issues if you are using Windows OS. In such cases, switch to ARC.
 
 ### Functions available in [data_preprocessor.py](src/utils/scripts/data_preprocessor.py)
@@ -159,7 +159,7 @@ python .\src\utils\scripts\data_preprocessor.py --prune_dataset --input_file <ab
 ```
 5. Get taxonomy information for the virus and virus hosts using taxonkit. 
 
-> [!NOTE]
+> [!IMPORTANT]
 > This step requires that taxonkit and pytaxonkit are installed. Refer [Installing taxonKit and pytaxonkit](#installing-taxonkit-and-pytaxonkit) for installation instructions.
 
 ```shell
@@ -174,7 +174,7 @@ python src/utils/scripts/data_preprocessor.py --filter_species_virus --input_fil
 python src/utils/scripts/data_preprocessor.py --filter_species_virus_host -input_file <absolute-path-to-the-input-file-(output-file-from-the-previous-step)> --output_dir <absolute-path-to-the-folder-where-the-output-file-will-be-written>
 ```
 8. Filter for virus hosts belonging to the _Vertebrata_ clade (virus hosts that are vertebrates)
-> [!NOTE]
+> [!IMPORTANT]
 > This step requires that taxonkit and pytaxonkit are installed. Refer [Installing taxonKit and pytaxonkit](#installing-taxonkit-and-pytaxonkit) for installation instructions.
 
 ```shell
