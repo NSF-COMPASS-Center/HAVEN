@@ -84,7 +84,7 @@ class VirProBERT_Emb(ProteinSequenceClassification):
             input, label = record
             # optimizer.zero_grad()
             output = model.get_embedding(input)
-            # output = output.to(nn_utils.get_device())
+            output = output.to(nn_utils.get_device())
             embeddings.append(output)
         print("RETURNN EMBEDDINGS")
         # return(embeddings)
