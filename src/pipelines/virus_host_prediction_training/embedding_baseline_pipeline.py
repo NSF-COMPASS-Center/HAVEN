@@ -123,7 +123,7 @@ def execute(config):
                         # optimizer.zero_grad()
                         output = model.get_embedding(input)
                         output = output.to(nn_utils.get_device())
-                        df = pd.DataFrame(output.cpu().numpy())
+                        df = pd.DataFrame(output.detach().cpu().numpy())
                         print(df)
                         del output
                         torch.cuda.empty_cache()
