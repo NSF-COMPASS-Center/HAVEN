@@ -160,7 +160,7 @@ python .\src\utils\scripts\data_preprocessor.py --prune_dataset --input_file <ab
 5. Get taxonomy information for the virus and virus hosts using taxonkit. 
 
 > [!IMPORTANT]
-> This step requires that taxonkit and pytaxonkit are installed. Refer [Installing taxonKit and pytaxonkit](#installing-taxonkit-and-pytaxonkit) for installation instructions.
+> This step requires that taxonkit and pytaxonkit are installed. Refer [Installing taxonkit and pytaxonkit](#installing-taxonkit-and-pytaxonkit) for installation instructions.
 
 ```shell
 python src/utils/scripts/data_preprocessor.py --taxon_metadata --input_file <absolute-path-to-the-input-file-(output-file-from-the-previous-step)> --output_dir <absolute-path-to-the-folder-where-the-output-file-will-be-written> --id_col <name-of-the-id-column-defined-in-the-firs-step: uniprot_id, uniref90_id, uniref50_id> --taxon_dir <absolute-path-to-the-taxon-directory-containing-taxonkit-files>
@@ -175,7 +175,7 @@ python src/utils/scripts/data_preprocessor.py --filter_species_virus_host -input
 ```
 8. Filter for virus hosts belonging to the _Vertebrata_ clade (virus hosts that are vertebrates)
 > [!IMPORTANT]
-> This step requires that taxonkit and pytaxonkit are installed. Refer [Installing taxonKit and pytaxonkit](#installing-taxonkit-and-pytaxonkit) for installation instructions.
+> This step requires that taxonkit and pytaxonkit are installed. Refer [Installing taxonkit and pytaxonkit](#installing-taxonkit-and-pytaxonkit) for installation instructions.
 
 ```shell
 python src/utils/scripts/data_preprocessor.py --filter_vertebrates --input_file <absolute-path-to-the-input-file-(output-file-from-the-previous-step)> --output_dir <absolute-path-to-the-folder-where-the-output-file-will-be-written> --taxon_dir <absolute-path-to-the-taxon-directory-containing-taxonkit-files>
