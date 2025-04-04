@@ -120,6 +120,8 @@ def execute(config):
                     print(f"Executing {task_name} in {mode} mode.")
                     embeddings = mapper.model_map[task_name].get_model(model_params=task,
                                                                   dataset_loader=train_dataset_loader)
+                    embeddings = pd.DataFrame(embeddings)
+                    embeddings.to_csv(output_filepath)
                 else:
                     print(f"ERROR: Unknown model {task_name}.")
                     continue
@@ -128,6 +130,8 @@ def execute(config):
                     print(f"Executing {task_name} in {mode} mode.")
                     embeddings = mapper.model_map[task_name].get_model(model_params=task,
                                                                   dataset_loader=test_dataset_loader)
+                    embeddings = pd.DataFrame(embeddings)
+                    embeddings.to_csv(output_filepath)
                 else:
                     print(f"ERROR: Unknown model {task_name}.")
                     continue
