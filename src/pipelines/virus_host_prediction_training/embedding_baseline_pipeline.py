@@ -141,17 +141,20 @@ def execute(config):
             elif mode == "test":
                 if task_name in mapper.model_map:
                     print(f"Executing {task_name} in {mode} mode.")
-                    # embeddings = mapper.model_map[task_name].get_model(model_params=task,
-                    #                                               dataset_loader=test_dataset_loader)
-                    # for _, record in enumerate(pbar := tqdm.tqdm(test_dataset_loader)):
-                    #     input, label = record
-                    #     # optimizer.zero_grad()
-                    #     output = model.get_embedding(input)
-                    #     output = output.to(nn_utils.get_device())
-                    #     embeddings.append(output)
-                    #     print("RETURNN EMBEDDINGS")
-                    # embeddings = pd.DataFrame(embeddings)
-                    # embeddings.to_csv(output_filepath)
+                    model = mapper.model_map[task_name].get_model(model_params=task)
+                    for _, record in enumerate(pbar := tqdm.tqdm(test_dataset_loader)):
+                        input, label = record
+                        # optimizer.zero_grad()
+                        with torch.no_grad():
+                            output = model.get_embedding(input)
+                        output = output.to(nn_utils.get_device())
+                        output_df = pd.DataFrame(output.detach().cpu().numpy())
+                        output_df.to_csv(output_filepath, mode="a",
+                                         header=not pd.io.common.file_exists(output_filepath),
+                                         index=False)
+                        del output
+                        output_df = []
+                        torch.cuda.empty_cache()
                 else:
                     print(f"ERROR: Unknown model {task_name}.")
                     continue
