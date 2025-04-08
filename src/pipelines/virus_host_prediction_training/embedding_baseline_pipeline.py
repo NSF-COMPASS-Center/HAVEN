@@ -129,7 +129,7 @@ def execute(config):
                         output = output.to(nn_utils.get_device())
                         output_df = pd.DataFrame(output.detach().cpu().numpy())
                         output_df.to_csv(output_filepath, mode="a",
-                                  header=not pd.io.common.file_exists(output_file_path),
+                                  header=not pd.io.common.file_exists(output_filepath),
                                   index=False)
                         del output
                         output_df = []
