@@ -63,8 +63,7 @@ def execute(config):
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # fine_tune_model store filepath
-        output_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{task_id}_itr{iter}.csv")
-        Path(os.path.dirname(output_filepath)).mkdir(parents=True, exist_ok=True)
+
         # 1. Read the data files
         df = dataset_utils.read_dataset(input_dir, input_file_names,
                                 cols=[id_col, sequence_col, label_col])
@@ -95,6 +94,8 @@ def execute(config):
             task_id = task["id"] # unique identifier
             task_name = task["name"]
             mode = task["mode"]
+            output_filepath = os.path.join(output_dir, results_dir, sub_dir, f"{output_prefix}_{task_id}_itr{iter}.csv")
+            Path(os.path.dirname(output_filepath)).mkdir(parents=True, exist_ok=True)
 
             if task["active"] is False:
                 print(f"Skipping {task_name} ...")
