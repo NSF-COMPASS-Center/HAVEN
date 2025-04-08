@@ -62,8 +62,6 @@ fine_tune_settings:
       "Red junglefowl": [ "Gallus gallus" ]
 
   task_settings:
-
-
     - id: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4"
       name: "VirProBERT_Emb"
       active: True

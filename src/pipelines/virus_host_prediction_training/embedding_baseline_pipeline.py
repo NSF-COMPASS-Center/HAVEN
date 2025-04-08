@@ -56,12 +56,15 @@ def execute(config):
         "output_prefix": output_prefix
     }
 
-    # fine_tune_model store filepath
-    output_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{task_id}_itr{itr}.csv")
-    Path(os.path.dirname(output_filepath)).mkdir(parents=True, exist_ok=True)
+    # # fine_tune_model store filepath
+    # output_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{task_id}_itr{iter}.csv")
+    # Path(os.path.dirname(output_filepath)).mkdir(parents=True, exist_ok=True)
 
     for iter in range(n_iters):
         print(f"Iteration {iter}")
+        # fine_tune_model store filepath
+        output_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{task_id}_itr{iter}.csv")
+        Path(os.path.dirname(output_filepath)).mkdir(parents=True, exist_ok=True)
         # 1. Read the data files
         df = dataset_utils.read_dataset(input_dir, input_file_names,
                                 cols=[id_col, sequence_col, label_col])
@@ -126,7 +129,7 @@ def execute(config):
                         output = output.to(nn_utils.get_device())
                         output_df = pd.DataFrame(output.detach().cpu().numpy())
                         output_df.to_csv(output_filepath, mode="a",
-                                  header=not pd.io.common.file_exists(file_path),
+                                  header=not pd.io.common.file_exists(output_file_path),
                                   index=False)
                         del output
                         output_df = []
