@@ -124,15 +124,13 @@ def execute(config):
                         with torch.no_grad():
                             output = model.get_embedding(input)
                         output = output.to(nn_utils.get_device())
-                        df = pd.DataFrame(output.detach().cpu().numpy())
-                        print(df)
+                        output_df = pd.DataFrame(output.detach().cpu().numpy())
+                        output_df.to_csv(output_filepath, mode="a",
+                                  header=not pd.io.common.file_exists(file_path),
+                                  index=False)
                         del output
+                        output_df = []
                         torch.cuda.empty_cache()
-                        # df = pd.DataFrame(output)
-                        # df.to_csv(output_filepath, mode="a",
-                        #           header=not pd.io.common.file_exists(file_path),
-                        #           index=False)
-                        print("RETURNN EMBEDDINGS")
                 else:
                     print(f"ERROR: Unknown model {task_name}.")
                     continue
