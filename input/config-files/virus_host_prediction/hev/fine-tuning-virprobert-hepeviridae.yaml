@@ -56,7 +56,7 @@ fine_tune_settings:
     exclude_labels: [ "nan" ]
     label_groupings:
       "Human": [ "homo sapiens" ]
-      "Pig": [ "swine"]
+      "Swine": [ "swine"]
       "Brown rat": [ 'rattus norvegicus' ]
       "Wild boar": ['wild boar']
       "Chevrier's field mouse": ['apodemus chevrieri']
