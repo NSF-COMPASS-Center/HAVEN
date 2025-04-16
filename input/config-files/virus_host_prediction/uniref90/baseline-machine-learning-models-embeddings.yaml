@@ -1,4 +1,4 @@
-config_type: "virus_host_prediction_baseline_machine_learning"
+config_type: "virus_host_prediction_baseline_machine_learning_embeddings"
 
 # Input Settings:
   ## initialize base input folder name

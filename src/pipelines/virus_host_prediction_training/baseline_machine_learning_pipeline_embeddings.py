@@ -15,7 +15,7 @@ def execute(config):
     file_name = input_settings["file_name"]
     input_file_names = input_settings["emb_file_names"]
     test_file_names = input_settings["emb_test_file_names"]
-    # input_split_seeds = input_settings["split_seeds"]
+    input_split_seeds = input_settings["split_seeds"]
 
     # output settings
     output_settings = config["output_settings"]
