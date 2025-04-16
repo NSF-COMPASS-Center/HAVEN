@@ -1,0 +1,72 @@
+config_type: "virus_host_prediction_baseline_machine_learning"
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  # Base input directory
+  input_dir: "output/raw/baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile"
+
+  # Name of file(s) in subdirectory to be read and processed.
+  # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
+  file_name: ["input/data/uniref90/baseline-project/uniref90_viridae_embl_hosts_pruned_metadata_species_vertebrates_w_seq_non_idv_t0.01_c5_seq_len_in_99.9percentile.csv"]
+  emb_file_names: [ "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_embeddings_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr0.csv",
+              "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_embeddings_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr1.csv",
+              "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_embeddings_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr2.csv",
+              "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_embeddings_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr3.csv",
+              "mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_embeddings_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr4.csv"]
+  emb_test_file_names: ["test/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_embeddings_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr0.csv",
+                    "test/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_embeddings_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr1.csv",
+                    "test/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_embeddings_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr2.csv",
+                    "test/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_embeddings_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr3.csv",
+                    "test/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_embeddings_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr4.csv"]
+  # seeds to split the files into training and testing
+  # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
+  split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
+
+
+classification_settings:
+  experiment: "virus_host_prediction_baseline_machine_learning"
+  n_iterations: 5
+  split_input: False
+  train_proportion: 0.8
+  type: "multi"
+  sequence_settings:
+    id_col: "uniref90_id"
+    sequence_col: "seq"
+    feature_type: "token"  # supported values 'kmer' (additional parameter 'k' required) , 'pssm', 'token'
+#    kmer_settings:
+#      k: 3
+#      kmer_prevalence_threshold: 0.1
+  label_settings:
+    label_col: "virus_host_name"
+    exclude_labels: [ "nan"]
+    label_groupings:
+      "Human": [ "Homo sapiens" ]
+      "Pig": [ "Sus scrofa" ]
+      "Capybara": [ "Hydrochoerus hydrochaeris" ]
+      "Himalayan marmot": [ "Marmota himalayana" ]
+      "Red junglefowl": [ "Gallus gallus" ]
+  models:
+    - name: "lr"
+      active: True
+      C: [0.01, 0.1, 1]
+      multiclass_type: "multinomial"
+      max_iter: 500
+
+    - name: "rf"
+      active: False
+      n_estimators: [10, 100, 1000]
+      max_depth: [3, 5]
+
+    - name: "svm"
+      active: False
+      C: [ 0.01, 0.1, 1, 10]
+      kernel: "rbf"
+
+output_settings:
+  output_dir: "output"
+  results_dir: "raw"
+  visualizations_dir: "visualization"
+  sub_dir: "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/202504/host_multi"
+  prefix:  # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

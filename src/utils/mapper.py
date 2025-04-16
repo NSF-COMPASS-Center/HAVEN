@@ -20,7 +20,7 @@ from models.virprobert.ablation.bert_virus_host_prediction import BERT_VirusHost
 
 from datasets.collations.custom_collate_function import ESM2CollateFunction
 
-from pipelines.virus_host_prediction_training import fine_tuning_pipeline, fine_tuning_external_pipeline, baseline_deep_learning_pipeline, baseline_machine_learning_pipeline, embedding_baseline_pipeline
+from pipelines.virus_host_prediction_training import fine_tuning_pipeline, fine_tuning_external_pipeline, baseline_deep_learning_pipeline, baseline_machine_learning_pipeline, embedding_baseline_pipeline, baseline_machine_learning_pipeline_embeddings
 from pipelines.transfer_learning import masked_language_modeling_pipleine
 from pipelines.analysis import perturbation_analysis_pipeline, perturbation_analysis_external_pipeline, embedding_generation_pipeline, virus_host_prediction_testing_pipeline, virus_host_prediction_testing_external_pipeline
 from pipelines.few_shot_learning import few_shot_learning_host_prediction_pipeline
@@ -39,7 +39,8 @@ pipeline_mapper = {
     "perturbation": perturbation_analysis_pipeline,
     "perturbation_external": perturbation_analysis_external_pipeline,
     "embedding_generation": embedding_generation_pipeline,
-    "embedding": embedding_baseline_pipeline
+    "embedding": embedding_baseline_pipeline,
+    "virus_host_prediction_baseline_machine_learning_embeddings": baseline_machine_learning_pipeline_embeddings
 }
 
 # mappings of all classes
