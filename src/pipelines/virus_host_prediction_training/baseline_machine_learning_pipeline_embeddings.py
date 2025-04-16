@@ -57,9 +57,11 @@ def execute(config):
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
-        df = dataset_utils.read_dataset(file_name)
-        emb_df = dataset_utils.read_dataset(input_dir, input_file_names[iter])
-        emb_test_df = dataset_utils.read_dataset(input_dir, test_file_names[iter])
+        df = dataset_utils.read_dataset("", file_name, cols=[id_col, sequence_col, label_col])
+        input_file_path = os.path.join(input_dir, input_file_names[iter])
+        emb_df = pd.read_csv(input_file_path)
+        test_file_path = os.path.join(input_dir, test_file_names[iter])
+        emb_test_df = pd.read_csv(test_file_path)
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                      classification_type=classification_type)
