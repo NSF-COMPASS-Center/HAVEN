@@ -110,10 +110,11 @@ def execute(config):
                 y_pred, feature_importance_df, validation_scores_df, classifier = svm.run(emb_df, emb_test_df, y_train, model)
             else:
                 continue
-            test_scores_df = pd.DataFrame()
-            convergence_df = pd.DataFrame()
+
             #  Create the result dataframe and remap the class indices to original input labels
             result_df = pd.DataFrame(y_pred)
+            test_scores_df = pd.DataFrame()
+            convergence_df = pd.DataFrame()
             result_df["y_true"] = y_test.values
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
@@ -135,16 +136,25 @@ def execute(config):
             utils.write_output_model(classifier, output_results_dir, f"{output_filename_prefix}_itr{iter}", model_name)
 
             # test scores
-            test_scores_df["test_scores"] = pd.Series([classifier.score(emb_test_df, y_test)])
-            test_scores_df["itr"] = iter
+            new_score = pd.Series([classifier.score(emb_test_df, y_test)])
+            new_test_score_row = {
+                "test_score": new_score,
+                "itr": iter
+            }
+            test_scores_df = pd.append(test_scores_df, new_test_score_row, ignore_index=True)
             test_scores[model_name].append(test_scores_df)
 
             # Convergence
             if hasattr(classifier, 'converged_'):
-                convergence_df["convergence"] = classifier.converged_
+                convergence_value = classifier.converged_
             else:
-                convergence_df["convergence"] = "None"
-            convergence_df["itr"] = iter
+                convergence_value = 'None'
+            # convergence_df["itr"] = iter
+            new_convergence_row = {
+                "convergence" : convergence_value,
+                "itr": iter
+            }
+            convergence_df.append(new_convergence_row, ignore_index=True)
             convergence[model_name].append(convergence_df)
 
 
@@ -158,7 +168,7 @@ def execute(config):
     #     utils.write_output(feature_importance, output_results_dir, output_filename_prefix, "feature_imp")
 
     # create plots for validation scores
-    # plot_validation_scores(validation_scores, os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
+    plot_validation_scores(validation_scores, os.path.join(output_dir, visualizations_dir, sub_dir), output_filename_prefix)
 
 
 def get_standardized_datasets(train_df, test_df, label_col):
