@@ -141,7 +141,7 @@ def execute(config):
                 "test_score": new_score,
                 "itr": iter
             }
-            test_scores_df = pd.append(test_scores_df, new_test_score_row, ignore_index=True)
+            test_scores_df.append(test_scores_df, new_test_score_row, ignore_index=True)
             test_scores[model_name].append(test_scores_df)
 
             # Convergence
