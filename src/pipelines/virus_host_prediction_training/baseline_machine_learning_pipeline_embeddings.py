@@ -134,7 +134,7 @@ def execute(config):
             utils.write_output_model(classifier, output_results_dir, f"{output_filename_prefix}_itr{iter}", model_name)
 
             # test scores
-            test_scores_df["test_scores"] = pd.DataFrame(classifier.score(emb_test_df, y_test))
+            test_scores_df["test_scores"] = pd.Series([classifier.score(emb_test_df, y_test)])
             test_scores_df["itr"] = iter
             test_scores[model_name].append(test_scores_df)
 
