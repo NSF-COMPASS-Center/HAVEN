@@ -113,8 +113,8 @@ def execute(config):
 
             #  Create the result dataframe and remap the class indices to original input labels
             result_df = pd.DataFrame(y_pred)
-            test_scores_df = pd.DataFrame()
-            convergence_df = pd.DataFrame()
+            test_scores_df = pd.DataFrame(columns=["test_score", "itr"])
+            convergence_df = pd.DataFrame(columns=["convergence", "itr"])
             result_df["y_true"] = y_test.values
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
@@ -138,10 +138,10 @@ def execute(config):
             # test scores
             new_score = pd.Series([classifier.score(emb_test_df, y_test)])
             new_test_score_row = {
-                "test_score": new_score,
+                "test_score": new_score.iloc[0],
                 "itr": iter
             }
-            test_scores_df.append(test_scores_df, new_test_score_row)
+            test_scores_df = test_scores_df.append(new_test_score_row, ignore_index=True)
             test_scores[model_name].append(test_scores_df)
 
             # Convergence
@@ -154,7 +154,7 @@ def execute(config):
                 "convergence" : convergence_value,
                 "itr": iter
             }
-            convergence_df.append(convergence_df, new_convergence_row)
+            convergence_df = convergence_df.append(new_convergence_row, ignore_index=True)
             convergence[model_name].append(convergence_df)
 
 
