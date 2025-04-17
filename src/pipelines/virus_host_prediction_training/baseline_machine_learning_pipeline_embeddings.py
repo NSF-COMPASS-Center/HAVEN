@@ -110,7 +110,8 @@ def execute(config):
                 y_pred, feature_importance_df, validation_scores_df, classifier = svm.run(emb_df, emb_test_df, y_train, model)
             else:
                 continue
-
+            test_scores_df = pd.DataFrame()
+            convergence_df = pd.DataFrame()
             #  Create the result dataframe and remap the class indices to original input labels
             result_df = pd.DataFrame(y_pred)
             result_df["y_true"] = y_test.values
