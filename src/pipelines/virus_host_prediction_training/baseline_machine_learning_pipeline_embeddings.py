@@ -141,7 +141,7 @@ def execute(config):
                 "test_score": new_score,
                 "itr": iter
             }
-            test_scores_df.append(test_scores_df, new_test_score_row, ignore_index=True)
+            test_scores_df.append(test_scores_df, new_test_score_row)
             test_scores[model_name].append(test_scores_df)
 
             # Convergence
@@ -154,7 +154,7 @@ def execute(config):
                 "convergence" : convergence_value,
                 "itr": iter
             }
-            convergence_df.append(new_convergence_row, ignore_index=True)
+            convergence_df.append(new_convergence_row)
             convergence[model_name].append(convergence_df)
 
 
