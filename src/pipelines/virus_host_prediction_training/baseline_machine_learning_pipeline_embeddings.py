@@ -55,7 +55,7 @@ def execute(config):
     feature_importance = {}
     validation_scores = {}
     convergence = {}
-    mean_test_scores = {}
+    test_scores = {}
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
@@ -93,7 +93,7 @@ def execute(config):
                 feature_importance[model_name] = []
                 validation_scores[model_name] = []
                 convergence[model_name] = []
-                mean_test_scores[model_name] = []
+                test_scores[model_name] = []
 
             # Set necessary values within model_params object for cleaner code and to avoid passing multiple arguments.
             model["label_col"] = label_col
@@ -133,10 +133,10 @@ def execute(config):
             # write the classification model_params
             utils.write_output_model(classifier, output_results_dir, f"{output_filename_prefix}_itr{iter}", model_name)
 
-            # Mean test scores
-            mean_test_scores_df = classifier.best_score_
-            mean_test_scores_df["itr"] = iter
-            mean_test_scores[model_name].append(mean_test_scores_df)
+            # test scores
+            test_scores_df = classifier.score(emb_test_df, y_test)
+            test_scores_df["itr"] = iter
+            test_scores[model_name].append(test_scores_df)
 
             # Convergence
             if hasattr(classifier, 'converged_'):
@@ -150,7 +150,7 @@ def execute(config):
     # write the raw results in csv files
     utils.write_output(results, output_results_dir, output_filename_prefix, "output",)
     utils.write_output(validation_scores, output_results_dir, output_filename_prefix, "validation_scores")
-    utils.write_output(mean_test_scores, output_results_dir, output_filename_prefix, "mean_test_scores")
+    utils.write_output(test_scores, output_results_dir, output_filename_prefix, "test_scores")
     utils.write_output(convergence, output_results_dir, output_filename_prefix, "convergence")
     # if feature importance exists:
     # if len(feature_importance) > 0:
