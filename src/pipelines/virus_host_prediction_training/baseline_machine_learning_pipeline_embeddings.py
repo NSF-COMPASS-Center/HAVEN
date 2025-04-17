@@ -135,8 +135,8 @@ def execute(config):
 
             # Mean test scores
             mean_test_scores_df = classifier.best_score_
-            mean_test_scores["itr"] = iter
-            mean_test_scores[model_name].append()
+            mean_test_scores_df["itr"] = iter
+            mean_test_scores[model_name].append(mean_test_scores_df)
 
             # Convergence
             if hasattr(classifier, 'converged_'):
