@@ -154,7 +154,7 @@ def execute(config):
                 "convergence" : convergence_value,
                 "itr": iter
             }
-            convergence_df.append(new_convergence_row)
+            convergence_df.append(convergence_df, new_convergence_row)
             convergence[model_name].append(convergence_df)
 
 
