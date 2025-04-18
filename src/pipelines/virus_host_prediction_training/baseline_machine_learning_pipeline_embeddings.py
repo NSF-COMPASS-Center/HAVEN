@@ -62,7 +62,9 @@ def execute(config):
         df = dataset_utils.read_dataset("", file_name, cols=[id_col, sequence_col, label_col])
         input_file_path = os.path.join(input_dir, input_file_names[iter])
         emb_df = pd.read_csv(input_file_path)
+        print("Train Embedding data frame: ",input_file_path)
         test_file_path = os.path.join(input_dir, test_file_names[iter])
+        print("Test Embedding data frame: ",test_file_path)
         emb_test_df = pd.read_csv(test_file_path)
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
