@@ -23,7 +23,7 @@ def parse_args():
     parser.add_argument("--fasta_to_csv", action="store_true",
                         help="Convert the input fasta file to csv format.\n")
     parser.add_argument("-it", "--input_type",
-                        help="Type of input file. Mandatory config option while converting from fasta to csv. Support values = 'uniref', 'uniprot'\n")
+                        help="Type of input file. Mandatory config option while converting from fasta to csv. Support values = 'uniref50', 'uniref90', 'uniref100', 'uniprot'\n")
     parser.add_argument("--uniprot_metadata", action="store_true",
                         help="Get metadata (hosts and embl reference id) of virus from UniProt.\n")
     parser.add_argument("--host_map_embl", action="store_true",
@@ -71,10 +71,12 @@ def process(config):
     if config.uniprot_metadata:
         uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
         print(f"uniprot_metadata_file_path ={uniprot_metadata_file_path}")
+        query_func = external_sources_utils.query_uniref if config.input_type.contains(UNIREF) else external_sources_utils.query_uniprot
         dataset_filter.get_metadata_from_uniprot(input_file_path=input_file_path,
                                                  output_file_path=uniprot_metadata_file_path,
                                                  id_col=id_col,
-                                                 query_uniprot=external_sources_utils.query_uniref)
+                                                 query_uniprot=query_func,
+                                                 input_type=config.input_type)
     # 2B. Host mapping from EMBL
     if config.host_map_embl:
         embl_host_mapping_filepath = os.path.join(output_dir, Path(input_file_path).stem + "_embl_host_mapping.csv")
@@ -154,7 +156,7 @@ def pre_process(config):
     df = None
     # 1. Parse the Fasta file
     if config.fasta_to_csv:
-        if config.input_type == UNIREF:
+        if config.input_type.contains(UNIREF):
             df = dataset_parser.parse_uniref_fasta_file(input_file_path=input_file_path, id_col=id_col)
         elif config.input_type == UNIPROT:
             df = dataset_parser.parse_uniprot_fasta_file(input_file_path=input_file_path, id_col=id_col)

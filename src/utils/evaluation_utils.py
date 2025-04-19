@@ -35,4 +35,3 @@ def get_f1_score(y_true, y_pred, select_non_zero=False):
     f1_micro = f1_score(y_true, y_pred, average="micro")
     f1_macro = f1_score(y_true, y_pred, average="macro")
     return f1_micro, f1_macro
-
