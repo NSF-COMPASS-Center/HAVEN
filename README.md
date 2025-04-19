@@ -143,11 +143,11 @@ The [data_preprocessor.py](src/utils/scripts/data_preprocessor.py) allows you to
 ### Functions available in [data_preprocessor.py](src/utils/scripts/data_preprocessor.py)
 1. Convert a uniprot or uniref fasta file into a csv file.
 ```shell
-python .\src\utils\scripts\data_preprocessor.py --fasta_to_csv --input_file <absolute-path-to-fasta-file> --output_dir <absolute-path-to-the folder-where-the-output-file-will-be-written> --input_type <uniprot or uniref> --id_col <name-of-the-id-column-for-the-output-file-example: uniprot_id, uniref90_id, uniref50_id> 
+python .\src\utils\scripts\data_preprocessor.py --fasta_to_csv --input_file <absolute-path-to-fasta-file> --output_dir <absolute-path-to-the folder-where-the-output-file-will-be-written> --input_type <uniprot, uniref50, uniref90, or uniref100> --id_col <name-of-the-id-column-for-the-output-file-example: uniprot_id, uniref90_id, uniref50_id> 
 ```
 2. Get metadata for each viral sequence from UniProt. The metadata includes host for the sequence as recorded in UniProt, and the EMBL id for the sequence. We use the EMBL id to query EMBL in the next step to get the virus host corresponding to each viral protein sequence.
 ```shell
-python .\src\utils\scripts\data_preprocessor.py --uniprot_metadata --input_file <absolute-path-to-the-input-file-(output-file-from-the-previous-step)> --output_dir <absolute-path-to-the-folder-where-the-output-file-will-be-written> --id_col <name-of-the-id-column-defined-in-the-firs-step: uniprot_id, uniref90_id, uniref50_id> 
+python .\src\utils\scripts\data_preprocessor.py --uniprot_metadata --input_file <absolute-path-to-the-input-file-(output-file-from-the-previous-step)> --output_dir <absolute-path-to-the-folder-where-the-output-file-will-be-written> --input_type <uniprot, uniref50, uniref90, or uniref100 --id_col <name-of-the-id-column-defined-in-the-firs-step: uniprot_id, uniref90_id, uniref50_id> 
 ```
 3. Query EMBL to get the virus hosts for each viral protein sequence using the EMBL id we fetched from UniProt in Step 2.
 ```shell
