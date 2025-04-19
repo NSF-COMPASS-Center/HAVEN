@@ -91,7 +91,7 @@ VIRUS_HOST_TAXON_RANK = "virus_host_taxon_rank"
 # Use multiprocessing to speed up the process
 # Note: this method drops the sequence information to save memory.
 # The sequences will be joined back and compiled into one dataset at a later stage
-def get_metadata_from_uniprot(input_file_path, output_file_path, id_col, query_uniprot):
+def get_metadata_from_uniprot(input_file_path, output_file_path, id_col, query_uniprot, input_type):
     print("START: Get metadata (virus hosts and EMBL reference id) from UniProt")
     # read the parsed uniref90_data csv file
     df = pd.read_csv(input_file_path)
@@ -120,7 +120,7 @@ def get_metadata_from_uniprot(input_file_path, output_file_path, id_col, query_u
 
     # multiprocessing for parallelization
     cpu_pool = Pool(N_CPU)
-    cpu_pool.starmap(get_uniprot_metadata, zip(dfs, repeat(output_file_path), repeat(id_col), repeat(query_uniprot)))
+    cpu_pool.starmap(get_uniprot_metadata, zip(dfs, repeat(output_file_path), repeat(id_col), repeat(query_uniprot), repeat(input_type)))
 
     cpu_pool.close()
     cpu_pool.join()
@@ -131,14 +131,14 @@ def get_metadata_from_uniprot(input_file_path, output_file_path, id_col, query_u
 # call another method which will query UniProt to get metadata (virus hosts and embl reference id) of virus
 # write the retrieved host ids and embl ref id
 # to the output file
-def get_uniprot_metadata(df, output_file_path, id_col, query_uniprot):
+def get_uniprot_metadata(df, output_file_path, id_col, query_uniprot, input_type):
     # get virus hosts
     for row in df.iterrows():
         row = row[1]
         # query uniprot
         id_value = row[id_col]
         tax_id = row[TAX_ID]
-        host_tax_ids, embl_entry_id = query_uniprot(id_value)
+        host_tax_ids, embl_entry_id = query_uniprot(id_value, input_type)
         print(f"{id_value}: {len(host_tax_ids) if host_tax_ids is not None else None}, {embl_entry_id}")
 
         # write output to file

@@ -13,7 +13,9 @@ from Bio import SeqIO
 # UniProt keywords/contsant values
 UNIPROT_REST_API = "https://rest.uniprot.org/uniprotkb/search"
 UNIREF_REST_API = "https://rest.uniprot.org/uniref/%s.json"
+UNIREF100_QUERY_PARAM = "uniref_cluster_100:%s"
 UNIREF90_QUERY_PARAM = "uniref_cluster_90:%s"
+UNIREF50_QUERY_PARAM = "uniref_cluster_50:%s"
 
 # EMBL keywords/constant values
 EMBL_REST_API = "https://www.ebi.ac.uk/Tools/dbfetch"
@@ -30,21 +32,33 @@ VERTEBRATA_TAX_ID = "7742"
 
 
 # query UniRef for to get the host of the virus of the protein sequence
-# input: uniref90_id
+# input: uniref_id
 # output: list of host(s) of the virus
-def query_uniref(uniref90_id):
+def query_uniref(uniref_id, input_type):
     # split UniRef90_A0A023GZ41 and capture A0A023GZ41
-    uniref90_id = uniref90_id.split("_")[1]
+    uniref_id = uniref_id.split("_")[1]
+
+    query_param = None
+    if input_type == "uniref100":
+        query_parm = UNIREF100_QUERY_PARAM
+    elif input_type == "uniref90":
+        query_parm = UNIREF90_QUERY_PARAM
+    elif input_type == "uniref50":
+        query_parm = UNIREF50_QUERY_PARAM
+    else:
+        print("ERROR: Invalid input type for UniRef dataset. Supported values are 'uniref100', 'uniref90', and, 'uniref50'".)
+        exit(1)
+
     response = requests.get(url=UNIPROT_REST_API,
-                            params={"query": UNIREF90_QUERY_PARAM % uniref90_id,
+                            params={"query": query_param % uniref_id,
                                     "fields": ",".join(["virus_hosts", "xref_embl"])})
-    return parse_uniprot_response(response, uniref90_id)
+    return parse_uniprot_response(response, uniref_id)
 
 
 # query Uniprot for to get the host of the virus of the protein sequence
 # input: uniprot_id
 # output: list of host(s) of the virus
-def query_uniprot(uniprot_id):
+def query_uniprot(uniprot_id, input_type):
     response = requests.get(url=UNIPROT_REST_API,
                             params={"query": uniprot_id,
                                     "fields": ",".join(["virus_hosts", "xref_embl"])})
