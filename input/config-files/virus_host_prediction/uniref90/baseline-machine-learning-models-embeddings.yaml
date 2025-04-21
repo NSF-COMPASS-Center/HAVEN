@@ -57,7 +57,7 @@ classification_settings:
     - name: "rf"
       active: True
       n_estimators: [10, 100, 200, 1000]
-      max_depth: [3, 5, 10, 20, 50, 100]
+      max_depth: [3, 5, 10, 20]
       max_features: ['auto', 'sqrt', 'log2']
 
     - name: "svm"
