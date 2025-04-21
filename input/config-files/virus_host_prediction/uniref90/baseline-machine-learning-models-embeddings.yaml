@@ -58,7 +58,7 @@ classification_settings:
       active: True
       n_estimators: [10, 100, 200, 1000]
       max_depth: [3, 5, 10, 20]
-      max_features: ['auto', 'log2'] # ,'sqrt']
+      max_features: ['log2' ,'sqrt', None]
 
     - name: "svm"
       active: False
