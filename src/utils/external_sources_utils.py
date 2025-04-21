@@ -37,7 +37,6 @@ VERTEBRATA_TAX_ID = "7742"
 def query_uniref(uniref_id, input_type):
     # split UniRef90_A0A023GZ41 and capture A0A023GZ41
     uniref_id = uniref_id.split("_")[1]
-    print(">>>>>>>>>" + input_type)
     query_param = None
     if input_type == "uniref100":
         query_parm = UNIREF100_QUERY_PARAM
@@ -46,7 +45,7 @@ def query_uniref(uniref_id, input_type):
     elif input_type == "uniref50":
         query_parm = UNIREF50_QUERY_PARAM
     else:
-        print("ERROR: Invalid input type for UniRef dataset. Supported values are 'uniref100', 'uniref90', and, 'uniref50'".)
+        print("ERROR: Invalid input type for UniRef dataset. Supported values are 'uniref100', 'uniref90', and, 'uniref50'")
         exit(1)
 
     response = requests.get(url=UNIPROT_REST_API,
