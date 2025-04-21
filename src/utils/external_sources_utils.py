@@ -41,7 +41,6 @@ def query_uniref(uniref_id, input_type):
     elif input_type == "uniref90":
         query_param = UNIREF90_QUERY_PARAM
     elif input_type == "uniref50":
-        print("inside uniref50 match")
         query_param = UNIREF50_QUERY_PARAM
     else:
         print("ERROR: Invalid input type for UniRef dataset. Supported values are 'uniref100', 'uniref90', and, 'uniref50'")
