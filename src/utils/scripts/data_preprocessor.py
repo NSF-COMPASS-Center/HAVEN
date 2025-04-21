@@ -71,7 +71,7 @@ def process(config):
     if config.uniprot_metadata:
         uniprot_metadata_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_uniprot_metadata.csv")
         print(f"uniprot_metadata_file_path ={uniprot_metadata_file_path}")
-        query_func = external_sources_utils.query_uniref if config.input_type.contains(UNIREF) else external_sources_utils.query_uniprot
+        query_func = external_sources_utils.query_uniref if UNIREF in config.input_type else external_sources_utils.query_uniprot
         dataset_filter.get_metadata_from_uniprot(input_file_path=input_file_path,
                                                  output_file_path=uniprot_metadata_file_path,
                                                  id_col=id_col,
@@ -156,7 +156,7 @@ def pre_process(config):
     df = None
     # 1. Parse the Fasta file
     if config.fasta_to_csv:
-        if config.input_type.contains(UNIREF):
+        if UNIREF in config.input_type:
             df = dataset_parser.parse_uniref_fasta_file(input_file_path=input_file_path, id_col=id_col)
         elif config.input_type == UNIPROT:
             df = dataset_parser.parse_uniprot_fasta_file(input_file_path=input_file_path, id_col=id_col)

@@ -35,15 +35,14 @@ VERTEBRATA_TAX_ID = "7742"
 # input: uniref_id
 # output: list of host(s) of the virus
 def query_uniref(uniref_id, input_type):
-    # split UniRef90_A0A023GZ41 and capture A0A023GZ41
-    uniref_id = uniref_id.split("_")[1]
     query_param = None
     if input_type == "uniref100":
-        query_parm = UNIREF100_QUERY_PARAM
+        query_param = UNIREF100_QUERY_PARAM
     elif input_type == "uniref90":
-        query_parm = UNIREF90_QUERY_PARAM
+        query_param = UNIREF90_QUERY_PARAM
     elif input_type == "uniref50":
-        query_parm = UNIREF50_QUERY_PARAM
+        print("inside uniref50 match")
+        query_param = UNIREF50_QUERY_PARAM
     else:
         print("ERROR: Invalid input type for UniRef dataset. Supported values are 'uniref100', 'uniref90', and, 'uniref50'")
         exit(1)
@@ -51,7 +50,9 @@ def query_uniref(uniref_id, input_type):
     response = requests.get(url=UNIPROT_REST_API,
                             params={"query": query_param % uniref_id,
                                     "fields": ",".join(["virus_hosts", "xref_embl"])})
-    return parse_uniprot_response(response, uniref_id)
+    # respnse contains only the uniprot id of the sequences. Hence, we need to extract the uniprot id from the uniref_id only to parse the response.
+    uniprot_id = uniref_id.split("_")[1]
+    return parse_uniprot_response(response, uniprot_id)
 
 
 # query Uniprot for to get the host of the virus of the protein sequence
