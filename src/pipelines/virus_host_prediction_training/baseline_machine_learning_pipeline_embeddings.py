@@ -143,7 +143,8 @@ def execute(config):
                 "test_score": new_score.iloc[0],
                 "itr": iter
             }
-            test_scores_df = test_scores_df.append(new_test_score_row, ignore_index=True)
+
+            test_scores_df = pd.concat([test_scores_df, pd.DataFrame(new_test_score_row)], ignore_index=True)
             test_scores[model_name].append(test_scores_df)
 
             # Convergence
@@ -156,7 +157,7 @@ def execute(config):
                 "convergence" : convergence_value,
                 "itr": iter
             }
-            convergence_df = convergence_df.append(new_convergence_row, ignore_index=True)
+            convergence_df = pd.concat([convergence_df,pd.DataFrame(new_convergence_row)], ignore_index=True)
             convergence[model_name].append(convergence_df)
 
 
