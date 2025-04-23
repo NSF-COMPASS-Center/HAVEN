@@ -21,7 +21,8 @@ module load Miniconda3
 module load cuda12.4/toolkit
 
 # Load conda environment
-source activate ~/.conda/envs/virprobert
+#source activate ~/.conda/envs/virprobert
+source activate /home/sipek/.conda/envs/virprobert
 echo "Conda information:"
 conda info
 
