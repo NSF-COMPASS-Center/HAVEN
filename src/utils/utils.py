@@ -1,8 +1,9 @@
 import random
 
 import sys
-print(sys.executable)
-print(sys.path)
+print("Python Executable:", sys.executable)
+print("sys.path:", sys.path)
+print("Active Environment:", os.environ.get('CONDA_DEFAULT_ENV'))
 import numpy as np
 import joblib
 import pandas as pd
