@@ -20,6 +20,7 @@ module load Miniconda3
 #Load CUDA
 module load cuda12.4/toolkit
 
+echo "TEST"
 # Load conda environment
 conda activate ~/.conda/envs/virprobert
 echo "Conda information:"
