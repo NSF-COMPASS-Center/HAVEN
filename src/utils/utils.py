@@ -1,6 +1,8 @@
 import random
 
-
+import sys
+print(sys.executable)
+print(sys.path)
 import numpy as np
 import joblib
 import pandas as pd
