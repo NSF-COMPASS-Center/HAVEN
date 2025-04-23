@@ -16,7 +16,7 @@ def run(X_train, X_test, y_train, rf_settings):
     # K-Fold Cross Validation: START #
     # hyper-parameter tuning using K-Fold Cross Validation with K = 5;
     # shuffle the data with given random seed before splitting into batches
-    tuning_parameters = {"n_estimators": rf_settings["n_estimators"], "max_depth": rf_settings["max_depth"]} #, "max_features": rf_settings["max_features"]}
+    tuning_parameters = {"n_estimators": rf_settings["n_estimators"], "max_depth": rf_settings["max_depth"] , "max_features": rf_settings["max_features"]}
     scoring_param = "accuracy"
     print(f"Tuning hyper-parameters {tuning_parameters} based on {scoring_param}")
 
