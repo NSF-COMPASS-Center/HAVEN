@@ -1,6 +1,6 @@
 from xgboost import XGBClassifier
 import pandas as pd
-from sklearn.model_selection import StratefiedKFold
+from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import GridSearchCV
 import random
 from utils import utils
