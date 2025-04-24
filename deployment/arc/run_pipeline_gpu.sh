@@ -2,7 +2,7 @@
 
 #SBATCH -J virprobert
 #SBATCH --account=seqevol
-#SBATCH --partition=a30_dev_q
+#SBATCH --partition=a30_normal_q
 
 #SBATCH --mem=450G
 #SBATCH --nodes=1
