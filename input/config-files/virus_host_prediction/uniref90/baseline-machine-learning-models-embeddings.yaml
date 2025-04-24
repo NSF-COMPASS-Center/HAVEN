@@ -66,7 +66,7 @@ classification_settings:
       kernel: "rbf"
 
     - name: "xgb"
-      active: False
+      active: True
       booster: ['gbtree','gblinear', 'dart']
       eta: [0.01, 0.1, 0.3]
       max_depth: [3,5,8]
