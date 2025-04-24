@@ -49,7 +49,7 @@ classification_settings:
       "Red junglefowl": [ "Gallus gallus" ]
   models:
     - name: "lr"
-      active: True
+      active: False
       C: [0.01, 0.1, 1]
       multiclass_type: "multinomial"
       max_iter: 1000
@@ -61,7 +61,7 @@ classification_settings:
       max_features: ['log2' ,'sqrt']
 
     - name: "svm"
-      active: False
+      active: True
       C: [ 0.01, 0.1, 1, 10]
       kernel: "rbf"
 
