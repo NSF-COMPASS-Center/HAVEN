@@ -9,7 +9,7 @@ def run(X_train, X_test, y_train, xgb_settings):
     # XGBoost
     xgb_model = XGBClassifier(
         n_estimators = 500,
-        early_stopping_rounds = 50,
+        # early_stopping_rounds = 50,
         num_class = xgb_settings['num_classes'],
         objective = 'multi:softmax',
         random_state = random.randint(1, 1000),
@@ -24,7 +24,8 @@ def run(X_train, X_test, y_train, xgb_settings):
                          "max_depth": xgb_settings['max_depth'],
                          "subsample": xgb_settings['subsample'],
                          "lambda": xgb_settings['lambda'],
-                         "tree_method": xgb_settings['tree_method']}
+                         "tree_method": xgb_settings['tree_method'],
+                         }
     scoring_param = "accuracy"
     print(f"Tuning hyper-parameters {tuning_parameters} based on {scoring_param}")
 
