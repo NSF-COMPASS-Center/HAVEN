@@ -110,6 +110,9 @@ def execute(config):
             elif "svm" in model_name:
                 print("Executing Support Vector Machine")
                 y_pred, feature_importance_df, validation_scores_df, classifier = svm.run(emb_df, emb_test_df, y_train, model)
+            elif "xgb" in model_name:
+                print("Executing XGBoost")
+                y_pred, feature_importance_df, validation_scores_df, classifier = xgb.run(emb_df, emb_test_df, y_train, model)
             else:
                 continue
 
