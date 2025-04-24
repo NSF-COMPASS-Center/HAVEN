@@ -5,7 +5,7 @@ from pathlib import Path
 from sklearn.preprocessing import MinMaxScaler
 
 from utils import utils, dataset_utils, kmer_utils, visualization_utils
-from models.baseline.std_ml import svm, random_forest, logistic_regression
+from models.baseline.std_ml import svm, random_forest, logistic_regression, xgboost
 
 
 def execute(config):
@@ -112,7 +112,7 @@ def execute(config):
                 y_pred, feature_importance_df, validation_scores_df, classifier = svm.run(emb_df, emb_test_df, y_train, model)
             elif "xgb" in model_name:
                 print("Executing XGBoost")
-                y_pred, feature_importance_df, validation_scores_df, classifier = xgb.run(emb_df, emb_test_df, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = xgboost.run(emb_df, emb_test_df, y_train, model)
             else:
                 continue
 
