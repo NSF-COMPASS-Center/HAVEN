@@ -72,7 +72,7 @@ classification_settings:
       max_depth: [3,5] # could try 8
       subsample: [0.5, 0.75, 0.9]
       lambda: [1, 10]
-      tree_method: [approx', 'hist']
+      tree_method: ['approx', 'hist']
       num_classes: 5
 
 output_settings:
