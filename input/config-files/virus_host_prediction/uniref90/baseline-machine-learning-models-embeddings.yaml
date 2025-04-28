@@ -69,10 +69,10 @@ classification_settings:
       active: True
       booster: ['gbtree', 'dart']
       eta: [0.1, 0.3] # could try 0.01
-      max_depth: [3,5] # could try 8
-      subsample: [0.5, 0.75, 0.9]
+      max_depth: [5] # could try 8, 3
+      subsample: [0.7, 0.9] # [0.5, 0.75, 0.9]
       lambda: [1, 10]
-      tree_method: ['approx', 'hist']
+      tree_method: ['hist'] # 'approx'
       num_classes: 5
 
 output_settings:
@@ -80,4 +80,4 @@ output_settings:
   results_dir: "raw"
   visualizations_dir: "visualization"
   sub_dir: "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/202504/host_multi"
-  prefix:  # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix:  "subset"# default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
