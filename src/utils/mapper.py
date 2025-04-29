@@ -23,7 +23,7 @@ from pipelines.virus_host_prediction_training import fine_tuning_pipeline, fine_
 # from pipelines.transfer_learning import masked_language_modeling_pipleine
 # from pipelines.analysis import perturbation_analysis_pipeline, perturbation_analysis_external_pipeline, embedding_generation_pipeline, virus_host_prediction_testing_pipeline, virus_host_prediction_testing_external_pipeline
 # from pipelines.few_shot_learning import few_shot_learning_host_prediction_pipeline
-# from pipelines.evaluation import evaluation_pipeline
+from pipelines.evaluation import evaluation_pipeline
 from pipelines.sequence_clustering import sequence_clustering_pipeline
 
 pipeline_mapper = {
@@ -35,7 +35,7 @@ pipeline_mapper = {
     # "virus_host_prediction_test": virus_host_prediction_testing_pipeline,
     # "virus_host_prediction_test_external": virus_host_prediction_testing_external_pipeline,
     # "few_shot_learning": few_shot_learning_host_prediction_pipeline,
-    # "evaluation": evaluation_pipeline,
+    "evaluation": evaluation_pipeline,
     # "perturbation": perturbation_analysis_pipeline,
     # "perturbation_external": perturbation_analysis_external_pipeline,
     # "embedding_generation": embedding_generation_pipeline,
