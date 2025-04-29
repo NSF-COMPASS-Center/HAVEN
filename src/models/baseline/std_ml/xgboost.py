@@ -19,12 +19,13 @@ def run(X_train, X_test, y_train, xgb_settings):
     # K-Fold Cross Validation: Start #
     # hyper-parameter tuning using K-Fold Cross Validation with K = 5;
     # shuffle the data with given random seed before splitting into batches
-    tuning_parameters = {"booster": xgb_settings['booster'],
+    tuning_parameters = {
+                        # "booster": xgb_settings['booster'],
                          "eta": xgb_settings['eta'],
                          "max_depth": xgb_settings['max_depth'],
-                         "subsample": xgb_settings['subsample'],
-                         "lambda": xgb_settings['lambda'],
-                         "tree_method": xgb_settings['tree_method'],
+                         # "subsample": xgb_settings['subsample'],
+                         # "lambda": xgb_settings['lambda'],
+                         # "tree_method": xgb_settings['tree_method'],
                          }
     scoring_param = "accuracy"
     print(f"Tuning hyper-parameters {tuning_parameters} based on {scoring_param}")
