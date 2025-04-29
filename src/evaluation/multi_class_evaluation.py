@@ -14,7 +14,7 @@ class MultiClassEvaluation(EvaluationBase):
         self.df = self.get_selected_df(label_mappings)
         self.y_pred_columns = self.df[self.y_true_col].unique()
         self.class_col = "class"
-        self.iter_col = "itr"
+        # self.iter_col = "itr"
 
     # def get_y_pred_columns(self):
     #     y_pred_columns = list(self.df.columns.values)
@@ -71,6 +71,7 @@ class MultiClassEvaluation(EvaluationBase):
     def plot_visualizations(self):
         super().plot_visualizations()
         # for multiclass evaluation, we will plot the curves for one iteration (selected randomly) for each model_params.
+        print(self.evaluation_metrics_df.columns)
         itr_selected = sample(list(self.evaluation_metrics_df[self.itr_col].values), 1).pop()
         if self.evaluation_settings["auroc"]:
             visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auroc",
