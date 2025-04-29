@@ -68,9 +68,9 @@ class MultiClassEvaluation(EvaluationBase):
         return [y for y in y_pred_prob.idxmax(axis="columns")]
 
     def plot_visualizations(self):
-        print("COLUMNS: ", self.evaluation_metrics_df.columns)
         super().plot_visualizations()
         # for multiclass evaluation, we will plot the curves for one iteration (selected randomly) for each model_params.
+        print("COLUMNS: ", self.evaluation_metrics_df.columns)
         itr_selected = sample(list(self.evaluation_metrics_df[self.itr_col].values), 1).pop()
         if self.evaluation_settings["auroc"]:
             visualization_utils.box_plot(self.evaluation_metrics_df, self.experiment_col, "auroc",
