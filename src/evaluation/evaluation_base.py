@@ -65,7 +65,7 @@ class EvaluationBase:
                         result_itr["f1"] = f1_itr
                     if self.evaluation_settings["prediction_distribution"]:
                         self.prediction_distribution()
-                    print("Result_it", result_itr)
+                    print("Result_itr: ", result_itr)
                     result.append(result_itr)
                 except Exception as e:
                     print(e)
