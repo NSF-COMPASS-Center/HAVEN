@@ -67,12 +67,12 @@ classification_settings:
 
     - name: "xgb"
       active: True
-      booster: ['gbtree', 'dart']
+#      booster: ['gbtree', 'dart']
       eta: [0.1, 0.3] # could try 0.01
-      max_depth: [5] # could try 8, 3
-      subsample: [0.7, 0.9] # [0.5, 0.75, 0.9]
-      lambda: [1, 10]
-      tree_method: ['hist'] # 'approx'
+      max_depth: [3,5,8]
+#      subsample: [0.7, 0.9] # [0.5, 0.75, 0.9]
+#      lambda: [1, 10]
+#      tree_method: ['hist'] # 'approx'
       num_classes: 5
 
 output_settings:
