@@ -14,6 +14,7 @@ class MultiClassEvaluation(EvaluationBase):
         self.df = self.get_selected_df(label_mappings)
         self.y_pred_columns = self.df[self.y_true_col].unique()
         self.class_col = "class"
+        self.iter_col = "itr"
 
     # def get_y_pred_columns(self):
     #     y_pred_columns = list(self.df.columns.values)
