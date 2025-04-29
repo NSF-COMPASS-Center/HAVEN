@@ -85,7 +85,7 @@ evaluation_settings:
   prediction_distribution: False
 
 label_mappings:
-  "Homo sapiens": "Human"
+#  "Homo sapiens": "Human"
 #  "Sus scrofa": "Pig"
 #  "Hydrochoerus hydrochaeris": "Capybara"
 #  "Marmota himalayana": "Himalayan marmot"
@@ -94,10 +94,12 @@ label_mappings:
 #  "Macaca mulatta": "Indochinese rhesus macaque"
 #  "Gallus gallus": "Red junglefowl"
 #  "Chlorocebus pygerythrus": "Vervet monkey"
-  "rattus norvegicus": "Brown rat"
-  "apodemus chvrieri": "Chevrier's field mouse"
-  "wild boar": "Wild boar"
-  "swine": "Swine"
+#  "Rattus norvegicus": "Brown rat"
+#  "Apodemus chvrieri": "Chevrier's field mouse"
+  "Chevrier's field mouse": "Chevrier's field mouse"
+  "Wild boar": "Wild boar"
+  "Swine": "Swine"
+  "Brown rat": "Brown rate"
 #  "Microtus arvalis": "Common vole"
 #  "Equus caballus": "Horse"
 #  "Phacochoerus africanus": "Common warthog"
