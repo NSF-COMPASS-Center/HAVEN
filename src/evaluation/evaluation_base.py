@@ -36,6 +36,8 @@ class EvaluationBase:
 
         for experiment in experiments:
             experiment_df = self.df[self.df[self.experiment_col] == experiment]
+            print(self.df.head())  # Ensure it's not empty
+            print(self.df.columns)
             for itr in self.itrs:
                 result_itr = {self.itr_col: itr, self.experiment_col: experiment}
                 df_itr = experiment_df[experiment_df[self.itr_col] == itr]
