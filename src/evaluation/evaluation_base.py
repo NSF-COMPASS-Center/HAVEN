@@ -54,6 +54,7 @@ class EvaluationBase:
                         print("AUROC", result_itr["auroc"])
                     if self.evaluation_settings["auprc"]:
                         pr_curve_itr, auprc_itr = self.compute_auprc(df_itr)
+                        print("comput_auprc", pr_curve_itr, auprc_itr)
                         # individual Precision-Recall curves
                         pr_curve_itr[self.itr_col] = itr
                         pr_curve_itr[self.experiment_col] = experiment
