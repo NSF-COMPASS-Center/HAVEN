@@ -61,9 +61,8 @@ class MultiClassEvaluation(EvaluationBase):
         for y_pred_column in self.y_pred_columns:
             y_true = df_itr[self.y_true_col].values
             y_score = df_itr[y_pred_column].values
-
             # precision, recall, _ = precision_recall_curve(y_true=df_itr[self.y_true_col].values, y_score=df_itr[y_pred_column].values, pos_label=y_pred_column)
-            precision, recall, _ = precision_recall_curve(y_true, y_score)
+            precision, recall, _ = precision_recall_curve(y_true, y_score, pos_label=y_pred_column)
             print("Precision", precision)
             print("Recall", recall)
             pr_curves.append(pd.DataFrame({"precision": precision, "recall": recall, self.class_col: y_pred_column}))
