@@ -43,6 +43,7 @@ class EvaluationBase:
                     if self.metadata is None:
                         # compute the metadata only once
                         self.metadata = utils.compute_class_distribution(df_itr, self.y_true_col, format=True)
+                        print("metadata", self.metadata)
                     if self.evaluation_settings["auroc"]:
                         roc_curve_itr, auroc_itr = self.compute_auroc(df_itr)
                         # individual ROC curves
@@ -50,6 +51,7 @@ class EvaluationBase:
                         roc_curve_itr[self.experiment_col] = experiment
                         roc_curves.append(roc_curve_itr)
                         result_itr["auroc"] = auroc_itr
+                        print("AUROC", result_itr["auroc"])
                     if self.evaluation_settings["auprc"]:
                         pr_curve_itr, auprc_itr = self.compute_auprc(df_itr)
                         # individual Precision-Recall curves
@@ -57,6 +59,7 @@ class EvaluationBase:
                         pr_curve_itr[self.experiment_col] = experiment
                         pr_curves.append(pr_curve_itr)
                         result_itr["auprc"] = auprc_itr
+                        print("AUPRC", result_itr["auprc"])
                     if self.evaluation_settings["accuracy"]:
                         acc_itr = self.compute_accuracy(df_itr)
                         result_itr["accuracy"] = acc_itr
