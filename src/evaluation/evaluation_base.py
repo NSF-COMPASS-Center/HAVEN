@@ -70,6 +70,7 @@ class EvaluationBase:
                     print(e)
                     pass
         self.evaluation_metrics_df = pd.DataFrame(result)
+        print(self.evaluation_metrics_df.head())
         self.evaluation_metrics_df.to_csv(self.evaluation_output_file_path + "_evaluation_metrics.csv")
 
         if len(roc_curves) > 0:
