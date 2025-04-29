@@ -30,17 +30,12 @@ class EvaluationBase:
 
     def execute(self):
         experiments = self.df[self.experiment_col].unique()
-        print(self.df[self.experiment_col].unique())
         result = []
         roc_curves = []
         pr_curves = []
 
         for experiment in experiments:
             experiment_df = self.df[self.df[self.experiment_col] == experiment]
-            print(self.df.head())  # Ensure it's not empty
-            print(self.df.columns)
-            print(self.experiment_col)  # Should print 'experiment'
-            print(self.itr_col)
             for itr in self.itrs:
                 result_itr = {self.itr_col: itr, self.experiment_col: experiment}
                 df_itr = experiment_df[experiment_df[self.itr_col] == itr]
@@ -70,6 +65,7 @@ class EvaluationBase:
                         result_itr["f1"] = f1_itr
                     if self.evaluation_settings["prediction_distribution"]:
                         self.prediction_distribution()
+                    print("Result_it", result_itr)
                     result.append(result_itr)
                 except Exception as e:
                     print(e)
