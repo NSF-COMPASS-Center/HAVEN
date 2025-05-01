@@ -7,6 +7,7 @@ from sklearn.preprocessing import MinMaxScaler
 from utils import utils, dataset_utils, kmer_utils, visualization_utils
 from models.baseline.std_ml import svm, random_forest, logistic_regression, xgboost
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 
 def execute(config):
@@ -82,6 +83,13 @@ def execute(config):
         emb_df_scaled = pd.DataFrame(emb_df_scaled, columns=emb_df.columns)
         emb_test_df_scaled = scaler.transform(emb_test_df)
         emb_test_df_scaled = pd.DataFrame(emb_test_df_scaled, columns=emb_test_df.columns)
+
+        # # PCA
+        # pca = PCA(n_components=64)
+        # X_train = pca.fit_transform(emb_df_scaled)
+        # X_train = pd.DataFrame(X_train, columns=emb_df.columns)
+        # X_test = pca.transform(emb_test_df_scaled)
+        # X_test = pd.DataFrame(X_test, columns=emb_test_df.columns)
 
         # 4. Compute kmer features
         # Get kmer keys only on training dataset
