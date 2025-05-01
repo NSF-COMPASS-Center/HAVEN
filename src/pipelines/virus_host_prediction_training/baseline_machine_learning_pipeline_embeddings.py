@@ -110,8 +110,8 @@ def execute(config):
         output_dim = 64
 
         transform_model = SingleLinearLayer(input_dim, output_dim)
-        X_train_tensor = torch.tensor(emb_df_scaled, dtype=torch.float32)
-        X_test_tensor = torch.tensor(emb_test_df_scaled, dtype=torch.float32)
+        X_train_tensor = torch.tensor(emb_df_scaled.values, dtype=torch.float32)
+        X_test_tensor = torch.tensor(emb_test_df_scaled.values, dtype=torch.float32)
         X_train = transform_model(X_train_tensor).detach().numpy()
         X_test = transform_model(X_test_tensor).detach().numpy()
 
