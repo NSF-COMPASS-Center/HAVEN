@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
 # from src.utils.utils import transform_labels
-from src.models.baseline.std_ml.single_linear_layer import SingleLinearLayer
+from models.baseline.std_ml.single_linear_layer import SingleLinearLayer
 
 
 
