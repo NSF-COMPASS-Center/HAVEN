@@ -10,4 +10,4 @@ class SingleLinearLayer(nn.Module):
         self.linear = nn.Linear(input_dim, output_dim)
 
     def forward(self, x):
-        return self.fc(x)
+        return self.linear(x)
