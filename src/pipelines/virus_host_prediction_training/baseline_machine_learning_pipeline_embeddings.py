@@ -85,7 +85,14 @@ def execute(config):
         emb_test_df_scaled = pd.DataFrame(emb_test_df_scaled, columns=emb_test_df.columns)
 
         # # PCA
-        pca = PCA(n_components=64)
+        pca = PCA()
+        pca.fit(emb_df_scaled)
+        explained_variance = pca.explained_variance_ratio_
+        cumulative_variance = explained_variance.cumsum()
+        threshold = 0.95
+        n_components_95 = (cumulative_variance >= threshold).argmax() + 1
+        print("Number of Components to Explain 95% of Variance: ", n_components_95)
+        pca = PCA(n_components=n_components_95)
         X_train = pca.fit_transform(emb_df_scaled)
         X_train = pd.DataFrame(X_train)
         X_test = pca.transform(emb_test_df_scaled)
