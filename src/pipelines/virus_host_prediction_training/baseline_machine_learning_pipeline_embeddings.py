@@ -89,9 +89,9 @@ def execute(config):
         pca.fit(emb_df_scaled)
         explained_variance = pca.explained_variance_ratio_
         cumulative_variance = explained_variance.cumsum()
-        threshold = 0.95
-        n_components_95 = (cumulative_variance >= threshold).argmax() + 1
-        print("Number of Components to Explain 95% of Variance: ", n_components_95)
+        threshold = 0.99
+        n_components_99 = (cumulative_variance >= threshold).argmax() + 1
+        print("Number of Components to Explain 99% of Variance: ", n_components_99)
         pca = PCA(n_components=n_components_95)
         X_train = pca.fit_transform(emb_df_scaled)
         X_train = pd.DataFrame(X_train)
