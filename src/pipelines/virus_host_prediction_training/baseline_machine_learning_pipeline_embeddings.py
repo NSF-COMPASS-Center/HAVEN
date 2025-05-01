@@ -79,7 +79,9 @@ def execute(config):
         # Standardize the data
         scaler = StandardScaler()
         emb_df_scaled = scaler.fit_transform(emb_df)
+        emb_df_scaled = pd.DataFrame(emb_df_scaled, columns=emb_df.columns)
         emb_test_df_scaled = scaler.transform(emb_test_df)
+        emb_test_df_scaled = pd.DataFrame(emb_test_df_scaled, columns=emb_test_df.columns)
 
         # 4. Compute kmer features
         # Get kmer keys only on training dataset
