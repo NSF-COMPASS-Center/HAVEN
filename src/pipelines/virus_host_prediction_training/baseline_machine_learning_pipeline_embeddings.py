@@ -6,6 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 from utils import utils, dataset_utils, kmer_utils, visualization_utils
 from models.baseline.std_ml import svm, random_forest, logistic_regression, xgboost
+from sklearn.preprocessing import StandardScaler
 
 
 def execute(config):
@@ -75,6 +76,11 @@ def execute(config):
         y_train = train_df[label_col]
         y_test = test_df[label_col]
 
+        # Standardize the data
+        scaler = StandardScaler()
+        emb_df_scaled = scaler.fit_transform(emb_df)
+        emb_test_df_scaled = scaler.transform(emb_test_df)
+
         # 4. Compute kmer features
         # Get kmer keys only on training dataset
         # kmer_keys = kmer_utils.get_kmer_keys(train_df, k=k, sequence_col=sequence_col, kmer_prevalence_threshold=kmer_settings["kmer_prevalence_threshold"])
@@ -103,16 +109,16 @@ def execute(config):
 
             if "lr" in model_name:
                 print("Executing Logistic Regression")
-                y_pred, feature_importance_df, validation_scores_df, classifier = logistic_regression.run(emb_df, emb_test_df, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = logistic_regression.run(emb_df_scaled, emb_test_df_scaled, y_train, model)
             elif "rf" in model_name:
                 print("Executing Random Forest")
-                y_pred, feature_importance_df, validation_scores_df, classifier = random_forest.run(emb_df, emb_test_df, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = random_forest.run(emb_df_scaled, emb_test_df_scaled, y_train, model)
             elif "svm" in model_name:
                 print("Executing Support Vector Machine")
-                y_pred, feature_importance_df, validation_scores_df, classifier = svm.run(emb_df, emb_test_df, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = svm.run(emb_df_scaled, emb_test_df_scaled, y_train, model)
             elif "xgb" in model_name:
                 print("Executing XGBoost")
-                y_pred, feature_importance_df, validation_scores_df, classifier = xgboost.run(emb_df, emb_test_df, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = xgboost.run(emb_df_scaled, emb_test_df_scaled, y_train, model)
             else:
                 continue
 
