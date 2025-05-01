@@ -9,6 +9,10 @@ from models.baseline.std_ml import svm, random_forest, logistic_regression, xgbo
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
+from src.utils.utils import transform_labels
+from src.models.baseline.std_ml.single_linear_layer import SingleLinearLayer
+
+
 
 def execute(config):
     # input settings
@@ -43,6 +47,8 @@ def execute(config):
     label_col = label_settings["label_col"]
     split_col = "split"
     # k = kmer_settings["k"]
+
+
 
     # wandb_config = {
     #     "n_epochs": training_settings["n_epochs"],
@@ -85,18 +91,28 @@ def execute(config):
         emb_test_df_scaled = pd.DataFrame(emb_test_df_scaled, columns=emb_test_df.columns)
 
         # # PCA
-        pca = PCA()
-        pca.fit(emb_df_scaled)
-        explained_variance = pca.explained_variance_ratio_
-        cumulative_variance = explained_variance.cumsum()
-        threshold = 0.95
-        n_components_95 = (cumulative_variance >= threshold).argmax() + 1
-        print("Number of Components to Explain 95% of Variance: ", n_components_95)
-        pca = PCA(n_components=n_components_95)
-        X_train = pca.fit_transform(emb_df_scaled)
-        X_train = pd.DataFrame(X_train)
-        X_test = pca.transform(emb_test_df_scaled)
-        X_test = pd.DataFrame(X_test)
+        # pca = PCA()
+        # pca.fit(emb_df_scaled)
+        # explained_variance = pca.explained_variance_ratio_
+        # cumulative_variance = explained_variance.cumsum()
+        # threshold = 0.95
+        # n_components_95 = (cumulative_variance >= threshold).argmax() + 1
+        # print("Number of Components to Explain 95% of Variance: ", n_components_95)
+        # pca = PCA(n_components=n_components_95)
+        # X_train = pca.fit_transform(emb_df_scaled)
+        # X_train = pd.DataFrame(X_train)
+        # X_test = pca.transform(emb_test_df_scaled)
+        # X_test = pd.DataFrame(X_test)
+
+
+        input_dim = emb_df_scaled.shape[1]
+        output_dim = 64
+
+        transform_model = OneLinearLayer(input_dim, output_dim)
+        X_train_tensor = torch.tensor(emb_df_scaled, dtype=torch.float32)
+        X_test_tensor = torch.tensor(emb_test_df_scaled, dtype=torch.float32)
+        X_train = transform_model(X_train_tensor).detach().numpy()
+        X_test = transform_model(X_test_tensor).detach().numpy()
 
         # 5. Perform classification
         for model in models:
