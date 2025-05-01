@@ -8,6 +8,7 @@ from utils import utils, dataset_utils, kmer_utils, visualization_utils
 from models.baseline.std_ml import svm, random_forest, logistic_regression, xgboost
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+import torch
 
 # from src.utils.utils import transform_labels
 from models.baseline.std_ml.single_linear_layer import SingleLinearLayer
