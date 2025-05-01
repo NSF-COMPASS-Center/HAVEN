@@ -85,19 +85,11 @@ def execute(config):
         emb_test_df_scaled = pd.DataFrame(emb_test_df_scaled, columns=emb_test_df.columns)
 
         # # PCA
-        # pca = PCA(n_components=64)
-        # X_train = pca.fit_transform(emb_df_scaled)
-        # X_train = pd.DataFrame(X_train, columns=emb_df.columns)
-        # X_test = pca.transform(emb_test_df_scaled)
-        # X_test = pd.DataFrame(X_test, columns=emb_test_df.columns)
-
-        # 4. Compute kmer features
-        # Get kmer keys only on training dataset
-        # kmer_keys = kmer_utils.get_kmer_keys(train_df, k=k, sequence_col=sequence_col, kmer_prevalence_threshold=kmer_settings["kmer_prevalence_threshold"])
-        # train_kmer_df = kmer_utils.compute_kmer_features(train_df, k, id_col, sequence_col, label_col, kmer_keys=kmer_keys)
-        # test_kmer_df = kmer_utils.compute_kmer_features(test_df, k, id_col, sequence_col, label_col, kmer_keys=kmer_keys)
-        #
-        # X_train, X_test, y_train, y_test = get_standardized_datasets(train_kmer_df, test_kmer_df, label_col=label_col)
+        pca = PCA(n_components=64)
+        X_train = pca.fit_transform(emb_df_scaled)
+        X_train = pd.DataFrame(X_train)
+        X_test = pca.transform(emb_test_df_scaled)
+        X_test = pd.DataFrame(X_test)
 
         # 5. Perform classification
         for model in models:
@@ -119,16 +111,16 @@ def execute(config):
 
             if "lr" in model_name:
                 print("Executing Logistic Regression")
-                y_pred, feature_importance_df, validation_scores_df, classifier = logistic_regression.run(emb_df_scaled, emb_test_df_scaled, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = logistic_regression.run(X_train, X_test, y_train, model)
             elif "rf" in model_name:
                 print("Executing Random Forest")
-                y_pred, feature_importance_df, validation_scores_df, classifier = random_forest.run(emb_df_scaled, emb_test_df_scaled, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = random_forest.run(X_train, X_test, y_train, model)
             elif "svm" in model_name:
                 print("Executing Support Vector Machine")
-                y_pred, feature_importance_df, validation_scores_df, classifier = svm.run(emb_df_scaled, emb_test_df_scaled, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = svm.run(X_train, X_test, y_train, model)
             elif "xgb" in model_name:
                 print("Executing XGBoost")
-                y_pred, feature_importance_df, validation_scores_df, classifier = xgboost.run(emb_df_scaled, emb_test_df_scaled, y_train, model)
+                y_pred, feature_importance_df, validation_scores_df, classifier = xgboost.run(X_train, X_test, y_train, model)
             else:
                 continue
 
