@@ -39,7 +39,7 @@ def run(X_train, X_test, y_train, rf_settings):
     # classifier.feature_importances_ : ndarray of shape (n_features, 1)
     # convert to pandas dataframe of shape (1, n_features)
     # feature_names = classifier.feature_names_in_
-    n_features = len(feature_names)
+    # n_features = len(feature_names)
     # feature_importances = pd.DataFrame(classifier.feature_importances_.reshape(1, n_features), columns=classifier.feature_names_in_)
     validation_scores = utils.get_validation_scores(cv_model.cv_results_)
 
