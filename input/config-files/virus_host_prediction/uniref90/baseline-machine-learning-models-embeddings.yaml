@@ -52,7 +52,7 @@ classification_settings:
       active: True
       C: [0.01, 0.1, 1, 10, 100]
       multiclass_type: "multinomial"
-      max_iter: 4000
+      max_iter: 5000
 
     - name: "rf"
       active: False
