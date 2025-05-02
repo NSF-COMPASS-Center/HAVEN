@@ -50,9 +50,9 @@ classification_settings:
   models:
     - name: "lr"
       active: True
-      C: [0.01, 0.1, 1]
+      C: [0.01, 0.1, 1, 10, 100]
       multiclass_type: "multinomial"
-      max_iter: 2000
+      max_iter: 3000
 
     - name: "rf"
       active: False
@@ -62,7 +62,7 @@ classification_settings:
 
     - name: "svm"
       active: False
-      C: [ 0.01, 0.1, 1, 10]
+      C: [ 0.01, 0.1, 1, 10, 100]
       kernel: "rbf"
 
     - name: "xgb"

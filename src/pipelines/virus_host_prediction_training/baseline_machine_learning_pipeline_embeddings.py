@@ -107,7 +107,7 @@ def execute(config):
 
 
         input_dim = emb_df_scaled.shape[1]
-        output_dim = 64
+        output_dim = 256
 
         transform_model = SingleLinearLayer(input_dim, output_dim)
         X_train_tensor = torch.tensor(emb_df_scaled.values, dtype=torch.float32)
@@ -173,7 +173,7 @@ def execute(config):
             utils.write_output_model(classifier, output_results_dir, f"{output_filename_prefix}_itr{iter}", model_name)
 
             # test scores
-            new_score = pd.Series([classifier.score(emb_test_df, y_test)])
+            new_score = pd.Series([classifier.score(X_test, y_test)])
             new_test_score_row = {
                 "test_score": new_score.iloc[0],
                 "itr": iter
