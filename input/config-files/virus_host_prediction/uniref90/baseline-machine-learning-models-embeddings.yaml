@@ -61,7 +61,7 @@ classification_settings:
       max_features: ['log2' ,'sqrt']
 
     - name: "svm"
-      active: False
+      active: True
       C: [ 0.01, 0.1, 1, 10, 100]
       kernel: "rbf"
 
