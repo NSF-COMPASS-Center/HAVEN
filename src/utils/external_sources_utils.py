@@ -135,6 +135,7 @@ def get_taxonomy_class_from_id(tax_ids):
     df.rename(columns={NCBI_Lineage: "class"}, inplace=True)
     return df
 
+
 # Get taxonomy names and ranks from ncbi using pytaxonkit for given list of tax_names
 # Input: list of names
 # Output: Dataframe with columns: ["TaxID", "Name", "Rank"]
@@ -197,7 +198,6 @@ def get_taxonomy_genus_data(tax_ids):
     return genus_tax_name_map
 
 
-
 # Get taxids belonging to the class of mammals and aves
 # Input: list of tax_ids
 # Output: list of tax_ids belonging to mammals and aves class
@@ -226,21 +226,37 @@ def query_embl(embl_ref_ids, temp_dir):
     with open(temp_output_file_path, "w") as f:
         f.write(response.text)
     embl_host_mapping = {}
-    for record in SeqIO.parse(temp_output_file_path, "embl"):
-        # find the source feature which contains the host information
-        source_feature = None
-        for feature in record.features:
-            if feature.type == "source":
-                source_feature = feature
-                break
+    index = 0
+    try:
+        # for record in wrapper(SeqIO.parse(temp_output_file_path, "embl")):
+        for record in SeqIO.parse(temp_output_file_path, "embl"):
+            index += 1
 
-        host = None
-        try:
-            if source_feature and source_feature.qualifiers["host"]:
-                host = source_feature.qualifiers["host"]
-        except KeyError:
-            pass
-        embl_host_mapping[record.id] = host
+            # find the source feature which contains the host information
+            source_feature = None
+            for feature in record.features:
+                if feature.type == "source":
+                    source_feature = feature
+                    break
+
+            host = None
+            try:
+                if source_feature and source_feature.qualifiers["host"]:
+                    host = source_feature.qualifiers["host"]
+            except KeyError:
+                pass
+            embl_host_mapping[record.id] = host
+    except ValueError as ve:
+        # catch parsing errors due to invalid values in response from EMBL.
+        # exclude the file
+        print(ve)
+        print(f"Removing Sequence with invalid response: Index={index}, Value = {embl_ref_ids[index]}")
+        os.remove(temp_output_file_path)
+        # hack to catch error stemming from the iterator itself.
+        # drop the sequence having invalid response.
+        # Recursion: return the host mapping you have so far and query for all remaining sequences.
+        return embl_host_mapping | query_embl(embl_ref_ids[index + 1:], temp_dir)  # | is used to adding two dictionaries
+
     # delete the temporary file
     os.remove(temp_output_file_path)
     return embl_host_mapping
