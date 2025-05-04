@@ -21,9 +21,9 @@ evaluation_settings:
   # metrics
   auroc: True
   auprc: True
-  f1: True
+  f1: False
   accuracy: False
-  prediction_distribution: True
+  prediction_distribution: False
 
 label_mappings:
   "Homo sapiens": "Human"
