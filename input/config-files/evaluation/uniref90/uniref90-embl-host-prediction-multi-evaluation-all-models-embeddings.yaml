@@ -37,5 +37,5 @@ output_settings:
   output_dir: "output"
   evaluation_dir: "evaluation"
   visualization_dir: "visualization"
-  dataset_dir: "uniref90/baseline-project/lr"
+  dataset_dir: "uniref90/baseline-project/svm"
   prefix: "host_multi_all_models"# default: none; default file name = <input_file_name>_<output_prefix>_output.csv
