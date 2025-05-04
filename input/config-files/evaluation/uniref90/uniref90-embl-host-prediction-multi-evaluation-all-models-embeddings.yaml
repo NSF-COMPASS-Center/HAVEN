@@ -23,7 +23,7 @@ evaluation_settings:
   auprc: True
   f1: True
   accuracy: True
-  prediction_distribution: True
+  prediction_distribution: False
 
 label_mappings:
   "Homo sapiens": "Human"
