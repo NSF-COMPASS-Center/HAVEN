@@ -9,11 +9,11 @@ input_settings:
 
   file_names:
 #    "LR-Original": "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/original-output-blessy/kmer_k3_virus_host_name_multi__lr_output.csv"
-    "LR-Embeddings": "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/202504/host_multi/token_virus_host_name_multi__lr_output.csv"
+#    "LR-Embeddings": "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/202504/host_multi/token_virus_host_name_multi__lr_output.csv"
 #    "RF-Original": "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/original-output-blessy/kmer_k3_virus_host_name_multi__rf_output.csv"
 #    "RF-Embeddings": "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/202504/host_multi/token_virus_host_name_multi__rf_output.csv"
 #    "SVM-Original": "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/original-output-blessy/kmer_k3_virus_host_name_multi__svm_output.csv"
-#    "SVM-Embeddings": "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/202504/host_multi/token_virus_host_name_multi__svm_output.csv"
+    "SVM-Embeddings": "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/202504/host_multi/token_virus_host_name_multi__svm_output.csv"
 #    "XGBoost": "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/202504/host_multi/token_virus_host_name_multi__xgb_output.csv"
     "VirProBERT": "baseline-project/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/original-output-blessy/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256s64allemb_vs30cls_batchnorm_hybrid_attention_msl256s64ae_fnn_2l_d1024_lr1e-4_output.csv"
 evaluation_settings:
