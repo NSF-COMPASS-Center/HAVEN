@@ -22,7 +22,7 @@ evaluation_settings:
   auroc: True
   auprc: True
   f1: True
-  accuracy: True
+  accuracy: False
   prediction_distribution: True
 
 label_mappings:
