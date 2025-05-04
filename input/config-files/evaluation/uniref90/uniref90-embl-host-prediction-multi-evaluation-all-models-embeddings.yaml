@@ -19,7 +19,7 @@ input_settings:
 evaluation_settings:
   type: "multi"
   # metrics
-  auroc: True
+  auroc: False
   auprc: True
   f1: False
   accuracy: False
