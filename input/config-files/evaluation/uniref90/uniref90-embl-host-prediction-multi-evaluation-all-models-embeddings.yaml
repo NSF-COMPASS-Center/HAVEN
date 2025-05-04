@@ -19,11 +19,11 @@ input_settings:
 evaluation_settings:
   type: "multi"
   # metrics
-  auroc: False
+  auroc: True
   auprc: True
-  f1: False
-  accuracy: False
-  prediction_distribution: False
+  f1: True
+  accuracy: True
+  prediction_distribution: True
 
 label_mappings:
   "Homo sapiens": "Human"
