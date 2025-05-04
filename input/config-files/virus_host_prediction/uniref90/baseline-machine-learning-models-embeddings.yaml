@@ -49,10 +49,10 @@ classification_settings:
       "Red junglefowl": [ "Gallus gallus" ]
   models:
     - name: "lr"
-      active: False
-      C: [0.01, 0.1, 1, 10, 100]
+      active: True
+      C: [0.01, 0.1, 1,10]
       multiclass_type: "multinomial"
-      max_iter: 10000
+      max_iter: 7500
 
     - name: "rf"
       active: False
@@ -66,7 +66,7 @@ classification_settings:
       kernel: "rbf"
 
     - name: "xgb"
-      active: True
+      active: False
 #      booster: ['gbtree', 'dart']
       eta: [0.1, 0.3] # could try 0.01
       max_depth: [3,5,8]
