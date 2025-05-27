@@ -55,7 +55,7 @@ classification_settings:
       name: "ESM2"
       active: True
       mode: "test" # supported values: train, test
-      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241117/host_multi/virprobert/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr4.pth"
+      model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20241117/host_multi/haven/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr3e-4_itr4.pth"
       fine_tuned_model_name: "esm2_t12_35M_UR50D" # "esm2_t36_3B_UR50D" # "esm2_t48_15B_UR50D" # "esm2_t33_650M_UR50D"
       repr_layer: 12 # 36 # 48 # 33
       input_dim: 480 # 2560 # 5120 # 1280 # input embedding dimension

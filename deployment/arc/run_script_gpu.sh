@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -J virprobert
+#SBATCH -J haven
 #SBATCH --account=seqevol
 #SBATCH --partition=a100_normal_q
 

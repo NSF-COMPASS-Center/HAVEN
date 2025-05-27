@@ -7,9 +7,9 @@ import torch.nn.functional as F
 from models.protein_sequence_classification import ProteinSequenceClassification
 
 
-class VirProBERT(ProteinSequenceClassification):
+class HAVEN(ProteinSequenceClassification):
     def __init__(self, pre_trained_model, segment_len, cls_token, h=8, input_dim=512, hidden_dim=2048, stride=1, n_mlp_layers=2, n_classes=1):
-        super(VirProBERT, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=True)
+        super(HAVEN, self).__init__(input_dim, hidden_dim, n_mlp_layers, n_classes, batch_norm=True)
         self.pre_trained_model = pre_trained_model
         self.input_dim = input_dim
         self.self_attn = MultiHeadAttention(h, input_dim)
@@ -72,17 +72,17 @@ class VirProBERT(ProteinSequenceClassification):
     # def forward() : use the template implementation in ProteinSequenceClassification
 
     def get_model(model_params) -> ProteinSequenceClassification:
-        model = VirProBERT(pre_trained_model=model_params["pre_trained_model"],
-                           segment_len=model_params["segment_len"],
-                           cls_token=model_params["cls_token"],
-                           h=model_params["n_heads"],
-                           input_dim=model_params["input_dim"],
-                           hidden_dim=model_params["hidden_dim"],
-                           n_mlp_layers=model_params["n_mlp_layers"],
-                           stride=model_params["stride"],
-                           n_classes=model_params["n_classes"])
+        model = HAVEN(pre_trained_model=model_params["pre_trained_model"],
+                      segment_len=model_params["segment_len"],
+                      cls_token=model_params["cls_token"],
+                      h=model_params["n_heads"],
+                      input_dim=model_params["input_dim"],
+                      hidden_dim=model_params["hidden_dim"],
+                      n_mlp_layers=model_params["n_mlp_layers"],
+                      stride=model_params["stride"],
+                      n_classes=model_params["n_classes"])
         print(model)
-        print("VirProBERT: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
+        print("HAVEN: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
 
         return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])
 

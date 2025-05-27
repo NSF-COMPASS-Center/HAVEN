@@ -20,7 +20,7 @@ class PaddingUnlabeled:
         self.pad_value = constants.PAD_TOKEN_VAL
         if cls_token:
             # self.max_seq_length + 1: adding 1 to account for CLS token which has been added in the ProteinSequenceUnlabeledDataset itself
-            # this is not needed in Padding because the CLS token is not added in ProteinSequenceDataset, but in VirProBERT.forward() method
+            # this is not needed in Padding because the CLS token is not added in ProteinSequenceDataset, but in HAVEN.forward() method
             self.max_seq_length = max_seq_length + 1
         else:
             self.max_seq_length = max_seq_length
