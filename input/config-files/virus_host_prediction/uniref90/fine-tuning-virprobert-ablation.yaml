@@ -91,7 +91,7 @@ fine_tune_settings:
       data_parallel: False
 
     - id: "hybd_attention_msl256s64ae_no_pretrain_fnn_2l_d1024_lr1e-4_itr4"
-      name: "VirProBERT"
+      name: "HAVEN"
       active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: # "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20241127/host_multi/ablation_study/tfenc_l6_h8_lr1e-4_vs30_no_pretrain_hybd_attention_msl256s64ae_no_pretrain_fnn_2l_d1024_lr1e-4_itr3.pth"
@@ -122,7 +122,7 @@ fine_tune_settings:
       data_parallel: False
 
     - id: "hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-4"
-      name: "VirProBERT"
+      name: "HAVEN"
       active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""

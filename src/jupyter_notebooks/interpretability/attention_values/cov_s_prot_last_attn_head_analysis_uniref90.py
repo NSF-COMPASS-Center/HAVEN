@@ -24,7 +24,7 @@ import math
 import numpy as np
 
 from src.models.baseline.nlp.transformer.transformer import TransformerEncoder
-from src.models.virprobert import VirProBERT
+from src.models.haven import VirProBERT
 from src.utils import constants, nn_utils, utils
 from src.datasets.protein_sequence_with_id_dataset import ProteinSequenceDatasetWithID
 from src.datasets.collations.padding_with_id import PaddingWithID
@@ -55,7 +55,7 @@ pre_train_encoder_settings = {
 pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train_encoder_settings, pre_train_encoder_settings["cls_token"])
 
 # +
-# VirProBERT model
+# HAVEN model
 virprobert_settings = {
     "n_mlp_layers": 2,
     "n_classes": 8,

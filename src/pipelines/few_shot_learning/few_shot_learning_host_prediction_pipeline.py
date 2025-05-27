@@ -110,8 +110,8 @@ def execute(config):
                 mlm_encoder_model = TransformerEncoder.get_transformer_encoder(mlm_encoder_settings, model_settings["cls_token"])
 
                 # NOTE: this pre_trained_model is the MLM pre-trained model_params
-                # this is different from the what we call "pre_trained" in the context of few-shot-learning,
-                # i.e., model_params pre-trained using few-dhot learning for the rare-class classification task.
+                # this is different from what we call "pre_trained" in the context of few-shot-learning,
+                # i.e., model_params pre-trained using few-shot learning for the rare-class classification task.
                 model_settings["pre_trained_model"] = mlm_encoder_model
 
             if model_name in mapper.model_map:
@@ -128,7 +128,7 @@ def execute(config):
 
 
             # Initialize Weights & Biases for each run
-            wandb.init(project="zoonosis-host-prediction",
+            wandb.init(project="haven",
                        config=wandb_config,
                        group=few_shot_learn_settings["experiment"],
                        job_type=model_name,

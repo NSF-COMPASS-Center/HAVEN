@@ -5,12 +5,12 @@ import torch
 from models.protein_sequence_classification import ProteinSequenceClassification
 
 
-class VirProBERT_wo_HierAttn(ProteinSequenceClassification):
+class HAVEN_wo_HierAttn(ProteinSequenceClassification):
     def __init__(self, pre_trained_model, segment_len, cls_token, input_dim, hidden_dim, stride=1, n_mlp_layers=2, n_classes=1):
-        super(VirProBERT_wo_HierAttn, self).__init__(input_dim, hidden_dim,
-                                                     n_mlp_layers=n_mlp_layers,
-                                                     n_classes=n_classes,
-                                                     batch_norm=False)
+        super(HAVEN_wo_HierAttn, self).__init__(input_dim, hidden_dim,
+                                                n_mlp_layers=n_mlp_layers,
+                                                n_classes=n_classes,
+                                                batch_norm=False)
         self.pre_trained_model = pre_trained_model
         self.segment_len = segment_len
         self.cls_token = cls_token
@@ -25,7 +25,7 @@ class VirProBERT_wo_HierAttn(ProteinSequenceClassification):
         # let # segment = n_s (depending on segment_len and stride)
         X = X.unfold(dimension=1, size=self.segment_len, step=self.stride)  # b x n_s x segment_len
 
-        # reshape the tensor to individual sequences of segment_len diregarding the sequence dimension (i.e. batch)
+        # reshape the tensor to individual sequences of segment_len disregarding the sequence dimension (i.e. batch)
         # since we only need to generate embeddings for each segment where the sequence identity does not matter
         # contiguous ensures contiguous memory allocation for every value in the tensor
         # this will enable reshaping using view which only changes the shape(view) of the tensor without creating a copy
@@ -55,7 +55,7 @@ class VirProBERT_wo_HierAttn(ProteinSequenceClassification):
             X = X[:, :, 0, :]
         else:
             # OPTION 2: representative vector for each segment = mean of the embeddings of tokens in every segment
-            # mean along segment_len dimension, i.e dim=2
+            # mean along segment_len dimension, i.e., dim=2
             X = X.mean(dim=2)  # b x n_s x input_dim
 
         # pool the embeddings of all segments in the input sequence using mean to generate a vector embedding for each sequence
@@ -66,15 +66,15 @@ class VirProBERT_wo_HierAttn(ProteinSequenceClassification):
     # def forward() : use the template implementation in ProteinSequenceClassification
 
     def get_model(model_params) -> ProteinSequenceClassification:
-        model = VirProBERT_wo_HierAttn(pre_trained_model=model_params["pre_trained_model"],
-                                       input_dim=model_params["input_dim"],
-                                       cls_token=model_params["cls_token"],
-                                       stride=model_params["stride"],
-                                       segment_len=model_params["segment_len"],
-                                       hidden_dim=model_params["hidden_dim"],
-                                       n_mlp_layers=model_params["n_mlp_layers"],
-                                       n_classes=model_params["n_classes"])
+        model = HAVEN_wo_HierAttn(pre_trained_model=model_params["pre_trained_model"],
+                                  input_dim=model_params["input_dim"],
+                                  cls_token=model_params["cls_token"],
+                                  stride=model_params["stride"],
+                                  segment_len=model_params["segment_len"],
+                                  hidden_dim=model_params["hidden_dim"],
+                                  n_mlp_layers=model_params["n_mlp_layers"],
+                                  n_classes=model_params["n_classes"])
         print(model)
-        print("VirProBERT_wo_HierAttn: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
+        print("HAVEN_wo_HierAttn: Number of parameters = ", sum(p.numel() for p in model.parameters() if p.requires_grad))
 
         return ProteinSequenceClassification.return_model(model, model_params["data_parallel"])

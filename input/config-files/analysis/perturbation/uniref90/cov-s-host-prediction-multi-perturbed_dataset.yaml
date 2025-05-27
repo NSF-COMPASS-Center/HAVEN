@@ -54,7 +54,7 @@ classification_settings:
         max_seq_len: 1366
 
     - id: "hybrid_attention_msl256ae_bn_vs30cls_s64_fnn_2l_d1024_lr1e-5"
-      name: "VirProBERT"
+      name: "HAVEN"
       active: True
       mode: "test"
       model_path: "output/raw/coronaviridae_s_prot_uniref90_embl_vertebrates_t0.01_c8/20240909/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_vs30_hybrid_attention_msl256s64ae_bn_cls_fnn_2l_d1024_lr1e-5_itr4.pth"

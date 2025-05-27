@@ -80,7 +80,7 @@ pre_trained_models:
 #      hidden_dim: 1024
 
   - id: "hybrid-attention_sl256st64vs30_ae_bn_fnn_2l_d1024_lr1e-4"
-    name: VirProBERT
+    name: HAVEN
     active: True
     mode: "train"
     path: "output/raw/uniref90_embl_vertebrates_non_idv_t0.01_c5_seq_len_in_99.9percentile/20240826/host_multi/fine_tuning_hybrid_cls/mlm_tfenc_l6_h8_lr1e-4_uniref90viridae_msl256s64allemb_vs30cls_batchnorm_hybrid_attention_msl256s64ae_fnn_2l_d1024_lr1e-4_itr4.pth"

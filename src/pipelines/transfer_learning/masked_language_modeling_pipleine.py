@@ -193,7 +193,7 @@ def evaluate_model(model, dataset_loader, criterion, encoder_model_name, epoch, 
             output, label = model(input)
             # transpose from b x max_seq_len x n_tokens -> b x n_tokens x max_seq_len
             # because CrossEntropyLoss expected input to be of the shape b x n_classes x number_dimensions_for_loss
-            # in this case, number_dimensions_for_loss = max_seq_len as every sequences in the batch will have a loss corresponding to each token position
+            # in this case, number_dimensions_for_loss = max_seq_len as every sequence in the batch will have a loss corresponding to each token position
             output = output.transpose(1, 2).to(nn_utils.get_device())
             loss = criterion(output, label.long())
 

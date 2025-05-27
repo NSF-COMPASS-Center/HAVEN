@@ -1,6 +1,6 @@
-# VirProBERT: Language Model for Virus Host Prediction
+# HAVEN: Hierarchical Attention for Viral protEin-based host iNference
 
-![VirProBERT](figures/virus_host_prediction.png)
+![HAVEN](figures/virus_host_prediction.png)
 
 ## Repository Organization
 - **deployment**
@@ -22,11 +22,11 @@
 ---
 ## Code and dependencies
 - Clone the GitHub repository at the desired location.
-- Setup conda environment 
+- Setup conda environment and install dependencies.
     ```shell
     bash
-    conda create -n virprobert python=3.11.8
-    conda activate virprobert
+    conda create -n haven python=3.11.8
+    conda activate haven
     pip install -r requirements.txt
     ```
 - [Install pytorch](https://pytorch.org/get-started/locally/) based on the GPU/CPU configuration.
@@ -34,14 +34,14 @@
 ### Create required folders
 - Create input and output folders
 ```shell
-cd zoonosis
-mkdir -p zoonosis/input/data
-mkdir zoonosis/output
+cd HAVEN
+mkdir -p HAVEN/input/data
+mkdir HAVEN/output
 ```
 
 ### Setup Weights & Biases
 1. Create an account in [Weights & Biases](https://wandb.ai/site/).
-2. Create a new project in Weights and Biases named `zoonosis-host-prediction`.
+2. Create a new project in Weights and Biases named `haven`.
 3. Setup the `wandb` library by completing [Step 1 in the Quickstart](https://wandb.ai/quickstart?utm_source=app-resource-center&utm_medium=app&utm_term=quickstart).
     - Note: Do not forget to log in to Weights and Biases (`wandb login`) in the server where you intend to execute the experiment.
 ---
@@ -51,7 +51,7 @@ python src/run.py -c <path-to-config-file>
 ```
 Example
 ```shell
-python src/run.py -c input/config-files/virus_host_prediction/uniref90/fine-tuning-virprobert.yaml
+python src/run.py -c input/config-files/virus_host_prediction/uniref90/fine-tuning-HAVEN.yaml
 ```
 ---
 ## Pipelines
@@ -59,19 +59,19 @@ The pipelines implemented and their corresponding configuration types (`config_t
 
 | Pipeline                                                         | Config Type                                     | Supported Models/ Examples                          | Example config                                                                                                                                                                                         |
 |:-----------------------------------------------------------------|:------------------------------------------------|:----------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Masked Language Modeling                                         | masked_language_modeling                        | VirProBERT Segment Encoder                          | [uniref90-mlm-msl256.yaml](input/config-files/transfer_learning/masked_language_modeling/uniref90-mlm-msl256.yaml)                                                                                     |
-| Virus Host Prediction - train & test - VirProBERT                | virus_host_prediction                           | VirProBERT, VirProBERT ablations                    | [uniref90-fine-tuning-host-prediction-multi.yaml](input/config-files/virus_host_prediction/uniref90/fine-tuning-virprobert.yaml)                                                                       |
+| Masked Language Modeling                                         | masked_language_modeling                        | HAVEN Segment Encoder                               | [uniref90-mlm-msl256.yaml](input/config-files/transfer_learning/masked_language_modeling/uniref90-mlm-msl256.yaml)                                                                                     |
+| Virus Host Prediction - train & test - HAVEN                     | virus_host_prediction                           | HAVEN, HAVEN ablations                              | [uniref90-fine-tuning-host-prediction-multi.yaml](input/config-files/virus_host_prediction/uniref90/fine-tuning-virprobert.yaml)                                                                       |
 | Virus Host Prediction - train & test - external pLMs             | virus_host_prediction_external                  | ProtT5, ProstT5, ESM2, ESM3                         | [uniref90-fine-tuning-host-prediction-external-multi.yaml](input/config-files/virus_host_prediction/uniref90/fine-tuning-external-multi.yaml)                                                          |
 | Virus Host Prediction - train & test - baseline models           | virus_host_prediction_baseline_deep_learning    | FNN, CNN, RNN, LSTM, Transformer-Encoder            | [host-prediction-all-models.yaml](input/config-files/virus_host_prediction/uniref90/baseline-deep-learning-models.yaml)                                                                                |
 | Virus Host Prediction - train & test - kmer feature-based models | virus_host_prediction_baseline_machine_learning | LR, RF, SVM                                         | [engg-features-kmer-baseline.yaml](input/config-files/virus_host_prediction/uniref90/baseline-machine-learning-models-kmer.yaml)                                                                       |
-| Virus Host Prediction - test only - VirProBERT                   | virus_host_prediction_test                      | VirProBERT for SARS-CoV-2 variants                  | [cov-s-host-prediction-multi-uniref90-sarscov2-variants.yaml](input/config-files/interpretability/sarscov2_variants/cov-s-host-prediction-multi-uniref90-sarscov2-variants.yaml)                       |
+| Virus Host Prediction - test only - HAVEN                        | virus_host_prediction_test                      | HAVEN for SARS-CoV-2 variants                       | [cov-s-host-prediction-multi-uniref90-sarscov2-variants.yaml](input/config-files/interpretability/sarscov2_variants/cov-s-host-prediction-multi-uniref90-sarscov2-variants.yaml)                       |
 | Virus Host Prediction - test only - external pLMs                | virus_host_prediction_test_external             | ProtT5, ProstT5, ESM2, ESM3 for SARS-CoV-2 variants | [cov-s-host-prediction-multi-uniref90-sarscov2-variants-external.yaml](input/config-files/interpretability/sarscov2_variants/cov-s-host-prediction-multi-uniref90-sarscov2-variants-external.yaml)     |
 | Evaluation of outputs                                            | evaluation                                      | AUPRC, AUROC, Precision, Recall, Accuracy, F1       | [uniref90-embl-host-prediction-multi-evaluation-all-models.yaml](input/config-files/evaluation/uniref90/uniref90-embl-host-prediction-multi-evaluation-all-models.yaml)                                |
-| Few Shot Learning - unseen and rare hosts                        | few_shot_learning                               | VirProBERT                                          | [uniref90-fine-tuning-host-prediction-non-idv-multi-few-shot-learning.yaml](input/config-files/few_shot_learning/novel_host/uniref90-fine-tuning-host-prediction-non-idv-multi-few-shot-learning.yaml) |
-| Few Shot Learning - unseen viruses                               | few_shot_learning                               | VirProBERT                                          | [uniref90-fine-tuning-host-prediction-idv-multi-few-shot-learning.yaml](input/config-files/few_shot_learning/novel_virus/uniref90-fine-tuning-host-prediction-idv-multi-few-shot-learning.yaml)        |
-| Perturbation Analysis - VirProBERT                               | perturbation                                    | VirProBERT                                          | [cov-s-host-prediction-multi-perturbed_dataset.yaml](input/config-files/interpretability/perturbation/uniref90/cov-s-host-prediction-multi-perturbed_dataset.yaml)                                     |
+| Few Shot Learning - unseen and rare hosts                        | few_shot_learning                               | HAVEN                                               | [uniref90-fine-tuning-host-prediction-non-idv-multi-few-shot-learning.yaml](input/config-files/few_shot_learning/novel_host/uniref90-fine-tuning-host-prediction-non-idv-multi-few-shot-learning.yaml) |
+| Few Shot Learning - unseen viruses                               | few_shot_learning                               | HAVEN                                               | [uniref90-fine-tuning-host-prediction-idv-multi-few-shot-learning.yaml](input/config-files/few_shot_learning/novel_virus/uniref90-fine-tuning-host-prediction-idv-multi-few-shot-learning.yaml)        |
+| Perturbation Analysis - HAVEN                                    | perturbation                                    | HAVEN                                               | [cov-s-host-prediction-multi-perturbed_dataset.yaml](input/config-files/interpretability/perturbation/uniref90/cov-s-host-prediction-multi-perturbed_dataset.yaml)                                     |
 | Perturbation Analysis - external pLMs                            | perturbation_external                           | ProtT5, ProstT5, ESM2, ESM3                         | [cov-s-host-prediction-multi-perturbed_dataset-external.yaml](input/config-files/interpretability/perturbation/uniref90/cov-s-host-prediction-multi-perturbed_dataset-external.yaml)                   |
-| Embedding generation - VirProBERT                                | embedding_generation                            | VirProBERT                                          | [uniref90-fine-tuning-host-prediction-multi-embedding.yaml](input/config-files/interpretability/embedding/uniref90-fine-tuning-host-prediction-multi-embedding.yaml)                                   |
+| Embedding generation - HAVEN                                     | embedding_generation                            | HAVEN                                               | [uniref90-fine-tuning-host-prediction-multi-embedding.yaml](input/config-files/interpretability/embedding/uniref90-fine-tuning-host-prediction-multi-embedding.yaml)                                   |
 
 ## Scripts
 The supported scripts and their respective python files
@@ -88,7 +88,7 @@ The supported scripts and their respective python files
 ### Common parameters used in all configuration types
 
 ### Masked Language Modeling (`masked_language_modeling`)
-### Fine-tuning VirProBERT for Virus Host Prediction (`virus_host_prediction`)
+### Fine-tuning HAVEN for Virus Host Prediction (`virus_host_prediction`)
 1. Configure a suitable experiment name to be used to reference the execution using the `experiment` parameter in the config.
 2. Set the relative path to the input file(s) within `input_settings` using `input_dir` and `file_names` parameters.
 3. Set the following sequence related parameters in `sequence_settings` with respect to the input data file -
