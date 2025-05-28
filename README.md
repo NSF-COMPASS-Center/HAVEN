@@ -49,7 +49,7 @@ The different pipelines used to pretrain and fine-tune HAVEN and their correspon
 | Pipeline                                             | Config Type                | Example config                                                                                                                                                                                         |
 |:-----------------------------------------------------|:---------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Pretraining HAVEN using Masked Language Modeling     | masked_language_modeling   | [uniref90-mlm-msl256.yaml](input/config-files/transfer_learning/masked_language_modeling/uniref90-mlm-msl256.yaml)                                                                                     |
-| Virus Host Prediction - train & test - HAVEN         | virus_host_prediction      | [uniref90-fine-tuning-host-prediction-multi.yaml](input/config-files/virus_host_prediction/uniref90/fine-tuning-virprobert.yaml)                                                                       |
+| Virus Host Prediction - train & test - HAVEN         | virus_host_prediction      | [uniref90-fine-tuning-host-prediction-multi.yaml](input/config-files/virus_host_prediction/uniref90/fine-tuning-haven.yaml)                                                                            |
 | Virus Host Prediction - test only - HAVEN            | virus_host_prediction_test | [cov-s-host-prediction-multi-uniref90-sarscov2-variants.yaml](input/config-files/interpretability/sarscov2_variants/cov-s-host-prediction-multi-uniref90-sarscov2-variants.yaml)                       |
 | Few Shot Learning  to predict unseen and rare hosts  | few_shot_learning          | [uniref90-fine-tuning-host-prediction-non-idv-multi-few-shot-learning.yaml](input/config-files/few_shot_learning/novel_host/uniref90-fine-tuning-host-prediction-non-idv-multi-few-shot-learning.yaml) |
 | Few Shot Learning to predict hosts of unseen viruses | few_shot_learning          | [uniref90-fine-tuning-host-prediction-idv-multi-few-shot-learning.yaml](input/config-files/few_shot_learning/novel_virus/uniref90-fine-tuning-host-prediction-idv-multi-few-shot-learning.yaml)        |
@@ -57,10 +57,6 @@ The different pipelines used to pretrain and fine-tune HAVEN and their correspon
 
 ---
 ### Config File Parameters
-#### Common parameters used in all configuration types
-
-#### Masked Language Modeling (`masked_language_modeling`)
-#### Fine-tuning HAVEN for Virus Host Prediction (`virus_host_prediction`)
 1. Configure a suitable experiment name to be used to reference the execution using the `experiment` parameter in the config.
 2. Set the relative path to the input file(s) within `input_settings` using `input_dir` and `file_names` parameters.
 3. Set the following sequence related parameters in `sequence_settings` with respect to the input data file -
@@ -77,20 +73,23 @@ The different pipelines used to pretrain and fine-tune HAVEN and their correspon
 8. Configure the output directory and the prefix to be used while naming the output file in `output_settings`
 ---
 ## Data
-All datasets used to pretrain and fine-tune HAVEN are available in Zenodo. **<insert-zenodo-link-here>**
+All datasets used to pretrain and fine-tune HAVEN are available in [Zenodo](https://doi.org/10.5281/zenodo.15540220).
 
 Information on the dataset preprocessing steps and script is available in the [Dataset Preprocessing Pipeline README](dataset_preprocessing_pipeline_README.md).
 
 ---
 ## Models
-Download the pretrained and fine-tuned models of HAVEN from Zenodo. **<insert-zenodo-link-here>**
+Download the pretrained and fine-tuned models of HAVEN from [Zenodo](https://doi.org/10.5281/zenodo.15537800).
 
 ---
 ## License
-HAVEN software and data are available for public use under the GNU GENERAL PUBLIC LICENSE v3. 
+HAVEN software is available for public use under the GNU General Public License v3. 
 
 ---
-## Reference
-If you use HAVEN in your research, please cite the following preprint:
 
-**<insert-bioRxiv-link-here>**
+[//]: # (## Reference)
+
+[//]: # (If you use HAVEN in your research, please cite the following preprint:)
+
+[//]: # ()
+[//]: # (**<insert-bioRxiv-link-here>**)
