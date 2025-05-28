@@ -18,7 +18,7 @@ We used Taxonkit and PyTaxonkit to obtain the NCBI taxonomy information of virus
 > The installation of taxonkit and pytaxonkit _may_ run into issues if you are using Windows OS. Linux and OSX are better suited. 
 
 ## Usage
-The followinf functions are available in [data_preprocessor.py](src/utils/scripts/data_preprocessor.py):
+The following functions are available in [data_preprocessor.py](src/utils/scripts/data_preprocessor.py):
 1. Convert a uniprot or uniref fasta file into a csv file.
 ```shell
 python .\src\utils\scripts\data_preprocessor.py --fasta_to_csv --input_file <absolute-path-to-fasta-file> --output_dir <absolute-path-to-the folder-where-the-output-file-will-be-written> --input_type <uniprot, uniref50, uniref90, or uniref100> --id_col <name-of-the-id-column-for-the-output-file-example: uniprot_id, uniref90_id, uniref50_id> 
