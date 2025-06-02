@@ -48,7 +48,7 @@ model_map = {
     "LSTM": LSTM_VirusHostPrediction,
     "Transformer_Encoder": TransformerEncoderVirusHostPrediction,
     "BERT": BERT_VirusHostPrediction,
-    "HAVEN_wo_Hierarchical_Attention": VirProBERT_wo_HierAttn,
+    "HAVEN_wo_Hierarchical_Attention": HAVEN_wo_HierAttn,
     "HAVEN": HAVEN,
     "ProstT5": ProstT5_VirusHostPrediction,
     "ProtT5": ProtT5_VirusHostPrediction,  # IMP: note the difference between ProstT5 and ProtT5
