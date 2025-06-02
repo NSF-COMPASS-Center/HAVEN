@@ -16,7 +16,7 @@ module load
 # Load conda
 module load Miniconda3
 #Load CUDA
-#module load cuda11.2/toolkit
+module load CUDA/12.6.0
 
 # Load conda environment
 source activate haven
