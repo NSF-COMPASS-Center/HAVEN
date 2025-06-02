@@ -48,7 +48,7 @@ class MaskedLanguageModel(nn.Module):
         random_mask_pos = torch.nonzero(random_token_mask, as_tuple=True)
 
         # random tokens to be used for replacement in each of the selected positions
-        # low is NOT equal to 0 beause 0 is pad token value
+        # low is NOT equal to 0 because 0 is pad token value
         random_mask_tokens = torch.randint(low=1, high=self.n_tokens, size=(len(random_mask_pos[0]), ),
                                            device=nn_utils.get_device(),
                                            dtype=sequence_batch.dtype)

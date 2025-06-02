@@ -41,3 +41,6 @@ output/
 
 # Weights and Biases files
 **/wandb/**
+
+# Archived files
+**/archive/**
