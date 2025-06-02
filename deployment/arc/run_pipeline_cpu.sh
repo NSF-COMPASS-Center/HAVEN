@@ -12,11 +12,11 @@
 # Load modules
 module reset
 module load
-module load Anaconda3
+module load Miniconda3
 
 
 # Load conda environment
-source activate ~/anaconda3/envs/zoonosis
+source activate haven
 echo "Conda information:"
 conda info
 

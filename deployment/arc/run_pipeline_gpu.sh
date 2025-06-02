@@ -16,12 +16,12 @@ module load
 # Load conda
 
 
-module load Anaconda3
+module load Miniconda3
 #Load CUDA
-module load cuda11.2/toolkit
+#module load cuda11.2/toolkit
 
 # Load conda environment
-source activate ~/.conda/envs/zoonosis
+source activate haven
 echo "Conda information:"
 conda info
 
