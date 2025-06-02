@@ -37,9 +37,10 @@ LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
 echo "GPU check"
-~/anaconda3/envs/haven/python -c "import torch; print(f'GPU available: {torch.cuda.is_available()}. Available GPU devices: {torch.cuda.device_count()}')"
+python --version
+python -c "import torch; print(f'GPU available: {torch.cuda.is_available()}. Available GPU devices: {torch.cuda.device_count()}')"
 echo "Pipeline START"
 date
-~/anaconda3/envs/haven/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
+python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
 echo "Pipeline END"
 date
