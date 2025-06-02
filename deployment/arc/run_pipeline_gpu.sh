@@ -21,7 +21,7 @@ module load Miniconda3
 module load CUDA/12.6.0
 
 # Load conda environment
-source activate haven
+source activate ~/.conda/envs/haven
 echo "Conda information:"
 conda info
 
