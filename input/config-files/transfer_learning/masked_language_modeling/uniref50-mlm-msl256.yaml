@@ -9,7 +9,7 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref50_viridae.csv" ]
+  file_names: [ "uniref_taxonomy_id_10239_AND_identit_2025_04_18.csv" ]
   # file_names: [ "uniref50_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
