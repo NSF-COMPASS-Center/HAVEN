@@ -69,8 +69,6 @@ def execute(config):
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # Initialize Weights & Biases for each run
-        wandb_config["hidden_dim"] = encoder_settings["hidden_dim"]
-        wandb_config["n_mlp_layers"] = encoder_settings["n_mlp_layers"]
         wandb.init(project="haven",
                    config=wandb_config,
                    group=training_settings["experiment"],
