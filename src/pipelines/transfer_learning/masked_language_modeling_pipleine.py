@@ -71,7 +71,7 @@ def execute(config):
         # Initialize Weights & Biases for each run
         wandb_config["hidden_dim"] = encoder_settings["hidden_dim"]
         wandb_config["n_mlp_layers"] = encoder_settings["n_mlp_layers"]
-        wandb.init(project="zoonosis-host-prediction",
+        wandb.init(project="haven",
                    config=wandb_config,
                    group=training_settings["experiment"],
                    job_type=encoder_model_name,

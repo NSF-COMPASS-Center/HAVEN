@@ -104,7 +104,7 @@ def execute(config):
             wandb_config["hidden_dim"] = task["hidden_dim"]
             wandb_config["n_mlp_layers"] = task["n_mlp_layers"]
 
-            wandb.init(project="zoonosis-host-prediction",
+            wandb.init(project="haven",
                        config=wandb_config,
                        group=fine_tune_settings["experiment"],
                        job_type=task_id,
