@@ -89,7 +89,7 @@ def execute(config):
         val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, exclude_label=True)
 
         # 3. instantiate the encoder model_params
-        encoder_model = transformer.get_transformer_encoder(encoder_settings)
+        encoder_model = transformer.TransformerEncoder.get_transformer_encoder(encoder_settings)
 
         # 4. instantiate the mlm model_params
         mlm_model = pre_training_masked_language_modeling.get_mlm_model(encoder_model=encoder_model,
