@@ -24,6 +24,11 @@ conda info
 PROJECT_DIR=$1
 LOGS_DIR=$PROJECT_DIR/output/logs
 echo "Project directory: $PROJECT_DIR"
+echo "Python version in $CONDA_PREFIX"
+
+conda activate haven
+echo "Python version in $CONDA_PREFIX"
+$CONDA_PREFIX/bin/python --version
 
 # Execute python script
 SCRIPT_LOCATION=$PROJECT_DIR/src/run.py
@@ -34,7 +39,7 @@ echo "Log File: $LOG_FILE"
 
 echo "Pipeline START"
 date
-python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
+$CONDA_PREFIX/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
 echo "Pipeline END"
 date
 

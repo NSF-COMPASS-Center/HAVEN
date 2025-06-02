@@ -25,6 +25,10 @@ LOGS_DIR=$PROJECT_DIR/output/logs
 export PYTHONPATH="$PROJECT_DIR/src"
 echo "Project directory: $PROJECT_DIR"
 
+conda activate haven
+echo "Python version in $CONDA_PREFIX"
+$CONDA_PREFIX/bin/python --version
+
 # Execute python script
 SCRIPT_LOCATION=$2
 shift # shift all arguments one to the left. So $1 is dropped, $1 is now original $2 and so on and so forth
@@ -35,7 +39,7 @@ LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Log File: $LOG_FILE"
 echo "Script START"
 date
-python $SCRIPT_LOCATION $ARGS > $LOG_FILE 2>&1
+$CONDA_PREFIX/bin/python $SCRIPT_LOCATION $ARGS > $LOG_FILE 2>&1
 echo "Script END"
 date
 

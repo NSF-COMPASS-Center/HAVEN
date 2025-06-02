@@ -7,7 +7,7 @@
 #SBATCH --mem=450G
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
-#SBATCH -t 96:00:00 # wall-time required (# 144hrs = 6 days)
+#SBATCH -t 1:00:00 # wall-time required (# 144hrs = 6 days)
 
 
 # Load modules
@@ -21,7 +21,7 @@ module load Miniconda3
 module load CUDA/12.6.0
 
 # Load conda environment
-source activate ~/.conda/envs/haven
+source activate haven
 echo "Conda information:"
 conda info
 
@@ -36,11 +36,15 @@ CONFIG_FILE=$2
 LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
+
+conda activate haven
+echo "Python version in $CONDA_PREFIX"
+$CONDA_PREFIX/bin/python --version
+
 echo "GPU check"
-python --version
-python -c "import torch; print(f'GPU available: {torch.cuda.is_available()}. Available GPU devices: {torch.cuda.device_count()}')"
+$CONDA_PREFIX/bin/python -c "import torch; print(f'GPU available: {torch.cuda.is_available()}. Available GPU devices: {torch.cuda.device_count()}')"
 echo "Pipeline START"
 date
-python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
+$CONDA_PREFIX/bin/python $SCRIPT_LOCATION -c $CONFIG_FILE > $LOG_FILE 2>&1
 echo "Pipeline END"
 date
