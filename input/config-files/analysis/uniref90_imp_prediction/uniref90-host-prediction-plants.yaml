@@ -21,7 +21,7 @@ classification_settings:
       k: 3
     cgr_settings:
       img_size: 8
-      img_dir: "input/data/coronaviridae/cgr_images"
+      img_dir: "input/data/uniref90_plant/cgr_images"
 
   label_settings:
     label_col: "virus_host_name"
