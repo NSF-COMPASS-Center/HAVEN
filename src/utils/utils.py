@@ -25,14 +25,13 @@ def filter_noise(df, label_settings):
 
 def transform_labels(df, label_settings, classification_type=None, silent=False):
     label_col = label_settings["label_col"]
+
     if "label_groupings" in label_settings.keys():
         label_grouping_config = label_settings["label_groupings"]
         if not silent:
             print(f"Grouping labels using config : {label_grouping_config}")
         df = group_labels(df, label_col, label_grouping_config)
-
-    # labels = df[label_col].unique()
-    labels = list(label_grouping_config.keys())
+        labels = list(label_grouping_config.keys())
 
     if classification_type == "binary":
         positive_label = label_settings["positive_label"]
@@ -44,12 +43,35 @@ def transform_labels(df, label_settings, classification_type=None, silent=False)
     if not silent:
         print(f"label_idx_map={label_idx_map}\nidx_label_map={idx_label_map}")
 
+    if "different_true_labels" in label_settings.keys():
+        # used in experiments where the true labels are not in the set of classes that the model was fine-tuned to predict.
+        # example: using HAVEN fined-tuned on UniRef90 five common hosts to predict hosts of plant sequences.
+        return transform_with_different_true_labels(df, label_col, label_idx_map, idx_label_map, label_settings["different_true_labels"],
+                                silent=False)
+
     try:
-        df[label_col] = df[label_col].transform(lambda x: label_idx_map[x] if x in label_idx_map else 0)
-    except KeyError:
-        pass # bypass keyerrors # hack for novel virus idv prediction
+        df[label_col] = df[label_col].transform(lambda x: label_idx_map[x])  #if x in label_idx_map else 0)
+    except (KeyError,):
+        pass  # bypass keyerrors # hack for novel virus idv prediction
+
     return df, idx_label_map
 
+
+def transform_with_different_true_labels(df, label_col, label_idx_map, idx_label_map, different_true_labels,
+                                         silent=False):
+    true_label_idx_map = label_idx_map
+    true_idx_label_map = idx_label_map
+
+    if different_true_labels:
+        true_labels = list(df[label_col].unique())
+        true_label_idx_map, true_idx_label_map = get_label_vocabulary(true_labels)
+
+    try:
+        df[label_col] = df[label_col].transform(lambda x: true_label_idx_map[x])  # if x in label_idx_map else 0)
+    except (KeyError,):
+        pass  # bypass keyerrors # hack for novel virus idv prediction
+
+    return df, idx_label_map, true_idx_label_map
 
 def group_labels(df, label_col, label_grouping_config):
     group_others = False
@@ -91,8 +113,8 @@ def compute_class_distribution(df, label_col, format=False):
 def get_class_weights(datasetloader):
     labels = datasetloader.dataset.get_labels()
     class_weights = compute_class_weight(class_weight="balanced",
-                                classes=np.unique(labels),
-                                y=labels)
+                                         classes=np.unique(labels),
+                                         y=labels)
     return torch.tensor(class_weights, dtype=torch.float)
 
 
@@ -169,7 +191,7 @@ def get_histogram(values, n_bins=12):
     freq, bins = np.histogram(values, bins=n_bins)
     hist_map = []
     for i in range(n_bins):
-        hist_map.append({"start": bins[i], "end": bins[i+1], "count": freq[i], "percentage": freq[i]/n*100})
+        hist_map.append({"start": bins[i], "end": bins[i + 1], "count": freq[i], "percentage": freq[i] / n * 100})
 
     hist_df = pd.DataFrame(hist_map)
     return hist_df

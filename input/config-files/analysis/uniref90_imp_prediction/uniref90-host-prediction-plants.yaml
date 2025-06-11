@@ -4,14 +4,14 @@ config_type: "virus_host_prediction_test"
   ## initialize base input folder name
   ## provide path to dataset folder
 input_settings:
-  input_dir: "input/data"
-  input_file_name: "uniref90_viridae_embl_hosts_pruned_metadata_species_plants_w_seq.csv"
+  input_dir: "input/data/uniref90_viruses"
+  input_file_name: "uniref90_viridae_embl_hosts_pruned_metadata_species_plants_w_seq_small.csv"
 
 classification_settings:
   type: "multi"
   sequence_settings:
     batch_size: 16
-    id_col: "accession_id"
+    id_col: "uniref90_id"
     sequence_col: "seq"
     metadata_cols: []
     truncate: False
@@ -32,13 +32,14 @@ classification_settings:
       "Capybara": [ "Hydrochoerus hydrochaeris" ]
       "Himalayan marmot": [ "Marmota himalayana" ]
       "Red junglefowl": [ "Gallus gallus" ]
+    different_true_labels: True
 
   models:
     - id: "hybrid_attention_msl256ae_bn_vs30cls_s64_fnn_2l_d1024_lr1e-4"
       name: "HAVEN"
       active: True
       mode: "test"
-      model_path: "output/raw/transformer_encoder-l_6-h_8-lr1e-4_msl256_b512_splitseq_mlm_vs30cls_allemb_itr0.pth"
+      model_path: "output/models/haven_finetuned_uniref90_nonidv_common_hosts.pth"
       segment_len: 256
       stride: 64
       cls_token: True
