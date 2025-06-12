@@ -1,0 +1,63 @@
+config_type: "virus_host_prediction_test"
+
+# Input Settings:
+  ## initialize base input folder name
+  ## provide path to dataset folder
+input_settings:
+  input_dir: "input/data"
+  input_file_name: "uniref90_viridae_embl_hosts_pruned_metadata_species_nonvertebrates_w_seq_kingdom_class_animal.csv"
+
+classification_settings:
+  type: "multi"
+  sequence_settings:
+    batch_size: 16
+    id_col: "uniref90_id"
+    sequence_col: "seq"
+    metadata_cols: []
+    truncate: False
+    split: False
+    feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
+    kmer_settings:
+      k: 3
+    cgr_settings:
+      img_size: 8
+      img_dir: "input/data/uniref90_invertebrate_animals/cgr_images"
+
+  label_settings:
+    label_col: "virus_host_name"
+    exclude_labels: [ "nan"]
+    label_groupings:
+      "Human": [ "Homo sapiens" ]
+      "Pig": [ "Sus scrofa" ]
+      "Capybara": [ "Hydrochoerus hydrochaeris" ]
+      "Himalayan marmot": [ "Marmota himalayana" ]
+      "Red junglefowl": [ "Gallus gallus" ]
+    different_true_labels: True
+
+  models:
+    - id: "hybrid_attention_msl256ae_bn_vs30cls_s64_fnn_2l_d1024_lr1e-4"
+      name: "HAVEN"
+      active: True
+      mode: "test"
+      model_path: "output/models/haven_finetuned_uniref90_nonidv_common_hosts.pth"
+      segment_len: 256
+      stride: 64
+      cls_token: True
+      n_heads: 8
+      n_mlp_layers: 2
+      n_classes: 5
+      input_dim: 512 # input embedding dimension
+      hidden_dim: 1024
+      data_parallel: False
+      pre_train_settings:
+        n_heads: 8
+        depth: 6
+        input_dim: 512 # input embedding dimension
+        hidden_dim: 1024
+        max_seq_len: 256
+
+output_settings:
+  output_dir: "output"
+  results_dir: "raw"
+  sub_dir: "uniref90-common-hosts/invertebrates"
+  prefix: "msl256ae_bn_vs30cls_s64" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv"
