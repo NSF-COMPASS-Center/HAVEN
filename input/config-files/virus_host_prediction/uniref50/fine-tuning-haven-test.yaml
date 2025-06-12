@@ -82,7 +82,7 @@ fine_tune_settings:
       active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
-      cls_token: True
+      cls_token: False
       stride: 64
       loss: "FocalLoss"
       n_mlp_layers: 2
@@ -98,7 +98,7 @@ fine_tune_settings:
       fine_tuned_model_path: ""
       segment_len: 256
       stride: 64
-      cls_token: True
+      cls_token: False
       n_heads: 8
       loss: "FocalLoss"
       n_mlp_layers: 2
