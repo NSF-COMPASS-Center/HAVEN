@@ -4,8 +4,8 @@ config_type: "virus_host_prediction_test"
   ## initialize base input folder name
   ## provide path to dataset folder
 input_settings:
-  input_dir: "input/data/uniref90_viruses"
-  input_file_name: "uniref90_viridae_embl_hosts_pruned_metadata_species_plants_w_seq_small.csv"
+  input_dir: "input/data"
+  input_file_name: "uniref90_viridae_embl_hosts_pruned_metadata_species_plants_w_seq.csv"
 
 classification_settings:
   type: "multi"
