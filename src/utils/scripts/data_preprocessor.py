@@ -1,7 +1,7 @@
 import argparse
 import os
 import sys
-import pytaxonkit
+
 
 sys.path.append(os.path.join(os.getcwd(), "src"))
 from pathlib import Path
