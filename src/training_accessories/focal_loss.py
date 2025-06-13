@@ -4,9 +4,18 @@ import torch.nn.functional as F
 
 
 class FocalLoss(nn.Module):
-    def __init__(self, alpha, gamma):
+    # def __init__(self, alpha, gamma):
+        # super(FocalLoss, self).__init__()
+        # self.alpha = alpha
+        # self.gamma = gamma
+
+    def __init__(self, alpha=None, gamma=2):
         super(FocalLoss, self).__init__()
-        self.alpha = alpha
+        if alpha is None:
+            # Default: equal weight for all 7 classes
+            self.alpha = torch.tensor([1.0] * 7, dtype=torch.float)
+        else:
+            self.alpha = torch.tensor(alpha, dtype=torch.float)
         self.gamma = gamma
 
     def forward(self, input, target):
