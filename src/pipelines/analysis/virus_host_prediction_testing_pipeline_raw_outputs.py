@@ -69,8 +69,8 @@ def execute(config):
                                 cols=[id_col, sequence_col, label_col] + metadata_cols)
 
         # 2. Transform labels
-        df, index_label_map = utils.transform_labels(df, label_settings,
-                                                     classification_type=classification_settings["type"], silent=True)
+        df, index_label_map, true_index_label_map = utils.transform_labels(df, label_settings,
+                                                     classification_type=classification_settings["type"], silent=False)
 
         # 3. Get dataset loader
         test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col, include_id_col=True)
@@ -80,7 +80,7 @@ def execute(config):
 
         # 5. Create the result dataframe and remap the class indices to original input labels
         result_df.rename(columns=index_label_map, inplace=True)
-        result_df["y_true"] = result_df["y_true"].map(index_label_map)
+        result_df["y_true"] = result_df["y_true"].map(true_index_label_map)
 
         # 6. Add the metadata from the input file
         result_df = result_df.set_index(id_col).join(df[metadata_cols + [id_col]].set_index(id_col), how="left").reset_index()
