@@ -33,6 +33,7 @@ pipeline_mapper = {
     "virus_host_prediction_baseline_machine_learning": baseline_machine_learning_pipeline,
     "virus_host_prediction_test": virus_host_prediction_testing_pipeline,
     "virus_host_prediction_test_external": virus_host_prediction_testing_external_pipeline,
+    "virus_host_prediction_test_raw_outputs": virus_host_prediction_testing_pipeline_raw_outputs,
     "few_shot_learning": few_shot_learning_host_prediction_pipeline,
     "evaluation": evaluation_pipeline,
     "perturbation": perturbation_analysis_pipeline,
