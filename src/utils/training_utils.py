@@ -108,3 +108,21 @@ def test_model_analysis(model, dataset_loader, id_col):
             result_df["y_true"] = label.cpu().numpy()
             results.append(result_df)
     return pd.concat(results, ignore_index=True)
+
+def test_model_analysis_raw(model, dataset_loader, id_col):
+    with torch.no_grad():
+        model.eval()
+
+        results = []
+        for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
+            id, input, label = record
+
+            output = model(input)  # b x n_classes
+            output = output.to(nn_utils.get_device())
+
+            # to get the raw output
+            result_df = pd.DataFrame(output.cpu().numpy())
+            result_df[id_col] = id
+            result_df["y_true"] = label.cpu().numpy()
+            results.append(result_df)
+    return pd.concat(results, ignore_index=True)
