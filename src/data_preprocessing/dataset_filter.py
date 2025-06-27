@@ -586,6 +586,149 @@ def get_sequences_from_vertebrata_hosts(input_file_path, taxon_metadata_dir_path
     print(f"Writing to file {output_file_path}")
     print("END: Filter records with virus hosts belonging to vertebrata' clade.")
 
+def get_sequences_from_nonvertebrata_hosts(input_file_path, taxon_metadata_dir_path, output_file_path):
+    print("START: Filter records with virus hosts not belonging to 'vertebrata' clade.")
+
+    # Set TAXONKIT_DB environment variable
+    os.environ["TAXONKIT_DB"] = taxon_metadata_dir_path
+
+    # Read input file
+    df = pd.read_csv(input_file_path)
+
+    # Get all unique host tax ids
+    host_tax_ids = df[VIRUS_HOST_TAX_ID].unique()
+    print(f"Number of unique host tax ids = {len(host_tax_ids)}")
+
+    # Get taxids belonging to the clade of non-vertebrata
+    # split into sublists for parallel processing
+    host_tax_ids_sublists = np.array_split(np.array(host_tax_ids), N_CPU)
+    for i in range(N_CPU):
+        print(f"Size of host_tax_ids_sublists[{i}] = {host_tax_ids_sublists[i].shape}")
+
+    # multiprocessing for parallelism
+    cpu_pool = Pool(N_CPU)
+    nonvertebrata_tax_ids_sublists = cpu_pool.map(external_sources_utils.get_nonvertebrata_tax_ids, host_tax_ids_sublists)
+    # flatten the list of sub_lists into one list
+    nonvertebrata_tax_ids = list(itertools.chain.from_iterable(nonvertebrata_tax_ids_sublists))
+    cpu_pool.close()
+    cpu_pool.join()
+    print(f"Number of unique non-vertebrata tax ids = {len(nonvertebrata_tax_ids)}")
+    # Filter
+    print(f"Dataset size before filtering for nonvertebrata: {df.shape}")
+    df = df[df[VIRUS_HOST_TAX_ID].isin(nonvertebrata_tax_ids)]
+    print(f"Dataset size after filtering for nonvertebrata: {df.shape}")
+
+    df.to_csv(output_file_path, index=False)
+    print(f"Writing to file {output_file_path}")
+    print("END: Filter records with virus hosts not belonging to vertebrata' clade.")
+
+def get_sequences_from_plantae_hosts(input_file_path, taxon_metadata_dir_path, output_file_path):
+    print("START: Filter records with virus hosts not belonging to 'plantae' kingdom.")
+
+    # Set TAXONKIT_DB environment variable
+    os.environ["TAXONKIT_DB"] = taxon_metadata_dir_path
+
+    # Read input file
+    df = pd.read_csv(input_file_path)
+
+    # Get all unique host tax ids
+    host_tax_ids = df[VIRUS_HOST_TAX_ID].unique()
+    print(f"Number of unique host tax ids = {len(host_tax_ids)}")
+
+    # Get taxids belonging to the clade of non-vertebrata
+    # split into sublists for parallel processing
+    host_tax_ids_sublists = np.array_split(np.array(host_tax_ids), N_CPU)
+    for i in range(N_CPU):
+        print(f"Size of host_tax_ids_sublists[{i}] = {host_tax_ids_sublists[i].shape}")
+
+    # multiprocessing for parallelism
+    cpu_pool = Pool(N_CPU)
+    plantae_tax_ids_sublists = cpu_pool.map(external_sources_utils.get_plantae_tax_ids, host_tax_ids_sublists)
+    # flatten the list of sub_lists into one list
+    plantae_tax_ids = list(itertools.chain.from_iterable(plantae_tax_ids_sublists))
+    cpu_pool.close()
+    cpu_pool.join()
+    print(f"Number of unique plant tax ids = {len(plantae_tax_ids)}")
+    # Filter
+    print(f"Dataset size before filtering for plants: {df.shape}")
+    df = df[df[VIRUS_HOST_TAX_ID].isin(plantae_tax_ids)]
+    print(f"Dataset size after filtering for plants: {df.shape}")
+
+    df.to_csv(output_file_path, index=False)
+    print(f"Writing to file {output_file_path}")
+    print("END: Filter records with virus hosts belonging to plantae' kingdom.")
+
+def get_sequences_from_microbe_hosts(input_file_path, taxon_metadata_dir_path, output_file_path):
+    print("START: Filter records with virus hosts belonging to microbes.")
+
+    # Set TAXONKIT_DB environment variable
+    os.environ["TAXONKIT_DB"] = taxon_metadata_dir_path
+
+    # Read input file
+    df = pd.read_csv(input_file_path)
+
+    # Get all unique host tax ids
+    host_tax_ids = df[VIRUS_HOST_TAX_ID].unique()
+    print(f"Number of unique host tax ids = {len(host_tax_ids)}")
+
+    # Get taxids belonging to the kingdom of plants
+    # split into sublists for parallel processing
+    host_tax_ids_sublists = np.array_split(np.array(host_tax_ids), N_CPU)
+    for i in range(N_CPU):
+        print(f"Size of host_tax_ids_sublists[{i}] = {host_tax_ids_sublists[i].shape}")
+
+    # multiprocessing for parallelism
+    cpu_pool = Pool(N_CPU)
+    microbe_tax_ids_sublists = cpu_pool.map(external_sources_utils.get_microbe_tax_ids, host_tax_ids_sublists)
+    # flatten the list of sub_lists into one list
+    microbe_tax_ids = list(itertools.chain.from_iterable(microbe_tax_ids_sublists))
+    cpu_pool.close()
+    cpu_pool.join()
+    print(f"Number of unique microbe tax ids = {len(microbe_tax_ids)}")
+    # Filter
+    print(f"Dataset size before filtering for microbes: {df.shape}")
+    df = df[df[VIRUS_HOST_TAX_ID].isin(microbe_tax_ids)]
+    print(f"Dataset size after filtering for microbes: {df.shape}")
+
+    df.to_csv(output_file_path, index=False)
+    print(f"Writing to file {output_file_path}")
+    print("END: Filter records with virus hosts belonging to microbes.")
+
+def get_sequences_from_animal_hosts(input_file_path, taxon_metadata_dir_path, output_file_path):
+    print("START: Filter records with virus hosts belonging to 'Metazoa' kingdom.")
+
+    # Set TAXONKIT_DB environment variable
+    os.environ["TAXONKIT_DB"] = taxon_metadata_dir_path
+
+    # Read input file
+    df = pd.read_csv(input_file_path)
+
+    # Get all unique host tax ids
+    host_tax_ids = df[VIRUS_HOST_TAX_ID].unique()
+    print(f"Number of unique host tax ids = {len(host_tax_ids)}")
+
+    # Get taxids belonging to the clade of non-vertebrata
+    # split into sublists for parallel processing
+    host_tax_ids_sublists = np.array_split(np.array(host_tax_ids), N_CPU)
+    for i in range(N_CPU):
+        print(f"Size of host_tax_ids_sublists[{i}] = {host_tax_ids_sublists[i].shape}")
+
+    # multiprocessing for parallelism
+    cpu_pool = Pool(N_CPU)
+    metazoa_tax_ids_sublists = cpu_pool.map(external_sources_utils.get_animal_tax_ids, host_tax_ids_sublists)
+    # flatten the list of sub_lists into one list
+    metazoa_tax_ids = list(itertools.chain.from_iterable(metazoa_tax_ids_sublists))
+    cpu_pool.close()
+    cpu_pool.join()
+    print(f"Number of unique animal tax ids = {len(metazoa_tax_ids)}")
+    # Filter
+    print(f"Dataset size before filtering for animals: {df.shape}")
+    df = df[df[VIRUS_HOST_TAX_ID].isin(metazoa_tax_ids)]
+    print(f"Dataset size after filtering for animals: {df.shape}")
+
+    df.to_csv(output_file_path, index=False)
+    print(f"Writing to file {output_file_path}")
+    print("END: Filter records with virus hosts belonging to Metazoa kingdom")
 
 # Join metadata dataset with sequence data from the parsed fasta file
 # Input: Metadata dataset. Columns = ["uniref90_id", "tax_id", "host_tax_ids", "virus_name", "virus_taxon_rank", "virus_host_name", "virus_host_taxon_rank"]
