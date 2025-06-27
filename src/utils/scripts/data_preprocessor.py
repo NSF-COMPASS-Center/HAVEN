@@ -158,7 +158,25 @@ def process(config):
                                                          sequence_data_file_path=config.merge_sequence_data,
                                                          output_file_path=sequence_dataset_file_path,
                                                          id_col=id_col)
+    # 9. Filter for virus_hosts not belonging to Vertebrata clade
+    if config.filter_nonvertebrata:
+       filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_nonvertebrates.csv")
+       dataset_filter.get_sequences_from_nonvertebrata_hosts(input_file_path=input_file_path,taxon_metadata_dir_path=config.taxon_dir, output_file_path=filtered_dataset_file_path)
 
+    # 10. Filter for virus_hosts belonging to Plantae clade
+    if config.filter_plants:
+       filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_plants.csv")
+       dataset_filter.get_sequences_from_plantae_hosts(input_file_path=input_file_path, taxon_metadata_dir_path=config.taxon_dir, output_file_path=filtered_dataset_file_path)
+
+    # 11. Filter for virus hosts belonging to microbes
+    if config.filter_microbes:
+       filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_microbe.csv")
+       dataset_filter.get_sequences_from_microbe_hosts(input_file_path=input_file_path, taxon_metadata_dir_path=config.taxon_dir, output_file_path=filtered_dataset_file_path)
+
+    # 12. Filter for virus hosts belonging to animals
+    if config.filter_animals:
+       filtered_dataset_file_path = os.path.join(output_dir, Path(input_file_path).stem + "_animal.csv")
+       dataset_filter.get_sequences_from_animal_hosts(input_file_path=input_file_path, taxon_metadata_dir_path=config.taxon_dir, output_file_path=filtered_dataset_file_path)
 
 def pre_process(config):
     input_file_path = config.input_file
