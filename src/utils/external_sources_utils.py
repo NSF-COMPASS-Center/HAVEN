@@ -29,7 +29,12 @@ TAXONKIT_DB = "TAXONKIT_DB"
 MAMMALIA = "Mammalia"
 AVES = "Aves"
 VERTEBRATA_TAX_ID = "7742"
-
+PLANTAE_TAX_ID = "3193"
+BACTERIA_TAX_ID = "2"
+ARCHAEA_TAX_ID = "2157"
+FUNGI_TAX_ID = "4751"
+PROTOZOA_TAX_ID = "1891099"
+METAZOA_TAX_ID = "33208"
 
 # query UniRef for to get the host of the virus of the protein sequence
 # input: uniref_id
@@ -166,6 +171,54 @@ def get_vertebrata_tax_ids(tax_ids):
             print(f"ERROR in lineage for tax_id = {tax_id}")
     return vertebrata_tax_ids
 
+# define a function to filter non-vertebrates
+def get_nonvertebrata_tax_ids(tax_ids):
+    nonvertebrata_tax_ids = []
+    for tax_id in tax_ids:
+        try:
+            full_lineage_tax_ids = pytaxonkit.lineage([tax_id])["FullLineageTaxIDs"].iloc[0].split(";")
+            if VERTEBRATA_TAX_ID not in full_lineage_tax_ids:
+                nonvertebrata_tax_ids.append(tax_id)
+        except Exception as e:
+            print(f"ERROR in lineage for tax_id = {tax_id}")
+            print(f"DETAILS Exception {type(e).__name__}: {e}")
+    return nonvertebrata_tax_ids
+
+# define a function to filter for plants
+def get_plantae_tax_ids(tax_ids):
+    plantae_tax_ids = []
+    for tax_id in tax_ids:
+        try:
+            full_lineage_tax_ids = pytaxonkit.lineage([tax_id])["FullLineageTaxIDs"].iloc[0].split(";")
+            if PLANTAE_TAX_ID in full_lineage_tax_ids:
+                plantae_tax_ids.append(tax_id)
+        except:
+            print(f"ERROR in lineage for tax_id = {tax_id}")
+    return plantae_tax_ids
+
+# define a function to filter microbes
+def get_microbe_tax_ids(tax_ids):
+    microbe_tax_ids = []
+    for tax_id in tax_ids:
+        try:
+            full_lineage_tax_ids = pytaxonkit.lineage([tax_id])["FullLineageTaxIDs"].iloc[0].split(";")
+            if any(tid in full_lineage_tax_ids for tid in [BACTERIA_TAX_ID, ARCHAEA_TAX_ID, FUNGI_TAX_ID, PROTOZOA_TAX_ID]):
+                microbe_tax_ids.append(tax_id)
+        except:
+            print(f"ERROR in lineage for tax_id = {tax_id}")
+    return microbe_tax_ids
+
+# define a function to filter animals
+def get_animal_tax_ids(tax_ids):
+    metazoa_tax_ids = []
+    for tax_id in tax_ids:
+        try:
+            full_lineage_tax_ids = pytaxonkit.lineage([tax_id])["FullLineageTaxIDs"].iloc[0].split(";")
+            if METAZOA_TAX_ID in full_lineage_tax_ids:
+                metazoa_tax_ids.append(tax_id)
+        except:
+            print(f"ERROR in lineage for tax_id = {tax_id}")
+    return metazoa_tax_ids
 
 # For given tax_ids at rank lower than species, get the species equivalent ranks
 # Input: tax ids at ranks lower than species
