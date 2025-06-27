@@ -51,6 +51,18 @@ def parse_args():
     #                     help="Filter for virus hosts belonging to mammalia OR aves family using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
     parser.add_argument("--filter_vertebrates", action="store_true",
                         help="Filter for virus hosts belonging to Vertebrata clade using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+    parser.add_argument("--filter_nonvertebrata", action="store_true",
+                        help="Filter for virus hosts not belonging to Vertebrata clade using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+
+    parser.add_argument("--filter_plants", action="store_true",
+                        help="Filter for virus hosts belonging to Plantae kingdom using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+
+    parser.add_argument("--filter_microbes", action="store_true",
+                        help="Filter for virus hosts belonging to microbes using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+
+    parser.add_argument("--filter_animals", action="store_true", 
+                        help="Filter for virus hosts belonging to Metazoa kingdom using the absolute path to the NCBI taxon directory provided in --taxon_dir.")
+
     parser.add_argument("--merge_sequence_data",
                         help="Join the metadata from the input_file with the sequence data from the provided absolute file path.")
     # parser.add_argument("--remove_multi_host_sequences", action="store_true",
