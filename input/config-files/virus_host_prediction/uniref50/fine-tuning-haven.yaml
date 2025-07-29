@@ -56,7 +56,7 @@ fine_tune_settings:
     label_col: "virus_host_name"
     exclude_labels: [ "nan" ]
     label_groupings:
-      "Human": [ "homo sapiens" ]
+      "Sweet cherry": [ "homo sapiens" ]
       "Pig": [ "sus scrofa" ]
       "Capybara": [ "hydrochoerus hydrochaeris" ]
       "Coquerel's sifaka (Lemur)" : [ "propithecus coquereli" ]
