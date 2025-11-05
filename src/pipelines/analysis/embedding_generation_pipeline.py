@@ -23,22 +23,43 @@ def execute(config):
     output_prefix = output_prefix if output_prefix is not None else ""
 
     sequence_settings = config["sequence_settings"]
-    pre_train_settings = config["pre_train_settings"]
 
-    fine_tune_settings = config["fine_tune_settings"]
-
-    pre_train_encoder_settings = pre_train_settings["encoder_settings"]
-    pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
-
-    sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
-
-    tasks = fine_tune_settings["task_settings"]
-    label_settings = fine_tune_settings["label_settings"]
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
-    label_col = label_settings["label_col"]
+    label_col = sequence_settings["label_col"]
+    metadata_cols = sequence_settings["metadata_cols"]
+
     results = {}
-    df = dataset_utils.read_dataset(input_dir, input_file_names, cols=[id_col, sequence_col, label_col])
+    df = dataset_utils.read_dataset(input_dir, input_file_names, cols=[id_col, sequence_col] + metadata_cols)
+    test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col, include_id_col=True)
+
+    models = config["models"]
+    for model in models:
+        model_id = model["id"]  # unique identifier
+        model_name = model["name"]
+        mode = model["mode"]
+
+        if model["active"] is False:
+            print(f"Skipping {model_name} ...")
+            continue
+
+        pre_train_encoder_settings = model["pre_train_settings"]["encoder_settings"]
+        pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
+
+        pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train_encoder_settings,
+                                                                               model["cls_token"])
+        model["pre_trained_model"] = pre_trained_encoder_model
+        model["segment_len"] = pre_train_encoder_settings["max_seq_len"]
+        sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
+
+        if model_name in mapper.model_map:
+            print(f"Executing {model_name} in {mode} mode.")
+            prediction_model = mapper.model_map[model_name].get_model(model_params=model)
+        else:
+            print(f"ERROR: Unknown model {model_name}.")
+            continue
+
+
     if fine_tune_settings["split_input"]:
         # Case: Host prediction using fine-tuning where there is dataset split and label groupings
         iter = 4 # choose only one iteration (first)

@@ -46,10 +46,13 @@ class HAVEN(ProteinSequenceClassification):
         # here -1 will account for n_s which changes with the sequence length in every batch
         # we use segment_len + 1 to account for the added CLS token
 
-        if self.cls_token:
-            X = X.view(batch_size, -1, self.segment_len + 1, self.input_dim)  # b x n_s x segment_len + 1 x input_dim
-        else:
-            X = X.view(batch_size, -1, self.segment_len, self.input_dim)  # b x n_s x segment_len + 1 x input_dim
+        try:
+            if self.cls_token:
+                X = X.view(batch_size, -1, self.segment_len + 1, self.input_dim)  # b x n_s x segment_len + 1 x input_dim
+            else:
+                X = X.view(batch_size, -1, self.segment_len, self.input_dim)  # b x n_s x segment_len x input_dim
+        except Exception as e:
+            print(f"ERROR {e}")
 
         if self.cls_token:
             # OPTION 1: representative vector for each segment = CLS token embedding in every segment
