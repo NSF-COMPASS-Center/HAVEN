@@ -5,18 +5,19 @@ config_type: "virus_host_prediction"
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/uniref50/20240131"
+  input_dir: "input/data"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
   # file_names: [ "uniref90_final_msl1114.csv" ]
-  file_names: [ "uniref50_viridae_embl_twopercent.csv" ]
+  file_names: [ "uniref50_98_percent_seq_length.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 16
+    # changed batch size to 32 since using a dataset with smaller largest sequence 
+    batch_size: 32
     id_col: "uniref50_id"
     sequence_col: "seq"
     truncate: False
@@ -44,8 +45,8 @@ fine_tune_settings:
   save_model: True
 
   training_settings:
-    n_epochs_freeze: 2
-    n_epochs_unfreeze: 3
+    n_epochs_freeze: 20
+    n_epochs_unfreeze: 30
     max_lr: 3e-4
     pct_start: 0.10
     div_factor: 25.0
@@ -98,7 +99,7 @@ fine_tune_settings:
       fine_tuned_model_path: ""
       segment_len: 256
       stride: 64
-      cls_token: False
+      cls_token: True
       n_heads: 8
       loss: "FocalLoss"
       n_mlp_layers: 2
@@ -110,5 +111,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "uniref50-viridae/uniref50_vertebrates_non_idv_2_percent_prevalence"
-  prefix: "mlm_tfenc_l6_h8_lr1e-4_uniref50viridae_vs30" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  sub_dir: "uniref50-viridae/uniref50_vertebrates_non_idv_98_percent_seq_length/lr_3e-4"
+  prefix: "mlm_tfenc_l6_h8_lr3e-4_bs32_uniref50viridae_vs30_clstoken" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
