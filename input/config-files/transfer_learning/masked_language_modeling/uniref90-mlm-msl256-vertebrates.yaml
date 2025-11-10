@@ -9,7 +9,7 @@ input_settings:
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "uniref90_viridae_valid_embl_hosts_metadata_species_vertebrates_w_seq_small-test-batch.csv" ]
+  file_names: [ "uniref90_viridae_valid_embl_hosts_metadata_species_vertebrates_w_seq.csv" ]
   # file_names: [ "uniref90_final.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
@@ -39,7 +39,7 @@ encoder_settings:
 
 training_settings:
   experiment: "pre-training-mlm"
-  n_iterations: 1
+  n_iterations: 5
   split_input: True
   train_proportion: 0.9
   n_epochs: 50
