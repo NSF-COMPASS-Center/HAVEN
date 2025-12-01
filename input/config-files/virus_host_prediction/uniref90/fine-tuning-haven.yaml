@@ -73,7 +73,7 @@ fine_tune_settings:
       n_classes: 5
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
-      data_parallel: False
+      data_parallel: True
 
     - id: "host_prediction_segment_msl256s64cls_bn_fnn_2l_d1024_lr1e-4"
       name: "HAVEN_wo_Hierarchical_Attention"
