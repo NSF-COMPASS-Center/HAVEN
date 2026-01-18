@@ -6,7 +6,7 @@
 
 #SBATCH --mem=450G
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:1
 #SBATCH -t 144:00:00 # wall-time required (# 144hrs = 6 days)
 
 
@@ -21,7 +21,7 @@ module load Miniconda3
 module load CUDA/12.6.0
 
 # Load conda environment
-source activate haven
+source activate haven_compass
 echo "Conda information:"
 conda info
 
@@ -37,7 +37,7 @@ LOG_FILE=$LOGS_DIR/$(date +%Y_%b_%d_%H_%M_%s).log
 echo "Config File: $CONFIG_FILE"
 echo "Log File: $LOG_FILE"
 
-conda activate haven
+conda activate haven_compass
 echo "Python version in $CONDA_PREFIX"
 $CONDA_PREFIX/bin/python --version
 
