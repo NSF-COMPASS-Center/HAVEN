@@ -41,7 +41,7 @@ def execute(config):
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
     label_col = label_settings["label_col"]
-    isolate_col = sequence_settings["isolate_col"]
+    accession_col = sequence_settings["accession_col"]
     genus_col = sequence_settings["genus_col"]
     results = {}
 
@@ -62,7 +62,7 @@ def execute(config):
         print(f"Iteration {iter}")
         # 1. Read the data files
         df = dataset_utils.read_dataset(input_dir, input_file_names,
-                                cols=[id_col, isolate_col, sequence_col, label_col, genus_col])
+                                cols=[id_col, accession_col, sequence_col, label_col, genus_col])
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                            classification_type=fine_tune_settings["classification_type"])
@@ -84,8 +84,8 @@ def execute(config):
                 val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
                 test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
             elif split_type == "ViTax_RefSeq":
-                train_df, test_df = dataset_utils.split_dataset_ViTax_RefSeq(df, input_settings["split_seeds"][iter], genus_col = genus_col)
-                val_df, test_df = dataset_utils.split_dataset_ViTax_RefSeq(test_df, input_split_seeds[iter], 0.5, genus_col = genus_col)
+                train_df, test_df = dataset_utils.split_dataset_vitax_refseq(df, input_settings["split_seeds"][iter], genus_col = genus_col, accession_col = accession_col)
+                val_df, test_df = dataset_utils.split_dataset_vitax_refseq(test_df, input_split_seeds[iter], 0.5, genus_col = genus_col, accession_col = accession_col)
                 train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col)
                 val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
                 test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
@@ -152,12 +152,12 @@ def execute(config):
             if mode == "train":
                 # retraining the model_params for the fine_tuning task
                 result_df, fine_tune_model = run_task(fine_tune_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
-                                                   task["loss"], training_settings, task_id)
+                                                   task["loss"], training_settings, task_id, test_df, accession_col, id_col)
             elif mode == "test":
                 # used for zero-shot evaluation
                 # load the pre-trained and fine_tuned model_params
                 fine_tune_model.load_state_dict(torch.load(task["fine_tuned_model_path"]))
-                result_df = training_utils.test_model(fine_tune_model, test_dataset_loader)
+                result_df = training_utils.test_model(fine_tune_model, test_dataset_loader, test_df, accession_col, id_col)
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values: 'train', 'test'.")
                 exit(1)
@@ -181,7 +181,7 @@ def execute(config):
     utils.write_output(results, output_results_dir, output_prefix, "output")
 
 
-def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, task_id):
+def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, task_id, test_df, accession_col, id_col):
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -243,6 +243,6 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     best_performing_model = early_stopper.get_current_best_model()
 
     # test the model_params
-    result_df = training_utils.test_model(best_performing_model, test_dataset_loader)
+    result_df = training_utils.test_model(best_performing_model, test_dataset_loader, test_df, accession_col, id_col)
 
     return result_df, best_performing_model

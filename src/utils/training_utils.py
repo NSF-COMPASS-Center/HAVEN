@@ -71,7 +71,7 @@ def validate_model(model, dataset_loader, criterion, model_id, epoch):
     return mean(val_loss)
 
 
-def test_model(model, dataset_loader):
+def test_model(model, dataset_loader, test_df, accession_col, id_col):
     with torch.no_grad():
         model.eval()
 
@@ -87,7 +87,11 @@ def test_model(model, dataset_loader):
             result_df = pd.DataFrame(output.cpu().numpy())
             result_df["y_true"] = label.cpu().numpy()
             results.append(result_df)
-    return pd.concat(results, ignore_index=True)
+
+    result = pd.concat(results, ignore_index=True)
+    result[accession_col] = test_df[accession_col].values
+    result[id_col] = test_df[id_col].values
+    return result
 
 
 def test_model_analysis(model, dataset_loader, id_col):

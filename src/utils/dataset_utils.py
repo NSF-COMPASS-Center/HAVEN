@@ -54,11 +54,12 @@ def split_dataset_stratified(df, seed, train_proportion, stratify_col=None):
     print(f"Size of test_dataset = {test_df.shape}")
     return train_df, test_df
 
-def split_dataset_vitax_refseq(df, seed, train_proportion, genus_col=None):
+def split_dataset_vitax_refseq(df, seed, train_proportion, genus_col=None, accession_col=None):
     print(f"Splitting dataset with seed={seed}, train_proportion={train_proportion}")
-    train_genomes, test_genomes = train_test_split(df[genus_col], train_size=train_proportion, random_state=seed)
-    train_df = df[df[genus_col].isin(train_genomes)].reset_index(drop=True)
-    test_df = df[df[genus_col].isin(test_genomes)].reset_index(drop=True)
+    unique_accessions = df[accession_col].unique()
+    train_genomes, test_genomes = train_test_split(unique_accessions, train_size=train_proportion, random_state=seed)
+    train_df = df[df[accession_col].isin(train_genomes)].reset_index(drop=True)
+    test_df = df[df[accession_col].isin(test_genomes)].reset_index(drop=True)
     print(f"Size of train_dataset = {train_df.shape}")
     print(f"Size of test_dataset = {test_df.shape}")
     return train_df, test_df

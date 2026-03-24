@@ -17,7 +17,7 @@ input_settings:
 sequence_settings:
     batch_size: 16
     id_col: "Protein ID"
-    isolate_col: "Isolate ID"
+    accession_col: "accession_clean"
     sequence_col: "prot_seq"
     genus_col: "Genus"
     truncate: False
