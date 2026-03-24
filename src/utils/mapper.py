@@ -29,6 +29,7 @@ pipeline_mapper = {
     "masked_language_modeling": masked_language_modeling_pipleine,
     "virus_host_prediction": fine_tuning_pipeline,
     "virus_host_prediction_external": fine_tuning_external_pipeline,
+    "virus_species_prediction": fine_tuning_species,
     "virus_host_prediction_baseline_deep_learning": baseline_deep_learning_pipeline,
     "virus_host_prediction_baseline_machine_learning": baseline_machine_learning_pipeline,
     "virus_host_prediction_test": virus_host_prediction_testing_pipeline,

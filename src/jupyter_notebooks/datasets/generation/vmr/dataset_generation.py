@@ -216,14 +216,25 @@ if __name__ == "__main__":
     output_dir = "/Users/katelandsipe/Documents/Research/git/viral_tax_dataset"
     Entrez.email = "sipek@vt.edu"
 
-    filtered_data = process_excel_file(
-        excel_file=excel_file,
-        accessions_column = accessions_column,
-        isolate_id_column=isolate_column,
-        ictv_column = ictv_column,
-        output_prefix= output_prefix,
-        output_dir = output_dir,
-        sheet_name="VMR MSL40"  # Use 0 for first sheet, or "Sheet1" for sheet name
-    )
-    query_genbank(filtered_data['accession'].tolist(), output_dir, output_prefix)
-    combine_protein_seq_files(output_dir, output_prefix)
+    # filtered_data = process_excel_file(
+    #     excel_file=excel_file,
+    #     accessions_column = accessions_column,
+    #     isolate_id_column=isolate_column,
+    #     ictv_column = ictv_column,
+    #     output_prefix= output_prefix,
+    #     output_dir = output_dir,
+    #     sheet_name="VMR MSL40"  # Use 0 for first sheet, or "Sheet1" for sheet name
+    # )
+    # query_genbank(filtered_data['accession'].tolist(), output_dir, output_prefix)
+    # combine_protein_seq_files(output_dir, output_prefix)
+    df = pd.read_csv(f"{output_dir}/{output_prefix}_proteins_taxonomy_final.csv")
+    # split into dataset with genera with only 1 genome vs >1 genome
+    counts = df.groupby("Genus")["accession_clean"].transform("count")
+    df_gt1 = df[counts > 1].reset_index(drop=True)
+    df_gt1.to_csv(f"{output_dir}/{output_prefix}_proteins_taxonomy_final_gt1.csv", index=False)
+    print(f"Genera with >1 genome: {len(df_gt1)}")
+    print(f"Number of Species: {len(df_gt1['Species'].unique())}")
+    df_eq1 = df[counts == 1].reset_index(drop=True)
+    print(f"Genera with 1 genome: {len(df_eq1)}")
+    print(f"Number of Species: {len(df_eq1['Species'].unique())}")
+    df_eq1.to_csv(f"{output_dir}/{output_prefix}_proteins_taxonomy_final_eq1.csv", index=False)
