@@ -65,43 +65,62 @@ def query_genbank(accession_ids, output_dir, output_prefix):
     record_count = 0
     chunk_size = 500
     pbar = tqdm(total = len(accession_ids), desc = 'Querying GenBank', ncols = 120, colour = 'cyan')
+    max_retries = 3
 
     for chunk_idx in range(0, len(accession_ids), chunk_size):
         chunk = accession_ids[chunk_idx:chunk_idx+chunk_size]
-        # Fetch chunk
-        handle = Entrez.efetch(db = 'nucleotide', id=chunk, rettype = 'gb',
-                               retmode = 'text', api_key = KEY, sleep_between_tries = True)
-        records = SeqIO.parse(handle, "genbank")
-        # Process Records in this chunk
-        for record in records:
+        for attempt in range(max_retries):
             try:
-                genome_seq = str(record.seq)
-                for feature in record.features:
-                    if feature.type == "CDS":
-                        new_row = {'Accession ID': record.id,
-                                   'Seq Length': len(record.seq),
-                                   'Location': str(feature.location),
-                                   'Protein ID': feature.qualifiers.get('protein_id', [None])[0],
-                                   'Protein Sequence': feature.qualifiers.get('translation', [None])[0],
-                                   'Genome Sequence': genome_seq
-                                   }
-                        proteins.append(new_row)
-                        protein_count +=1
-                    record_count += 1
-                if record_count % batch == 0:
-                    df_batch = pd.DataFrame(proteins)
-                    df_batch.to_csv(f"{output_dir}/{output_prefix}_checkpoint/checkpoint_{record_count}_proteins.csv", index=False)
-                    proteins = []
-                if record_count % 10 == 0:
-                    pbar.set_postfix({'Rec': record_count, 'ID': record.id[:12], 'Prots': protein_count})
+                handle = Entrez.efetch(db='nucleotide', id=chunk, rettype='gb',
+                                       retmode='text', api_key=KEY, sleep_between_tries=True)
+                chunk_proteins = []
+                chunk_records_processed = 0
 
-                pbar.update(1)
-            except Exception as e:
-                tqdm.write(f"Error processing {record.id}: {e}")
-                failed_records.append(record.id)
-                continue
-        handle.close()
-        time.sleep(0.5)  # Be nice to NCBI
+                for record in SeqIO.parse(handle, "genbank"):  # IncompleteRead thrown here
+                    for feature in record.features:
+                        if feature.type == "CDS":
+                            new_row = {
+                                'Accession ID': record.id,
+                                'Seq Length': len(record.seq),
+                                'Location': str(feature.location),
+                                'Protein ID': feature.qualifiers.get('protein_id', [None])[0],
+                                'Protein Sequence': feature.qualifiers.get('translation', [None])[0],
+                            }
+                            chunk_proteins.append(new_row)
+                            protein_count += 1
+                        record_count += 1
+
+                    chunk_records_processed += 1
+                    if record_count % batch == 0:
+                        proteins.extend(chunk_proteins)
+                        df_batch = pd.DataFrame(proteins)
+                        df_batch.to_csv(
+                            f"{output_dir}/{output_prefix}_checkpoint/checkpoint_{record_count}_proteins.csv",
+                            index=False)
+                        proteins = []
+                        chunk_proteins = []
+
+                    if record_count % 10 == 0:
+                        pbar.set_postfix({'Rec': record_count, 'ID': record.id[:12], 'Prots': protein_count})
+                    pbar.update(1)
+
+                handle.close()
+                proteins.extend(chunk_proteins)  # flush any remaining
+                break  # success, exit retry loop
+
+            except (IncompleteRead, Exception) as e:
+                tqdm.write(f"Attempt {attempt + 1}/{max_retries} failed for chunk {chunk_idx}: {e}")
+                try:
+                    handle.close()
+                except:
+                    pass
+                if attempt < max_retries - 1:
+                    time.sleep(10 * (attempt + 1))  # back off: 10s, 20s, 30s
+                else:
+                    tqdm.write(f"Chunk {chunk_idx} failed after {max_retries} attempts, skipping.")
+                    failed_records.extend(chunk)
+
+        time.sleep(0.5) # Be nice to NCBI
     pbar.close()
     # Save remaining proteins
     if proteins:
@@ -127,6 +146,12 @@ def combine_protein_seq_files(output_dir, output_prefix):
         right_on ='accession_clean',
         how = 'left'
     )
+    merged_df = merged_df.drop_duplicates(subset = ['accession_clean', "Protein ID"])
+    initial = len(merged_df)
+    print(f"Dropping Rows with missing Protein Sequences")
+    merged_df = merged_df.dropna(subset = "Protein Sequence")
+    final = len(merged_df)
+    print(f"Dropped {initial - final} Rows with missing Protein Sequences")
     merged_df.to_csv(f"{output_dir}/{output_prefix}_proteins_taxonomy.csv", index=False)
     # Some entries specify coordinate locations, so need to update the sequences for those
     print("Updating the Entries with Locations")
@@ -165,7 +190,8 @@ def combine_protein_seq_files(output_dir, output_prefix):
     ], axis=1)
 
     def get_final_seq(row):
-        if pd.notna(row["genome_start"]) and pd.notna(row["genome_end"]) and pd.notna(row["prot_start"]):
+        if (pd.notna(row["genome_start"]) and pd.notna(row["genome_end"]) and
+                pd.notna(row["prot_start"]) and pd.notna(row["prot_end"])):
             if row["prot_end"] >= row["genome_start"] and row["prot_start"] <= row["genome_end"]:
                 return row["Protein Sequence"][int(row["prot_start"]):int(row["prot_end"])]
             else:
@@ -174,7 +200,7 @@ def combine_protein_seq_files(output_dir, output_prefix):
             return row["Protein Sequence"]
     df_filtered["prot_seq"] = df_filtered.apply(get_final_seq, axis = 1)
     rows_before = len(df_filtered)
-    df_filtered = df_filtered.dropna(subset=["final_sequence"]).reset_index(drop=True)
+    df_filtered = df_filtered.dropna(subset=["prot_seq"]).reset_index(drop=True)
     rows_after = len(df_filtered)
     print(
         f"Dropped {rows_before - rows_after} rows where coordinates were specified but no protein overlap was found ({rows_after} remaining)")
