@@ -75,13 +75,15 @@ def query_genbank(accession_ids, output_dir, output_prefix):
         # Process Records in this chunk
         for record in records:
             try:
+                genome_seq = str(record.seq)
                 for feature in record.features:
                     if feature.type == "CDS":
                         new_row = {'Accession ID': record.id,
                                    'Seq Length': len(record.seq),
                                    'Location': str(feature.location),
                                    'Protein ID': feature.qualifiers.get('protein_id', [None])[0],
-                                   'Protein Sequence': feature.qualifiers.get('translation', [None])[0]
+                                   'Protein Sequence': feature.qualifiers.get('translation', [None])[0],
+                                   'Genome Sequence': genome_seq
                                    }
                         proteins.append(new_row)
                         protein_count +=1
@@ -162,7 +164,20 @@ def combine_protein_seq_files(output_dir, output_prefix):
         pd.json_normalize(df_filtered["filtered_protein"])
     ], axis=1)
 
-
+    def get_final_seq(row):
+        if pd.notna(row["genome_start"]) and pd.notna(row["genome_end"]) and pd.notna(row["prot_start"]):
+            if row["prot_end"] >= row["genome_start"] and row["prot_start"] <= row["genome_end"]:
+                return row["Protein Sequence"][int(row["prot_start"]):int(row["prot_end"])]
+            else:
+                return None
+        else:
+            return row["Protein Sequence"]
+    df_filtered["prot_seq"] = df_filtered.apply(get_final_seq, axis = 1)
+    rows_before = len(df_filtered)
+    df_filtered = df_filtered.dropna(subset=["final_sequence"]).reset_index(drop=True)
+    rows_after = len(df_filtered)
+    print(
+        f"Dropped {rows_before - rows_after} rows where coordinates were specified but no protein overlap was found ({rows_after} remaining)")
     df_filtered.to_csv(f"{output_dir}/{output_prefix}_proteins_taxonomy_final.csv", index=False)
 
 
