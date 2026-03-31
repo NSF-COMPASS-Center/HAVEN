@@ -8,8 +8,6 @@ from utils import utils, dataset_utils, nn_utils, constants, mapper, training_ut
 from training_accessories.early_stopping import EarlyStopping
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
 
-from src.jupyter_notebooks.interpretability.attention_values.cov_s_prot_last_attn_head_analysis_uniref90 import \
-    idx_label_map
 
 
 def execute(config):
