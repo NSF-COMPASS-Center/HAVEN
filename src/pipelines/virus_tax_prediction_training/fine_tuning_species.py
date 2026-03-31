@@ -99,6 +99,9 @@ def execute(config):
                         continue
                     g_train, g_test = dataset_utils.split_dataset_vitax_refseq(genomes, input_split_seeds[iter],fine_tune_settings["train_proportion"])
                     train_genomes.extend(g_train)
+                    if len(g_test) < 2:
+                        val_genomes.extend(g_test)
+                        continue
                     g_val, g_test = dataset_utils.split_dataset_vitax_refseq(g_test, input_split_seeds[iter],0.5)
                     val_genomes.extend(g_val)
                     test_genomes.extend(g_test)

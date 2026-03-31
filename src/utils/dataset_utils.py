@@ -62,10 +62,7 @@ def split_dataset_vitax_refseq(genomes, seed, train_proportion):
     # print(f"Size of train_dataset = {train_df.shape}")
     # print(f"Size of test_dataset = {test_df.shape}")
     # return train_df, test_df
-    print(f"Splitting genera genomes with seed={seed}, train_proportion={train_proportion}")
     train_genomes, test_genomes = train_test_split(genomes, train_size=train_proportion, random_state=seed)
-    print(f"Size of train genomes = {train_genomes.shape}")
-    print(f"Size of test genomes = {test_genomes.shape}")
     return train_genomes, test_genomes
 
 def split_dataset_vitax_ood():
