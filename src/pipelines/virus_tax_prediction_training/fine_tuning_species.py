@@ -66,7 +66,7 @@ def execute(config):
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                            classification_type=fine_tune_settings["classification_type"])
-
+        n_classes = len(df[label_col].unique())
         train_dataset_loader = None
         val_dataset_loader = None
         test_dataset_loader = None
@@ -84,14 +84,35 @@ def execute(config):
                 val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
                 test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
             elif split_type == "ViTax_RefSeq":
-                train_df, test_df = dataset_utils.split_dataset_vitax_refseq(df, input_settings["split_seeds"][iter], fine_tune_settings["train_proportion"],
-                                                                             genus_col = genus_col, accession_col = accession_col)
-                val_df, test_df = dataset_utils.split_dataset_vitax_refseq(test_df, input_split_seeds[iter], 0.5,
-                                                                           genus_col = genus_col, accession_col = accession_col)
+                # train_df, test_df = dataset_utils.split_dataset_vitax_refseq(df, input_settings["split_seeds"][iter], fine_tune_settings["train_proportion"],
+                #                                                              genus_col = genus_col, accession_col = accession_col)
+                # val_df, test_df = dataset_utils.split_dataset_vitax_refseq(test_df, input_split_seeds[iter], 0.5,
+                #                                                            genus_col = genus_col, accession_col = accession_col)
+                # train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col)
+                # val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
+                # test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
+                train_genomes, val_genomes, test_genomes = [], [], []
+                for genus, group in df.groupby(genus_col):
+                    genomes = group[accession_col].unique()
+                    if len(genomes) <3:
+                        train_genomes.extend(genomes)
+                        continue
+                    g_train, g_test = dataset_utils.split_dataset_vitax_refseq(genomes, input_split_seeds[iter],fine_tune_settings["train_proportion"])
+                    train_genomes.extend(g_train)
+                    g_val, g_test = dataset_utils.split_dataset_vitax_refseq(g_test, input_split_seeds[iter],0.5)
+                    val_genomes.extend(g_val)
+                    test_genomes.extend(g_test)
+                train_df = df[df[accession_col].isin(train_genomes)].reset_index(drop=True)
+                n_classes = len(train_df[label_col].unique())
+                val_df = df[df[accession_col].isin(val_genomes)].reset_index(drop=True)
+                test_df = df[df[accession_col].isin(test_genomes)].reset_index(drop=True)
+                print(f"Size of train_dataset = {train_df.shape}")
+                print(f"Size of val_dataset = {val_df.shape}")
+                print(f"Size of test_dataset = {test_df.shape}")
                 train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col)
                 val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
                 test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
-                pass
+
             elif split_type == "ViTax_OOD":
                 pass
             elif split_type == "VirHRanger":
@@ -111,7 +132,7 @@ def execute(config):
             if task["active"] is False:
                 print(f"Skipping {task_name} ...")
                 continue
-            task["n_classes"] = len(train_df[label_col].unique())
+            task["n_classes"] = n_classes
             # load pre-trained encoder model_params
             pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train_encoder_settings, task["cls_token"])
             pre_trained_model_path = pre_train_settings["model_path"]
