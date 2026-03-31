@@ -54,7 +54,7 @@ fine_tune_settings:
     final_div_factor: 10000.0
 
   label_settings:
-    label_col: "Species"
+    label_col: "Genus"
     exclude_labels: [ "nan" ]
 
   task_settings:
@@ -70,7 +70,7 @@ fine_tune_settings:
       n_heads: 8
       loss: "FocalLoss"
       n_mlp_layers: 2
-      n_classes: 14344
+#      n_classes: 14344
       input_dim: 512 # input embedding dimension
       hidden_dim: 1024
       data_parallel: False

@@ -84,7 +84,7 @@ def execute(config):
                 val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
                 test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
             elif split_type == "ViTax_RefSeq":
-                train_df, test_df = dataset_utils.split_dataset_vitax_refseq(df, input_settings["split_seeds"][iter], 0.6,
+                train_df, test_df = dataset_utils.split_dataset_vitax_refseq(df, input_settings["split_seeds"][iter], fine_tune_settings["train_proportion"],
                                                                              genus_col = genus_col, accession_col = accession_col)
                 val_df, test_df = dataset_utils.split_dataset_vitax_refseq(test_df, input_split_seeds[iter], 0.5,
                                                                            genus_col = genus_col, accession_col = accession_col)
@@ -111,7 +111,7 @@ def execute(config):
             if task["active"] is False:
                 print(f"Skipping {task_name} ...")
                 continue
-
+            task["n_classes"] = len(train_df[label_col].unique())
             # load pre-trained encoder model_params
             pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train_encoder_settings, task["cls_token"])
             pre_trained_model_path = pre_train_settings["model_path"]
