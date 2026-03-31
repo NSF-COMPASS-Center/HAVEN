@@ -8,6 +8,9 @@ from utils import utils, dataset_utils, nn_utils, constants, mapper, training_ut
 from training_accessories.early_stopping import EarlyStopping
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
 
+from src.jupyter_notebooks.interpretability.attention_values.cov_s_prot_last_attn_head_analysis_uniref90 import \
+    idx_label_map
+
 
 def execute(config):
     # input settings
@@ -64,8 +67,7 @@ def execute(config):
         df = dataset_utils.read_dataset(input_dir, input_file_names,
                                 cols=[id_col, accession_col, sequence_col, label_col, genus_col])
         # 2. Transform labels
-        df, index_label_map = utils.transform_labels(df, label_settings,
-                                                           classification_type=fine_tune_settings["classification_type"])
+
         n_classes = len(df[label_col].unique())
         train_dataset_loader = None
         val_dataset_loader = None
@@ -74,6 +76,9 @@ def execute(config):
         if fine_tune_settings["split_input"]:
             split_type = fine_tune_settings["split_settings"]
             if split_type == "base_stratified":
+                df, index_label_map = utils.transform_labels(df, label_settings,
+                                                             classification_type=fine_tune_settings[
+                                                                 "classification_type"])
                 # full df into training and testing datasets in the ratio configured in the config file
                 train_df, test_df = dataset_utils.split_dataset_stratified(df, input_settings["split_seeds"][iter],
                                                                            fine_tune_settings["train_proportion"], stratify_col=label_col)
@@ -110,9 +115,14 @@ def execute(config):
                     val_genomes.extend(g_val)
                     test_genomes.extend(g_test)
                 train_df = df[df[accession_col].isin(train_genomes)].reset_index(drop=True)
-                n_classes = len(train_df[label_col].unique())
+                train_df, index_label_map = utils.transform_labels(train_df, label_settings,
+                                                                 classification_type=fine_tune_settings["classification_type"])
+                task["n_classes"] = len(index_label_map)
                 val_df = df[df[accession_col].isin(val_genomes)].reset_index(drop=True)
                 test_df = df[df[accession_col].isin(test_genomes)].reset_index(drop=True)
+                train_label_to_idx = {v: k for k, v in index_label_map.items()}
+                val_df[label_col] = val_df[label_col].map(train_label_to_idx)
+                test_df[label_col] = test_df[label_col].map(train_label_to_idx)
                 print(f"Size of train_dataset = {train_df.shape}")
                 print(f"Size of val_dataset = {val_df.shape}")
                 print(f"Size of test_dataset = {test_df.shape}")
