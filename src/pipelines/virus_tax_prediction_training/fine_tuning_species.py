@@ -115,7 +115,7 @@ def execute(config):
                 train_df = df[df[accession_col].isin(train_genomes)].reset_index(drop=True)
                 train_df, index_label_map = utils.transform_labels(train_df, label_settings,
                                                                  classification_type=fine_tune_settings["classification_type"])
-                task["n_classes"] = len(index_label_map)
+                n_classes = len(index_label_map)
                 val_df = df[df[accession_col].isin(val_genomes)].reset_index(drop=True)
                 test_df = df[df[accession_col].isin(test_genomes)].reset_index(drop=True)
                 train_label_to_idx = {v: k for k, v in index_label_map.items()}
