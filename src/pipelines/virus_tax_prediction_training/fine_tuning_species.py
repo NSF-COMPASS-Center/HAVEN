@@ -92,6 +92,10 @@ def execute(config):
                 # val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
                 # test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
                 train_genomes, val_genomes, test_genomes = [], [], []
+                null_seqs = df[sequence_col].isna().sum()
+                if null_seqs > 0:
+                    print(f"WARNING: Data has {null_seqs} null sequences")
+                df = df.dropna(subset=[sequence_col]).reset_index(drop=True)
                 for genus, group in df.groupby(genus_col):
                     genomes = group[accession_col].unique()
                     if len(genomes) <3:
@@ -112,15 +116,6 @@ def execute(config):
                 print(f"Size of train_dataset = {train_df.shape}")
                 print(f"Size of val_dataset = {val_df.shape}")
                 print(f"Size of test_dataset = {test_df.shape}")
-                for name, split_df in [("train", train_df), ("val", val_df), ("test", test_df)]:
-                    null_seqs = split_df[sequence_col].isna().sum()
-                    if null_seqs > 0:
-                        print(f"WARNING: {name} has {null_seqs} null sequences")
-
-                train_df = train_df.dropna(subset=[sequence_col]).reset_index(drop=True)
-                val_df = val_df.dropna(subset=[sequence_col]).reset_index(drop=True)
-                test_df = test_df.dropna(subset=[sequence_col]).reset_index(drop=True)
-
                 train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col)
                 val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
                 test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
