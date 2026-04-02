@@ -1,15 +1,15 @@
-config_type: "virus_species_prediction"
+config_type: "virus_genus_prediction"
 
 # Input Settings:
   ## initialize base input folder name
   ## provide path to dataset folder
 input_settings:
   # Base input directory
-  input_dir: "input/data/vmr"
+  input_dir: "input/data/vmr/Realm"
 
   # Name of file(s) in subdirectory to be read and processed.
   # Example: file_names: ["file_1.csv", "file_2.csv", "file_3.csv"]
-  file_names: [ "vmr_msl40_v2_20251013_proteins_taxonomy_final_gt1.csv" ]
+  file_names: [ "Riboviria.csv" ]
   # seeds to split the files into training and testing
   # if provided, the number of seeds must match the number of iterations configured in classification_settings (n_iterations)
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
@@ -37,10 +37,10 @@ pre_train_settings:
     max_seq_len: 256
 
 fine_tune_settings:
-  experiment: "virus_species_prediction"
+  experiment: "virus_genus_prediction"
   n_iterations: 5
   split_input: True
-  split_settings: "ViTax_RefSeq" # options: base_stratified, ViTax_RefSeq, ViTax_OOD, VirHRanger, (custom at some point)
+  split_settings: "within_genus_split" # options: base_stratified, within_genus_split, genome_split, genus_level_split, family_level_split, ViTax_OOD, VirHRanger, (custom at some point)
   train_proportion: 0.6 #If ViTax_RefSeq -> 0.6
   classification_type: "multi"
   save_model: True
@@ -79,4 +79,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "genus_prediction_experiment/"
-  prefix: "mlm_tfenc_l6_h8_lr1e-4_vmr_genus_ViTax-RefSeq-split" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "mlm_tfenc_l6_h8_lr1e-4_vmr_genus_Riboviria_within-genus-split" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv

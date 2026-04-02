@@ -86,7 +86,7 @@ def execute(config):
                 train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col)
                 val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col)
                 test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col)
-            elif split_type == "ViTax_RefSeq":
+            elif split_type == "within_genus_split":
                 # train_df, test_df = dataset_utils.split_dataset_vitax_refseq(df, input_settings["split_seeds"][iter], fine_tune_settings["train_proportion"],
                 #                                                              genus_col = genus_col, accession_col = accession_col)
                 # val_df, test_df = dataset_utils.split_dataset_vitax_refseq(test_df, input_split_seeds[iter], 0.5,
