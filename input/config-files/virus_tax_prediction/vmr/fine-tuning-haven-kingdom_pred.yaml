@@ -37,8 +37,8 @@ pre_train_settings:
     max_seq_len: 256
 
 fine_tune_settings:
-  experiment: "virus_genus_prediction"
-  n_iterations: 5
+  experiment: "virus_kingdom_prediction"
+  n_iterations: 1
   split_input: True
   split_settings: "within_genus_split" # options: base_stratified, within_genus_split, genome_split, genus_level_split, family_level_split, ViTax_OOD, VirHRanger, (custom at some point)
   train_proportion: 0.6 #If ViTax_RefSeq -> 0.6

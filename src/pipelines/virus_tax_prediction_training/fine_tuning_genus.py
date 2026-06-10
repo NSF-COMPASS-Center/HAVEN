@@ -110,6 +110,7 @@ def execute(config):
                     val_genomes.extend(g_val)
                     test_genomes.extend(g_test)
                 train_df = df[df[accession_col].isin(train_genomes)].reset_index(drop=True)
+                # TODO Need to transform labels on full dataset
                 train_df, index_label_map = utils.transform_labels(train_df, label_settings,
                                                                  classification_type=fine_tune_settings["classification_type"])
                 n_classes = len(index_label_map)
