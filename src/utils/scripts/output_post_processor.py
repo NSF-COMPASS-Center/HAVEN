@@ -23,7 +23,7 @@ def aggregate_output(input_file_template, output_file_path, n_iterations):
 
 def main():
     config = parse_args()
-    aggregate_output(config.input_file_template, config.output_file_path, config.n_iterations)
+    aggregate_output(config.input_file_template, config.output_file_path, int(config.n_iterations))
     return
 
 
