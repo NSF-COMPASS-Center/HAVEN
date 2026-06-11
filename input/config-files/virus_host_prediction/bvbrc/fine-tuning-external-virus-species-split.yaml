@@ -19,7 +19,7 @@ input_settings:
 sequence_settings:
     batch_size: 16
     id_col: "protein_id_name"
-    virus_col: "virus_genus_tax_name"
+    virus_col: "virus_species_tax_name"
     sequence_col: "sequence"
     truncate: True
     max_sequence_length: 2048
@@ -30,7 +30,7 @@ fine_tune_settings:
   experiment: "virus_host_prediction_external_virus_genus_split"
   n_iterations: 5
   split_input: True
-  split_input_col: "virus_genus_tax_name"
+  split_input_col: "virus_species_tax_name"
   train_proportion: 0.8
   classification_type: "multi"
   save_model: True
@@ -114,5 +114,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "bvbrc_virus_genus_host_species_vertebrates_t0.01_c8/20260611/host_multi/virus_genus_split/external"
+  sub_dir: "bvbrc_virus_genus_host_species_vertebrates_t0.01_c8/20260611/host_multi/virus_species_split/external"
   prefix: "bvbrc_prott5" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
