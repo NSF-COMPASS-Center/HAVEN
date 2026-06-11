@@ -34,12 +34,14 @@ def execute(config):
     tasks = fine_tune_settings["task_settings"]
     id_col = sequence_settings["id_col"]
     sequence_col = sequence_settings["sequence_col"]
+    virus_col = sequence_settings["virus_col"]
     label_col = label_settings["label_col"]
     results = {}
 
     wandb_config = {
         "n_epochs": training_settings["n_epochs"],
         "lr": training_settings["max_lr"],
+        "weight_decay": training_settings["weight_decay"],
         "max_sequence_length": sequence_settings["max_sequence_length"],
         "dataset": input_file_names[0],
         "output_prefix": output_prefix
@@ -49,11 +51,13 @@ def execute(config):
     fine_tune_model_filepath = os.path.join(output_dir, results_dir, sub_dir, "{output_prefix}_{task_id}_itr{itr}.pth")
     Path(os.path.dirname(fine_tune_model_filepath)).mkdir(parents=True, exist_ok=True)
 
+    output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
+
     for iter in range(n_iters):
         print(f"Iteration {iter}")
         # 1. Read the data files
         df = dataset_utils.read_dataset(input_dir, input_file_names,
-                                cols=[id_col, sequence_col, label_col])
+                                cols=[id_col, sequence_col, virus_col, label_col])
         # 2. Transform labels
         df, index_label_map = utils.transform_labels(df, label_settings,
                                                            classification_type=fine_tune_settings["classification_type"])
@@ -63,9 +67,16 @@ def execute(config):
         test_dataset_loader = None
         # 3. Split dataset
         if fine_tune_settings["split_input"]:
-            # full df into training and testing datasets in the ratio configured in the config file
-            train_df, test_df = dataset_utils.split_dataset_stratified(df, input_settings["split_seeds"][iter],
-                                                                       fine_tune_settings["train_proportion"], stratify_col=label_col)
+
+            if fine_tune_settings["split_input_col"]:
+                train_df, test_df = dataset_utils.split_dataset_based_on_column(df, input_split_seeds[iter],
+                                                                                fine_tune_settings["train_proportion"],
+                                                                                split_input_col=fine_tune_settings["split_input_col"],
+                                                                                label_col=label_col)
+            else:
+                # full df into training and testing datasets in the ratio configured in the config file
+                train_df, test_df = dataset_utils.split_dataset_stratified(df, input_settings["split_seeds"][iter],
+                                                                           fine_tune_settings["train_proportion"], stratify_col=label_col)
             # split testing set into validation and testing datasets in equal proportion
             # so 80:20 will now be 80:10:10
             val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
@@ -113,12 +124,12 @@ def execute(config):
             if mode == "train":
                 # retraining the model_params for the fine_tuning task
                 result_df, fine_tune_model = run_task(fine_tune_model, train_dataset_loader, val_dataset_loader, test_dataset_loader,
-                                                   task["loss"], training_settings, task_id)
+                                                   task["loss"], training_settings, id_col, task_id)
             elif mode == "test":
                 # used for zero-shot evaluation
                 # load the pre-trained and fine_tuned model_params
                 fine_tune_model.load_state_dict(torch.load(task["fine_tuned_model_path"]))
-                result_df = training_utils.test_model(fine_tune_model, test_dataset_loader)
+                result_df = training_utils.test_model_analysis(fine_tune_model, test_dataset_loader, id_col=id_col)
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values: 'train', 'test'.")
                 exit(1)
@@ -127,7 +138,8 @@ def execute(config):
             result_df.rename(columns=index_label_map, inplace=True)
             result_df["y_true"] = result_df["y_true"].map(index_label_map)
             result_df["itr"] = iter
-            results[task_id].append(result_df)
+            # write the raw results in csv files
+            utils.write_output({task_id: [result_df]}, output_results_dir, output_prefix, f"output_itr{iter}")
 
             if fine_tune_settings["save_model"]:
                 # save the fine_tuned model_params
@@ -137,15 +149,11 @@ def execute(config):
 
             wandb.finish()
 
-    # write the raw results in csv files
-    output_results_dir = os.path.join(output_dir, results_dir, sub_dir)
-    utils.write_output(results, output_results_dir, output_prefix, "output")
 
-
-def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, task_id):
+def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loader, loss, training_settings, id_col, task_id):
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=float(training_settings["max_lr"]), weight_decay=float(training_settings["weight_decay"]))
     n_epochs = training_settings["n_epochs"]
 
     lr_scheduler = OneCycleLR(
@@ -180,6 +188,6 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     best_performing_model = early_stopper.get_current_best_model()
 
     # test the model_params
-    result_df = training_utils.test_model(best_performing_model, test_dataset_loader)
+    result_df = training_utils.test_model_analysis(best_performing_model, test_dataset_loader, id_col=id_col)
 
     return result_df, best_performing_model
