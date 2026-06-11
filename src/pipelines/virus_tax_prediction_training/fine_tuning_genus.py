@@ -109,11 +109,11 @@ def execute(config):
                     g_val, g_test = dataset_utils.split_dataset_vitax_refseq(g_test, input_split_seeds[iter],0.5)
                     val_genomes.extend(g_val)
                     test_genomes.extend(g_test)
-                train_df = df[df[accession_col].isin(train_genomes)].reset_index(drop=True)
-                # TODO Need to transform labels on full dataset
-                train_df, index_label_map = utils.transform_labels(train_df, label_settings,
+
+                df, index_label_map = utils.transform_labels(df, label_settings,
                                                                  classification_type=fine_tune_settings["classification_type"])
                 n_classes = len(index_label_map)
+                train_df = df[df[accession_col].isin(train_genomes)].reset_index(drop=True)
                 val_df = df[df[accession_col].isin(val_genomes)].reset_index(drop=True)
                 test_df = df[df[accession_col].isin(test_genomes)].reset_index(drop=True)
                 train_label_to_idx = {v: k for k, v in index_label_map.items()}
