@@ -18,7 +18,7 @@ class ProtT5_VirusHostPrediction(ProteinSequenceClassification):
 
     def initialize_pre_trained_model(self, pre_trained_model_link, hugging_face_cache_dir):
         tokenizer = T5Tokenizer.from_pretrained(pre_trained_model_link, do_lower_case=False,
-                                                cache_dir=hugging_face_cache_dir)
+                                                cache_dir=hugging_face_cache_dir, use_fast=False)
 
         # explicitly set the model to float16 otherwise the generated embeddings will be full precision
         pre_trained_model = T5EncoderModel.from_pretrained(pre_trained_model_link,
