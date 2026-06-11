@@ -98,7 +98,7 @@ def execute(config):
             if fine_tune_settings["split_input"]:
                 train_dataset_loader = dataset_utils.get_external_dataset_loader(train_df, sequence_settings, label_col, task_name)
                 val_dataset_loader = dataset_utils.get_external_dataset_loader(val_df, sequence_settings, label_col, task_name)
-            test_dataset_loader = dataset_utils.get_external_dataset_loader(test_df, sequence_settings, label_col, task_name)
+            test_dataset_loader = dataset_utils.get_external_dataset_loader(test_df, sequence_settings, label_col, task_name, include_id_col=True)
 
             if task_name in mapper.model_map:
                 print(f"Executing {task_name} in {mode} mode.")
