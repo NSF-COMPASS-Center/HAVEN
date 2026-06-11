@@ -18,6 +18,7 @@ def aggregate_output(input_file_template, output_file_path, n_iterations):
     for i in range(n_iterations):
         input_file_path = input_file_template.format(itr=i)
         result_dfs.append(pd.read_csv(input_file_path, index_col=0))
+    print(f"Writing output to {output_file_path}")
     pd.concat(result_dfs).to_csv(output_file_path, index=True)
 
 def main():
