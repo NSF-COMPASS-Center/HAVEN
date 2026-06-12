@@ -28,7 +28,7 @@ sequence_settings:
 
 fine_tune_settings:
   experiment: "virus_host_prediction_external_virus_genus_split"
-  n_iterations: 5
+  n_iterations: 1
   split_input: True
   split_input_col: "virus_species_tax_name"
   train_proportion: 0.8
@@ -57,7 +57,7 @@ fine_tune_settings:
       "Boa": [ 8574 ]
 
   task_settings:
-    - id: "prostt5_msl2048_fnn_2l_d1024_lr3e-4_itr0"
+    - id: "prostt5_msl2048_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
       active: False
       mode: "train" # supported values: train, test
@@ -73,7 +73,7 @@ fine_tune_settings:
 
     - id: "prot_t5_base_mt_uniref50_msl2048_fnn_2l_d768_lr3e-4"
       name: "ProtT5" # IMP: note the difference between ProstT5 and ProtT5
-      active: True
+      active: False
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       pre_trained_model_link: "Rostlab/prot_t5_base_mt_uniref50" # "Rostlab/prot_t5_xl_uniref50"
