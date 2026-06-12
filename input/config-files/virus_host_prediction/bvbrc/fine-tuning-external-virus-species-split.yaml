@@ -27,8 +27,8 @@ sequence_settings:
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
 fine_tune_settings:
-  experiment: "virus_host_prediction_external_virus_genus_split"
-  n_iterations: 1
+  experiment: "virus_host_prediction_external_virus_species_split"
+  n_iterations: 5
   split_input: True
   split_input_col: "virus_species_tax_name"
   train_proportion: 0.8
@@ -59,7 +59,7 @@ fine_tune_settings:
   task_settings:
     - id: "prostt5_msl2048_fnn_2l_d1024_lr3e-4"
       name: "ProstT5"
-      active: False
+      active: True
       mode: "train" # supported values: train, test
       fine_tuned_model_path: ""
       pre_trained_model_link: "Rostlab/ProstT5"
@@ -115,4 +115,4 @@ output_settings:
   output_dir: "output"
   results_dir: "raw"
   sub_dir: "bvbrc_virus_genus_host_species_vertebrates_t0.01_c8/20260611/host_multi/virus_species_split/external"
-  prefix: "bvbrc_prott5" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
+  prefix: "bvbrc_prostt5" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
