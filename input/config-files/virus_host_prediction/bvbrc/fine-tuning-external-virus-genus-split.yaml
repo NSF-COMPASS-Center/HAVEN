@@ -22,7 +22,7 @@ sequence_settings:
     virus_col: "virus_genus_tax_name"
     sequence_col: "sequence"
     truncate: True
-    max_sequence_length: 2048
+    max_sequence_length: 7141
     split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
@@ -69,9 +69,9 @@ fine_tune_settings:
       n_classes: 8
       input_dim: 1024 # input embedding dimension
       hidden_dim: 1024
-      data_parallel: True
+      data_parallel: False
 
-    - id: "prot_t5_base_mt_uniref50_msl2048_fnn_2l_d768_lr3e-4"
+    - id: "prot_t5_base_mt_uniref50_msl7141_fnn_2l_d768_lr3e-4"
       name: "ProtT5" # IMP: note the difference between ProstT5 and ProtT5
       active: True
       mode: "train" # supported values: train, test
@@ -114,5 +114,5 @@ fine_tune_settings:
 output_settings:
   output_dir: "output"
   results_dir: "raw"
-  sub_dir: "bvbrc_virus_genus_host_species_vertebrates_t0.01_c8/20260611/host_multi/virus_genus_split/external"
+  sub_dir: "bvbrc_virus_genus_host_species_vertebrates_t0.01_c8/20260612a/host_multi/virus_genus_split/external"
   prefix: "bvbrc_prott5" # default: none; default file name = kmer_k<k>_lr_c<c>_<label>_<type>_tr<train_proportion>_n<n_iterations>_<output_prefix>_output.csv
