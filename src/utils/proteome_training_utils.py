@@ -27,6 +27,9 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion,
             outputs.append(output)
 
         output = torch.stack(outputs, dim=0).to(nn_utils.get_device())
+        del outputs # mark for deletion
+        del inputs # mark for deletion
+        torch.cuda.empty_cache()
 
         loss = criterion(output, labels.long())
         loss.backward()
