@@ -47,8 +47,8 @@ fine_tune_settings:
   save_model: True
 
   training_settings:
-    n_epochs_freeze: 0
-    n_epochs_unfreeze: 20
+    n_epochs_freeze: 20
+    n_epochs_unfreeze: 0
     max_lr: 1e-4
     weight_decay: 1e-2
     pct_start: 0.10
