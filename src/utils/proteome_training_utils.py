@@ -21,6 +21,8 @@ def run_epoch(model, train_dataset_loader, val_dataset_loader, criterion,
         optimizer.zero_grad()
         outputs = []
         for input in inputs:
+            if input.shape[0] > 32:
+                input = input[:32] # hack for memory overflow
             output = model(input)
             output = F.softmax(output, dim=1)
             output, _ = output.max(dim=0)
