@@ -61,12 +61,24 @@ def validate_model(model, dataset_loader, criterion, model_id, epoch):
 
         val_loss = []
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
-            input, label = record
+            _, inputs, labels = record
+            labels = torch.stack(labels, dim=0)
+            outputs = []
+            for input in inputs:
+                if input.shape[0] > 32:
+                    input = input[:32]  # hack for memory overflow
+                output = model(input)
+                output = F.softmax(output, dim=1)
+                output, _ = output.max(dim=0)
+                outputs.append(output)
 
-            output = model(input)  # b x n_classes
-            output = output.to(nn_utils.get_device())
+            output = torch.stack(outputs, dim=0).to(nn_utils.get_device())
+            del outputs  # mark for deletion
+            del inputs  # mark for deletion
+            torch.cuda.empty_cache()
 
-            loss = criterion(output, label.long())
+            loss = criterion(output, labels.long())
+
             curr_val_loss = loss.item()
             model.val_iter += 1
 
@@ -87,15 +99,27 @@ def test_model(model, dataset_loader):
 
         results = []
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
-            input, label = record
 
-            output = model(input)  # b x n_classes
-            output = output.to(nn_utils.get_device())
+            _, inputs, labels = record
+            labels = torch.stack(labels, dim=0)
+            outputs = []
+            for input in inputs:
+                if input.shape[0] > 32:
+                    input = input[:32]  # hack for memory overflow
+                output = model(input)
+                output = F.softmax(output, dim=1)
+                output, _ = output.max(dim=0)
+                outputs.append(output)
+
+            output = torch.stack(outputs, dim=0).to(nn_utils.get_device())
+            del outputs  # mark for deletion
+            del inputs  # mark for deletion
+            torch.cuda.empty_cache()
 
             # to get probabilities of the output
             output = F.softmax(output, dim=-1)
             result_df = pd.DataFrame(output.cpu().numpy())
-            result_df["y_true"] = label.cpu().numpy()
+            result_df["y_true"] = labels.cpu().numpy()
             results.append(result_df)
     return pd.concat(results, ignore_index=True)
 
@@ -106,15 +130,27 @@ def test_model_analysis(model, dataset_loader, id_col):
 
         results = []
         for _, record in enumerate(pbar := tqdm.tqdm(dataset_loader)):
-            id, input, label = record
+            ids, inputs, labels = record
+            labels = torch.stack(labels, dim=0)
+            outputs = []
+            for input in inputs:
+                if input.shape[0] > 32:
+                    input = input[:32]  # hack for memory overflow
+                output = model(input)
+                output = F.softmax(output, dim=1)
+                output, _ = output.max(dim=0)
+                outputs.append(output)
 
-            output = model(input)  # b x n_classes
-            output = output.to(nn_utils.get_device())
+            output = torch.stack(outputs, dim=0).to(nn_utils.get_device())
+            del outputs  # mark for deletion
+            del inputs  # mark for deletion
+            torch.cuda.empty_cache()
+
 
             # to get probabilities of the output
             output = F.softmax(output, dim=-1)
             result_df = pd.DataFrame(output.cpu().numpy())
-            result_df[id_col] = id
-            result_df["y_true"] = label.cpu().numpy()
+            result_df[id_col] = ids
+            result_df["y_true"] = labels.cpu().numpy()
             results.append(result_df)
     return pd.concat(results, ignore_index=True)
