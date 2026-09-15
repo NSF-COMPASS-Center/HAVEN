@@ -17,11 +17,11 @@ input_settings:
   split_seeds: [ 12612648, 31062180, 48918293, 55631155, 79221635 ] # [ 12612648, 31062180, 48918293, 55631155, 79221635 ]
 
 sequence_settings:
-    batch_size: 8
+    batch_size: 4
     id_col: "proteome_id"
     virus_col: "virus_genus_tax_name"
     sequence_col: "sequence"
-    truncate: False
+    truncate: True
     split_sequence: False
     feature_type: "token"  # supported values 'kmer', 'cgr', 'token'
 
