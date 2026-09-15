@@ -227,6 +227,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     else:
         nn_utils.set_model_grad(model.pre_trained_model, grad_value=True)
 
+    best_performing_model = early_stopper.get_current_best_model()
 
     # reset early stopper
     early_stopper.reset()
@@ -241,7 +242,8 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     # END: Model training with early stopping using validation
 
     # choose the model_params with the lowest validation loss from the early stopper
-    best_performing_model = early_stopper.get_current_best_model()
+    if n_epochs_unfreeze > 0 :
+        best_performing_model = early_stopper.get_current_best_model()
 
     # test the model_params
     result_df = proteome_training_utils.test_model_analysis(best_performing_model, test_dataset_loader, id_col=id_col)
