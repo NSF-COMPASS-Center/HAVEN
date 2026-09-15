@@ -1,0 +1,24 @@
+{
+  "version": "1.2",
+  "dbname": "Sus_scrofa.fasta",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "target-Sus_scrofa",
+  "number-of-letters": 716309,
+  "number-of-sequences": 1984,
+  "last-updated": "2026-09-15T17:13:00",
+  "number-of-volumes": 1,
+  "bytes-total": 967024,
+  "bytes-to-cache": 734278,
+  "files": [
+    "Sus_scrofa.fasta.pdb",
+    "Sus_scrofa.fasta.phr",
+    "Sus_scrofa.fasta.pin",
+    "Sus_scrofa.fasta.pog",
+    "Sus_scrofa.fasta.pos",
+    "Sus_scrofa.fasta.pot",
+    "Sus_scrofa.fasta.psq",
+    "Sus_scrofa.fasta.ptf",
+    "Sus_scrofa.fasta.pto"
+  ]
+}

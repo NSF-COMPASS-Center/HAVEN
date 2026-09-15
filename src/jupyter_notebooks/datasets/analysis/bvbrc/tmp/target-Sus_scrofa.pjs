@@ -1,0 +1,24 @@
+{
+  "version": "1.2",
+  "dbname": "target-Sus_scrofa",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "/home/blessyantony/dev/git/HAVEN/src/jupyter_notebooks/datasets/analysis/bvbrc/tmp/Sus_scrofa.fasta",
+  "number-of-letters": 716309,
+  "number-of-sequences": 1984,
+  "last-updated": "2026-09-15T16:47:00",
+  "number-of-volumes": 1,
+  "bytes-total": 967104,
+  "bytes-to-cache": 734358,
+  "files": [
+    "target-Sus_scrofa.pdb",
+    "target-Sus_scrofa.phr",
+    "target-Sus_scrofa.pin",
+    "target-Sus_scrofa.pog",
+    "target-Sus_scrofa.pos",
+    "target-Sus_scrofa.pot",
+    "target-Sus_scrofa.psq",
+    "target-Sus_scrofa.ptf",
+    "target-Sus_scrofa.pto"
+  ]
+}
