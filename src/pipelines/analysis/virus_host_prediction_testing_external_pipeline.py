@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import torch
 
-from utils import utils, dataset_utils, nn_utils, mapper, training_utils
+from utils import utils, dataset_utils, nn_utils, mapper, proteins_training_utils
 
 
 def execute(config):

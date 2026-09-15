@@ -3,9 +3,10 @@ from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
 import torch
 import wandb
-
-from utils import utils, dataset_utils, nn_utils, mapper, training_utils
+import torch.nn as nn
+from utils import utils, dataset_utils, nn_utils, constants, mapper, proteome_training_utils
 from training_accessories.early_stopping import EarlyStopping
+from models.baseline.nlp.transformer.transformer import TransformerEncoder
 
 
 def execute(config):
@@ -24,12 +25,17 @@ def execute(config):
     output_prefix = output_prefix if output_prefix is not None else ""
 
     sequence_settings = config["sequence_settings"]
+    pre_train_settings = config["pre_train_settings"]
 
     fine_tune_settings = config["fine_tune_settings"]
     label_settings = fine_tune_settings["label_settings"]
     training_settings = fine_tune_settings["training_settings"]
 
+    pre_train_encoder_settings = pre_train_settings["encoder_settings"]
+    pre_train_encoder_settings["vocab_size"] = constants.VOCAB_SIZE
     n_iters = fine_tune_settings["n_iterations"]
+
+    sequence_settings["max_sequence_length"] = pre_train_encoder_settings["max_seq_len"]
 
     tasks = fine_tune_settings["task_settings"]
     id_col = sequence_settings["id_col"]
@@ -39,7 +45,8 @@ def execute(config):
     results = {}
 
     wandb_config = {
-        "n_epochs": training_settings["n_epochs"],
+        "n_epochs_freeze": training_settings["n_epochs_freeze"],
+        "n_epochs_unfreeze": training_settings["n_epochs_unfreeze"],
         "lr": training_settings["max_lr"],
         "weight_decay": training_settings["weight_decay"],
         "max_sequence_length": sequence_settings["max_sequence_length"],
@@ -84,9 +91,12 @@ def execute(config):
                 # split testing set into validation and testing datasets in equal proportion
                 # so 80:20 will now be 80:10:10
                 val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
+            train_dataset_loader = dataset_utils.get_proteome_dataset_loader(train_df, sequence_settings, label_col)
+            val_dataset_loader = dataset_utils.get_proteome_dataset_loader(val_df, sequence_settings, label_col)
+            test_dataset_loader = dataset_utils.get_proteome_dataset_loader(test_df, sequence_settings, label_col)
         else:
             # used in zero shot evaluation, where split_input=False in fine_tune_settings and mode=test in task
-            test_df = df
+            test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col, include_id_col=True)
 
         fine_tune_model = None
         for task in tasks:
@@ -98,11 +108,23 @@ def execute(config):
                 print(f"Skipping {task_name} ...")
                 continue
 
-            # Load the dataset based on the external model
-            if fine_tune_settings["split_input"]:
-                train_dataset_loader = dataset_utils.get_external_dataset_loader(train_df, sequence_settings, label_col, task_name)
-                val_dataset_loader = dataset_utils.get_external_dataset_loader(val_df, sequence_settings, label_col, task_name)
-            test_dataset_loader = dataset_utils.get_external_dataset_loader(test_df, sequence_settings, label_col, task_name, include_id_col=True)
+            # load pre-trained encoder model_params
+            pre_trained_encoder_model = TransformerEncoder.get_transformer_encoder(pre_train_encoder_settings, task["cls_token"])
+            pre_trained_model_path = pre_train_settings["model_path"]
+            if pre_trained_model_path:
+                pre_trained_encoder_model.load_state_dict(
+                    torch.load(pre_trained_model_path, map_location=nn_utils.get_device()))
+
+            # HACK to load models from checkpoints. CAUTION: Use only under dire circumstances
+            # pre_trained_encoder_model = nn_utils.load_model_from_checkpoint(pre_trained_encoder_model,
+            #                                                                pre_train_settings["model_path"])
+
+            # set the pre_trained model_params within the task config
+            task["pre_trained_model"] = pre_trained_encoder_model
+
+            # add maximum sequence length of pretrained model_params as the segment size from the sequence_settings
+            # in pre_train_encoder_settings it has been incremented by 1 to account for CLS token
+            task["segment_len"] = sequence_settings["max_sequence_length"]
 
             if task_name in mapper.model_map:
                 print(f"Executing {task_name} in {mode} mode.")
@@ -133,7 +155,7 @@ def execute(config):
                 # used for zero-shot evaluation
                 # load the pre-trained and fine_tuned model_params
                 fine_tune_model.load_state_dict(torch.load(task["fine_tuned_model_path"]))
-                result_df = training_utils.test_model_analysis(fine_tune_model, test_dataset_loader, id_col=id_col)
+                result_df = proteome_training_utils.test_model_analysis(fine_tune_model, test_dataset_loader, id_col=id_col)
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values: 'train', 'test'.")
                 exit(1)
@@ -158,12 +180,17 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     class_weights = utils.get_class_weights(train_dataset_loader).to(nn_utils.get_device())
     criterion = nn_utils.get_criterion(loss, class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=float(training_settings["max_lr"]), weight_decay=float(training_settings["weight_decay"]))
-    n_epochs = training_settings["n_epochs"]
+    # optimizer = torch.optim.AdamW(model.parameters(), lr=float(training_settings["max_lr"]),
+    #                              weight_decay=float(training_settings["weight_decay"]))
+    # optimizer = torch.optim.SGD(model.parameters(), lr=float(training_settings["max_lr"]),
+    #                               weight_decay=float(training_settings["weight_decay"]))
 
+    n_epochs_freeze = training_settings["n_epochs_freeze"]
+    n_epochs_unfreeze = training_settings["n_epochs_unfreeze"]
     lr_scheduler = OneCycleLR(
         optimizer=optimizer,
         max_lr=float(training_settings["max_lr"]),
-        epochs=n_epochs,
+        epochs=n_epochs_freeze + n_epochs_unfreeze,
         steps_per_epoch=len(train_dataset_loader),
         pct_start=training_settings["pct_start"],
         anneal_strategy='cos',
@@ -174,24 +201,49 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     model.val_iter = 0
 
     # START: Model training with early stopping using validation
-    # freeze the pretrained model_params
-    #nn_utils.set_model_grad(model.pre_trained_model, grad_value=False)
+    # freeze the pretrained model_params for the first n_epochs_freeze
+    # nn_utils.set_model_grad(model.module.pre_trained_model, grad_value=False)
+    if isinstance(model, torch.nn.DataParallel):
+        nn_utils.set_model_grad(model.module.pre_trained_model, grad_value=False)
+    else:
+        nn_utils.set_model_grad(model.pre_trained_model, grad_value=False)
 
-    # train for n_epochs
-    for e in range(n_epochs):
-        model = training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+
+    # train for n_epochs_freeze
+    for e in range(n_epochs_freeze):
+        model = proteome_training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
                                          lr_scheduler, early_stopper, task_id, e)
+
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
             print("Breaking off frozen training loop due to early stop")
             break
 
+    # unfreeze the pretrained model_params for the next n_epochs_unfreeze
+    # nn_utils.set_model_grad(model.module.pre_trained_model, grad_value=True)
+
+    if isinstance(model, torch.nn.DataParallel):
+        nn_utils.set_model_grad(model.module.pre_trained_model, grad_value=True)
+    else:
+        nn_utils.set_model_grad(model.pre_trained_model, grad_value=True)
+
+
+    # reset early stopper
+    early_stopper.reset()
+
+    for e in range(n_epochs_unfreeze):
+        model = proteome_training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+                                         lr_scheduler, early_stopper, task_id, e)
+        # check if early stopping condition was satisfied and stop accordingly
+        if early_stopper.early_stop:
+            print("Breaking off unfrozen training loop due to early stop")
+            break
     # END: Model training with early stopping using validation
 
     # choose the model_params with the lowest validation loss from the early stopper
     best_performing_model = early_stopper.get_current_best_model()
 
     # test the model_params
-    result_df = training_utils.test_model_analysis(best_performing_model, test_dataset_loader, id_col=id_col)
+    result_df = proteome_training_utils.test_model_analysis(best_performing_model, test_dataset_loader, id_col=id_col)
 
     return result_df, best_performing_model

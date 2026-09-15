@@ -12,6 +12,7 @@ import numpy as np
 from utils import utils, kmer_utils, constants, mapper
 from datasets.collations.padding import Padding, PaddingUnlabeled
 from datasets.collations.padding_with_id import PaddingWithID
+from datasets.collations.proteome_collation import ProteomeCollation
 from datasets.protein_sequence_dataset import ProteinSequenceDataset
 from datasets.protein_sequence_with_label_dataset import ProteinSequenceWithLabelDataset
 from datasets.protein_sequence_unlabeled_dataset import ProteinSequenceUnlabeledDataset
@@ -21,6 +22,7 @@ from datasets.protein_sequence_cgr_dataset import ProteinSequenceCGRDataset
 from datasets.protein_sequence_custom_dataset import ProteinSequenceProstT5Dataset
 from datasets.collations.fsl_episode import FewShotLearningEpisode
 from datasets.collations.fsl_external_episode import FewShotLearningExternalEpisode
+from datasets.samplers.proteome_sampler import ProteomeSampler
 from datasets.samplers.fsl_fixed_task_sampler import FewShotLearningFixedTaskSampler
 from datasets.samplers.fsl_varying_task_sampler import FewShotLearningVaryingTaskSampler
 from datasets.samplers.fsl_test_task_sampler import FewShotLearningTestTaskSampler
@@ -167,6 +169,18 @@ def get_dataset_loader(df, sequence_settings, label_col=None, include_id_col=Fal
     else:
         print(f"ERROR: Unsupported feature type: {feature_type}")
 
+def get_proteome_dataset_loader(df, sequence_settings, label_col):
+    id_col = sequence_settings["id_col"]
+    seq_col = sequence_settings["sequence_col"]
+    batch_size = sequence_settings["batch_size"]
+    max_seq_len = sequence_settings["max_sequence_length"]
+    truncate = sequence_settings["truncate"]
+
+    dataset = ProteinSequenceDatasetWithID(df, id_col, seq_col, max_seq_len, truncate, label_col)
+
+    return DataLoader(dataset=dataset,
+                      batch_sampler=ProteomeSampler(dataset, batch_size, id_col),
+                      collate_fn=ProteomeCollation(max_seq_length=max_seq_len))
 
 def get_token_dataset_loader(df, sequence_settings, label_col, exclude_label):
     seq_col = sequence_settings["sequence_col"]

@@ -4,7 +4,7 @@ from torch.optim.lr_scheduler import OneCycleLR
 import torch
 import wandb
 
-from utils import utils, dataset_utils, nn_utils, constants, mapper, training_utils
+from utils import utils, dataset_utils, nn_utils, constants, mapper, proteins_training_utils
 from training_accessories.early_stopping import EarlyStopping
 
 

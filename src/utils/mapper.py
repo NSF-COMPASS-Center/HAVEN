@@ -19,7 +19,9 @@ from datasets.protein_sequence_custom_dataset import ProteinSequenceESM2Dataset
 
 from datasets.collations.custom_collate_function import ESM2CollateFunction
 
-from pipelines.virus_host_prediction_training import fine_tuning_pipeline, fine_tuning_external_pipeline, baseline_deep_learning_pipeline, baseline_machine_learning_pipeline, baseline_homology_pipeline
+from pipelines.virus_host_prediction_training.viral_protein import fine_tuning_pipeline as protein_fine_tuning_pipeline, fine_tuning_external_pipeline as protein_fine_tuning_external_pipeline, baseline_deep_learning_pipeline as protein_baseline_deep_learning_pipeline, baseline_machine_learning_pipeline as protein_baseline_machine_learning_pipeline, baseline_homology_pipeline as protein_baseline_homology_pipeline
+from pipelines.virus_host_prediction_training.viral_proteome import fine_tuning_pipeline as proteome_fine_tuning_pipeline, fine_tuning_external_pipeline as proteome_fine_tuning_external_pipeline
+
 from pipelines.transfer_learning import masked_language_modeling_pipleine
 from pipelines.analysis import perturbation_analysis_pipeline, perturbation_analysis_external_pipeline, embedding_generation_pipeline, virus_host_prediction_testing_pipeline, virus_host_prediction_testing_external_pipeline
 from pipelines.few_shot_learning import few_shot_learning_host_prediction_pipeline, few_shot_learning_host_prediction_external_pipeline
@@ -27,12 +29,14 @@ from pipelines.evaluation import evaluation_pipeline
 
 pipeline_mapper = {
     "masked_language_modeling": masked_language_modeling_pipleine,
-    "virus_host_prediction": fine_tuning_pipeline,
-    "virus_host_prediction_external": fine_tuning_external_pipeline,
-    "virus_host_prediction_baseline_deep_learning": baseline_deep_learning_pipeline,
-    "virus_host_prediction_baseline_machine_learning": baseline_machine_learning_pipeline,
-    "virus_host_prediction_baseline_homology": baseline_homology_pipeline,
-    "virus_host_prediction_test": virus_host_prediction_testing_pipeline,
+    "virus_protein_host_prediction": protein_fine_tuning_pipeline,
+    "virus_protein_host_prediction_external": protein_fine_tuning_external_pipeline,
+    "virus_protein_host_prediction_baseline_deep_learning": protein_baseline_deep_learning_pipeline,
+    "virus_protein_host_prediction_baseline_machine_learning": protein_baseline_machine_learning_pipeline,
+    "virus_protein_host_prediction_baseline_homology": protein_baseline_homology_pipeline,
+    "virus_proteome_host_prediction": proteome_fine_tuning_pipeline,
+    "virus_proteome_host_prediction_external": proteome_fine_tuning_external_pipeline,
+    "virus_protein_host_prediction_test": virus_host_prediction_testing_pipeline,
     "virus_host_prediction_test_external": virus_host_prediction_testing_external_pipeline,
     "few_shot_learning": few_shot_learning_host_prediction_pipeline,
     "few_shot_learning_external": few_shot_learning_host_prediction_external_pipeline,
