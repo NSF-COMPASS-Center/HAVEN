@@ -155,7 +155,7 @@ def execute(config):
                 # used for zero-shot evaluation
                 # load the pre-trained and fine_tuned model_params
                 fine_tune_model.load_state_dict(torch.load(task["fine_tuned_model_path"]))
-                result_df = training_utils.test_model_analysis(fine_tune_model, test_dataset_loader, id_col=id_col)
+                result_df = proteins_training_utils.test_model_analysis(fine_tune_model, test_dataset_loader, id_col=id_col)
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values: 'train', 'test'.")
                 exit(1)
@@ -211,7 +211,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
 
     # train for n_epochs_freeze
     for e in range(n_epochs_freeze):
-        model = training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+        model = proteins_training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
                                          lr_scheduler, early_stopper, task_id, e)
 
         # check if early stopping condition was satisfied and stop accordingly
@@ -232,7 +232,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     early_stopper.reset()
 
     for e in range(n_epochs_unfreeze):
-        model = training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+        model = proteins_training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
                                          lr_scheduler, early_stopper, task_id, e)
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
@@ -244,6 +244,6 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     best_performing_model = early_stopper.get_current_best_model()
 
     # test the model_params
-    result_df = training_utils.test_model_analysis(best_performing_model, test_dataset_loader, id_col=id_col)
+    result_df = proteins_training_utils.test_model_analysis(best_performing_model, test_dataset_loader, id_col=id_col)
 
     return result_df, best_performing_model

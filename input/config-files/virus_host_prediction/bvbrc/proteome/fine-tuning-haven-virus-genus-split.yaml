@@ -38,10 +38,10 @@ pre_train_settings:
     max_seq_len: 256
 
 fine_tune_settings:
-  experiment: "virus_host_prediction_proteome_random_split"
+  experiment: "virus_host_prediction_proteome_virus_genus_split"
   n_iterations: 3
   split_input: True
-  split_input_col: "proteome_id"
+  split_input_col: "virus_genus_tax_name"
   train_proportion: 0.8
   classification_type: "multi"
   save_model: True
