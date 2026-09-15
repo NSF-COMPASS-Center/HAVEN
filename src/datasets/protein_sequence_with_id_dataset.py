@@ -13,7 +13,7 @@ class ProteinSequenceDatasetWithID(ProteinSequenceDataset):
     def __getitem__(self, idx: int):
         # loc selects based on index in df
         # iloc selects based on integer location (0, 1, 2, ...)
-        record = self.data.iloc[idx, :]
+        record = self.data.loc[idx, :]
         sequence = record[self.sequence_col]
         label = record[self.label_col]
 
