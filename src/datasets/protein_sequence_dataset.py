@@ -13,7 +13,7 @@ class ProteinSequenceDataset(Dataset):
         self.label_col = label_col
         self.amino_acid_map = constants.AMINO_ACID_VOCABULARY
         self.data = df
-        self.max_seq_len = max_seq_len
+        self.max_seq_len = 2048
         if truncate:
             self.data = self.truncate_dataset(df)
 

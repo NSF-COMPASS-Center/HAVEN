@@ -4,10 +4,11 @@
 #SBATCH --account=seqevol
 #SBATCH --partition=h200_normal_q
 
-#SBATCH --mem=200G
+#SBATCH --mem=300G
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
-#SBATCH -t 72:00:00 # wall-time required (# 144hrs = 6 days)
+#SBATCH --qos=tc_h200_normal_short
+#SBATCH -t 02:00:00 # wall-time required (# 144hrs = 6 days)
 
 
 # Load modules

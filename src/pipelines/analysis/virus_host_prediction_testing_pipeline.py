@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import torch
 
-from utils import utils, dataset_utils, nn_utils, constants, mapper, training_utils
+from utils import utils, dataset_utils, nn_utils, constants, mapper, proteins_training_utils
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
 
 

@@ -3,8 +3,8 @@ from pathlib import Path
 from torch.optim.lr_scheduler import OneCycleLR
 import torch
 import wandb
-
-from utils import utils, dataset_utils, nn_utils, constants, mapper, training_utils
+import torch.nn as nn
+from utils import utils, dataset_utils, nn_utils, constants, mapper, proteome_training_utils
 from training_accessories.early_stopping import EarlyStopping
 from models.baseline.nlp.transformer.transformer import TransformerEncoder
 
@@ -80,16 +80,20 @@ def execute(config):
                                                                                 fine_tune_settings["train_proportion"],
                                                                                 split_input_col=fine_tune_settings["split_input_col"],
                                                                                 label_col=label_col)
+                val_df, test_df = dataset_utils.split_dataset_based_on_column(test_df, input_split_seeds[iter],
+                                                                              0.5,
+                                                                              split_input_col=fine_tune_settings["split_input_col"],
+                                                                              label_col=label_col)
             else:
                 # full df into training and testing datasets in the ratio configured in the config file
                 train_df, test_df = dataset_utils.split_dataset_stratified(df, input_settings["split_seeds"][iter],
                                                                            fine_tune_settings["train_proportion"], stratify_col=label_col)
-            # split testing set into validation and testing datasets in equal proportion
-            # so 80:20 will now be 80:10:10
-            val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
-            train_dataset_loader = dataset_utils.get_dataset_loader(train_df, sequence_settings, label_col, include_id_col=False)
-            val_dataset_loader = dataset_utils.get_dataset_loader(val_df, sequence_settings, label_col, include_id_col=False)
-            test_dataset_loader = dataset_utils.get_dataset_loader(test_df, sequence_settings, label_col, include_id_col=True)
+                # split testing set into validation and testing datasets in equal proportion
+                # so 80:20 will now be 80:10:10
+                val_df, test_df = dataset_utils.split_dataset_stratified(test_df, input_split_seeds[iter], 0.5, stratify_col=label_col)
+            train_dataset_loader = dataset_utils.get_proteome_dataset_loader(train_df, sequence_settings, label_col)
+            val_dataset_loader = dataset_utils.get_proteome_dataset_loader(val_df, sequence_settings, label_col)
+            test_dataset_loader = dataset_utils.get_proteome_dataset_loader(test_df, sequence_settings, label_col)
         else:
             # used in zero shot evaluation, where split_input=False in fine_tune_settings and mode=test in task
             test_dataset_loader = dataset_utils.get_dataset_loader(df, sequence_settings, label_col, include_id_col=True)
@@ -151,7 +155,7 @@ def execute(config):
                 # used for zero-shot evaluation
                 # load the pre-trained and fine_tuned model_params
                 fine_tune_model.load_state_dict(torch.load(task["fine_tuned_model_path"]))
-                result_df = training_utils.test_model_analysis(fine_tune_model, test_dataset_loader, id_col=id_col)
+                result_df = proteome_training_utils.test_model_analysis(fine_tune_model, test_dataset_loader, id_col=id_col)
             else:
                 print(f"ERROR: Unsupported mode '{mode}'. Supported values: 'train', 'test'.")
                 exit(1)
@@ -192,7 +196,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
         anneal_strategy='cos',
         div_factor=training_settings["div_factor"],
         final_div_factor=training_settings["final_div_factor"])
-    early_stopper = EarlyStopping(patience=10, min_delta=0)
+    early_stopper = EarlyStopping(patience=3, min_delta=0)
     model.train_iter = 0
     model.val_iter = 0
 
@@ -207,7 +211,7 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
 
     # train for n_epochs_freeze
     for e in range(n_epochs_freeze):
-        model = training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+        model = proteome_training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
                                          lr_scheduler, early_stopper, task_id, e)
 
         # check if early stopping condition was satisfied and stop accordingly
@@ -223,12 +227,13 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     else:
         nn_utils.set_model_grad(model.pre_trained_model, grad_value=True)
 
+    best_performing_model = early_stopper.get_current_best_model()
 
     # reset early stopper
     early_stopper.reset()
 
     for e in range(n_epochs_unfreeze):
-        model = training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
+        model = proteome_training_utils.run_epoch(model, train_dataset_loader, val_dataset_loader, criterion, optimizer,
                                          lr_scheduler, early_stopper, task_id, e)
         # check if early stopping condition was satisfied and stop accordingly
         if early_stopper.early_stop:
@@ -237,9 +242,10 @@ def run_task(model, train_dataset_loader, val_dataset_loader, test_dataset_loade
     # END: Model training with early stopping using validation
 
     # choose the model_params with the lowest validation loss from the early stopper
-    best_performing_model = early_stopper.get_current_best_model()
+    if n_epochs_unfreeze > 0 :
+        best_performing_model = early_stopper.get_current_best_model()
 
     # test the model_params
-    result_df = training_utils.test_model_analysis(best_performing_model, test_dataset_loader, id_col=id_col)
+    result_df = proteome_training_utils.test_model_analysis(best_performing_model, test_dataset_loader, id_col=id_col)
 
     return result_df, best_performing_model
