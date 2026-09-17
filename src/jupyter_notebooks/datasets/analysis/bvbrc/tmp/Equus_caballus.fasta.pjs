@@ -1,0 +1,24 @@
+{
+  "version": "1.2",
+  "dbname": "Equus_caballus.fasta",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "target-Equus_caballus",
+  "number-of-letters": 1041,
+  "number-of-sequences": 5,
+  "last-updated": "2026-09-15T19:28:00",
+  "number-of-volumes": 1,
+  "bytes-total": 50781,
+  "bytes-to-cache": 1207,
+  "files": [
+    "Equus_caballus.fasta.pdb",
+    "Equus_caballus.fasta.phr",
+    "Equus_caballus.fasta.pin",
+    "Equus_caballus.fasta.pog",
+    "Equus_caballus.fasta.pos",
+    "Equus_caballus.fasta.pot",
+    "Equus_caballus.fasta.psq",
+    "Equus_caballus.fasta.ptf",
+    "Equus_caballus.fasta.pto"
+  ]
+}

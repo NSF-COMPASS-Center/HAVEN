@@ -1,0 +1,24 @@
+{
+  "version": "1.2",
+  "dbname": "Boa_constrictor.fasta",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "target-Boa_constrictor",
+  "number-of-letters": 23262,
+  "number-of-sequences": 32,
+  "last-updated": "2026-09-15T19:28:00",
+  "number-of-volumes": 1,
+  "bytes-total": 75243,
+  "bytes-to-cache": 23671,
+  "files": [
+    "Boa_constrictor.fasta.pdb",
+    "Boa_constrictor.fasta.phr",
+    "Boa_constrictor.fasta.pin",
+    "Boa_constrictor.fasta.pog",
+    "Boa_constrictor.fasta.pos",
+    "Boa_constrictor.fasta.pot",
+    "Boa_constrictor.fasta.psq",
+    "Boa_constrictor.fasta.ptf",
+    "Boa_constrictor.fasta.pto"
+  ]
+}
